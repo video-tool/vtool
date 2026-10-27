@@ -952,8 +952,8 @@ body::before{background:transparent!important}
 .pill{background:rgba(8,10,14,.5)!important;-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.1)!important;border-radius:10px!important;font-variant-numeric:tabular-nums}
 
 /* Ansicht wechseln: weich einblenden */
-.card.player:not([hidden]){animation:viewIn .55s var(--ease-out) both}
-@keyframes viewIn{from{opacity:0;transform:translateY(10px) scale(.985);filter:blur(4px)}to{opacity:1;transform:none;filter:none}}
+.card.player.view-in{animation:viewIn .42s cubic-bezier(.22,1,.36,1) both}
+@keyframes viewIn{from{opacity:0;transform:translateY(8px) scale(.99)}to{opacity:1;transform:none}}
 .libcard{animation:sideIn .6s var(--ease-out) both}
 @keyframes sideIn{from{opacity:0;transform:translateX(-14px)}to{opacity:1;transform:none}}
 header .head-in{animation:hdrIn .6s var(--ease-out) both}
@@ -1454,6 +1454,36 @@ body.touring .toast{top:calc(12px + env(safe-area-inset-top,0px))!important;bott
 .ov-hint{font-size:12.5px!important;color:rgba(255,255,255,.75)!important;margin-top:4px!important}
 .player .g-state{font-size:13.5px!important;line-height:1.45;color:#e6ebf1!important;padding:8px 12px;border-radius:10px;background:linear-gradient(90deg,rgba(255,90,74,.12),rgba(255,90,74,.03));box-shadow:inset 3px 0 0 #ff5a4a}
 @media (max-width:860px){ .ov-txt{font-size:13.5px!important;padding:8px 11px} }
+
+/* Seitenwechsel */
+.card.player:not([hidden]){view-transition-name:mainview}
+html.vt-mode::view-transition-old(root),html.vt-mode::view-transition-new(root){animation:none}
+::view-transition-group(mainview){animation-duration:.45s;animation-timing-function:cubic-bezier(.22,1,.36,1)}
+html.vt-fwd::view-transition-old(mainview){animation:vtOutL .2s cubic-bezier(.4,0,1,1) both}
+html.vt-fwd::view-transition-new(mainview){animation:vtInR .45s cubic-bezier(.22,1,.36,1) .05s both}
+html.vt-back::view-transition-old(mainview){animation:vtOutR .2s cubic-bezier(.4,0,1,1) both}
+html.vt-back::view-transition-new(mainview){animation:vtInL .45s cubic-bezier(.22,1,.36,1) .05s both}
+@keyframes vtOutL{to{opacity:0;transform:translateX(-32px) scale(.985)}}
+@keyframes vtOutR{to{opacity:0;transform:translateX(32px) scale(.985)}}
+@keyframes vtInR{from{opacity:0;transform:translateX(40px) scale(.985)}}
+@keyframes vtInL{from{opacity:0;transform:translateX(-40px) scale(.985)}}
+/* Tabs: kein harter Fokusrahmen */
+.tabs .tab:focus-visible{outline:none!important;box-shadow:0 0 0 2px rgba(218,41,28,.28)!important}
+.tabs .tab:focus:not(:focus-visible){outline:none!important}
+
+/* Dateien: Listenansicht */
+.side-hrow{display:flex;align-items:flex-start;gap:10px}
+.side-hrow .side-hint{flex:1;min-width:0}
+.side-hrow .lib-view{margin-top:2px}
+#sideTree.names .ft-th{display:none}
+#sideTree.names .ft-row.file{min-height:30px;padding-top:2px;padding-bottom:2px}
+#sideTree.names .ft-tx{flex-direction:row;align-items:baseline;gap:8px;overflow:hidden}
+#sideTree.names .ft-nm{flex:0 1 auto;font-size:13px}
+#sideTree.names .ft-sub{flex:0 0 auto;font-size:10.5px}
+#sideTree.names .ft-row.file::before{content:"";flex:none;width:6px;height:6px;border-radius:50%;background:var(--line2);margin:0 2px 0 4px}
+#sideTree.names .ft-row.file.on::before{background:var(--red)}
+/* Segment-Schalter: kein harter Fokusrahmen */
+.seg button:focus-visible,.lib-view button:focus-visible{outline:none!important;box-shadow:0 0 0 2px rgba(218,41,28,.28)!important}
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
   .aurora{display:none}
@@ -1489,7 +1519,7 @@ body.touring .toast{top:calc(12px + env(safe-area-inset-top,0px))!important;bott
   <section class="card libcard">
     <div class="seg side-tabs" id="sideTabs"><button data-st="tree" class="on" title="Deine Ordner auf dem Gerät – umbenennen und verschieben ändert die echten Dateien"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7.5A2.5 2.5 0 0 1 5.5 5h3.4l2 2h7.6A2.5 2.5 0 0 1 21 9.5v8a2.5 2.5 0 0 1-2.5 2.5h-13A2.5 2.5 0 0 1 3 17.5z"/></svg>Dateien</button><button data-st="open" title="Videos, die gerade in der App geladen sind"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="13" height="12" rx="2"/><path d="M16 10.5l5-3v9l-5-3"/></svg>In Arbeit <span class="count" id="libCount">0</span></button></div>
     <div id="sideTree" class="side-pane">
-      <p class="side-hint">Deine Ordner auf dem Gerät. Klick öffnet ein Video · Umbenennen und Verschieben ändern die echten Dateien.</p>
+      <div class="side-hrow"><p class="side-hint">Deine Ordner auf dem Gerät. Klick öffnet ein Video · Umbenennen und Verschieben ändern die echten Dateien.</p><div class="lib-view" id="ftView" role="group" aria-label="Ansicht"><button data-fv="thumbs" title="Mit Vorschaubild"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="7" height="5" rx="1.2"/><rect x="3" y="14" width="7" height="5" rx="1.2"/><path d="M13 7h8M13 16h8"/></svg></button><button data-fv="names" title="Nur Dateinamen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button></div></div>
       <div class="ft-tools" id="ftTools" hidden>
         <div class="lib-search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><input id="ftQ" type="search" placeholder="Suchen in Ordnern …" autocomplete="off"></div>
         <button class="ft-addmini" id="ftAdd" title="Weiteren Ordner verbinden"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"><path d="M12 6v12M6 12h12"/></svg></button>
@@ -1848,10 +1878,13 @@ function addFiles(files){
 // Lange Dateinamen: beim Darüberfahren seitlich durchlaufen lassen
 (()=>{ const glide=(el,to)=>{ cancelAnimationFrame(el._ga); const from=el.scrollLeft, d=to-from, t0=performance.now(), T=Math.min(2600,Math.max(500,Math.abs(d)*9));
     const st=now=>{ const f=Math.min(1,(now-t0)/T), e=f<.5?2*f*f:1-Math.pow(-2*f+2,2)/2; el.scrollLeft=from+d*e; if(f<1) el._ga=requestAnimationFrame(st); }; el._ga=requestAnimationFrame(st); };
-  document.addEventListener('pointerover',e=>{ const r=e.target.closest('.lib.names .clip.row'); if(!r||r._gl) return; r._gl=1; const n=$('.nm',r); if(n&&n.scrollWidth>n.clientWidth+2) glide(n,n.scrollWidth-n.clientWidth); });
-  document.addEventListener('pointerout',e=>{ const r=e.target.closest('.lib.names .clip.row'); if(!r||r.contains(e.relatedTarget)) return; r._gl=0; const n=$('.nm',r); if(n) glide(n,0); });
+  document.addEventListener('pointerover',e=>{ const r=e.target.closest('.lib.names .clip.row, #sideTree.names .ft-row.file'); if(!r||r._gl) return; r._gl=1; const n=$('.nm, .ft-nm',r); if(n&&n.scrollWidth>n.clientWidth+2) glide(n,n.scrollWidth-n.clientWidth); });
+  document.addEventListener('pointerout',e=>{ const r=e.target.closest('.lib.names .clip.row, #sideTree.names .ft-row.file'); if(!r||r.contains(e.relatedTarget)) return; r._gl=0; const n=$('.nm, .ft-nm',r); if(n) glide(n,0); });
 })();
 document.addEventListener('click',e=>{ const b=e.target.closest('#libView [data-lv]'); if(!b) return; LS.set('libview',b.dataset.lv); renderLib(); });
+function ftViewUI(){ const n=LS.get('ftview','thumbs')==='names'; $('#sideTree').classList.toggle('names',n); $$('#ftView button').forEach(b=>b.classList.toggle('on',b.dataset.fv===(n?'names':'thumbs'))); }
+document.addEventListener('click',e=>{ const b=e.target.closest('#ftView [data-fv]'); if(!b) return; LS.set('ftview',b.dataset.fv); ftViewUI(); });
+ftViewUI();
 function renderLib(){
   const el=$('#lib'); el.innerHTML=''; $('#libCount').textContent=clips.length; if(typeof renderDemoList==='function') setTimeout(renderDemoList,0);
   el.classList.add('list'); const NAMES=LS.get('libview','thumbs')==='names'; el.classList.toggle('names',NAMES); $$('#libView button').forEach(b=>b.classList.toggle('on',b.dataset.lv===(NAMES?'names':'thumbs')));
@@ -2514,7 +2547,15 @@ function setMode(m){
   decks.forEach(d=>{ d.dirty=true; d.annDirty=true; }); LS.set('mode',m);
   try{ history.replaceState(null,'',m==='cmp'?'#vergleich':m==='gps'?'#gps':'#einzel'); }catch(e){}
 }
-$$('.tab').forEach(t=>t.addEventListener('click',()=>setMode(t.dataset.mode)));
+// Seitenwechsel: weicher Übergang in Richtung des Tabs (View Transitions, sonst Einblenden)
+const MODES=['single','cmp','gps'];
+function switchMode(m){ if(m===mode) return;
+  const fwd=MODES.indexOf(m)>MODES.indexOf(mode), html=document.documentElement, calm=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if(document.startViewTransition&&!calm){ html.classList.add('vt-mode',fwd?'vt-fwd':'vt-back');
+    const t=document.startViewTransition(()=>setMode(m)); t.finished.finally(()=>html.classList.remove('vt-mode','vt-fwd','vt-back')); return; }
+  setMode(m); if(calm) return; const v=$(m==='cmp'?'#viewCmp':m==='gps'?'#viewGps':'#viewSingle'); v.classList.remove('view-in'); void v.offsetWidth; v.classList.add('view-in');
+  v.addEventListener('animationend',()=>v.classList.remove('view-in'),{once:true}); }
+$$('.tab').forEach(t=>t.addEventListener('click',()=>{ switchMode(t.dataset.mode); }));
 
 /* Dateien */
 $('#fileIn').addEventListener('change',e=>{ const fs=e.target.files; if(fs&&fs.length){
@@ -4070,7 +4111,7 @@ if(!LS.get('hint1',0)){ setTimeout(()=>{ toast(matchMedia('(pointer:coarse)').ma
 
 /* Update-Hinweis: prüft version.json auf GitHub Pages; «Aktualisieren» lädt die Seite ohne Cache neu */
 (()=>{
-  const BUILD='20261027162102'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
+  const BUILD='20261027163435'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
   // nach einem Update die ?v=… aus der Adresse entfernen
   try{ const u=new URL(location.href); if(u.searchParams.has('v')){ u.searchParams.delete('v'); history.replaceState(null,'',u.pathname+(u.search||'')+u.hash); } }catch(e){}
   const el=$('#upd'); let latest=null, snoozed=null, busy=false;
