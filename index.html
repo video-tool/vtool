@@ -2111,7 +2111,7 @@ class Deck{
   setRate(r){ this.rate=r; this.v.playbackRate=r; this.osd(); }
   loopRVFC(){
     if(!HAS_RVFC) return;
-    const cb=(now,md)=>{ if(this.v.paused) return; this.mf=Math.round(md.mediaTime*this.fps); this.v.requestVideoFrameCallback(cb); };
+    const cb=(now,md)=>{ if(this.v.paused) return; this.mf=Math.round(md.mediaTime*this.fps); this.mt=md.mediaTime; this.mtw=performance.now(); this.v.requestVideoFrameCallback(cb); };
     this.v.requestVideoFrameCallback(cb);
   }
   tickPlaying(){
@@ -2397,7 +2397,10 @@ function cmpStep(n){ if(G.linked&&A.ready) A.step(n); else { A.step(n); B.step(n
 function cmpToggle(){
   const playing=!A.v.paused||!B.v.paused;
   if(playing){ A.pause(); B.pause(); G.playing=false; return; }
-  if(G.linked&&A.ready&&B.ready){ A.play(); G.playing=true; } else { A.play(); B.play(); }
+  if(G.linked&&A.ready&&B.ready){ A.play(); G.playing=true; G.errS=0;
+    // B gleichzeitig starten, wenn es schon am richtigen Bild steht (sonst startet es verspätet)
+    const exp=A.v.currentTime+G.off; if(exp>=0&&exp<B.dur-0.01&&Math.abs(B.v.currentTime-exp)<1.5/B.fps){ B.v.playbackRate=A.rate; const q=B.v.play(); if(q) q.catch(()=>{}); B.loopRVFC(); } }
+  else { A.play(); B.play(); }
 }
 function linkedTick(){
   if(!G.linked||!G.playing||!A.ready||!B.ready) return;
@@ -2405,8 +2408,13 @@ function linkedTick(){
   const exp=A.v.currentTime+G.off;
   if(exp<0||exp>B.dur-0.01){ if(!B.v.paused) B.pause(); if(exp<0&&B.frame!==0) B.seekFrame(0); return; }
   if(B.v.paused){ B.v.currentTime=exp; B.v.playbackRate=A.rate; const p=B.v.play(); if(p) p.catch(()=>{}); B.loopRVFC(); return; }
-  const err=B.v.currentTime-exp;
-  if(Math.abs(err)>0.25) B.v.currentTime=exp; else B.v.playbackRate=clamp(A.rate*(1-err*1.5),A.rate*0.85,A.rate*1.15);
+  // tatsächlich gezeigte Bilder (requestVideoFrameCallback) statt currentTime – genauer
+  const now=performance.now(), pos=d=>(d.mt!=null&&now-d.mtw<250)?d.mt+(now-d.mtw)/1000*d.v.playbackRate:d.v.currentTime;
+  const err=pos(B)-(pos(A)+G.off); G.errS=(G.errS||0)*0.6+err*0.4;
+  const tight=typeof ovAligned==='function'&&ovAligned(); // Overlay: Bilder müssen exakt zusammenpassen
+  if(Math.abs(err)>(tight?0.2:0.25)) { B.v.currentTime=exp; G.errS=0; }
+  else if(tight) B.v.playbackRate=clamp(A.rate*(1-G.errS*4),A.rate*0.75,A.rate*1.25);
+  else B.v.playbackRate=clamp(A.rate*(1-err*1.5),A.rate*0.85,A.rate*1.15);
 }
 function setLayout(l){ if(l!=='overlay'&&typeof OV!=='undefined'&&OV.pick) OV.pick=null; setTimeout(()=>typeof ovUI==='function'&&ovUI(),0);  $$('#layoutSeg button').forEach(x=>x.classList.toggle('on',x.dataset.layout===l)); const v=$('#viewCmp'); v.classList.toggle('overlay',l==='overlay'); v.classList.toggle('ghost',l==='ghost'); if(typeof ghostUI==='function') ghostUI();  LS.set('layout',l); decks.forEach(d=>{ d.dirty=true; d.annDirty=true; }); if(typeof splitsUI==='function') splitsUI(); }
 $('#layoutSeg').addEventListener('click',e=>{ const b=e.target.closest('[data-layout]'); if(b) setLayout(b.dataset.layout); });
@@ -2809,7 +2817,8 @@ const OV={pa:[],pb:[],T:null,pick:null,follow:false,key:'',cut:{a:null,b:null},e
 // Nachkorrektur: Verschiebung/Grösse/Drehung von B in A-Koordinaten (Einheit = Bildbreite A), Drehpunkt Bildmitte
 const OVFADE=3; // s – Korrektur wird über ±3 s weich ein-/ausgeblendet
 function ovC(){ return [0.5,0.5*(A.v.videoHeight||9)/(A.v.videoWidth||16)]; }
-function ovE(){ return A.v.currentTime-(GH.t0||0); }
+function ovTA(){ const now=performance.now(); return (!A.v.paused&&A.mt!=null&&now-A.mtw<250)?A.mt+(now-A.mtw)/1000*A.v.playbackRate:A.v.currentTime; } // angezeigtes Bild von A
+function ovE(){ return ovTA()-(GH.t0||0); }
 function ovDAt(e){ if(OV.fix) return OV.fix; let w=0,d={dx:0,dy:0,s:0,r:0};
   for(const k of OV.K){ const q=Math.max(0,1-Math.abs(e-k.e)/OVFADE); if(!q) continue; w+=q; d.dx+=q*k.dx; d.dy+=q*k.dy; d.s+=q*Math.log(k.s); d.r+=q*k.r; }
   const n=Math.max(1,w); return {dx:d.dx/n,dy:d.dy/n,s:Math.exp(d.s/n),r:d.r/n}; }
@@ -2903,7 +2912,7 @@ function renderOv(){
   Object.assign(cv.style,{left:R.x+'px',top:R.y+'px',width:R.w+'px',height:R.h+'px'});
   if(cv.width!==Wc||cv.height!==Hc){ cv.width=Wc; cv.height=Hc; }
   const x=cv.getContext('2d'); x.setTransform(1,0,0,1,0,0); x.clearRect(0,0,Wc,Hc); x.globalAlpha=+$('#opRange').value||0.5;
-  if(ovFollowOK()){ const p=paramsAt(clamp(A.v.currentTime-GH.t0,0,GH.eEnd)), M=affMul(ovDMat(ovDAt(ovE()),GH.W0),affInv(simToAff(p,GH.W0,GH.hA,GH.W0,GH.hB))), sc=Wc/GH.W0;
+  if(ovFollowOK()){ const p=paramsAt(clamp(ovE(),0,GH.eEnd)), M=affMul(ovDMat(ovDAt(ovE()),GH.W0),affInv(simToAff(p,GH.W0,GH.hA,GH.W0,GH.hB))), sc=Wc/GH.W0;
     x.setTransform(sc*M[0],sc*M[3],sc*M[1],sc*M[4],sc*M[2],sc*M[5]); x.drawImage(B.v,0,0,GH.W0,GH.hB); }
   else { const k=Wc/A.v.videoWidth, M=OV.T; x.setTransform(k*M[0],k*M[3],k*M[1],k*M[4],k*M[2],k*M[5]); x.drawImage(B.v,0,0,B.v.videoWidth,B.v.videoHeight); }
   x.setTransform(1,0,0,1,0,0); x.globalAlpha=1;
@@ -3950,7 +3959,7 @@ if(!LS.get('hint1',0)){ setTimeout(()=>{ toast(matchMedia('(pointer:coarse)').ma
 
 /* Update-Hinweis: prüft version.json auf GitHub Pages; «Aktualisieren» lädt die Seite ohne Cache neu */
 (()=>{
-  const BUILD='20261027145214'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
+  const BUILD='20261027150532'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
   // nach einem Update die ?v=… aus der Adresse entfernen
   try{ const u=new URL(location.href); if(u.searchParams.has('v')){ u.searchParams.delete('v'); history.replaceState(null,'',u.pathname+(u.search||'')+u.hash); } }catch(e){}
   const el=$('#upd'); let latest=null, snoozed=null, busy=false;
