@@ -346,7 +346,7 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,ca
 .gb-row{display:flex;align-items:center;gap:8px 12px;flex-wrap:wrap}
 .g-state{font-size:12px;color:var(--muted);flex:1;min-width:220px;line-height:1.4}
 .g-state b{color:var(--ink)}
-.ctl.gbtn{background:linear-gradient(135deg,#1d6fe0,#7b4fe0);border:none;color:#fff;padding:0 14px;box-shadow:0 6px 18px -8px rgba(80,90,230,.8)}
+.ctl.gbtn{background:linear-gradient(135deg,#ff5a4a,#c81d12);border:none;color:#fff;padding:0 14px;box-shadow:0 8px 18px -8px rgba(218,41,28,.8)}
 .ctl.gbtn:hover{filter:brightness(1.08);background:linear-gradient(135deg,#1d6fe0,#7b4fe0)}
 .gprog{display:flex;align-items:center;gap:10px;flex:1;min-width:220px}
 .gprog-bar{flex:1;height:8px;border-radius:99px;background:var(--bg);overflow:hidden;border:1px solid var(--line)}
@@ -1417,6 +1417,14 @@ body.m-cmp .lib.list .clip.row:hover .abtag{display:none}
 
 .zoomer canvas.ovlive{position:absolute;pointer-events:none;z-index:2}
 #viewCmp.ov-fixing canvas.ovlive{outline:2px solid #ffd166;outline-offset:-1px;box-shadow:0 0 0 6px rgba(255,209,102,.18)}
+
+#viewCmp.overlay.ov-split .stages>.stage:nth-child(2) .osd{top:10px;bottom:auto;left:10px;right:auto}
+#viewCmp.overlay.ov-split .stages>.stage:nth-child(2) .osd-r{display:flex}
+.pill.gps-no{font-family:var(--font);font-weight:500;max-width:min(80%,520px);text-align:center;line-height:1.4;white-space:normal}
+
+@media (hover:none){ .tabs .tab:not(.on):hover{background:transparent!important;color:inherit} }
+
+body.touring .toast{top:calc(12px + env(safe-area-inset-top,0px))!important;bottom:auto!important}
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
   .aurora{display:none}
@@ -1701,8 +1709,9 @@ body.m-cmp .lib.list .clip.row:hover .abtag{display:none}
         <dt><kbd>Enter</kbd></dt><dd>An aktuellen Bildern synchronisieren</dd>
         <dt><kbd>m</kbd> · <kbd>n</kbd></dt><dd>Tor in A · Tor in B markieren (Abschnittszeiten)</dd>
         <dt><kbd>Alt</kbd>+<kbd>←</kbd><kbd>→</kbd></dt><dd>Nur B bewegen (nachführen)</dd>
-        <dt>Overlay</dt><dd>1 Gemeinsamer Punkt (erstes Tor in beiden) · 2 je 2 Referenzpunkte in A und B · 3 «Overlay erstellen» – B folgt dem Kameraschwenk. Export und Standbild speichern das Overlay.</dd>
-        <dt>Anleitung</dt><dd>Knopf «Anleitung» im Vergleich: zeigt Side by Side bzw. Overlay Schritt für Schritt mit den Beispiel-Läufen</dd>
+        <dt>Overlay</dt><dd>1 Gemeinsamer Punkt (erstes Tor in beiden) · 2 je 2 gleiche Tore in A und B antippen – oder «Übereinanderlegen» und B von Hand schieben · 3 «Overlay erstellen» – B folgt dem Kameraschwenk. Export und Standbild speichern das Overlay.</dd>
+        <dt>Korrigieren</dt><dd>Während «Overlay erstellen»: Pause · 1 s zurück · Korrigieren – die Berechnung läuft mit deiner Lage weiter. Im fertigen Overlay: anhalten → «Hier korrigieren». B ziehen, Mausrad = Grösse, Shift + Rad = drehen, Pfeiltasten = fein, Enter = übernehmen</dd>
+        <dt>Anleitung</dt><dd>Knopf «Anleitung» im Vergleich: zeigt Side by Side, Overlay bzw. Ghost Schritt für Schritt mit den Beispiel-Läufen · Leertaste = Pause</dd>
         <span class="h4">GPS-Daten</span>
         <dt>Format</dt><dd>CSV, GPX oder JSON mit Zeit (s oder ISO), <code>lat</code>, <code>lon</code>, optional <code>alt</code>, <code>speed</code> (m/s) bzw. <code>speed_kmh</code></dd>
         <dt>Sync</dt><dd>Bild beim Losfahren suchen → «GPS-Start = dieses Bild», fein mit ±1F</dd>
@@ -2372,7 +2381,7 @@ function syncSelects(){
   [['#selA',A],['#selB',B]].forEach(([sel,d])=>{ const s=$(sel); s.innerHTML='<option value="">– Video wählen –</option>'+clips.map(c=>{ const m=c.meta; const t=m&&m.ok?metaTitle(c)+(m.run?' · '+m.run:''):c.name; return `<option value="${c.id}" title="${esc(c.name)}">${esc(t)}</option>`; }).join(''); s.value=d.clip?d.clip.id:''; });
   cmpMeta();
 }
-function cmpMeta(){ [[A,'#metaA'],[B,'#metaB']].forEach(([d,m])=>{ const c=d.clip; $(m).textContent=c&&c.fps?fmtFps(c.fps)+' fps · '+fmtDur(c.dur):''; }); }
+function cmpMeta(){ [[A,'#metaA'],[B,'#metaB']].forEach(([d,m])=>{ const c=d.clip; $(m).textContent=c&&c.dur?fmtDur(c.dur):''; }); }
 $('#selA').addEventListener('change',e=>{ A.setClip(clips.find(c=>c.id==e.target.value)||null); unlink(); renderLib(); });
 $('#selB').addEventListener('change',e=>{ B.setClip(clips.find(c=>c.id==e.target.value)||null); unlink(); renderLib(); });
 function cmpPlayIcon(){ $('#viewCmp .ctl.play').innerHTML=(!A.v.paused||!B.v.paused)?ICON.pause:ICON.play; }
@@ -2525,7 +2534,7 @@ document.addEventListener('keydown',e=>{
   else if(/^[1-6]$/.test(k)) setTool(TOOLS[+k-1].id);
   else if(k==='Enter'&&!single){ e.preventDefault(); doSync(); }
   else if(k==='?') $('#helpModal').classList.toggle('on');
-  else if(k==='Escape'){ $('#helpModal').classList.remove('on'); setTool('none'); }
+  else if(k==='Escape'){ $('#helpModal').classList.remove('on'); if(!EXP.live) $('#expModal').classList.remove('on'); setTool('none'); }
 });
 $('#btnHelp').addEventListener('click',()=>$('#helpModal').classList.add('on'));
 $('#helpX').addEventListener('click',()=>$('#helpModal').classList.remove('on'));
@@ -2895,7 +2904,7 @@ function ovUI(){
   else if(OV.fix){ const near=OV.K.some(k=>Math.abs(k.e-ovE())<0.15);
     t=`<b>Korrigieren</b> · B ziehen, bis die Tore genau übereinander liegen. <span class="ov-hint">Mausrad: Grösse · Shift + Rad: drehen · Pfeiltasten: fein</span>`;
     acts=(near?ovBtn('fixdel','Korrektur löschen',OVI.trash,'ghost'):'')+ovBtn('fixno','Abbrechen','','ghost')+ovBtn('fixok','Übernehmen',OVI.ok,'pri','Gilt hier und wird über ±3 s weich ausgeblendet'); }
-  else if(st===1){ t=`<b>Beide Videos zum gleichen Moment schieben</b> – z. B. das erste Tor, das in beiden sichtbar ist. Zeitleiste A und B einzeln ziehen. Optional Start/Ende des Ausschnitts in A setzen. ${cut}`;
+  else if(st===1){ t=`<b>Beide Videos zum gleichen Moment schieben</b> – z. B. das erste Tor, das in beiden sichtbar ist. A und B einzeln ziehen. ${cut}`;
     acts=cutBtns+ovBtn('hand','Übereinanderlegen',OVI.fix,'','A und B hier verbinden und B von Hand über A schieben')+ovBtn('sync','Gemeinsamer Punkt',OVI.pin,'pri','A und B an diesem Moment verbinden'); }
   else if(st===2){ t=`<b>Synchron</b> <span class="ov-dim">B ${G.off>=0?'+':'−'}${Math.abs(G.off).toFixed(2)} s</span> · Jetzt in A und B je zwei gleiche Tore antippen. ${cut}`;
     acts=ovBtn('edit','Punkt ändern',OVI.back,'ghost')+ovBtn('pick','Referenzpunkte setzen',OVI.pin,'pri','2 feste Punkte in A und B antippen'); }
@@ -4006,7 +4015,7 @@ if(!LS.get('hint1',0)){ setTimeout(()=>{ toast(matchMedia('(pointer:coarse)').ma
 
 /* Update-Hinweis: prüft version.json auf GitHub Pages; «Aktualisieren» lädt die Seite ohne Cache neu */
 (()=>{
-  const BUILD='20261027153633'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
+  const BUILD='20261027155053'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
   // nach einem Update die ?v=… aus der Adresse entfernen
   try{ const u=new URL(location.href); if(u.searchParams.has('v')){ u.searchParams.delete('v'); history.replaceState(null,'',u.pathname+(u.search||'')+u.hash); } }catch(e){}
   const el=$('#upd'); let latest=null, snoozed=null, busy=false;
@@ -4041,17 +4050,20 @@ const PRE_GH={"t0":0,"off":0,"step":0.1406,"eEnd":42.18,"W0":400,"hA":224,"hB":2
   const demo=n=>clips.find(c=>c.name===n);
   const waitReady=async()=>{ for(let k=0;k<200&&!(A.ready&&B.ready);k++) await sleep(100); };
   // Spotlight
-  function focus(target,pad=8){
+  function focus(target,pad=8,depth=0){
     let r=null; try{ if(typeof target==='function') r=target(); else if(target){ const e=typeof target==='string'?$(target):target; r=e?e.getBoundingClientRect():null; } }catch(err){ r=null; }
     if(!r||!r.width){ spot.style.opacity='0'; placeCard(null); return; }
+    // Handy: Ziel in den sichtbaren Bereich über der Karte scrollen
+    if(innerWidth<700&&depth<2){ const room=innerHeight-(card.offsetHeight||190)-110; if(r.top<60||r.bottom>room){ window.scrollBy(0,r.top-Math.max(60,(room-r.height)/2)); return requestAnimationFrame(()=>focus(target,pad,depth+1)); } }
     spot.style.opacity='1'; Object.assign(spot.style,{left:(r.left-pad)+'px',top:(r.top-pad)+'px',width:(r.width+2*pad)+'px',height:(r.height+2*pad)+'px'});
     placeCard(r);
   }
   function placeCard(r){
     const W=innerWidth,H=innerHeight, cw=Math.min(360,W-24); card.style.width=cw+'px'; const ch=card.offsetHeight||170;
-    let x,y; if(!r){ x=(W-cw)/2; y=H-ch-24; }
+    let x,y; if(W<700){ x=(W-cw)/2; y=H-ch-96; card.style.left=x+'px'; card.style.top=Math.max(12,y)+'px'; return; } // Handy: unten über der Navigation
+    if(!r){ x=(W-cw)/2; y=H-ch-24; }
     else { x=clamp(r.left+r.width/2-cw/2,12,W-cw-12); y=r.bottom+18; if(y+ch>H-12) y=r.top-ch-18; if(y<12){ y=clamp(r.top+16,12,H-ch-12); x=r.right+18+cw<W?r.right+18:clamp(r.left-cw-18,12,W-cw-12); } }
-    card.style.left=x+'px'; card.style.top=y+'px';
+    card.style.left=x+'px'; card.style.top=clamp(y,12,Math.max(12,H-ch-12))+'px';
   }
   // Mauszeiger
   const cpos={x:innerWidth/2,y:innerHeight*0.7};
