@@ -20,7 +20,7 @@ Beim Öffnen des Links sind Beispiel-Läufe geladen: Sölden (26.10.2025, Riesen
 
 ## Bedienung
 
-- **Links: Ordner.** «Ordner wählen» verbindet einen Video-Ordner deines Geräts (Chrome/Edge). Du siehst die Ordnerstruktur, öffnest Videos per Klick, benennst sie um und verschiebst sie per Ziehen. **Brave:** Ohne Einstellung kann der Ordner angesehen und Videos geöffnet werden. Zum Umbenennen/Verschieben einmalig `brave://flags/#file-system-access-api` aktivieren und Brave neu starten. Unter «Geöffnet» stehen die aktuell geladenen Videos.
+- **Links: «Dateien».** «Ordner wählen» verbindet einen Video-Ordner deines Geräts (Chrome/Edge). Du siehst die Ordnerstruktur, öffnest Videos per Klick, benennst sie um und verschiebst sie per Ziehen. **Brave:** Ohne Einstellung kann der Ordner angesehen und Videos geöffnet werden. Zum Umbenennen/Verschieben einmalig `brave://flags/#file-system-access-api` aktivieren und Brave neu starten. Unter «In Arbeit» stehen die aktuell geladenen Videos – nur diese stehen für A, B und GPS zur Wahl.
 - **Unter dem Video:** links In / Out / Loop, in der Mitte Abspielen und Bild-für-Bild, daneben **ein Tempo-Knopf**: jeder Klick wechselt 1× → ½× → ¼× → 0,1× → 1×.
 - **Werkzeuge** (Zeichnen, Messen, Bildanpassung) öffnen sich per Klick auf den Stift neben dem Video und sind sonst eingeklappt.
 - **fps** stehen oben in der Kopfzeile und werden beim Laden gemessen; Klick darauf, um sie von Hand zu ändern.
@@ -68,7 +68,7 @@ VideoLab.link(trackId, "Datei.mp4", offset)
 Nach jedem Push erscheint in offenen Fenstern der Hinweis «Neue Version verfügbar»; «Aktualisieren» lädt die neue Version ohne Cache (`version.json` gehört zum Push dazu).
 
 - **fps** werden direkt aus der Datei gelesen (MP4/MOV), auch am Handy exakt.
-- **«Geöffnet»**: kompakte Liste nach Rennen gruppiert, Umschalter auf «nur Dateinamen».
+- **«In Arbeit»** (geladene Videos): kompakte Liste nach Rennen gruppiert, Umschalter auf «nur Dateinamen».
 - **Overlay exportieren**: Clip-Export und Standbild speichern im Overlay das ausgerichtete Bild.
 
 Tastenkürzel: in der App unter **?**.

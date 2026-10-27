@@ -1287,7 +1287,7 @@ body.m-cmp .lib.list .clip.row:hover .abtag{display:none}
 .lib.list .clip.row .ab .ba.on{background:var(--a);color:#fff;border-color:transparent}.lib.list .clip.row .ab .bb.on{background:var(--b);color:#fff;border-color:transparent}
 .lib.list .clip.row .x{position:static!important;width:26px;height:26px;border-radius:8px;background:none!important;color:var(--muted)!important;opacity:0;display:grid;place-items:center;border:none;padding:0}
 .lib.list .clip.row .x svg{width:13px;height:13px}
-.lib.list .clip.row:hover .x{opacity:1}.lib.list .clip.row .x:hover{background:color-mix(in srgb,var(--red) 14%,transparent)!important;color:var(--red)!important}
+.lib.list .clip.row:hover .x{opacity:1}.lib.list .clip.row .x:hover{background:color-mix(in srgb,var(--ink) 9%,transparent)!important;color:var(--ink)!important}
 .lib.list .clip.row .demo,.lib.list .clip.row .mk-count{display:none}
 .lib.list .add-tile{min-height:52px!important;flex-direction:row!important;gap:8px;margin-top:8px;font-size:12.5px}
 .lib.list .add-tile small{display:none}
@@ -1311,8 +1311,16 @@ body.m-cmp .lib.list .clip.row:hover .abtag{display:none}
 .lib.list.names .clip.row{grid-template-columns:minmax(0,1fr) auto auto auto auto;padding:6px 8px;border-radius:9px;gap:8px}
 .lib.list.names .clip.row .thumb{display:none}
 .lib.list.names .clip.row .mt{display:none}
-.lib.list.names .clip.row .nm{font-family:var(--mono);font-size:11px;font-weight:500;white-space:normal;word-break:break-all;line-height:1.35}
+.lib.list.names .clip.row .nm{font-family:var(--font);font-size:12.5px;font-weight:500;letter-spacing:-.005em;white-space:nowrap;overflow-x:auto;overflow-y:hidden;text-overflow:clip;scrollbar-width:none;
+  -webkit-mask-image:linear-gradient(90deg,#000 calc(100% - 18px),transparent);mask-image:linear-gradient(90deg,#000 calc(100% - 18px),transparent);padding-right:14px!important}
+.lib.list.names .clip.row .nm::-webkit-scrollbar{display:none}
+.lib.list.names .clip.row .ndur{font-family:var(--font)!important;font-variant-numeric:tabular-nums}
 .lib.list.names .clip.row.on .nm{font-weight:700}
+
+.side-hint{margin:2px 4px 10px;font-size:11.5px;line-height:1.45;color:var(--muted)}
+.side-tabs button{display:inline-flex;align-items:center;justify-content:center;gap:6px}
+.side-tabs button svg{width:15px;height:15px;flex:none;opacity:.85}
+#sideTree:not([hidden]){min-height:0;flex:1 1 auto;overflow-y:auto;overscroll-behavior:contain}
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
   .aurora{display:none}
@@ -1352,8 +1360,9 @@ body.m-cmp .lib.list .clip.row:hover .abtag{display:none}
 
 <main class="wrap layout">
   <section class="card libcard">
-    <div class="seg side-tabs" id="sideTabs"><button data-st="tree" class="on">Ordner</button><button data-st="open">Geöffnet <span class="count" id="libCount">0</span></button></div>
+    <div class="seg side-tabs" id="sideTabs"><button data-st="tree" class="on" title="Deine Ordner auf dem Gerät – umbenennen und verschieben ändert die echten Dateien"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7.5A2.5 2.5 0 0 1 5.5 5h3.4l2 2h7.6A2.5 2.5 0 0 1 21 9.5v8a2.5 2.5 0 0 1-2.5 2.5h-13A2.5 2.5 0 0 1 3 17.5z"/></svg>Dateien</button><button data-st="open" title="Videos, die gerade in der App geladen sind"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="13" height="12" rx="2"/><path d="M16 10.5l5-3v9l-5-3"/></svg>In Arbeit <span class="count" id="libCount">0</span></button></div>
     <div id="sideTree" class="side-pane">
+      <p class="side-hint">Deine Ordner auf dem Gerät. Klick öffnet ein Video · Umbenennen und Verschieben ändern die echten Dateien.</p>
       <div class="ft-tools" id="ftTools" hidden>
         <div class="lib-search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><input id="ftQ" type="search" placeholder="Suchen in Ordnern …" autocomplete="off"></div>
         <button class="ft-addmini" id="ftAdd" title="Weiteren Ordner verbinden"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"><path d="M12 6v12M6 12h12"/></svg></button>
@@ -1367,10 +1376,11 @@ body.m-cmp .lib.list .clip.row:hover .abtag{display:none}
       </div>
       <div class="ft-demo" id="ftDemo" hidden></div>
       <div class="ft-note ft-ro" id="ftRo" hidden></div>
-      <div class="ft-note" id="ftNote" hidden>Ordnerzugriff gibt es am Computer in <b>Chrome</b>, <b>Edge</b> und <b>Brave</b>. In diesem Browser Videos über «+ Videos» öffnen – sie erscheinen unter «Geöffnet».</div>
+      <div class="ft-note" id="ftNote" hidden>Ordnerzugriff gibt es am Computer in <b>Chrome</b>, <b>Edge</b> und <b>Brave</b>. In diesem Browser Videos über «+ Videos» öffnen – sie erscheinen unter «In Arbeit».</div>
       <div class="ft-busy" id="ftBusy" hidden><span></span></div>
     </div>
     <div id="sideOpen" class="side-pane" hidden>
+    <p class="side-hint">Gerade in der App geladen – nur diese stehen für A, B und GPS zur Wahl. «–» entfernt nur aus der Liste.</p>
     <div class="lib-top"><div class="lib-search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><input id="libQ" type="search" placeholder="Suchen: Athlet, Ort, Datum …" autocomplete="off"></div><div class="lib-view" id="libView" role="group" aria-label="Ansicht"><button data-lv="thumbs" title="Mit Vorschaubild"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="7" height="5" rx="1.2"/><rect x="3" y="14" width="7" height="5" rx="1.2"/><path d="M13 7h8M13 16h8"/></svg></button><button data-lv="names" title="Nur Dateinamen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button></div></div>
     <div class="lib-restore" id="libRestore" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg><span></span><button id="btnRestore">Öffnen</button></div>
     <div class="lib" id="lib"></div>
@@ -1692,6 +1702,7 @@ function removeClip(c){
   decks.forEach(d=>{ if(d.clip===c) d.setClip(null); });
   try{ URL.revokeObjectURL(c.url); }catch(e){}
   renderLib(); syncSelects(); refreshSingleHead();
+  if(!c.demo) toast('«'+(c.meta&&c.meta.ok?metaTitle(c):c.name)+'» aus der Liste genommen – die Datei im Ordner bleibt erhalten.',3200);
 }
 function addFiles(files){
   const gfs=[...files].filter(f=>/\.(csv|gpx|json|txt)$/i.test(f.name)); if(gfs.length){ importGpsFiles(gfs); if(gfs.length===files.length) return; files=[...files].filter(f=>!gfs.includes(f)); }
@@ -1705,6 +1716,12 @@ function addFiles(files){
   toast(added.length===1?'«'+added[0].name+'» geöffnet':added.length+' Videos geöffnet');
 }
 
+// Lange Dateinamen: beim Darüberfahren seitlich durchlaufen lassen
+(()=>{ const glide=(el,to)=>{ cancelAnimationFrame(el._ga); const from=el.scrollLeft, d=to-from, t0=performance.now(), T=Math.min(2600,Math.max(500,Math.abs(d)*9));
+    const st=now=>{ const f=Math.min(1,(now-t0)/T), e=f<.5?2*f*f:1-Math.pow(-2*f+2,2)/2; el.scrollLeft=from+d*e; if(f<1) el._ga=requestAnimationFrame(st); }; el._ga=requestAnimationFrame(st); };
+  document.addEventListener('pointerover',e=>{ const r=e.target.closest('.lib.names .clip.row'); if(!r||r._gl) return; r._gl=1; const n=$('.nm',r); if(n&&n.scrollWidth>n.clientWidth+2) glide(n,n.scrollWidth-n.clientWidth); });
+  document.addEventListener('pointerout',e=>{ const r=e.target.closest('.lib.names .clip.row'); if(!r||r.contains(e.relatedTarget)) return; r._gl=0; const n=$('.nm',r); if(n) glide(n,0); });
+})();
 document.addEventListener('click',e=>{ const b=e.target.closest('#libView [data-lv]'); if(!b) return; LS.set('libview',b.dataset.lv); renderLib(); });
 function renderLib(){
   const el=$('#lib'); el.innerHTML=''; $('#libCount').textContent=clips.length; if(typeof renderDemoList==='function') setTimeout(renderDemoList,0);
@@ -1713,7 +1730,7 @@ function renderLib(){
   const gk=c=>{ const m=c.meta; return m&&m.ok&&(m.place||m.date)?[m.place||'',m.disc||'',m.date||''].join('|'):'~'; };
   const order=[]; clips.forEach(c=>{ const k=gk(c); if(!order.includes(k)) order.push(k); });
   const list=order.flatMap(k=>clips.filter(c=>gk(c)===k)); let lastG=null;
-  const XI='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>';
+  const XI='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/></svg>';
   list.forEach(c=>{
     if(!libMatch(c)) return;
     const g=gk(c); if(!NAMES&&g!==lastG&&order.length>1){ lastG=g; const m=c.meta||{}, h=document.createElement('div'); h.className='lib-grp';
@@ -1726,7 +1743,7 @@ function renderLib(){
       +'<div class="info"><div class="nm"></div><div class="mt"></div></div>'+'<span class="ndur">'+(c.dur?fmtDur(c.dur):'')+'</span>'
       +'<span class="abtag">'+(A.clip===c?'<span class="ta">A</span>':'')+(B.clip===c?'<span class="tb">B</span>':'')+'</span>'
       +'<div class="ab"><button class="ba'+(A.clip===c?' on':'')+'" title="Als Video A">A</button><button class="bb'+(B.clip===c?' on':'')+'" title="Als Video B">B</button></div>'
-      +'<button class="x" title="Aus der Liste entfernen (Datei bleibt auf dem Gerät)">'+XI+'</button>';
+      +'<button class="x" title="Aus «In Arbeit» nehmen – die Datei im Ordner bleibt unverändert">'+XI+'</button>';
     const mm=c.meta, grouped=!NAMES&&order.length>1&&g!=='~'&&mm&&mm.ok;
     $('.nm',card).textContent=NAMES?c.name:grouped?mm.athlete:metaTitle(c); card.title=c.name;
     $('.mt',card).textContent=grouped?[mm.run,c.fps?fmtFps(c.fps)+' fps':null].filter(Boolean).join(' · '):(c.demo?'Beispiel · ':'')+(metaLine(c)||[c.w?c.h+'p':null,c.fps?fmtFps(c.fps)+' fps':null,c.size?fmtMB(c.size):null].filter(Boolean).join(' · ')||'—');
@@ -3789,7 +3806,7 @@ if(!LS.get('hint1',0)){ setTimeout(()=>{ toast(matchMedia('(pointer:coarse)').ma
 
 /* Update-Hinweis: prüft version.json auf GitHub Pages; «Aktualisieren» lädt die Seite ohne Cache neu */
 (()=>{
-  const BUILD='20261027124829'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
+  const BUILD='20261027133253'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
   // nach einem Update die ?v=… aus der Adresse entfernen
   try{ const u=new URL(location.href); if(u.searchParams.has('v')){ u.searchParams.delete('v'); history.replaceState(null,'',u.pathname+(u.search||'')+u.hash); } }catch(e){}
   const el=$('#upd'); let latest=null, snoozed=null, busy=false;
