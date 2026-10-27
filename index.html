@@ -1261,6 +1261,41 @@ body.touring .toast{z-index:450}
 @media (max-width:600px){ .tour-card{padding:12px 14px} .tour-p{font-size:12.5px} }
 
 .ft-demo .ft-demo-h:not(:first-child){margin-top:12px;padding-top:10px;border-top:1px solid var(--line)}
+
+/* ---------- «Geöffnet» als kompakte Liste ---------- */
+.lib.list{display:flex!important;flex-direction:column!important;gap:2px!important;overflow:visible!important;padding:0!important;scroll-snap-type:none}
+.lib.list .lib-grp{font-size:11px;font-weight:600;color:var(--muted);padding:10px 8px 4px;letter-spacing:.01em}
+.lib.list .lib-grp:not(:first-child){margin-top:6px;border-top:1px solid var(--line)}
+.lib.list .clip.row{display:grid!important;grid-template-columns:76px minmax(0,1fr) auto auto;align-items:center;gap:10px;width:auto!important;padding:5px 6px;border-radius:12px;background:none;cursor:pointer;transition:background .2s,transform .25s var(--ease-out)}
+.lib.list .clip.row:hover{background:color-mix(in srgb,var(--ink) 5%,transparent);transform:translateX(2px)}
+.lib.list .clip.row.on{background:linear-gradient(90deg,rgba(218,41,28,.12),rgba(218,41,28,.03));box-shadow:inset 3px 0 0 var(--red)}
+.lib.list .clip.row .thumb{width:76px;height:43px;aspect-ratio:auto;border-radius:8px;box-shadow:0 1px 2px rgba(0,0,0,.12)!important;transform:none!important}
+.lib.list .clip.row .thumb::after{display:none}
+.lib.list .clip.row .thumb img,.lib.list .clip.row .thumb canvas{width:100%;height:100%;object-fit:cover}
+.lib.list .clip.row .dur{top:auto!important;bottom:3px;right:3px;font-size:9px;padding:1px 4px;border-radius:4px}
+.lib.list .clip.row .info{position:static!important;padding:0!important;min-width:0;display:flex;flex-direction:column;gap:2px}
+.lib.list .clip.row .nm{color:var(--ink)!important;text-shadow:none!important;font-size:13px;font-weight:600;padding:0!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lib.list .clip.row.on .nm{color:var(--red)!important}
+.lib.list .clip.row .mt{color:var(--muted)!important;font-size:10.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lib.list .clip.row .abtag{position:static!important;display:flex;gap:3px}
+.lib.list .clip.row .abtag span{width:18px;height:18px;border-radius:6px;display:grid;place-items:center;font-size:10px;font-weight:800;color:#fff;box-shadow:none!important}
+.lib.list .clip.row .abtag .ta{background:var(--a)}.lib.list .clip.row .abtag .tb{background:var(--b)}
+.lib.list .clip.row .ab{display:none;padding:0!important;gap:3px}
+body.m-cmp .lib.list .clip.row:hover .ab{display:flex}
+body.m-cmp .lib.list .clip.row:hover .abtag{display:none}
+.lib.list .clip.row .ab button{width:26px;height:24px;padding:0;border-radius:7px;font-size:11px;font-weight:800}
+.lib.list .clip.row .ab .ba.on{background:var(--a);color:#fff;border-color:transparent}.lib.list .clip.row .ab .bb.on{background:var(--b);color:#fff;border-color:transparent}
+.lib.list .clip.row .x{position:static!important;width:26px;height:26px;border-radius:8px;background:none!important;color:var(--muted)!important;opacity:0;display:grid;place-items:center;border:none;padding:0}
+.lib.list .clip.row .x svg{width:13px;height:13px}
+.lib.list .clip.row:hover .x{opacity:1}.lib.list .clip.row .x:hover{background:color-mix(in srgb,var(--red) 14%,transparent)!important;color:var(--red)!important}
+.lib.list .clip.row .demo,.lib.list .clip.row .mk-count{display:none}
+.lib.list .add-tile{min-height:52px!important;flex-direction:row!important;gap:8px;margin-top:8px;font-size:12.5px}
+.lib.list .add-tile small{display:none}
+.lib.list .add-tile svg{width:16px;height:16px}
+@media (hover:none){ body.m-cmp .lib.list .clip.row .ab{display:flex} body.m-cmp .lib.list .clip.row .abtag{display:none} .lib.list .clip.row .x{opacity:.6} }
+
+#sideOpen:not([hidden]){display:flex;flex-direction:column;min-height:0;flex:1 1 auto}
+#sideOpen .lib.list{flex:1 1 auto;min-height:0;overflow-y:auto!important;overscroll-behavior:contain;padding-right:2px!important}
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
   .aurora{display:none}
@@ -1630,20 +1665,30 @@ function addFiles(files){
 
 function renderLib(){
   const el=$('#lib'); el.innerHTML=''; $('#libCount').textContent=clips.length; if(typeof renderDemoList==='function') setTimeout(renderDemoList,0);
-  clips.forEach(c=>{
+  el.classList.add('list');
+  // nach Rennen/Training gruppieren (Ort · Disziplin · Datum), Reihenfolge wie geöffnet
+  const gk=c=>{ const m=c.meta; return m&&m.ok&&(m.place||m.date)?[m.place||'',m.disc||'',m.date||''].join('|'):'~'; };
+  const order=[]; clips.forEach(c=>{ const k=gk(c); if(!order.includes(k)) order.push(k); });
+  const list=order.flatMap(k=>clips.filter(c=>gk(c)===k)); let lastG=null;
+  const XI='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>';
+  list.forEach(c=>{
     if(!libMatch(c)) return;
-    const card=document.createElement('div'); card.className='clip'+(mode==='single'&&S.clip===c?' on':''); card.tabIndex=0;
-    card.innerHTML='<div class="thumb">'+(c.poster?'<img alt="" src="'+c.poster+'">':'<div class="ph">'+(c.err?'Format nicht lesbar':'wird vorbereitet …')+'</div>')
+    const g=gk(c); if(g!==lastG&&order.length>1){ lastG=g; const m=c.meta||{}, h=document.createElement('div'); h.className='lib-grp';
+      h.textContent=g==='~'?'Weitere Videos':[[m.place,m.date?m.date.slice(-4):''].filter(Boolean).join(' '),DISC_LONG[m.disc]||m.disc,m.cam].filter(Boolean).join(' · '); el.appendChild(h); }
+    const on=mode==='single'?S.clip===c:mode==='gps'?GD.clip===c:(A.clip===c||B.clip===c);
+    const card=document.createElement('div'); card.className='clip row'+(on?' on':''); card.tabIndex=0;
+    card.innerHTML='<div class="thumb">'+(c.poster?'<img alt="" src="'+c.poster+'">':'<div class="ph"></div>')
       +'<canvas width="320" height="180"></canvas><div class="prog"></div>'
-      +(c.dur?'<span class="dur">'+fmtDur(c.dur)+'</span>':'')+(c.demo?'<span class="demo">Beispiel</span>':'')
-      +'<span class="abtag">'+(A.clip===c?'<span style="background:var(--a)">A</span>':'')+(B.clip===c?'<span style="background:var(--b)">B</span>':'')+'</span>'
-      +'<div class="info"><div class="nm"></div><div class="mt"></div></div></div>'
+      +(c.dur?'<span class="dur">'+fmtDur(c.dur)+'</span>':'')+'</div>'
+      +'<div class="info"><div class="nm"></div><div class="mt"></div></div>'
+      +'<span class="abtag">'+(A.clip===c?'<span class="ta">A</span>':'')+(B.clip===c?'<span class="tb">B</span>':'')+'</span>'
       +'<div class="ab"><button class="ba'+(A.clip===c?' on':'')+'" title="Als Video A">A</button><button class="bb'+(B.clip===c?' on':'')+'" title="Als Video B">B</button></div>'
-      +'<button class="x" title="Aus der Liste entfernen (Datei bleibt auf dem Gerät)">✕</button>';
-    $('.nm',card).textContent=metaTitle(c); card.title=c.name;
-    $('.mt',card).textContent=metaLine(c)||[c.w?c.h+'p':null,c.fps?fmtFps(c.fps)+' fps':null,c.size?fmtMB(c.size):null].filter(Boolean).join(' · ')||'—';
+      +'<button class="x" title="Aus der Liste entfernen (Datei bleibt auf dem Gerät)">'+XI+'</button>';
+    const mm=c.meta, grouped=order.length>1&&g!=='~'&&mm&&mm.ok;
+    $('.nm',card).textContent=grouped?mm.athlete:metaTitle(c); card.title=c.name;
+    $('.mt',card).textContent=grouped?[mm.run,c.fps?fmtFps(c.fps)+' fps':null].filter(Boolean).join(' · '):(c.demo?'Beispiel · ':'')+(metaLine(c)||[c.w?c.h+'p':null,c.fps?fmtFps(c.fps)+' fps':null,c.size?fmtMB(c.size):null].filter(Boolean).join(' · ')||'—');
     if(c.markers.length){ const mk=document.createElement('span'); mk.className='mk-count'; mk.innerHTML='<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 9-7 9-7-9z"/></svg>'+c.markers.length; $('.thumb',card).appendChild(mk); }
-    const open=()=>{ if(mode==='single'){ S.setClip(c); renderLib(); refreshSingleHead(); } };
+    const open=()=>{ if(mode==='single'){ S.setClip(c); refreshSingleHead(); } else if(mode==='gps'){ GD.setClip(c); if(typeof gpsSelects==='function') gpsSelects(); } else if(A.clip!==c&&B.clip!==c){ B.setClip(c); unlink(); syncSelects(); } renderLib(); };
     card.addEventListener('click',e=>{ if(e.target.closest('.x,.ab')) return; open(); });
     card.addEventListener('keydown',e=>{ if(e.key==='Enter') open(); });
     $('.x',card).addEventListener('click',()=>removeClip(c));
@@ -3690,7 +3735,7 @@ if(!LS.get('hint1',0)){ setTimeout(()=>{ toast(matchMedia('(pointer:coarse)').ma
 
 /* Update-Hinweis: prüft version.json auf GitHub Pages; «Aktualisieren» lädt die Seite ohne Cache neu */
 (()=>{
-  const BUILD='20261027123310'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
+  const BUILD='20261027124009'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
   // nach einem Update die ?v=… aus der Adresse entfernen
   try{ const u=new URL(location.href); if(u.searchParams.has('v')){ u.searchParams.delete('v'); history.replaceState(null,'',u.pathname+(u.search||'')+u.hash); } }catch(e){}
   const el=$('#upd'); let latest=null, snoozed=null, busy=false;
