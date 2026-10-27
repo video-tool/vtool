@@ -15,7 +15,7 @@ Videos werden nur im Browser geöffnet und **nie hochgeladen**. Alles steckt in 
 
 ## Bedienung
 
-- **Links: Ordner.** «Ordner wählen» verbindet einen Video-Ordner deines Geräts (Chrome/Edge). Du siehst die Ordnerstruktur, öffnest Videos per Klick, benennst sie um und verschiebst sie per Ziehen. Unter «Geöffnet» stehen die aktuell geladenen Videos.
+- **Links: Ordner.** «Ordner wählen» verbindet einen Video-Ordner deines Geräts (Chrome/Edge). Du siehst die Ordnerstruktur, öffnest Videos per Klick, benennst sie um und verschiebst sie per Ziehen. **Brave:** Ohne Einstellung kann der Ordner angesehen und Videos geöffnet werden. Zum Umbenennen/Verschieben einmalig `brave://flags/#file-system-access-api` aktivieren und Brave neu starten. Unter «Geöffnet» stehen die aktuell geladenen Videos.
 - **Unter dem Video:** links In / Out / Loop, in der Mitte Abspielen und Bild-für-Bild, daneben **ein Tempo-Knopf**: jeder Klick wechselt 1× → ½× → ¼× → 0,1× → 1×.
 - **Werkzeuge** (Zeichnen, Messen, Bildanpassung) öffnen sich per Klick auf den Stift neben dem Video und sind sonst eingeklappt.
 - **fps** stehen oben in der Kopfzeile und werden beim Laden gemessen; Klick darauf, um sie von Hand zu ändern.

@@ -822,6 +822,7 @@ canvas.strip{border-radius:12px}
 @media (max-width:1100px){.dz-c .rate-btn{position:static;transform:none;margin-left:6px}}
 #viewGps .ttl-wrap{flex:0 0 auto;min-width:0}
 @media (max-width:1400px){#viewGps .ttl-wrap{display:none}}
+.ft-ro{margin-top:auto;font-size:11.5px;line-height:1.45}.ft-ro code{font-family:var(--mono,monospace);font-size:10.5px;background:var(--soft,rgba(0,0,0,.06));padding:1px 4px;border-radius:4px;word-break:break-all;user-select:all}
 .dock.dock3{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:center;gap:8px 12px}
 .dz{display:flex;align-items:center;gap:4px;min-width:0}
 .dz-l{justify-content:flex-start;flex-wrap:wrap}
@@ -911,7 +912,8 @@ canvas.strip{border-radius:12px}
         <span>Wähle z. B. deinen Ordner mit Trainings- und Rennvideos. Du siehst dann die Ordnerstruktur, kannst Videos öffnen, beschriften und verschieben.</span>
         <button class="btn-pri" id="ftAdd2">Ordner wählen</button>
       </div>
-      <div class="ft-note" id="ftNote" hidden>Ordnerzugriff gibt es in <b>Chrome</b> und <b>Edge</b> am Computer. In diesem Browser Videos über «+ Videos» öffnen – sie erscheinen unter «Geöffnet».</div>
+      <div class="ft-note ft-ro" id="ftRo" hidden></div>
+      <div class="ft-note" id="ftNote" hidden>Ordnerzugriff gibt es am Computer in <b>Chrome</b>, <b>Edge</b> und <b>Brave</b>. In diesem Browser Videos über «+ Videos» öffnen – sie erscheinen unter «Geöffnet».</div>
       <div class="ft-busy" id="ftBusy" hidden><span></span></div>
     </div>
     <div id="sideOpen" class="side-pane" hidden>
@@ -2830,6 +2832,19 @@ $$('#strN button').forEach(b=>b.classList.toggle('on',+b.dataset.n===STR.n));
 const FT={roots:[],q:'',thumbs:new Map(),tq:[],tbusy:false,drag:null,noMove:false,dlg:null};
 const VID_RE=/\.(mp4|mov|m4v|mkv|webm|avi|mts)$/i, GPS_RE=/\.(csv|gpx|json)$/i;
 const DIR_OK=typeof window.showDirectoryPicker==='function';
+const IS_BRAVE=!!navigator.brave;
+// Ersatz ohne Datei-Schnittstelle (z. B. Brave, Firefox, Safari): Ordner einlesen, nur ansehen & öffnen
+const DIR_RO=!DIR_OK&&('webkitdirectory' in document.createElement('input'))&&!/iPhone|iPad|Android/i.test(navigator.userAgent);
+function vDir(name){ const kids=new Map(); return {kind:'directory',name,ro:true,_k:kids,async *entries(){ for(const e of kids) yield e; }}; }
+function vFile(f){ return {kind:'file',name:f.name,ro:true,getFile:async()=>f}; }
+function ftPickRO(){ const i=document.createElement('input'); i.type='file'; i.webkitdirectory=true; i.multiple=true; i.hidden=true; document.body.appendChild(i);
+  i.addEventListener('change',async()=>{ const fs=[...i.files]; i.remove(); if(!fs.length){ toast('In diesem Ordner sind keine Dateien.'); return; }
+    const root=vDir((fs[0].webkitRelativePath||fs[0].name).split('/')[0]);
+    for(const f of fs){ const parts=(f.webkitRelativePath||f.name).split('/').slice(1); if(!parts.length) continue; let d=root;
+      for(let k=0;k<parts.length-1;k++){ let x=d._k.get(parts[k]); if(!x){ x=vDir(parts[k]); d._k.set(parts[k],x); } d=x; }
+      d._k.set(parts[parts.length-1],vFile(f)); }
+    await ftAddRoot(root,false); setSideTab('tree'); });
+  i.click(); }
 let ftId=0;
 const ICN={
   folder:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 6.5A2.5 2.5 0 0 1 5.5 4h3.6c.6 0 1.2.25 1.6.7L12 6h6.5A2.5 2.5 0 0 1 21 8.5v9a2.5 2.5 0 0 1-2.5 2.5h-13A2.5 2.5 0 0 1 3 17.5z"/></svg>',
@@ -2843,7 +2858,7 @@ const ICN={
   x:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>',
   lock:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><rect x="4.5" y="11" width="15" height="10" rx="2"/><path d="M8 11V7.5a4 4 0 0 1 8 0V11"/></svg>'
 };
-function ftNode(h,parent){ return {h,name:h.name,kind:h.kind,parent,children:null,open:false,id:++ftId,size:null,mod:null,meta:h.kind==='file'?parseName(h.name):null}; }
+function ftNode(h,parent){ return {h,ro:!!h.ro,name:h.name,kind:h.kind,parent,children:null,open:false,id:++ftId,size:null,mod:null,meta:h.kind==='file'?parseName(h.name):null}; }
 async function ftLoad(node){
   const kids=[];
   for await (const [name,h] of node.h.entries()){ if(name.startsWith('.')||name.startsWith('~$')) continue; if(h.kind==='file'&&!VID_RE.test(name)&&!GPS_RE.test(name)) continue; kids.push(ftNode(h,node)); }
@@ -2860,7 +2875,7 @@ async function ftAddRoot(h,persist=true){
   ftRender(); return r;
 }
 async function ftConnect(){
-  if(!DIR_OK){ toast('Ordnerzugriff gibt es in Chrome und Edge am Computer.',3500); return; }
+  if(!DIR_OK){ if(DIR_RO) return ftPickRO(); toast('Ordnerzugriff gibt es in Chrome, Edge und Brave am Computer.',3500); return; }
   let h; try{ h=await window.showDirectoryPicker({mode:'readwrite',id:'vlab-root'}); }catch(e){ return; }
   await ftAddRoot(h); setSideTab('tree');
 }
@@ -2882,7 +2897,7 @@ async function ftOpen(node,target){
   let c=clipOfNode(node);
   if(!c){ let f; try{ f=await node.h.getFile(); }catch(e){ toast('Datei nicht lesbar – wurde sie verschoben?'); return; }
     c=clips.find(x=>!x.demo&&x.name===f.name&&x.size===f.size);
-    if(!c){ c=addClip({name:f.name,size:f.size,url:URL.createObjectURL(f)}); rememberHandle(c,node.h); }
+    if(!c){ c=addClip({name:f.name,size:f.size,url:URL.createObjectURL(f)}); if(!node.ro) rememberHandle(c,node.h); }
     c._node=node; }
   if(mode==='single') { S.setClip(c); refreshSingleHead(); }
   else if(mode==='gps'){ GD.setClip(c); gpsSelects(); }
@@ -2929,7 +2944,7 @@ function ftMatch(n){ if(!FT.q) return true; if(n.kind==='directory') return ftHa
 function ftHasMatch(n){ if(!n.children) return false; return n.children.some(k=>k.kind==='directory'?ftHasMatch(k):ftMatch(k)); }
 function ftRender(){
   const el=$('#ftree'); if(!el) return; el.innerHTML='';
-  $('#ftEmpty').hidden=!!FT.roots.length||!DIR_OK; $('#ftNote').hidden=DIR_OK; $('#ftTools').hidden=!FT.roots.length;
+  $('#ftEmpty').hidden=!!FT.roots.length||!(DIR_OK||DIR_RO); $('#ftNote').hidden=DIR_OK||DIR_RO; $('#ftRo').hidden=!FT.roots.some(r=>r.ro); $('#ftTools').hidden=!FT.roots.length;
   const openIds=new Set([S,A,B,GD].map(d=>d.clip&&d.clip._node&&d.clip._node.id).filter(Boolean));
   const row=(n,depth)=>{
     const r=document.createElement('div'); r.className='ft-row '+(n.kind==='directory'?'dir':'file')+(n.root?' root':'')+(openIds.has(n.id)?' on':''); r.dataset.id=n.id; r.style.setProperty('--d',depth);
@@ -2937,15 +2952,15 @@ function ftRender(){
       r.draggable=false;
       r.innerHTML=`<span class="ft-chev${n.open?' open':''}">${ICN.chev}</span><span class="ft-ic dir">${n.open?ICN.open:ICN.folder}</span><span class="ft-nm"></span>`
         +(n.root&&!n.ok?`<button class="ft-unlock" data-a="unlock">${ICN.lock}Zugriff erlauben</button>`:`<span class="ft-cnt">${n.children?n.children.filter(k=>k.kind==='file').length||'':''}</span>`)
-        +`<span class="ft-acts"><button data-a="newdir" title="Neuer Unterordner">${ICN.plus}</button><button data-a="refresh" title="Aktualisieren">${ICN.refresh}</button>${n.root?`<button data-a="unroot" title="Ordner trennen">${ICN.x}</button>`:''}</span>`;
+        +`<span class="ft-acts">${n.ro?'':`<button data-a="newdir" title="Neuer Unterordner">${ICN.plus}</button><button data-a="refresh" title="Aktualisieren">${ICN.refresh}</button>`}${n.root?`<button data-a="unroot" title="Ordner trennen">${ICN.x}</button>`:''}</span>`;
       $('.ft-nm',r).textContent=n.name;
     } else {
       const isV=VID_RE.test(n.name), m=isV?n.meta:null, ttl=m&&m.ok?m.athlete+(m.place?' · '+m.place:''):n.name.replace(/\.[^.]+$/,''), sub=m&&m.ok?[m.date,m.disc?(m.disc+(m.sex?' '+m.sex:'')):null,m.run].filter(Boolean).join(' · '):(n.size?fmtMB(n.size):'');
-      r.draggable=true;
+      r.draggable=!n.ro;
       const th=FT.thumbs.get(n.id);
       r.innerHTML=(isV?`<span class="ft-th${th?' has':''}" data-tid="${n.id}" style="${th?`background-image:url(${th})`:''}"><i>${n.dur?fmtDur(n.dur):''}</i></span>`:`<span class="ft-ic gps">${ICN.gps}</span>`)
         +`<span class="ft-tx"><span class="ft-nm"></span><span class="ft-sub"></span></span>`
-        +`<span class="ft-acts">${mode==='cmp'&&isV?'<button data-a="a" class="ab-a" title="Als Video A">A</button><button data-a="b" class="ab-b" title="Als Video B">B</button>':''}<button data-a="label" title="Beschriften / umbenennen">${ICN.tag}</button><button data-a="move" title="Verschieben">${ICN.move}</button></span>`;
+        +`<span class="ft-acts">${mode==='cmp'&&isV?'<button data-a="a" class="ab-a" title="Als Video A">A</button><button data-a="b" class="ab-b" title="Als Video B">B</button>':''}${n.ro?'':`<button data-a="label" title="Beschriften / umbenennen">${ICN.tag}</button><button data-a="move" title="Verschieben">${ICN.move}</button>`}</span>`;
       $('.ft-nm',r).textContent=ttl; $('.ft-sub',r).textContent=sub; r.title=n.name+(n.size?' · '+fmtMB(n.size):'');
       if(isV&&!th) ftThumb(n);
     }
@@ -3020,6 +3035,9 @@ function ftWire(){
 }
 
 ftWire();
+(()=>{ const n=$('#ftRo'); if(!n) return; n.innerHTML=IS_BRAVE
+  ?'<b>Nur ansehen &amp; öffnen.</b> Zum Umbenennen und Verschieben in Brave einmalig <code>brave://flags/#file-system-access-api</code> aktivieren und Brave neu starten. Dann bleibt der Ordner auch nach dem Neuladen verbunden.'
+  :'<b>Nur ansehen &amp; öffnen.</b> Umbenennen, Verschieben und dauerhaftes Verbinden gehen in Chrome, Edge oder Brave. Nach dem Neuladen den Ordner erneut wählen.'; })();
 
 /* Beispiel-Videos: animierter Riesenslalom mit eingebrannter Bildnummer (prüft Bildgenauigkeit) */
 function b64Blob(b64,type){ const bin=atob(b64), u=new Uint8Array(bin.length); for(let i=0;i<bin.length;i++) u[i]=bin.charCodeAt(i); return new Blob([u],{type}); }
@@ -3037,7 +3055,7 @@ try{ const demoG=addTracks(DEMO_GPS.map(o=>({...o,samples:normSamples(o.samples)
 }catch(e){ console.error(e); }
 setColor(LS.get('color',COLORS[0])); setTool('none');
 restoreSession();
-setSideTab(LS.get('side',DIR_OK?'tree':'open')); ftRestore();
+setSideTab(LS.get('side',(DIR_OK||DIR_RO)?'tree':'open')); ftRestore();
 setRate(LS.get('rate',1));
 setLayout(LS.get('layout','side')==='overlay'?'overlay':'side');
 $$('.ctl.play').forEach(b=>b.innerHTML=ICON.play);
