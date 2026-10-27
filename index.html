@@ -1321,6 +1321,31 @@ body.m-cmp .lib.list .clip.row:hover .abtag{display:none}
 .side-tabs button{display:inline-flex;align-items:center;justify-content:center;gap:6px}
 .side-tabs button svg{width:15px;height:15px;flex:none;opacity:.85}
 #sideTree:not([hidden]){min-height:0;flex:1 1 auto;overflow-y:auto;overscroll-behavior:contain}
+
+/* ---------- Auswahlfelder auf der dunklen Bühne: hell, klar, mit Beschriftung im Feld ---------- */
+.player select.sel{appearance:none;-webkit-appearance:none;background-color:rgba(255,255,255,.09)!important;border:1px solid rgba(255,255,255,.16)!important;color:#fff!important;font-weight:600;
+  border-radius:12px!important;padding-right:34px!important;cursor:pointer;transition:background-color .2s,border-color .2s,box-shadow .2s;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E")!important;
+  background-repeat:no-repeat!important;background-position:right 11px center!important;background-size:14px!important}
+.player select.sel:hover{background-color:rgba(255,255,255,.14)!important;border-color:rgba(255,255,255,.28)!important}
+.player select.sel:focus-visible{outline:none;box-shadow:0 0 0 3px rgba(255,90,74,.45)}
+.player select.sel option{background:#1b1f26;color:#fff}
+/* GPS-Kopf: Beschriftung steht im Feld */
+.gps-sel{gap:8px!important;align-items:stretch!important}
+.gps-sel .ctl-lab{position:relative;display:flex!important;flex-direction:column;justify-content:center;gap:0;padding:0!important;font-size:0!important}
+.gps-sel .ctl-lab::before{content:attr(data-lab);position:absolute;left:13px;top:6px;font-size:9.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#9aa6b4;pointer-events:none;z-index:1}
+.gps-sel .ctl-lab select.sel{height:46px!important;padding-top:15px!important;padding-left:12px!important;font-size:13.5px!important;min-width:170px;max-width:280px}
+.gps-sel>label.ctl[for="gpsIn"]{height:46px!important;padding:0 16px!important;border-radius:12px!important;border:1px dashed rgba(255,255,255,.35)!important;background:transparent!important;color:#fff!important;font-weight:650;gap:7px;transition:background .2s,border-color .2s}
+.gps-sel>label.ctl[for="gpsIn"]:hover{background:rgba(255,90,74,.16)!important;border-color:#ff5a4a!important;border-style:solid!important}
+.gps-sel>label.ctl[for="gpsIn"] svg{color:#ff8a7c}
+/* Vergleich: Auswahlfelder A/B */
+.slot-head .sel{height:40px!important;font-size:13.5px!important}
+.slot-flip{background:rgba(255,255,255,.08)!important;border:1px solid rgba(255,255,255,.14)!important;color:#fff!important;border-radius:11px!important}
+.slot-flip:hover{background:rgba(255,255,255,.16)!important}
+.slot-head .meta{color:#aab4c0!important}
+.player .seg{background:rgba(255,255,255,.08)!important;border:1px solid rgba(255,255,255,.1)!important}
+.player .seg button{color:#b9c2cd!important}.player .seg button:hover{color:#fff!important}.player .seg button.on{color:#fff!important}
+.tut-open{border-color:rgba(255,255,255,.2)!important;color:#d4dae2!important}
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
   .aurora{display:none}
@@ -1428,10 +1453,10 @@ body.m-cmp .lib.list .clip.row:hover .abtag{display:none}
     <div class="pbar">
       <div class="ttl-wrap"><div class="eyebrow">GPS · Video</div><div class="ttl" id="gpsTitle">Tempo &amp; Zeit</div></div>
       <div class="gps-sel">
-        <label class="ctl-lab">Video <select class="sel" id="gpsVideo"></select></label>
-        <label class="ctl-lab">GPS <select class="sel" id="gpsTrack"></select></label>
+        <label class="ctl-lab" data-lab="Video">Video <select class="sel" id="gpsVideo"></select></label>
+        <label class="ctl-lab" data-lab="GPS-Daten">GPS <select class="sel" id="gpsTrack"></select></label>
         <label class="ctl" for="gpsIn" title="GPS-Datei importieren (CSV, GPX, JSON)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V4M7 9l5-5 5 5M5 20h14"/></svg>Import</label>
-        <label class="ctl-lab">Referenz <select class="sel" id="gpsRef"></select></label>
+        <label class="ctl-lab" data-lab="Referenz">Referenz <select class="sel" id="gpsRef"></select></label>
       </div>
       <input type="file" id="gpsIn" accept=".csv,.gpx,.json,.txt" multiple hidden>
     </div>
@@ -3806,7 +3831,7 @@ if(!LS.get('hint1',0)){ setTimeout(()=>{ toast(matchMedia('(pointer:coarse)').ma
 
 /* Update-Hinweis: prüft version.json auf GitHub Pages; «Aktualisieren» lädt die Seite ohne Cache neu */
 (()=>{
-  const BUILD='20261027133253'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
+  const BUILD='20261027133618'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
   // nach einem Update die ?v=… aus der Adresse entfernen
   try{ const u=new URL(location.href); if(u.searchParams.has('v')){ u.searchParams.delete('v'); history.replaceState(null,'',u.pathname+(u.search||'')+u.hash); } }catch(e){}
   const el=$('#upd'); let latest=null, snoozed=null, busy=false;
