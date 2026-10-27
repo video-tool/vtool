@@ -1644,6 +1644,21 @@ body.no-hdr #viewGps .pbar{flex-wrap:nowrap!important}
 body.no-hdr .gps-sel{flex-wrap:nowrap!important;gap:6px!important;margin-left:auto}
 body.no-hdr .gps-sel .ctl-lab select.sel{height:40px!important;padding-top:13px!important;min-width:150px!important;max-width:220px!important;font-size:12.5px!important}
 body.no-hdr .gps-sel>label.ctl[for="gpsIn"]{height:40px!important;padding:0 12px!important}
+
+/* Ghost-Leiste: Hinweis einzeilig */
+@media (min-width:1000px){
+  .player .g-state{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:7px 12px!important;flex:1 1 200px!important;min-width:0!important}
+  .player .g-state b:first-child{color:#ff8a7d}
+  #viewCmp .ov-acts [data-ov="cuta"] span,#viewCmp .ov-acts [data-ov="cutb"] span{display:none}
+  #viewCmp .ov-acts [data-ov="cuta"],#viewCmp .ov-acts [data-ov="cutb"]{width:32px;padding:0!important;justify-content:center}
+}
+
+@media (min-width:1000px){
+  .player .g-state{flex:1 1 300px!important;min-width:240px!important}
+  #ghostBar .gopts{gap:10px!important;flex-wrap:nowrap}
+  #ghostBar .gopts input[type=range]{width:80px!important}
+  #ghostBar .gopts .ctl-lab{font-size:11px!important;gap:6px}
+}
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
   .aurora{display:none}
@@ -1832,7 +1847,7 @@ body.no-hdr .gps-sel>label.ctl[for="gpsIn"]{height:40px!important;padding:0 12px
           <div class="seg" id="gStyle"><button data-gs="ghost" class="on" title="Nur Fahrer:in B einblenden">Geist</button><button data-gs="blend" title="Ganzes Bild B halbtransparent">50/50</button></div>
           <label class="ctl-lab">Deckkraft <input type="range" class="op" id="gOp" min="0.3" max="1" step="0.05" value="0.85"></label>
           <label class="ctl-lab" title="Wie stark B sich vom Hintergrund abheben muss">Empfindlichkeit <input type="range" class="op" id="gSens" min="10" max="60" step="1" value="32" style="direction:rtl"></label>
-          <button class="ctl" id="btnGExp" title="Ghost-Video als MP4 speichern (läuft in Echtzeit)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg>Video exportieren</button>
+          <button class="ctl" id="btnGExp" title="Ghost-Video als MP4 speichern (läuft in Echtzeit)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg><span>Export</span></button>
         </div>
       </div>
       <canvas class="gchart" id="gChart" hidden title="Zeitabstand A − B entlang des Laufs · grün: A gewinnt Zeit, rot: A verliert · klicken = hinspringen"></canvas>
@@ -1929,7 +1944,7 @@ body.no-hdr .gps-sel>label.ctl[for="gpsIn"]{height:40px!important;padding:0 12px
         <dt><kbd>Enter</kbd></dt><dd>An aktuellen Bildern synchronisieren</dd>
         <dt><kbd>m</kbd> · <kbd>n</kbd></dt><dd>Tor in A · Tor in B markieren (Abschnittszeiten)</dd>
         <dt><kbd>Alt</kbd>+<kbd>←</kbd><kbd>→</kbd></dt><dd>Nur B bewegen (nachführen)</dd>
-        <dt>Overlay</dt><dd>1 Gemeinsamer Punkt (erstes Tor in beiden) · 2 je 2 gleiche Tore in A und B antippen – oder «Übereinanderlegen» und B von Hand schieben · 3 «Overlay erstellen» – B folgt dem Kameraschwenk. Export und Standbild speichern das Overlay.</dd>
+        <dt>Overlay</dt><dd>1 Gemeinsamer Punkt (erstes Tor in beiden) · 2 je 2 gleiche Tore in A und B antippen – oder «Von Hand» und B von Hand schieben · 3 «Overlay erstellen» – B folgt dem Kameraschwenk. Export und Standbild speichern das Overlay.</dd>
         <dt>Korrigieren</dt><dd>Während «Overlay erstellen»: Pause · 1 s zurück · Korrigieren – die Berechnung läuft mit deiner Lage weiter. Im fertigen Overlay: anhalten → «Hier korrigieren». B ziehen, Rechtsklick ziehen (oder Ctrl/Alt + ziehen) = drehen, Mausrad = Grösse, Pfeiltasten = fein, Enter = übernehmen</dd>
         <dt>Mehrere Läufe</dt><dd>Fertiges Overlay → «Lauf hinzufügen»: der Lauf bleibt im Bild, bei B den nächsten wählen und ausrichten (bis 4 Läufe). × am Lauf-Chip entfernt ihn</dd>
         <dt>Namen</dt><dd>Knopf «Namen» oben: blasse Namens-Pillen folgen den Fahrer:innen im Overlay</dd>
@@ -3159,13 +3174,13 @@ function ovUI(){
     t=OV.pick==='a'?`<b>Lauf A</b> · Punkt ${n} von 2 antippen – am besten ein Tor (Torflagge), zwei weit auseinander.`:`<b>Lauf B</b> · den <b>gleichen</b> Punkt ${n} antippen. Die gestrichelten Kreise zeigen die Lage in A.`;
     acts=ovBtn('cancel','Abbrechen'); }
   else if(OV.fix&&!done){ // von Hand übereinanderlegen (ohne Berechnung)
-    t=`<b>Übereinanderlegen</b> · B auf die Tore ziehen, dann übernehmen. <span class="ov-hint">Rechtsklick ziehen: drehen · Mausrad: Grösse · Pfeiltasten: fein <b class="ov-fixinfo" id="ovFixInfo"></b></span>`;
+    t=`<b>Von Hand</b> · B auf die Tore ziehen, dann übernehmen. <span class="ov-hint">Rechtsklick ziehen: drehen · Mausrad: Grösse · Pfeiltasten: fein <b class="ov-fixinfo" id="ovFixInfo"></b></span>`;
     acts=ovBtn('fixreset','Auf 0',OVI.reset,'ghost','Handkorrektur zurücksetzen')+ovBtn('fixno','Abbrechen','','ghost')+ovBtn('fixok','Übernehmen',OVI.ok,'pri'); }
   else if(OV.fix){ const near=OV.K.some(k=>Math.abs(k.e-ovE())<0.15);
     t=`<b>Korrigieren</b> · B auf die Tore ziehen – ab hier wird neu gerechnet. <span class="ov-hint">Rechtsklick ziehen: drehen · Mausrad: Grösse · Pfeiltasten: fein <b class="ov-fixinfo" id="ovFixInfo"></b></span>`;
     acts=(near?ovBtn('fixdel','Korrektur löschen',OVI.trash,'ghost'):'')+ovBtn('fixreset','Auf 0',OVI.reset,'ghost','Handkorrektur zurücksetzen')+ovBtn('fixno','Abbrechen','','ghost')+ovBtn('fixok','Übernehmen & ab hier neu rechnen',OVI.ok,'pri','Ab diesem Bild wird mit deiner Lage neu berechnet – davor bleibt alles'); }
   else if(st===1){ t=`<b>Gleicher Moment</b> · A und B einzeln zum ersten gemeinsamen Tor ziehen. ${cut}`;
-    acts=cutBtns+ovBtn('hand','Übereinanderlegen',OVI.fix,'','A und B hier verbinden und B von Hand über A schieben')+ovBtn('sync','Gemeinsamer Punkt',OVI.pin,'pri','A und B an diesem Moment verbinden'); }
+    acts=cutBtns+ovBtn('hand','Von Hand',OVI.fix,'','A und B hier verbinden und B von Hand über A schieben')+ovBtn('sync','Gemeinsamer Punkt',OVI.pin,'pri','A und B an diesem Moment verbinden'); }
   else if(st===2){ t=`<b>Synchron</b> <span class="ov-dim">B ${G.off>=0?'+':'−'}${Math.abs(G.off).toFixed(2)} s</span> · in A und B je zwei gleiche Tore antippen. ${cut}`;
     acts=ovBtn('edit','Punkt ändern',OVI.back,'ghost')+ovBtn('pick','Referenzpunkte setzen',OVI.pin,'pri','2 feste Punkte in A und B antippen'); }
   else if(!done){ t=`<b>B liegt über A</b> · vorklicken zeigt den Vorsprung – bei Kameraschwenk «Overlay erstellen». ${cut}`;
@@ -3536,11 +3551,12 @@ function ghostUI(){
   pr.hidden=GH.state!=='busy'; opts.hidden=GH.state!=='ready'; ch.hidden=GH.state!=='ready';
   btn.textContent=GH.state==='busy'?'Abbrechen':GH.state==='ready'?'Neu berechnen':'Ghost berechnen';
   btn.disabled=!key&&GH.state!=='busy';
-  if(!A.ready||!B.ready) st.innerHTML='<b>Lauf A</b> (Kameraansicht) und <b>Lauf B</b> (Geist) oben wählen. Beide vom <b>gleichen Kamerastandort</b> gefilmt, Zoom darf variieren.';
-  else if(!G.linked) st.innerHTML='<b>Schritt 1:</b> kurz «Side by Side» wählen, in A und B den <b>gleichen Moment</b> einstellen (z. B. Startbewegung oder erstes Tor) und <b>«Sync»</b> drücken.';
-  else if(GH.state==='idle') st.innerHTML='<b>Schritt 2:</b> «Ghost berechnen» – die Kamerabewegung von B wird auf A umgerechnet. Dauer ca. '+Math.max(5,Math.round((Math.min(A.dur,B.dur))*0.5))+' s.';
+  if(!A.ready||!B.ready) st.innerHTML='<b>Lauf A</b> und <b>Lauf B</b> oben wählen – gleicher Kamerastandort, Zoom darf variieren.';
+  else if(!G.linked) st.innerHTML='<b>1 · Gleicher Moment</b> · in «Side by Side» A und B zum gleichen Tor ziehen, dann «Sync».';
+  else if(GH.state==='idle') st.innerHTML='<b>2 · Ghost berechnen</b> · dauert ca. '+Math.max(5,Math.round((Math.min(A.dur,B.dur))*0.5))+' s.';
   else if(GH.state==='busy') st.innerHTML='Berechnet lokal auf deinem Gerät …';
-  else st.innerHTML='Lauf B als Geist in Lauf A · Zahl oben rechts = Zeitabstand (<span style="color:var(--good);font-weight:800">−</span> = A schneller). Gemessen nur, wo die Kamera der Fahrer:in folgt.';
+  else st.innerHTML='<b>Ghost fertig</b> · Zeitabstand oben rechts (<span style="color:var(--good);font-weight:800">−</span> = A schneller)';
+  st.title='Lauf B als Geist in Lauf A. Gemessen wird nur, wo die Kamera der Fahrer:in folgt.';
   if(GH.state!=='ready'){ $('canvas.ghost',A.stage).hidden=true; $('.gap',A.stage).hidden=true; }
 }
 async function ghostExport(){
@@ -4532,7 +4548,7 @@ if(!LS.get('hint1',0)){ setTimeout(()=>{ toast(matchMedia('(pointer:coarse)').ma
 
 /* Update-Hinweis: prüft version.json auf GitHub Pages; «Aktualisieren» lädt die Seite ohne Cache neu */
 (()=>{
-  const BUILD='20261027193746'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
+  const BUILD='20261027201655'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
   // nach einem Update die ?v=… aus der Adresse entfernen
   try{ const u=new URL(location.href); if(u.searchParams.has('v')){ u.searchParams.delete('v'); history.replaceState(null,'',u.pathname+(u.search||'')+u.hash); } }catch(e){}
   const el=$('#upd'); let latest=null, snoozed=null, busy=false;
