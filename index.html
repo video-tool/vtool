@@ -1660,6 +1660,21 @@ body.no-hdr .gps-sel>label.ctl[for="gpsIn"]{height:40px!important;padding:0 12px
   #ghostBar .gopts .ctl-lab{font-size:11px!important;gap:6px}
 }
 
+
+/* Namensliste: kleinere Schrift */
+.lib.list.names .clip.row{padding:3px 8px!important;gap:6px!important;min-height:0!important;margin:0!important}
+.lib.list.names .clip.row .nm{font-size:11px!important;font-weight:500!important;line-height:1.5!important}
+.lib.list.names .clip.row.on .nm{font-weight:650!important}
+.lib.list.names .clip.row .ndur{font-size:10px!important}
+.lib.list.names .clip.row .abtag span{width:16px!important;height:16px!important;font-size:9px!important;border-radius:5px!important}
+#sideTree.names .ft-nm{font-size:11.5px!important}
+#sideTree.names .ft-sub{font-size:9.5px!important}
+#sideTree.names .ft-row.file{min-height:26px!important}
+
+#viewCmp.ov-nameset .stage:first-child{cursor:crosshair;box-shadow:0 0 0 2px rgba(255,209,102,.8)}
+
+.slot-flip{display:inline-grid!important;place-items:center!important;padding:0!important;line-height:0}
+.slot-flip svg{display:block;margin:0!important}
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
   .aurora{display:none}
@@ -3145,7 +3160,7 @@ function ovSim(pa,pb){ // Ähnlichkeits-Transformation B-Videopixel → A-Videop
   return [re,-im,a1[0]-(re*b1[0]-im*b1[1]),im,re,a1[1]-(im*b1[0]+re*b1[1])]; }
 function ovFollowOK(){ return OV.follow&&GH.state==='ready'&&ghostKey()===GH.key; }
 
-const OVI={plus:`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>`,reset:`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 1 0 2.3-5.6"/><path d="M4 4v4h4"/></svg>`,pause:`<svg class="ic" viewBox="0 0 24 24" fill="currentColor"><rect x="6.5" y="5" width="4" height="14" rx="1"/><rect x="13.5" y="5" width="4" height="14" rx="1"/></svg>`,play:`<svg class="ic" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>`,fix:`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M3 12h18"/><path d="M9 6l3-3 3 3M9 18l3 3 3-3M6 9l-3 3 3 3M18 9l3 3-3 3"/></svg>`,trash:`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg>`,side:`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="5" width="8.5" height="14" rx="2"/><rect x="13" y="5" width="8.5" height="14" rx="2"/></svg>`,cs:`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M8 4H5v16h3"/><path d="M11 12h8M16 9l3 3-3 3"/></svg>`,ce:`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h3v16h-3"/><path d="M13 12H5M8 9l-3 3 3 3"/></svg>`,ok:`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>`,pin:`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="10" r="3"/><path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0C18.5 15.4 12 21 12 21z"/></svg>`,go:`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/><path d="M19 16l.7 2 2 .7-2 .7-.7 2-.7-2-2-.7 2-.7z"/></svg>`,back:`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>`,x:`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"/></svg>`};
+const OVI={tag:`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12V5a2 2 0 0 1 2-2h7l9 9-9 9-9-9z"/><circle cx="8" cy="8" r="1.6"/></svg>`,plus:`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>`,reset:`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 1 0 2.3-5.6"/><path d="M4 4v4h4"/></svg>`,pause:`<svg class="ic" viewBox="0 0 24 24" fill="currentColor"><rect x="6.5" y="5" width="4" height="14" rx="1"/><rect x="13.5" y="5" width="4" height="14" rx="1"/></svg>`,play:`<svg class="ic" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>`,fix:`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M3 12h18"/><path d="M9 6l3-3 3 3M9 18l3 3 3-3M6 9l-3 3 3 3M18 9l3 3-3 3"/></svg>`,trash:`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg>`,side:`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="5" width="8.5" height="14" rx="2"/><rect x="13" y="5" width="8.5" height="14" rx="2"/></svg>`,cs:`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M8 4H5v16h3"/><path d="M11 12h8M16 9l3 3-3 3"/></svg>`,ce:`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h3v16h-3"/><path d="M13 12H5M8 9l-3 3 3 3"/></svg>`,ok:`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>`,pin:`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="10" r="3"/><path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0C18.5 15.4 12 21 12 21z"/></svg>`,go:`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/><path d="M19 16l.7 2 2 .7-2 .7-.7 2-.7-2-2-.7 2-.7z"/></svg>`,back:`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>`,x:`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"/></svg>`};
 function ovT0(){ return OV.cut.a!=null?Math.max(OV.cut.a,-G.off,0):G.syncA; }
 function ovStep(){ if(!G.linked||OV.edit) return 1; if(OV.pick||!OV.T) return 2; return 3; }
 function ovApplyCut(){ // Ausschnitt als Loop in beiden Zeitleisten anzeigen
@@ -3174,6 +3189,7 @@ function ovUI(){
   else if(OV.pick){ const n=(OV.pick==='a'?OV.pa:OV.pb).length+1;
     t=OV.pick==='a'?`<b>Lauf A</b> · Punkt ${n} von 2 antippen – am besten ein Tor (Torflagge), zwei weit auseinander.`:`<b>Lauf B</b> · den <b>gleichen</b> Punkt ${n} antippen. Die gestrichelten Kreise zeigen die Lage in A.`;
     acts=ovBtn('cancel','Abbrechen'); }
+  else if(OV.nameQ&&OV.nameQ.length){ const it=OV.nameQ[0]; t=`<b>Namen setzen</b> · im Bild auf <b>${it.n}</b> tippen`; acts=ovBtn('nameskip','Überspringen','','ghost')+ovBtn('namedone','Fertig',OVI.ok,'pri'); }
   else if(OV.fix&&!done){ // von Hand übereinanderlegen (ohne Berechnung)
     t=`<b>Von Hand</b> · B auf die Tore ziehen, dann übernehmen. <span class="ov-hint">Rechtsklick ziehen: drehen · Mausrad: Grösse · Pfeiltasten: fein <b class="ov-fixinfo" id="ovFixInfo"></b></span>`;
     acts=ovBtn('fixreset','Auf 0',OVI.reset,'ghost','Handkorrektur zurücksetzen')+ovBtn('fixno','Abbrechen','','ghost')+ovBtn('fixok','Übernehmen',OVI.ok,'pri'); }
@@ -3188,7 +3204,7 @@ function ovUI(){
     acts=ovBtn('edit','Punkt ändern',OVI.back,'ghost')+ovBtn('pick','Punkte setzen',OVI.pin,'ghost','2 gleiche Tore in A und B antippen')+ovBtn('hand','Von Hand',OVI.fix,'','B von Hand nachschieben')+ovBtn('make','Overlay erstellen',OVI.go,'pri'); }
   else { const kc=OV.K.length?`<span class="ov-chip">${OVI.fix}${OV.K.length} Korrektur${OV.K.length>1?'en':''}<button data-ov="fixall" title="Alle Korrekturen entfernen">${OVI.x}</button></span>`:'';
     t=`<b>Overlay fertig</b> · Tore verrutscht? Anhalten und «Hier korrigieren». ${cut} ${kc}`;
-    acts=ovBtn('edit','Neu beginnen',OVI.back,'ghost')+ovBtn('make','Neu berechnen',OVI.go,'ghost')+(LAY.length<3?ovBtn('addrun','Lauf hinzufügen',OVI.plus,'ghost','Diesen Lauf im Bild behalten und einen weiteren dazunehmen'):'')+ovBtn('fix','Hier korrigieren',OVI.fix,'pri','B an dieser Stelle von Hand nachschieben'); }
+    acts=ovBtn('edit','Neu beginnen',OVI.back,'ghost')+ovBtn('make','Neu berechnen',OVI.go,'ghost')+ovBtn('nameset','Namen setzen',OVI.tag,'ghost','Fahrer:innen antippen – die Namens-Pillen folgen dann genau ihnen')+(LAY.length<3?ovBtn('addrun','Lauf hinzufügen',OVI.plus,'ghost','Diesen Lauf im Bild behalten und einen weiteren dazunehmen'):'')+ovBtn('fix','Hier korrigieren',OVI.fix,'pri','B an dieser Stelle von Hand nachschieben'); }
   // nur neu zeichnen, wenn sich etwas ändert – sonst gehen Klicks verloren
   if(LAY.length) t+=' <span class="ov-lays">'+LAY.map((L,i)=>`<span class="ov-lay"><i style="background:${L.col}"></i>${L.let} · ${L.name}<button data-ov="laydel" data-i="${i}" title="Lauf ${L.let} entfernen">${OVI.x}</button></span>`).join('')+'</span>';
   const tx=$('#ovTxt'), ac=$('#ovActs'); if(tx._h!==t){ tx.innerHTML=t; tx._h=t; tx.title=tx.textContent.replace(/\s+/g,' ').trim(); } if(ac._h!==acts){ ac.innerHTML=acts; ac._h=acts; }
@@ -3251,7 +3267,7 @@ function ovTags(on){
   TAGS.geo={SX,SY,R,z}; tagsDetect(items);
   const now=performance.now(), playing=!A.v.paused, rr=Math.max(5,R.w*z.s*0.016), gapL=12, out=[];
   for(const it of items){ const S0=TAGS.st[it.k]||(TAGS.st[it.k]={vis:false}), el=els[it.k];
-    const T=TRK[it.k]; let uv=T&&T.ok?[T.u,T.v]:null;
+    const T=TRK[it.k]; let uv=T&&T.ok?[T.u,T.v]:pathAt(it.k,A.frame,2);
     if(!uv){ S0.vis=false; el.classList.remove('on'); if(lines[it.k]) lines[it.k].style.opacity=0; continue; }
     if(el.classList.contains('drag')){ out.push({it,el,S0,w:el.offsetWidth,h:el.offsetHeight,x:S0.px,y:S0.py,fixed:1}); continue; }
     S0.uv=uv; const t=toS(uv);
@@ -3274,39 +3290,48 @@ function ovTags(on){
       ln.setAttribute('x1',x1.toFixed(1)); ln.setAttribute('y1',y1.toFixed(1)); ln.setAttribute('x2',S0.ax.toFixed(1)); ln.setAttribute('y2',Math.max(y1,y2).toFixed(1)); ln.style.opacity=y2-y1>2?0.75:0; ln.style.stroke=p.it.col; } } }
 /* Verfolgung: Vorhersage aus Tempo/Richtung, nur Treffer im engen Fenster um die Vorhersage (Rutscher & Zuschauer fallen weg) */
 const TGD={a:document.createElement('canvas'),b:document.createElement('canvas'),t:0,f:-1};
-const TRK={}; TAGS.live={};
+const TRK={}; TAGS.live={}; TAGS.path={}; TAGS.seed=null;
 function trkPrior(it){ const e=it.L?ovTA()-it.L.t0:ovE(); if(it.L&&(e<0||e>it.L.eEnd)) return null; const p=posAt(e,it.pk,null,it.L); return p?[p[0]/(it.L?it.L.W0:GH.W0),p[1]/(it.L?it.L.hA:GH.hA)]:null; }
+function pathAt(k,fr,tol){ const P=TAGS.path[k]; if(!P) return null; for(let d=0;d<=tol;d++){ const q=P.get(fr-d)||P.get(fr+d); if(q) return q; } return null; }
 function trkStep(k,list,W,H,it){
-  const mt=A.v.currentTime; let T=TRK[k]; const prior=trkPrior(it);
-  if(T&&Math.abs(mt-T.t)>0.45&&!T.user){ T=TRK[k]=null; } // grosser Sprung in der Zeitleiste → neu fassen
-  if(T&&T.user&&Math.abs(mt-T.t)>0.45){ T=TRK[k]=null; }
-  if(!T){ // fassen: nur in der Nähe der berechneten Lage
-    if(!prior) return; let best=null,bs=-1; for(const b of list){ const d=Math.hypot(b.x/W-prior[0],(b.y/H-prior[1])*H/W); if(d>0.07||b.a<4) continue; const sc=b.a*Math.exp(-d/0.025); if(sc>bs){ bs=sc; best=b; } }
-    if(!best){ TRK[k]={u:prior[0],v:prior[1],du:0,dv:0,t:mt,miss:1,hits:1,ok:true}; return; } TRK[k]={u:best.x/W,v:best.y/H,du:0,dv:0,t:mt,miss:0,hits:1,ok:true}; return; }
-  const dt=clamp(mt-T.t,-0.2,0.2); T.t=mt; const pu=T.u+T.du*dt, pv=T.v+T.dv*dt, gate=0.022+0.012*Math.min(T.miss,4)+Math.abs(dt)*0.05;
-  let best=null,bd=1e9; for(const b of list){ if(b.a<3) continue; const d=Math.hypot(b.x/W-pu,(b.y/H-pv)*H/W); if(d<gate&&d<bd){ bd=d; best=b; } }
-  if(best){ const ru=best.x/W-pu, rv=best.y/H-pv; T.u=pu+ru*0.45; T.v=pv+rv*0.45; if(Math.abs(dt)>0.01){ T.du=clamp(T.du+ru/dt*0.18,-1.2,1.2); T.dv=clamp(T.dv+rv/dt*0.18,-1.2,1.2); } T.miss=0; T.hits++; if(T.hits>=2) T.ok=true; }
-  else if(prior&&!T.user&&Math.hypot(prior[0]-pu,(prior[1]-pv)*H/W)<gate*2.5){ T.u=pu+(prior[0]-pu)*0.3; T.v=pv+(prior[1]-pv)*0.3; T.miss=Math.max(0,T.miss-1); } // berechnete Lage als schwacher Messwert
-  else { T.u=pu; T.v=pv; T.miss++; T.du*=0.9; T.dv*=0.9; if(T.miss>(T.user?24:12)) TRK[k]=null; }
-  if(TRK[k]&&prior&&!T.user){ const d=Math.hypot(T.u-prior[0],(T.v-prior[1])*H/W); if(d>0.08) TRK[k]=null; } } // weit weg von der berechneten Lage → verworfen
+  const mt=A.v.currentTime, fr=A.frame; let T=TRK[k];
+  if(T&&Math.abs(mt-T.t)>0.6) T=TRK[k]=null; // Sprung in der Zeitleiste
+  if(!T){ const q=pathAt(k,fr,3); if(q){ T=TRK[k]={u:q[0],v:q[1],du:0,dv:0,t:mt,miss:0,ok:true}; } }
+  if(!T){ // automatisch fassen: grösster bewegter Fleck, der zweimal hintereinander am gleichen Ort auftaucht
+    const big=list.filter(b=>b.a>=5).sort((x,y)=>y.a-x.a)[0], C=TAGS.cand||(TAGS.cand={}); if(!big){ C[k]=null; return; }
+    const u=big.x/W, v=big.y/H, c=C[k]; if(c&&Math.hypot(u-c.u,(v-c.v)*H/W)<0.05){ c.n++; c.u=u; c.v=v; } else C[k]={u,v,n:1};
+    if(C[k].n>=2){ T=TRK[k]={u,v,du:0,dv:0,t:mt,miss:0,ok:true}; C[k]=null; } else return; }
+  const dt=clamp(mt-T.t,-0.3,0.3); T.t=mt; const pu=T.u+T.du*dt, pv=T.v+T.dv*dt, gate=0.025+0.012*Math.min(T.miss,4)+Math.abs(dt)*0.08;
+  let best=null,bs=-1; for(const b of list){ if(b.a<3) continue; const d=Math.hypot(b.x/W-pu,(b.y/H-pv)*H/W); if(d>gate) continue; const sc=b.a*Math.exp(-d/(gate*0.5)); if(sc>bs){ bs=sc; best=b; } }
+  if(best){ const ru=best.x/W-pu, rv=best.y/H-pv; T.u=pu+ru*0.6; T.v=pv+rv*0.6; if(Math.abs(dt)>0.01){ T.du=clamp(T.du+ru/dt*0.25,-1.5,1.5); T.dv=clamp(T.dv+rv/dt*0.25,-1.5,1.5); } T.miss=0; }
+  else { T.u=pu; T.v=pv; T.miss++; T.du*=0.9; T.dv*=0.9; if(T.miss>15){ TRK[k]=null; return; } }
+  if(!TAGS.path[k]) TAGS.path[k]=new Map(); if(T.miss<3) TAGS.path[k].set(fr,[T.u,T.v]); }
+/* Bewegung statt Unterschied: Fahrer:innen bewegen sich schnell, Zuschauer stehen, Rutscher sind langsam. Kamerabewegung wird herausgerechnet. */
+const MOV={W:360,prev:null,tmp:document.createElement('canvas')};
+function grayData(id){ const d=id.data, n=d.length>>2, g=new Float32Array(n); for(let i=0,j=0;i<n;i++,j+=4) g[i]=0.299*d[j]+0.587*d[j+1]+0.114*d[j+2]; return g; }
 function tagsDetect(items){
-  const now=performance.now(), fr=A.frame; if(A.v.paused?fr===TGD.f:now-TGD.t<60) return;
-  if(!A.v.videoWidth||A.v.readyState<2||A.v.seeking||(B.clip&&(B.v.seeking||B.v.readyState<2))||LAY.some(L=>L.v.seeking)) return; // erst wenn alle Bilder stehen
-  TGD.t=now; TGD.f=fr;
-  const W=480, H=Math.round(W*A.v.videoHeight/A.v.videoWidth), n=W*H, sc=W/GH.W0;
-  for(const c of [TGD.a,TGD.b]) if(c.width!==W||c.height!==H){ c.width=W; c.height=H; }
-  const xa=TGD.a.getContext('2d',{willReadFrequently:true}), xb=TGD.b.getContext('2d',{willReadFrequently:true});
-  xa.drawImage(A.v,0,0,W,H); const dA=xa.getImageData(0,0,W,H).data;
-  const bl=m=>blobs(morph(m,W,H,true),W,H,4).filter(b=>b.a<W*H*0.004); // nur zusammenfassen, nicht wegfressen – kleine Fahrer:innen bleiben erhalten
-  const runs=items.filter(it=>it.k!=='a'); let doneA=false;
-  for(const it of runs){ const L=it.L, v=L?L.v:B.v; if(!v||v.readyState<2) continue;
+  const now=performance.now(), fr=A.frame; if(A.v.paused?fr===TGD.f:now-TGD.t<70) return;
+  if(!A.v.videoWidth||A.v.readyState<2||A.v.seeking) return;
+  TGD.t=now; TGD.f=fr; const bBusy=B.clip&&(B.v.seeking||B.v.readyState<2);
+  const W=MOV.W, H=Math.round(W*A.v.videoHeight/A.v.videoWidth), n=W*H, sc=W/GH.W0, mt=A.v.currentTime;
+  const mk=()=>{ const c=document.createElement('canvas'); c.width=W; c.height=H; return c; };
+  const cur={t:mt,a:mk(),b:{}}; cur.a.getContext('2d').drawImage(A.v,0,0,W,H);
+  for(const it of items){ if(it.k==='a') continue; const L=it.L, v=L?L.v:B.v; if(!v||v.readyState<2||v.seeking||(!L&&bBusy)) continue;
     let M; if(L){ const e=ovTA()-L.t0; if(e<0||e>L.eEnd) continue; M=affInv(simToAff(paramsAtL(L,clamp(e,0,L.eEnd)),L.W0,L.hA,L.W0,L.hB)); }
     else { const p=paramsAt(clamp(ovE(),0,GH.eEnd)); M=affMul(ovDMat(ovDAt(ovE()),GH.W0),affInv(simToAff(p,GH.W0,GH.hA,GH.W0,GH.hB))); }
-    xb.setTransform(1,0,0,1,0,0); xb.clearRect(0,0,W,H); xb.setTransform(sc*M[0],sc*M[3],sc*M[1],sc*M[4],sc*M[2],sc*M[5]); xb.drawImage(v,0,0,GH.W0,L?L.hB:GH.hB); xb.setTransform(1,0,0,1,0,0);
-    const dB=xb.getImageData(0,0,W,H).data, ok=new Uint8Array(n); for(let i=0;i<n;i++) ok[i]=dB[i*4+3]>200?1:0;
-    const c=L?0:(paramsAt(clamp(ovE(),0,GH.eEnd))[4]||0);
-    trkStep(it.k,bl(ghostMask(dA,dB,ok,n,c,GH.sens+14,'B')),W,H,it);
-    if(!doneA){ doneA=true; trkStep('a',bl(ghostMask(dA,dB,ok,n,c,GH.sens+14,'A')),W,H,items[0]); } } }
+    const c=mk(), x=c.getContext('2d'); x.setTransform(sc*M[0],sc*M[3],sc*M[1],sc*M[4],sc*M[2],sc*M[5]); x.drawImage(v,0,0,GH.W0,L?L.hB:GH.hB); cur.b[it.k]=c; }
+  const P=MOV.prev; MOV.prev=cur;
+  if(!P) return; const dt=mt-P.t; if(Math.abs(dt)<0.02||Math.abs(dt)>0.45) return; // zu nah / zu weit auseinander für eine Bewegungsmessung
+  // Kamerabewegung vorher → jetzt aus den beiden A-Bildern bestimmen
+  const ga=grayData(cur.a.getContext('2d').getImageData(0,0,W,H)), gp=grayData(P.a.getContext('2d').getImageData(0,0,W,H));
+  const r=align(pyramid(gp,W,H,3),pyramid(ga,W,H,3),[0,0,0,0,0],false,1); const Q=r&&r.ok&&r.inl>0.3?simToAff(r.p,W,H,W,H):[1,0,0,0,1,0];
+  const T=MOV.tmp; if(T.width!==W||T.height!==H){ T.width=W; T.height=H; } const tx=T.getContext('2d',{willReadFrequently:true});
+  const warp=c=>{ tx.setTransform(1,0,0,1,0,0); tx.clearRect(0,0,W,H); tx.setTransform(Q[0],Q[3],Q[1],Q[4],Q[2],Q[5]); tx.drawImage(c,0,0); tx.setTransform(1,0,0,1,0,0); return tx.getImageData(0,0,W,H).data; };
+  const motion=(curC,prevC)=>{ const a=curC.getContext('2d').getImageData(0,0,W,H).data, b=warp(prevC), m=new Uint8Array(n);
+    for(let i=0,j=0;i<n;i++,j+=4){ if(a[j+3]<200||b[j+3]<200) continue; const d=Math.abs(0.299*(a[j]-b[j])+0.587*(a[j+1]-b[j+1])+0.114*(a[j+2]-b[j+2])); if(d>26) m[i]=1; }
+    return blobs(morph(m,W,H,true),W,H,4).filter(bb=>bb.a<n*0.01); };
+  trkStep('a',motion(cur.a,P.a),W,H,items[0]);
+  for(const it of items){ if(it.k==='a'||!cur.b[it.k]||!P.b[it.k]) continue; trkStep(it.k,motion(cur.b[it.k],P.b[it.k]),W,H,it); } }
 /* Pille auf die richtige Person ziehen */
 function tagDrag(el){
   el.addEventListener('pointerdown',e=>{ e.stopPropagation(); e.preventDefault(); const k=el.dataset.k, S0=TAGS.st[k]; if(!S0) return;
@@ -3316,7 +3341,7 @@ function tagDrag(el){
     const up=ev=>{ el.releasePointerCapture(ev.pointerId); el.removeEventListener('pointermove',mv); el.removeEventListener('pointerup',up); el.classList.remove('drag');
       const g=TAGS.geo; if(!g) return; const px=S0.px+el.offsetWidth/2, py=S0.py+el.offsetHeight+22; // Spitze des Strichs = Person
       const u=((px-g.SX-g.z.x)/g.z.s-g.R.x)/g.R.w, v=((py-g.SY-g.z.y)/g.z.s-g.R.y)/g.R.h;
-      if(u<0||u>1||v<0||v>1) return; TRK[k]={u,v,du:0,dv:0,t:A.v.currentTime,miss:0,hits:3,ok:true,user:true}; S0.ax=null; S0.vis=false; TGD.f=-1;
+      if(u<0||u>1||v<0||v>1) return; tagSeed(k,u,v); S0.ax=null; S0.vis=false;
       toast('Pille sitzt jetzt auf dieser Person.',1600); };
     el.addEventListener('pointermove',mv); el.addEventListener('pointerup',up); });
 }
@@ -3329,7 +3354,7 @@ function layerAdd(){
   if(!ovFollowOK()){ toast('Zuerst «Overlay erstellen» – dann weiteren Lauf hinzufügen.'); return; }
   const v=document.createElement('video'); v.muted=true; v.playsInline=true; v.preload='auto'; v.src=B.clip.url; v.className='gen-vid'; document.body.appendChild(v);
   const L={aClip:A.clip,clip:B.clip,v,off:G.off,syncA:G.syncA,t0:GH.t0,step:GH.step,eEnd:GH.eEnd,W0:GH.W0,hA:GH.hA,hB:GH.hB,S:GH.S.map(s=>({e:s.e,p:ovKeep(s),pb:s.pb,cb:s.cb})),col:LCOL[LAY.length],let:LLET[LAY.length],name:lastName(B.clip)};
-  LAY.push(L);
+  LAY.push(L); if(TAGS.path.b){ TAGS.path['l'+(LAY.length-1)]=TAGS.path.b; delete TAGS.path.b; delete TRK.b; }
   // B frei machen für den nächsten Lauf – gleicher Ausschnitt, neue Synchronisierung
   A.pause(); B.pause(); G.playing=false; OV.T=null; OV.follow=false; OV.K=[]; OV.fix=null; OV.pick=null; OV.edit=false; OV.pa=[]; OV.pb=[]; GH.state='idle'; GH.key='';
   B.setClip(null); unlink(); syncSelects(); renderLib(); ovUI(); ghostUI();
@@ -3412,7 +3437,7 @@ function renderOv(){
       OV.T=null; OV.follow=false; toast((a==='cuta'?'Start':'Ende')+' des Ausschnitts: '+fmtS(t),1400); }
     else if(a==='cutx'){ OV.cut={a:null,b:null}; OV.T=null; OV.follow=false; }
     else if(a==='sync'){ doSync(); OV.edit=false; OV.T=null; OV.follow=false; return ovStart(); }
-    else if(a==='edit'){ ovKill(); OV.edit=true; OV.T=null; OV.follow=false; OV.pick=null; unlink(); toast('A und B einzeln verschieben, dann «Gemeinsamer Punkt».',2600); }
+    else if(a==='edit'){ ovKill(); tagsReset(); OV.edit=true; OV.T=null; OV.follow=false; OV.pick=null; unlink(); toast('A und B einzeln verschieben, dann «Gemeinsamer Punkt».',2600); }
     else if(a==='pick') return ovStart();
     else if(a==='cancel') return ovStop();
     else if(a==='make'){ OV.follow=true; OV.fix=null; if(!(GH.state==='ready'&&ghostKey()===GH.key)){ OV.K=[]; ovUI(); ghostCompute(); return; } ovUI(); return; }
@@ -3424,6 +3449,9 @@ function renderOv(){
     else if(a==='fixreset'){ if(OV.fix){ OV.fix.dx=0; OV.fix.dy=0; OV.fix.s=1; OV.fix.r=0; A.dirty=true; } return; }
     else if(a==='fixno'){ if(!ovFollowOK()&&OV.handNew){ OV.T=null; } OV.handNew=false; OV.fix=null; }
     else if(a==='addrun'){ return layerAdd(); }
+    else if(a==='nameset'){ tagsReset(); return nameSetStart(); }
+    else if(a==='nameskip'){ OV.nameQ.shift(); if(!OV.nameQ.length) nameSetEnd(); else ovUI(); return; }
+    else if(a==='namedone'){ return nameSetEnd(); }
     else if(a==='laydel'){ return layerDel(+b.dataset.i); }
     else if(a==='lvpause'){ GH.paused=true; }
     else if(a==='lvrun'){ GH.paused=false; }
@@ -3456,7 +3484,7 @@ function resFile(kind){ const b=c=>base(c.name).replace(/[^\w\-]+/g,'_'); return
 function resPack(kind){ const r=n=>Math.round(n*1e4)/1e4, pt=q=>q?[Math.round(q[0]*10)/10,Math.round(q[1]*10)/10]:null;
   const ghOk=GH.state==='ready'&&GH.key===ghostKey()&&GH.S&&GH.S.length;
   return {v:1,kind,a:A.clip.name,b:B.clip.name,at:Date.now(),off:G.off,syncA:G.syncA,
-    ov:kind==='ov'?{cut:OV.cut,T:OV.T,pa:OV.pa,pb:OV.pb,K:OV.K,follow:ovFollowOK()}:null,
+    ov:kind==='ov'?{cut:OV.cut,T:OV.T,pa:OV.pa,pb:OV.pb,K:OV.K,follow:ovFollowOK(),names:{a:TAGS.path.a?[...TAGS.path.a].filter((_,i)=>i%2===0).map(([f,q])=>[f,+q[0].toFixed(4),+q[1].toFixed(4)]):null,b:TAGS.path.b?[...TAGS.path.b].filter((_,i)=>i%2===0).map(([f,q])=>[f,+q[0].toFixed(4),+q[1].toFixed(4)]):null}}:null,
     gh:ghOk?{t0:GH.t0,off:GH.off,step:GH.step,eEnd:GH.eEnd,W0:GH.W0,hA:GH.hA,hB:GH.hB,gapE:GH.gapE,gapV:GH.gapV,
       S:GH.S.map(s=>[r(s.e),s.p.map(r),s.ok?1:0,pt(s.pa),pt(s.pb),pt(s.ca),pt(s.cb),s.q?s.q.map(r):null])}:null}; }
 function resSave(){ clearTimeout(RES.timer); RES.timer=setTimeout(async()=>{
@@ -3474,7 +3502,8 @@ async function resTry(){
   if(!d||pairKey(kind)!==key||GH.state==='busy') return; resApply(d,kind); }
 function resApply(d,kind){
   A.pause(); B.pause(); G.playing=false; G.off=d.off; G.syncA=d.syncA; G.linked=true; linkBtn(); updSync();
-  if(kind==='ov'&&d.ov){ OV.cut=d.ov.cut||{a:null,b:null}; OV.T=d.ov.T||null; OV.pa=d.ov.pa||[]; OV.pb=d.ov.pb||[]; OV.K=d.ov.K||[]; OV.edit=false; OV.pick=null; OV.fix=null; OV.follow=!!(d.ov.follow&&d.gh); }
+  if(kind==='ov'&&d.ov){ tagsReset(); const nm=d.ov.names||{}; for(const k of ['a','b']) if(nm[k]){ const m=new Map(); nm[k].forEach(([f,u,v])=>{ m.set(f,[u,v]); m.set(f+1,[u,v]); }); TAGS.path[k]=m; }
+    OV.cut=d.ov.cut||{a:null,b:null}; OV.T=d.ov.T||null; OV.pa=d.ov.pa||[]; OV.pb=d.ov.pb||[]; OV.K=d.ov.K||[]; OV.edit=false; OV.pick=null; OV.fix=null; OV.follow=!!(d.ov.follow&&d.gh); }
   if(d.gh){ const g=d.gh; Object.assign(GH,{t0:g.t0,off:g.off,step:g.step,eEnd:g.eEnd,W0:g.W0,hA:g.hA,hB:g.hB,gapE:g.gapE||[],gapV:g.gapV||[]});
     GH.S=g.S.map(([e,p,ok,pa,pb,ca,cb,q])=>({e,p,ok:!!ok,pa,pb,ca,cb,q:q||[1,0,0,0,1,0]})); GH.state='ready'; GH.key=ghostKey(); GH.dirty=true; }
   const t=kind==='ov'?ovT0():G.syncA; A.seekTime(t); if(A.onUserSeek) A.onUserSeek(A);
@@ -3484,7 +3513,7 @@ function resApply(d,kind){
 setInterval(resTry,800);
 
 (()=>{ const b=$('#ovNames'), set=v=>{ $('#viewCmp').classList.toggle('ov-names',v); b.classList.toggle('on',v); LS.set('ovnames',v?1:0); };
-  set(LS.get('ovnames',1)!==0); b.addEventListener('click',()=>set(!b.classList.contains('on'))); })();
+  set(LS.get('ovnames',1)!==0); b.addEventListener('click',()=>{ const on=!b.classList.contains('on'); set(on); if(on&&!Object.keys(TAGS.path).length&&(ovFollowOK()||LAY.length)) nameSetStart(); if(!on&&OV.nameQ) nameSetEnd(); }); })();
 
 if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)) window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
 
@@ -3500,12 +3529,25 @@ if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)) window.add
     else { [nav,add,...mov].forEach(el=>{ const m=ph.get(el); if(el.nextSibling!==m) m.before(el); }); sp.remove(); }
     requestAnimationFrame(()=>dispatchEvent(new Event('resize'))); };
   mq.addEventListener('change',placeChrome); placeChrome(); })();
+
+/* Namen setzen: Fahrer:in einmal antippen – ab dort wird genau diese Person verfolgt */
+function tagSeed(k,u,v){ TAGS.path[k]=new Map([[A.frame,[u,v]]]); TRK[k]={u,v,du:0,dv:0,t:A.v.currentTime,miss:0,hits:3,ok:true}; TGD.f=-1;
+  (TAGS.seedPts=TAGS.seedPts||{})[k]=[A.frame,u,v]; if(typeof resSave==='function') resSave(); }
+function tagKeys(){ const L=[{k:'a',n:lastName(A.clip)}]; if(B.clip) L.push({k:'b',n:lastName(B.clip)}); LAY.forEach((l,i)=>L.push({k:'l'+i,n:l.name})); return L; }
+function tagsReset(){ TAGS.path={}; TAGS.seedPts={}; TAGS.cand={}; MOV.prev=null; for(const k in TRK) delete TRK[k]; }
+function nameSetStart(){ if(!ovFollowOK()&&!LAY.length){ toast('Zuerst «Overlay erstellen».'); return; } A.pause(); B.pause(); G.playing=false; cmpPlayIcon();
+  OV.nameQ=tagKeys(); $('#viewCmp').classList.add('ov-names','ov-nameset'); $('#ovNames').classList.add('on'); ovUI(); }
+function nameSetEnd(){ OV.nameQ=null; $('#viewCmp').classList.remove('ov-nameset'); ovUI(); }
+(()=>{ const st=$('#cStages');
+  st.addEventListener('pointerdown',e=>{ if(!OV.nameQ||!OV.nameQ.length) return; if(e.target.closest('.stage')!==A.stage) return; e.stopPropagation(); e.preventDefault();
+    const [u,v]=A.toUV(e), it=OV.nameQ.shift(); tagSeed(it.k,u,v); if(!OV.nameQ.length){ nameSetEnd(); toast('Namen gesetzt – die Pillen folgen jetzt diesen Personen. Falsch? Pille auf die richtige Person ziehen.',4200); } else ovUI(); },true);
+  ['click','pointerup'].forEach(t=>st.addEventListener(t,e=>{ if(OV.nameQ&&OV.nameQ.length){ e.stopPropagation(); e.preventDefault(); } },true)); })();
 function cmpReset(){
   A.pause(); B.pause(); G.playing=false;
   A.setClip(null); B.setClip(null); unlink(); G.off=0; G.syncA=0;
   if(typeof OV!=='undefined'){ OV.T=null; OV.follow=false; OV.pick=null; OV.edit=false; OV.cut={a:null,b:null}; OV.pa=[]; OV.pb=[]; OV.key=''; ovKill(); }
   if(GH.state==='busy') GH.abort=true; GH.state='idle'; GH.key='';
-  RES.tried=''; layersClear(); A.loopOv=null; B.loopOv=null; syncSelects(); renderLib(); if(typeof ovUI==='function') ovUI(); ghostUI(); cmpPlayIcon(); updSync();
+  RES.tried=''; layersClear(); tagsReset(); A.loopOv=null; B.loopOv=null; syncSelects(); renderLib(); if(typeof ovUI==='function') ovUI(); ghostUI(); cmpPlayIcon(); updSync();
   toast('Vergleich zurückgesetzt – die Videos bleiben unter «In Arbeit».',2600); }
 $('#cmpReset').addEventListener('click',cmpReset);
 function renderGhost(){
@@ -4549,7 +4591,7 @@ if(!LS.get('hint1',0)){ setTimeout(()=>{ toast(matchMedia('(pointer:coarse)').ma
 
 /* Update-Hinweis: prüft version.json auf GitHub Pages; «Aktualisieren» lädt die Seite ohne Cache neu */
 (()=>{
-  const BUILD='20261027203218'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
+  const BUILD='20261027205300'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
   // nach einem Update die ?v=… aus der Adresse entfernen
   try{ const u=new URL(location.href); if(u.searchParams.has('v')){ u.searchParams.delete('v'); history.replaceState(null,'',u.pathname+(u.search||'')+u.hash); } }catch(e){}
   const el=$('#upd'); let latest=null, snoozed=null, busy=false;
