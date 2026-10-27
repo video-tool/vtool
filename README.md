@@ -8,7 +8,7 @@ Videos werden nur im Browser geöffnet und **nie hochgeladen**. Alles steckt in 
 
 ## Beispiel-Videos
 
-Beim Öffnen des Links sind Beispiel-Läufe geladen: Sölden (26.10.2025, Riesenslalom Herren, Kamera auf der Piste: Meillard, Gratz, Braathen) und Courchevel (11.03.2026, Abfahrtstraining, Kamera am Gegenhang: Boisset, Kriechmayr, Allègre). Sie liegen im Ordner `demo/` (720p) und werden direkt von GitHub Pages abgespielt. Eigene Videos bleiben weiterhin nur auf dem Gerät.
+Beim Öffnen des Links sind Beispiel-Läufe geladen: Sölden (26.10.2025, Riesenslalom Herren, Kamera auf der Piste: Meillard, Gratz, Braathen) Courchevel (11.03.2026, Abfahrtstraining, Gegenhang: Boisset, Kriechmayr, Allègre) und Hafjell (Weltcup März 2026, Gegenhang: Riesenslalom Moltzan, Rast; Slalom Holdener, Shiffrin). Sie liegen im Ordner `demo/` (720p) und werden direkt von GitHub Pages abgespielt. Eigene Videos bleiben weiterhin nur auf dem Gerät.
 
 ## Modi
 
@@ -27,7 +27,7 @@ Beim Öffnen des Links sind Beispiel-Läufe geladen: Sölden (26.10.2025, Riesen
 
 ## Arbeitsablauf
 
-- **Dateinamen** im Format `Athlet_Ort_JJMMTT_Disziplin_Geschlecht_Lauf.mp4` (z. B. `Meillard_Adelboden_270110_GS_M_L1.mp4`) werden erkannt: Athlet, Ort, Datum, Disziplin und Lauf erscheinen in der Liste und sind durchsuchbar. `T1`/`TR1` = Training 1. Auch die Reihenfolge `athlet_vgh_dh_tr1_ort_JJMMTT` wird erkannt (`vgh` = Kamera Gegenhang).
+- **Dateinamen** im Format `Athlet_Ort_JJMMTT_Disziplin_Geschlecht_Lauf.mp4` (z. B. `Meillard_Adelboden_270110_GS_M_L1.mp4`) werden erkannt: Athlet, Ort, Datum, Disziplin und Lauf erscheinen in der Liste und sind durchsuchbar. `T1`/`TR1` = Training 1. Auch die Reihenfolge `athlet_vgh_dh_tr1_ort_JJMMTT` wird erkannt (`vgh`/`camGH` = Kamera Gegenhang, `wc` = Weltcup).
 - **Videos bleiben nach Neuladen** in der Liste (Chrome/Edge). Nach einem Neustart des Browsers genügt ein Klick auf «Öffnen».
 - **Marker mit Notizen** (`m`), Sprung zum vorherigen/nächsten Marker mit `,` / `.`. Notizen erscheinen im Bild, in der Zeitleiste und im Export.
 - **Clip-Export** (`e`): Loop-Bereich, ab aktuellem Bild oder ganzes Video, in 1× bis 0,1× Zeitlupe, mit Zeichnungen, Info-Leiste und Notizen. Im Vergleich A | B nebeneinander, im GPS-Modus mit GPS-Anzeigen. MP4, direkt teilbar.

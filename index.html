@@ -1050,7 +1050,8 @@ canvas.strip:hover{box-shadow:inset 0 0 0 1px rgba(255,255,255,.1),0 10px 30px -
 .ft-demo-h{display:flex;flex-direction:column;gap:1px;padding:0 8px 6px}
 .ft-demo-h b{font-size:12.5px;font-weight:650}
 .ft-demo-h span{font-size:11px;color:var(--muted)}
-.ft-demo .ft-row{--d:0;animation:rowIn .45s var(--ease-out) both}
+.ft-demo .ft-row{--d:0}
+.ft-demo.first .ft-row{animation:rowIn .45s var(--ease-out) both}
 .ft-demo .ft-row:nth-child(3){animation-delay:.06s}.ft-demo .ft-row:nth-child(4){animation-delay:.12s}
 .ab-tags{display:flex;gap:3px;margin-left:auto}
 .ab-tags em{font-style:normal;font-size:10px;font-weight:800;color:#fff;width:18px;height:18px;border-radius:6px;display:grid;place-items:center}
@@ -1259,6 +1260,7 @@ svg.ic{width:15px;height:15px;flex:none;vertical-align:-2px;margin-right:5px}
 body.touring .toast{z-index:450}
 @media (max-width:600px){ .tour-card{padding:12px 14px} .tour-p{font-size:12.5px} }
 
+.ft-demo .ft-demo-h:not(:first-child){margin-top:12px;padding-top:10px;border-top:1px solid var(--line)}
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
   .aurora{display:none}
@@ -2385,6 +2387,10 @@ const RBUF=new Float32Array(20000);
 function costAt(T,L,p){ const {g,w,h}=L, cx=w/2, cy=h/2, n0=T.length/3; let n=0, s=0;
   for(let k=0;k<T.length;k+=3){ const x=T[k],y=T[k+1]; const X=(1+p[0])*x-p[1]*y+p[2]+cx, Y=p[1]*x+(1+p[0])*y+p[3]+cy; if(X<1||Y<1||X>=w-2||Y>=h-2) continue; const r=bil(g,w,h,X,Y)-T[k+2]; RBUF[n++]=r; s+=r; }
   if(n<n0*0.5) return 1e9; const m=s/n; let a=0; for(let i=0;i<n;i++) a+=Math.abs(RBUF[i]-m); return a/n+(1-n/n0)*10; }
+function costOv(T,L,p){ // wie costAt, aber auch bei kleiner Überlappung (grosse Schwenks) brauchbar
+  const {g,w,h}=L, cx=w/2, cy=h/2, n0=T.length/3; let n=0, s=0;
+  for(let k=0;k<T.length;k+=3){ const x=T[k],y=T[k+1]; const X=(1+p[0])*x-p[1]*y+p[2]+cx, Y=p[1]*x+(1+p[0])*y+p[3]+cy; if(X<1||Y<1||X>=w-2||Y>=h-2) continue; const r=bil(g,w,h,X,Y)-T[k+2]; RBUF[n++]=r; s+=r; }
+  if(n<Math.max(40,n0*0.15)) return 1e9; const m=s/n; let a=0; for(let i=0;i<n;i++) a+=Math.abs(RBUF[i]-m); return a/n+(1-n/n0)*2; }
 function search(T,L,p0,rad,stp,scales){ let best=p0.slice(), bc=costAt(T,L,p0);
   for(const ds of scales) for(let dy=-rad;dy<=rad;dy+=stp) for(let dx=-rad;dx<=rad;dx+=stp){ const p=[(1+p0[0])*ds-1,p0[1]*ds,p0[2]+dx,p0[3]+dy,p0[4]]; const c=costAt(T,L,p); if(c<bc){ bc=c; best=p; } }
   return best; }
@@ -2419,8 +2425,9 @@ function solve5(A0,b0){ const A=Array.from({length:5},(_,i)=>Array.from(A0.slice
 function align(PA,PB,init,global,minL=0){
   const nl=PA.length, top=nl-1; let p=init.slice(); p[2]/=1<<top; p[3]/=1<<top;
   const Tc=allPix(PA[top]);
-  if(global){ const o=typeof global==='object'?global:{R:0.35}; let sc=o.scales; if(!sc){ sc=[]; for(let s=0.7;s<=1.46;s+=0.04) sc.push(s); } const R=Math.round(PB[top].w*o.R); p=search(Tc,PB[top],[0,0,0,0,0],R,1,sc); }
+  if(global&&!global.around){ const o=typeof global==='object'?global:{R:0.35}; let sc=o.scales; if(!sc){ sc=[]; for(let s=0.7;s<=1.46;s+=0.04) sc.push(s); } const R=Math.round(PB[top].w*o.R); p=search(Tc,PB[top],[0,0,0,0,0],R,1,sc); }
   else p=search(Tc,PB[top],p,4,1,[0.97,0.985,1,1.015,1.03]);
+  if(global&&global.around){ p=init.slice(); p[2]/=1<<top; p[3]/=1<<top; p=search(Tc,PB[top],p,global.rad,1,global.scales); }
   let res=null;
   for(let l=top;l>=minL;l--){
     const T=pick(PA[l],l===0?3000:l===1?2000:l===2?1200:600);
@@ -2482,7 +2489,7 @@ async function ghostCompute(){
   try{ va=await loadV(A.clip.url); vb=await loadV(B.clip.url); }catch(e){ GH.state='idle'; ghostUI(); toast('Videos konnten nicht geladen werden.'); return; }
   const ca=document.createElement('canvas'); ca.width=W0; ca.height=hA; const xa=ca.getContext('2d',{willReadFrequently:true});
   const cb=document.createElement('canvas'); cb.width=W0; cb.height=hB; const xb=cb.getContext('2d',{willReadFrequently:true});
-  const S=[]; let prev=null, prevPA=null, prevPB=null, pInit=[0,0,0,0,0], lastQa=[0,0,0,0,0], lastQb=[0,0,0,0,0]; const trk={a:null,b:null};
+  GH.dbg=[]; const hist=[]; let fail=0; const S=[]; let prev=null, prevPA=null, prevPB=null, pInit=[0,0,0,0,0], lastQa=[0,0,0,0,0], lastQb=[0,0,0,0,0]; const trk={a:null,b:null};
   const n=Math.max(2,Math.floor(eEnd/step)+1), t0=performance.now();
   for(let i=0;i<n;i++){
     if(GH.abort||ghostKey()!==key){ break; }
@@ -2494,14 +2501,29 @@ async function ghostCompute(){
     // Kameraketten: A(i-1)→A(i) und B(i-1)→B(i) – aufeinanderfolgende Bilder sind sich sehr ähnlich, daher sehr zuverlässig
     let q=[1,0,0,0,1,0], qb=[1,0,0,0,1,0];
     const sane=r=>r.ok&&r.inl>0.35&&Math.abs(r.p[0])<0.06&&Math.abs(r.p[1])<0.04&&Math.hypot(r.p[2],r.p[3])<W0*0.35;
-    if(prevPA){ const rq=align(prevPA,PA,lastQa,false,1); if(sane(rq)){ q=simToAff(rq.p,W0,hA,W0,hA); lastQa=rq.p.slice(); lastQa[4]=0; }
-      const rb=align(prevPB,PB,lastQb,false,1); if(sane(rb)){ qb=simToAff(rb.p,W0,hB,W0,hB); lastQb=rb.p.slice(); lastQb[4]=0; } }
+    const dbg={e:+(i*step).toFixed(2)};
+    if(prevPA){ const rq=align(prevPA,PA,lastQa,false,1); dbg.qa=sane(rq)?1:0; dbg.qainl=+rq.inl.toFixed(2); dbg.qat=[+rq.p[2].toFixed(1),+rq.p[3].toFixed(1)]; if(sane(rq)){ q=simToAff(rq.p,W0,hA,W0,hA); lastQa=rq.p.slice(); lastQa[4]=0; }
+      const rb=align(prevPB,PB,lastQb,false,1); dbg.qb=sane(rb)?1:0; dbg.qbinl=+rb.inl.toFixed(2); dbg.qbt=[+rb.p[2].toFixed(1),+rb.p[3].toFixed(1)]; if(sane(rb)){ qb=simToAff(rb.p,W0,hB,W0,hB); lastQb=rb.p.slice(); lastQb[4]=0; } }
     // B → A: aus den Ketten vorhersagen, dann fein nachführen (nur übernehmen, wenn plausibel)
     let p, ok;
     if(!prev){ let r=refP?align(PA,PB,refP,false):null; if(!r||!(r.ok&&r.inl>0.35)) r=align(PA,PB,refP||pInit,true); if(refP&&!(r.ok&&r.inl>0.35)){ r={ok:true,inl:0.4,p:refP.slice()}; } ok=r.ok&&r.inl>0.35; p=r.p.slice(); }
     else{ const Mp=affMul(affMul(qb,prev.M),affInv(q)), p0=affToSim(Mp,W0,hA,W0,hB); p0[4]=prev.p[4];
-      const r=align(PA,PB,p0,false), ds=Math.abs((1+r.p[0])/(1+p0[0])-1), dt=Math.hypot(r.p[2]-p0[2],r.p[3]-p0[3]);
-      ok=r.ok&&r.inl>0.45&&ds<0.04&&dt<W0*0.03&&r.p[0]>-0.5&&r.p[0]<1; p=ok?r.p.slice():p0; }
+      // Zoom/Drehung zwischen zwei Läufen vom gleichen Standort ändern sich nur langsam → Vorhersage sanft zum bisherigen Median ziehen
+      const med=k=>{ const v=hist.map(h=>h[k]).sort((a,b)=>a-b); return v[v.length>>1]; };
+      const mS=hist.length>=5?med(0):null, mB=hist.length>=5?med(1):null;
+      if(mS!=null){ p0[0]+=(mS-p0[0])*0.15; p0[1]+=(mB-p0[1])*0.15; }
+      // Kandidaten: Vorhersage, Feinausrichtung ab Vorhersage, nach Fehlschlägen zusätzlich breite Suche um die Vorhersage
+      const cands=[{p:p0,src:'pred'}]; const r=align(PA,PB,p0,false); if(r.ok) cands.push({p:r.p,src:'ref',inl:r.inl});
+      if(fail>=1){ const r2=align(PA,PB,p0,{around:true,rad:fail>=3?14:9,scales:[0.95,0.975,1,1.025,1.05]}); if(r2&&r2.ok) cands.push({p:r2.p,src:'wide',inl:r2.inl}); }
+      // Bewertung auf Stufe 1: robuste Abweichung an kontrastreichen Stellen (Torstangen, Zäune, Kanten)
+      const T1=pick(PA[1],1500), L1=PB[1], cost=pp=>costOv(T1,L1,[pp[0],pp[1],pp[2]/2,pp[3]/2,pp[4]]);
+      let best=null; for(const c of cands){ c.c=cost(c.p); if(mS!=null&&(Math.abs(c.p[0]-mS)>0.06||Math.abs(c.p[1]-mB)>0.03)) c.c+=1e6; if(Math.abs(c.p[1])>0.12) c.c+=1e6; if(!best||c.c<best.c) best=c; }
+      const cp=cands[0].c, refined=best.src!=='pred'&&best.c<cp*0.995&&best.c<1e6;
+      p=refined?best.p.slice():p0; fail=refined?0:fail+1; ok=best.c<1e6&&fail<6; // Vorhersage gilt ~1 s als sicher
+      const ds=Math.abs((1+r.p[0])/(1+p0[0])-1), dt=Math.hypot(r.p[2]-p0[2],r.p[3]-p0[3]);
+      dbg.rinl=+r.inl.toFixed(2); dbg.ds=+ds.toFixed(3); dbg.dt=+dt.toFixed(1); dbg.src=best.src; dbg.cp=+cp.toFixed(2); dbg.cb=+best.c.toFixed(2); }
+    if(ok&&!fail){ hist.push([p[0],p[1]]); if(hist.length>40) hist.shift(); }
+    dbg.ok=ok?1:0; dbg.p=p.map(v=>+v.toFixed(3)); (GH.dbg=GH.dbg||[]).push(dbg);
     // Positionen beider Fahrer:innen (in A(i)-Pixeln)
     const M=simToAff(p,W0,hA,W0,hB); const dB=new Uint8ClampedArray(W0*hA*4), okB=new Uint8Array(W0*hA);
     const gB=ib.data;
@@ -2627,7 +2649,8 @@ function ovUI(){
     acts=ovBtn('pick','Punkte neu',OVI.back,'ghost')+ovBtn('make','Overlay erstellen',OVI.go,'pri'); }
   else { t=`<b>Overlay fertig</b> · abspielen oder in der Zeitleiste scrubben. Deckkraft oben anpassen. ${cut}`;
     acts=ovBtn('edit','Neu beginnen',OVI.back,'ghost')+ovBtn('make','Neu berechnen',OVI.go,''); }
-  $('#ovTxt').innerHTML=t; $('#ovActs').innerHTML=acts;
+  // nur neu zeichnen, wenn sich etwas ändert – sonst gehen Klicks verloren
+  const tx=$('#ovTxt'), ac=$('#ovActs'); if(tx._h!==t){ tx.innerHTML=t; tx._h=t; } if(ac._h!==acts){ ac.innerHTML=acts; ac._h=acts; }
   const pr=$('#ovProg'); pr.hidden=!busy; if(busy){ const w=($('#ghostBar .gprog i')||{style:{}}).style.width||'0%'; $('i',pr).style.width=w; }
   ovApplyCut(); ovMarks();
 }
@@ -2995,7 +3018,8 @@ function parseName(n){
     if(!m.disc&&DISC[u]){ m.disc=u; continue; }
     if(!m.sex&&/^(M|W|F|H|D|MEN|WOMEN|HERREN|DAMEN)$/.test(u)){ m.sex=/^(M|H|MEN|HERREN)$/.test(u)?'M':'W'; continue; }
     if(!m.run&&/^(L|R|RUN|LAUF|T|TR)\d{1,2}$/.test(u)){ m.run=(u.startsWith('T')?'Training ':'Lauf ')+u.match(/\d+/)[0]; continue; }
-    if(!m.cam&&/^(VGH|GH|GEGENHANG|VZ|VS|VST|VZI|VPI|PISTE|CAM\d*|POS\d+)$/.test(u)){ m.cam=/^(VGH|GH|GEGENHANG)$/.test(u)?'Gegenhang':/^(VZ|VZI)$/.test(u)?'Ziel':/^(VS|VST)$/.test(u)?'Start':/^(VPI|PISTE)$/.test(u)?'Piste':u; continue; }
+    if(/^(WC|EC|COC|FIS|NJR|NC)$/.test(u)){ m.level=u==='WC'?'Weltcup':u==='EC'?'Europacup':u; continue; }
+    if(!m.cam&&/^(VGH|GH|CAMGH|GEGENHANG|VZ|VS|VST|VZI|VPI|PISTE|CAM\d*|CAM[A-Z]{1,3}|POS\d+)$/.test(u)){ m.cam=/^(VGH|GH|CAMGH|GEGENHANG)$/.test(u)?'Gegenhang':/^(VZ|VZI)$/.test(u)?'Ziel':/^(VS|VST)$/.test(u)?'Start':/^(VPI|PISTE)$/.test(u)?'Piste':u; continue; }
     if(/^(BEISPIEL|GHOST|VIDEO|CLIP|KAMERA|FIX|FPS|LAUF)$/.test(u)) continue;
     if(/^[A-Za-zÄÖÜäöüéèàçñ]{2,}(-[A-Za-zÄÖÜäöüéèàçñ]{2,})*$/.test(t)) rest.push(t);
   }
@@ -3497,6 +3521,8 @@ function ftRender(){
 function renderDemoList(){
   const el=$('#ftDemo'); if(!el) return; const ds=clips.filter(c=>c.demo&&c.meta&&c.meta.ok);
   const show=ds.length>0&&!FT.roots.length; el.hidden=!show; const em=$('#ftEmpty'); if(em) em.classList.toggle('compact',show); if(!show) return;
+  const sig=mode+'|'+[S,A,B,GD].map(d=>d.clip&&d.clip.id).join(',')+'|'+ds.map(c=>c.id+':'+(c.poster?1:0)+':'+(c.fps||0)).join(',');
+  if(el._sig===sig) return; el.classList.toggle('first',!el._sig); el._sig=sig;
   el.innerHTML=''; let grp=null;
   ds.forEach(c=>{ const r=document.createElement('div'); const isOn=mode==='single'?S.clip===c:mode==='gps'?GD.clip===c:(A.clip===c||B.clip===c);
     r.className='ft-row file demo-row'+(isOn?' on':''); r.dataset.ci=clips.indexOf(c); const m=c.meta||{};
@@ -3602,9 +3628,9 @@ try{ const demoG=addTracks(DEMO_GPS.map(o=>({...o,samples:normSamples(o.samples)
 setColor(LS.get('color',COLORS[0])); setTool('none');
 restoreSession();
 /* Beispiel-Rennvideos (Sölden 2025, RS Herren) – liegen neben der App im Ordner demo/ */
-const REAL_DEMO=[["Meillard_Soelden_251026_GS_M_L1.mp4", 15588690], ["Gratz_Soelden_251026_GS_M_L1.mp4", 14558417], ["Braathen_Soelden_251026_GS_M_L1.mp4", 14943167], ["boisset_vgh_dh_tr1_courchevel_260311.mp4", 21187378], ["kriechmayr_vgh_dh_tr1_courchevel_260311.mp4", 20042150], ["allegre_vgh_dh_tr1_courchevel_260311.mp4", 22402295]];
+const REAL_DEMO=[["Meillard_Soelden_251026_GS_M_L1.mp4", 15588690], ["Gratz_Soelden_251026_GS_M_L1.mp4", 14558417], ["Braathen_Soelden_251026_GS_M_L1.mp4", 14943167], ["boisset_vgh_dh_tr1_courchevel_260311.mp4", 21187378], ["kriechmayr_vgh_dh_tr1_courchevel_260311.mp4", 20042150], ["allegre_vgh_dh_tr1_courchevel_260311.mp4", 22402295], ["moltzan_wc_gs_l2_camGH_hafjell_260325.mp4", 20626562], ["rast_wc_gs_l2_camGH_hafjell_260325.mp4", 22227812], ["holdener_wc_sl_l1_camGH_hafjell_260324.mp4", 19422965], ["shiffrin_wc_sl_l1_camGH_hafjell_260324.mp4", 19588133]];
 // Zeitpunkt im Video, an dem alle Läufe derselben Serie am gleichen Ort sind (gemessen)
-const DEMO_OFF={'boisset_vgh_dh_tr1_courchevel_260311.mp4':0.7,'kriechmayr_vgh_dh_tr1_courchevel_260311.mp4':0.3,'allegre_vgh_dh_tr1_courchevel_260311.mp4':0};
+const DEMO_OFF={'boisset_vgh_dh_tr1_courchevel_260311.mp4':0.7,'kriechmayr_vgh_dh_tr1_courchevel_260311.mp4':0.3,'allegre_vgh_dh_tr1_courchevel_260311.mp4':0,'moltzan_wc_gs_l2_camGH_hafjell_260325.mp4':0,'rast_wc_gs_l2_camGH_hafjell_260325.mp4':2.0,'holdener_wc_sl_l1_camGH_hafjell_260324.mp4':0.7,'shiffrin_wc_sl_l1_camGH_hafjell_260324.mp4':0};
 (async()=>{
   if(!/^https?:/.test(location.protocol)) return;
   try{ const r=await fetch('demo/'+REAL_DEMO[0][0],{method:'HEAD',cache:'no-store'}); if(!r.ok) return; }catch(e){ return; }
@@ -3664,7 +3690,7 @@ if(!LS.get('hint1',0)){ setTimeout(()=>{ toast(matchMedia('(pointer:coarse)').ma
 
 /* Update-Hinweis: prüft version.json auf GitHub Pages; «Aktualisieren» lädt die Seite ohne Cache neu */
 (()=>{
-  const BUILD='20261027114042'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
+  const BUILD='20261027123310'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
   // nach einem Update die ?v=… aus der Adresse entfernen
   try{ const u=new URL(location.href); if(u.searchParams.has('v')){ u.searchParams.delete('v'); history.replaceState(null,'',u.pathname+(u.search||'')+u.hash); } }catch(e){}
   const el=$('#upd'); let latest=null, snoozed=null, busy=false;
