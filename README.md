@@ -10,8 +10,26 @@ Videos werden nur im Browser geöffnet und **nie hochgeladen**. Alles steckt in 
 
 - **Einzelvideo:** Zeitlupe, Bild für Bild, Zeitleiste mit Vorschaubildern, Loop-Bereich, Marker, Zeichnen & Winkel messen, Standbild (PNG).
 - **Vergleich:** A und B nebeneinander oder überlagert, an einem Moment synchronisieren und gemeinsam abspielen.
-  - **Ghost:** Zwei Läufe vom gleichen Kamerastandort in einem Bild. Die Kamerabewegung von B wird auf A umgerechnet (lokal im Browser), B erscheint als Geist, mit Zeitabstand live, Grafik «wo gewonnen/verloren» und MP4-Export.
+  - **Ghost:** Zwei Läufe vom gleichen Kamerastandort in einem Bild. Die Kamerabewegung von B wird auf A umgerechnet (lokal im Browser), B erscheint als Geist, mit Zeitabstand live (nur dort gemessen, wo die Kamera der Fahrer:in folgt), Grafik «wo gewonnen/verloren» und MP4-Export.
 - **GPS:** GPS-Daten eines Laufs mit dem Video verknüpfen. Im Bild: Tempo & Beschleunigung, Fahrlinie (gefärbt nach Tempo, Beschleunigung oder Δ zur Referenz), Laufzeit und Differenz. Darunter das Profil über die Distanz.
+
+## Bedienung
+
+- **Links: Ordner.** «Ordner wählen» verbindet einen Video-Ordner deines Geräts (Chrome/Edge). Du siehst die Ordnerstruktur, öffnest Videos per Klick, benennst sie um und verschiebst sie per Ziehen. Unter «Geöffnet» stehen die aktuell geladenen Videos.
+- **Unter dem Video:** links In / Out / Loop, in der Mitte Abspielen und Bild-für-Bild, daneben **ein Tempo-Knopf**: jeder Klick wechselt 1× → ½× → ¼× → 0,1× → 1×.
+- **Werkzeuge** (Zeichnen, Messen, Bildanpassung) öffnen sich per Klick auf den Stift neben dem Video und sind sonst eingeklappt.
+- **fps** stehen oben in der Kopfzeile und werden beim Laden gemessen; Klick darauf, um sie von Hand zu ändern.
+
+## Arbeitsablauf
+
+- **Dateinamen** im Format `Athlet_Ort_JJMMTT_Disziplin_Geschlecht_Lauf.mp4` (z. B. `Meillard_Adelboden_270110_GS_M_L1.mp4`) werden erkannt: Athlet, Ort, Datum, Disziplin und Lauf erscheinen in der Liste und sind durchsuchbar. `T1` = Training 1.
+- **Videos bleiben nach Neuladen** in der Liste (Chrome/Edge). Nach einem Neustart des Browsers genügt ein Klick auf «Öffnen».
+- **Marker mit Notizen** (`m`), Sprung zum vorherigen/nächsten Marker mit `,` / `.`. Notizen erscheinen im Bild, in der Zeitleiste und im Export.
+- **Clip-Export** (`e`): Loop-Bereich, ab aktuellem Bild oder ganzes Video, in 1× bis 0,1× Zeitlupe, mit Zeichnungen, Info-Leiste und Notizen. Im Vergleich A | B nebeneinander, im GPS-Modus mit GPS-Anzeigen. MP4, direkt teilbar.
+- **Hilfsraster** (`g`) für Körperwinkel und Lot.
+- **Bildanpassung** (Halbkreis-Symbol): Helligkeit, Kontrast, Sättigung, Preset «Schnee» für flaches Licht, Spiegeln (Links-/Rechtsschwung vergleichen). Gilt auch für Export und Standbild.
+- **Stroboskop**: mehrere Positionen eines Schwungs in einem Bild (Loop-Bereich). Kameraschwenk und Zoom werden ausgeglichen, das Bild wird bei Bedarf zum Panorama. Voraussetzung: Kamera vom festen Standort.
+- **Abschnittszeiten im Vergleich**: Tore in A (`m`) und B (`n`) markieren → Zeit und Δ pro Tor und Abschnitt. Klick auf ein Tor = beide Läufe springen dorthin und werden dort synchronisiert. `Alt`+`←`/`→` bewegt nur B.
 
 ## GPS-Datenformat
 
