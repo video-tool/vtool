@@ -1659,6 +1659,7 @@ body.no-hdr .gps-sel>label.ctl[for="gpsIn"]{height:40px!important;padding:0 12px
   #ghostBar .gopts input[type=range]{width:80px!important}
   #ghostBar .gopts .ctl-lab{font-size:11px!important;gap:6px}
 }
+
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
   .aurora{display:none}
@@ -1743,8 +1744,8 @@ body.no-hdr .gps-sel>label.ctl[for="gpsIn"]{height:40px!important;padding:0 12px
         <button class="ctl play" data-act="play" title="Abspielen / Pause (Leertaste)"></button>
         <button class="ctl" data-act="step" data-n="1" title="1 Bild vor (→ / x)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/><path d="M18 6v12" opacity=".55"/></svg></button>
         <button class="ctl" data-act="step" data-n="10" title="10 Bilder vor (Shift+→ / s)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.5 17l5-5-5-5"/><path d="M6 17l5-5-5-5"/></svg></button>
-      <button class="ctl rate-btn" data-act="rate" title="Tempo: Klick wechselt 1× → ½× → ¼× → 0,1× (↑ / ↓ auch 1,5× und 2×)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 16a8 8 0 1 1 15 0"/><path d="M12 12.5l3.5-4"/><circle cx="12" cy="13" r="1.3" fill="currentColor"/></svg><span>1×</span></button></div></div>
-      <div class="dz dz-r"><button class="ctl" data-act="marker" title="Marker setzen / entfernen (m) – z. B. Torwechsel, Kantenwechsel"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><path d="M12 3l7 9-7 9-7-9z"/></svg></button><button class="ctl" data-act="strobe" title="Stroboskop-Bild: mehrere Positionen in einem Bild (Loop-Bereich oder ±0,7 s)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><circle cx="5" cy="15" r="2.2" opacity=".45"/><circle cx="10.5" cy="11" r="2.2" opacity=".7"/><circle cx="17" cy="8" r="2.6"/><path d="M3 20c5-1 10-5 15-12" opacity=".5"/></svg></button><div class="ctl-sep"></div><div class="grp">
+      <button class="ctl rate-btn" data-act="rate" title="Tempo: Klick wechselt 1× → ½× → ¼× → 0.1× (↑ / ↓ auch 1.5× und 2×)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 16a8 8 0 1 1 15 0"/><path d="M12 12.5l3.5-4"/><circle cx="12" cy="13" r="1.3" fill="currentColor"/></svg><span>1×</span></button></div></div>
+      <div class="dz dz-r"><button class="ctl" data-act="marker" title="Marker setzen / entfernen (m) – z. B. Torwechsel, Kantenwechsel"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><path d="M12 3l7 9-7 9-7-9z"/></svg></button><button class="ctl" data-act="strobe" title="Stroboskop-Bild: mehrere Positionen in einem Bild (Loop-Bereich oder ±0.7 s)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><circle cx="5" cy="15" r="2.2" opacity=".45"/><circle cx="10.5" cy="11" r="2.2" opacity=".7"/><circle cx="17" cy="8" r="2.6"/><path d="M3 20c5-1 10-5 15-12" opacity=".5"/></svg></button><div class="ctl-sep"></div><div class="grp">
         <label class="ctl-lab fps-edit" title="Bilder pro Sekunde – wird beim Laden gemessen">fps <input class="num" id="sFps" type="number" min="1" max="1000" step="0.01"></label>
         <button class="ctl" data-act="sound" title="Ton ein / aus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5L6 9H2v6h4l5 4z"/><path class="snd-on" d="M15.5 8.5a5 5 0 0 1 0 7" hidden/><path class="snd-off" d="M16 9l5 6M21 9l-5 6"/></svg></button>
         <button class="ctl" data-act="shot" title="Standbild mit Zeichnungen als PNG speichern (p)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.6"/></svg></button>
@@ -1773,7 +1774,7 @@ body.no-hdr .gps-sel>label.ctl[for="gpsIn"]{height:40px!important;padding:0 12px
     <div class="dock dock3">
       <div class="dz dz-l"><div class="grp" title="Video und GPS zeitlich verbinden">
         <button class="ctl" id="gpsSync" title="Aktuelles Bild = Start im GPS (Fahrer:in setzt sich in Bewegung)"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2.2"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg>GPS-Start = dieses Bild</button>
-        <button class="ctl" data-gn="-0.1" title="GPS 0,1 s früher">−0,1</button><button class="ctl" data-gn="-1f" title="GPS 1 Bild früher">−1F</button><button class="ctl" data-gn="1f" title="GPS 1 Bild später">+1F</button><button class="ctl" data-gn="0.1" title="GPS 0,1 s später">+0,1</button>
+        <button class="ctl" data-gn="-0.1" title="GPS 0.1 s früher">−0.1</button><button class="ctl" data-gn="-1f" title="GPS 1 Bild früher">−1F</button><button class="ctl" data-gn="1f" title="GPS 1 Bild später">+1F</button><button class="ctl" data-gn="0.1" title="GPS 0.1 s später">+0,1</button>
       </div></div>
       <div class="dz dz-c"><div class="grp">
         <button class="ctl" data-act="step" data-n="-10" title="10 Bilder zurück"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M11.5 17l-5-5 5-5"/><path d="M18 17l-5-5 5-5"/></svg></button>
@@ -1781,7 +1782,7 @@ body.no-hdr .gps-sel>label.ctl[for="gpsIn"]{height:40px!important;padding:0 12px
         <button class="ctl play" data-act="play" title="Abspielen / Pause (Leertaste)"></button>
         <button class="ctl" data-act="step" data-n="1" title="1 Bild vor"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/><path d="M18 6v12" opacity=".55"/></svg></button>
         <button class="ctl" data-act="step" data-n="10" title="10 Bilder vor"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.5 17l5-5-5-5"/><path d="M6 17l5-5-5-5"/></svg></button>
-      <button class="ctl rate-btn" data-act="rate" title="Tempo: Klick wechselt 1× → ½× → ¼× → 0,1× (↑ / ↓ auch 1,5× und 2×)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 16a8 8 0 1 1 15 0"/><path d="M12 12.5l3.5-4"/><circle cx="12" cy="13" r="1.3" fill="currentColor"/></svg><span>1×</span></button></div></div>
+      <button class="ctl rate-btn" data-act="rate" title="Tempo: Klick wechselt 1× → ½× → ¼× → 0.1× (↑ / ↓ auch 1.5× und 2×)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 16a8 8 0 1 1 15 0"/><path d="M12 12.5l3.5-4"/><circle cx="12" cy="13" r="1.3" fill="currentColor"/></svg><span>1×</span></button></div></div>
       <div class="dz dz-r"><div class="grp">
         
         
@@ -1833,7 +1834,7 @@ body.no-hdr .gps-sel>label.ctl[for="gpsIn"]{height:40px!important;padding:0 12px
         <button class="ctl play" data-act="play" title="Beide abspielen / Pause"></button>
         <button class="ctl" data-act="step" data-n="1" title="1 Bild vor"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/><path d="M18 6v12" opacity=".55"/></svg></button>
         <button class="ctl" data-act="step" data-n="10" title="10 Bilder vor"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.5 17l5-5-5-5"/><path d="M6 17l5-5-5-5"/></svg></button>
-      <button class="ctl rate-btn" data-act="rate" title="Tempo: Klick wechselt 1× → ½× → ¼× → 0,1× (↑ / ↓ auch 1,5× und 2×)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 16a8 8 0 1 1 15 0"/><path d="M12 12.5l3.5-4"/><circle cx="12" cy="13" r="1.3" fill="currentColor"/></svg><span>1×</span></button></div></div>
+      <button class="ctl rate-btn" data-act="rate" title="Tempo: Klick wechselt 1× → ½× → ¼× → 0.1× (↑ / ↓ auch 1.5× und 2×)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 16a8 8 0 1 1 15 0"/><path d="M12 12.5l3.5-4"/><circle cx="12" cy="13" r="1.3" fill="currentColor"/></svg><span>1×</span></button></div></div>
       <div class="dz dz-r"><div class="grp" id="cTools"></div></div>
     </div>
     <div class="sync-info" id="syncInfo"></div>
@@ -1886,7 +1887,7 @@ body.no-hdr .gps-sel>label.ctl[for="gpsIn"]{height:40px!important;padding:0 12px
     <div class="exp-grid">
       <span class="exp-l">Ausschnitt</span><div class="seg" id="expRange"></div>
       <span class="exp-l" id="expDurL">Dauer</span><div id="expDurRow"><input class="exp-num" id="expDur" type="number" min="0.5" max="120" step="0.5" value="3"> s</div>
-      <span class="exp-l">Tempo</span><div class="seg" id="expRate"><button data-r="1">1×</button><button data-r="0.5">½×</button><button data-r="0.25">¼×</button><button data-r="0.1">0,1×</button></div>
+      <span class="exp-l">Tempo</span><div class="seg" id="expRate"><button data-r="1">1×</button><button data-r="0.5">½×</button><button data-r="0.25">¼×</button><button data-r="0.1">0.1×</button></div>
       <span class="exp-l">Inhalt</span><div class="exp-checks">
         <label><input type="checkbox" id="expAnn" checked> Zeichnungen</label>
         <label><input type="checkbox" id="expInfo" checked> Info-Leiste (Name, Zeit, Tempo)</label>
@@ -1977,7 +1978,7 @@ const ICON={play:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.5v1
 function fmtDur(s){ if(!isFinite(s)) return '–'; const m=Math.floor(s/60), r=s-m*60; return m+':'+(r<10?'0':'')+Math.floor(r); }
 function fmtT(s){ return s.toFixed(3)+' s'; }
 function fmtMB(b){ return b>=1e9?(b/1e9).toFixed(2)+' GB':b>=1e6?Math.round(b/1e6)+' MB':Math.max(1,Math.round(b/1e3))+' KB'; }
-function fmtRate(r){ return r===0.25?'¼×':r===0.5?'½×':String(r).replace('.',',')+'×'; }
+function fmtRate(r){ return r===0.25?'¼×':r===0.5?'½×':String(r)+'×'; }
 function fmtFps(f){ return Math.abs(f-Math.round(f))<0.01?String(Math.round(f)):f.toFixed(2); }
 function esc(s){ return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
 let toastT, toastUndo=null;
@@ -2591,7 +2592,7 @@ function refreshSingleHead(){
   $('#sTitle').textContent=c?metaTitle(c):'Kein Video geöffnet'; $('#sTitle').title=c?c.name:'';
   const ch=$('#sChips');
   const mt=c&&c.meta&&c.meta.ok?[c.meta.date,c.meta.disc?c.meta.disc+(c.meta.sex?' '+c.meta.sex:''):null,c.meta.run].filter(Boolean).map(t=>`<span class="chip meta">${esc(t)}</span>`).join(''):'';
-  ch.innerHTML=mt+(c?'<span class="tech">'+[c.w?c.w+'×'+c.h:'',c.fps?`<b class="fps-chip ${c.fpsAuto?'ok':'warn'}" title="${c.fpsAuto?'Automatisch gemessen':'Von Hand gesetzt'} – klicken zum Ändern">${fmtFps(c.fps)} fps</b>`:'',c.dur?fmtDur(c.dur):'',c.size?fmtMB(c.size):''].filter(Boolean).join('<i>·</i>')+'</span>':'');
+  ch.innerHTML=mt+(c?'<span class="tech">'+[c.w?c.w+'×'+c.h:'',c.dur?fmtDur(c.dur):'',c.size?fmtMB(c.size):''].filter(Boolean).join('<i>·</i>')+'</span>':'');
   const fi=$('#sFps'); if(document.activeElement!==fi) fi.value=c&&c.fps?fmtFps(c.fps):'';
   renderMarks(); loopUI();
 }
@@ -3085,7 +3086,7 @@ function ghostGap(){
   const coarse=raw.map((x,i)=>x==null?null:med(raw,i,H1,Math.max(4,Math.round(H1*0.6))));
   const clean=raw.map((x,i)=>x==null||coarse[i]==null||Math.abs(x-coarse[i])>0.5?null:x);
   const v=clean.map((x,i)=>x==null?null:med(clean,i,H2,3));
-  // kurze Inseln (< 0,8 s) verwerfen – dort ist die Messung nicht belastbar
+  // kurze Inseln (< 0.8 s) verwerfen – dort ist die Messung nicht belastbar
   for(let i=0;i<v.length;){ if(v[i]==null){ i++; continue; } let j=i; while(j<v.length&&v[j]!=null) j++; if(E[j-1]-E[i]<0.8) for(let k=i;k<j;k++) v[k]=null; i=j; }
   GH.raw=raw;
   GH.gapE=E; GH.gapV=v; GH.PA=PA; GH.PB=PB;
@@ -3194,7 +3195,7 @@ function ovUI(){
   const pr=$('#ovProg'); pr.hidden=!busy; if(busy){ const w=($('#ghostBar .gprog i')||{style:{}}).style.width||'0%'; $('i',pr).style.width=w; }
   ovApplyCut(); ovMarks();
 }
-function fmtS(t){ return t.toFixed(2).replace('.',',')+' s'; }
+function fmtS(t){ return t.toFixed(2)+' s'; }
 function ovStart(){ if(!A.ready||!B.ready){ toast('Zuerst Video A und B wählen.'); return; } if(!G.linked){ toast('Zuerst den gemeinsamen Punkt setzen.'); return; }
   A.pause(); B.pause(); const t0=ovT0(); A.seekTime(t0); B.seekTime(t0+G.off);
   OV.pa=[]; OV.pb=[]; OV.T=null; OV.pick='a'; OV.follow=false; ovKill(); ovUI(); }
@@ -3360,7 +3361,7 @@ function renderOv(){
   const show=!live&&ovActive()&&!OV.pick&&(!!OV.T||ovFollowOK())&&A.ready&&B.ready;
   $('#viewCmp').classList.toggle('ov-fixing',!!OV.fix); A.stage.classList.toggle('ov-fixstage',!!OV.fix);
   ovTags((show&&ovFollowOK()||LAY.length&&!B.clip)&&!OV.fix&&$('#viewCmp').classList.contains('ov-names'));
-  if(OV.fix){ const fi=$('#ovFixInfo'); if(fi){ const tx='Drehung '+(OV.fix.r*180/Math.PI).toFixed(1).replace('.',',')+'° · Grösse '+Math.round(OV.fix.s*100)+' %'; if(fi.textContent!==tx) fi.textContent=tx; } }
+  if(OV.fix){ const fi=$('#ovFixInfo'); if(fi){ const tx='Drehung '+(OV.fix.r*180/Math.PI).toFixed(1)+'° · Grösse '+Math.round(OV.fix.s*100)+' %'; if(fi.textContent!==tx) fi.textContent=tx; } }
   $('#viewCmp').classList.toggle('ov-aligned',show||live); cv.hidden=!show; if(!show){ ovTags(false); if(OV.fix&&!live){ OV.fix=null; A.stage.classList.remove('ov-fixstage'); } return; }
   const R=A.rect(), Wc=Math.max(2,Math.round(Math.min(1280,R.w*DPR()))), Hc=Math.max(2,Math.round(Wc*R.h/R.w));
   Object.assign(cv.style,{left:R.x+'px',top:R.y+'px',width:R.w+'px',height:R.h+'px'});
@@ -3640,7 +3641,7 @@ function buildTrack(o){
   const acc=smooth(t.map((_,i)=>{ const a=Math.max(0,i-1), b=Math.min(t.length-1,i+1); return (v[b]-v[a])/Math.max(1e-3,t[b]-t[a])/9.81; }),2);
   const s=[0]; for(let i=1;i<t.length;i++) s.push(s[i-1]+Math.hypot(x[i]-x[i-1],y[i]-y[i-1]));
   const P=t.map((_,i)=>({t:t[i],x:x[i],y:y[i],alt:S[i].alt,v:v[i],a:acc[i],s:s[i]}));
-  // Start/Ende: über 9 km/h für mindestens 0,5 s
+  // Start/Ende: über 9 km/h für mindestens 0.5 s
   const mov=i=>P[i].v>2.5; let iS=0; for(let i=0;i<P.length;i++){ let ok=true; for(let j=i;j<P.length&&P[j].t-P[i].t<0.5;j++) if(!mov(j)){ ok=false; break; } if(ok){ iS=i; break; } }
   let iE=P.length-1; for(let i=P.length-1;i>iS;i--){ if(mov(i)){ iE=i; break; } }
   const tr={id:++gpsUid,name:o.name||'GPS '+gpsUid,athlete:o.athlete,run:o.run,source:o.source,t0abs:t0,P,iS,iE,tStart:P[iS].t,tEnd:P[iE].t,ref:null,dt:null,dv:null};
@@ -3896,7 +3897,7 @@ function drawGrid(ctx,R){
 }
 
 /* ---------- Clip-Export ---------- */
-const EXP={live:false,rate:0.25,range:'all',dur:3};
+const EXP={live:false,rate:1,range:'all',dur:3};
 function expDecks(){ return mode==='single'?[S]:mode==='gps'?[GD]:[A,B]; }
 function openExport(){
   if(mode==='cmp'&&$('#viewCmp').classList.contains('ghost')&&GH.state==='ready'){ ghostExport(); return; }
@@ -3904,7 +3905,7 @@ function openExport(){
   if(EXP.live) return;
   const L=mode==='single'&&S.clip.loop, hasLoop=!!(L&&L.a!=null&&L.b!=null&&L.b>L.a);
   const opts=[]; if(hasLoop) opts.push(['loop','Loop-Bereich']); if(mode==='cmp'&&G.linked) opts.push(['sync','Ab Sync-Punkt']); opts.push(['here','Ab aktuellem Bild'],['all','Ganzes Video']);
-  EXP.range='all'; // Standard: ganzes Video
+  EXP.range='all'; EXP.rate=1; // Standard: ganzes Video in Normaltempo
   $('#expRange').innerHTML=opts.map(o=>`<button data-er="${o[0]}" class="${o[0]===EXP.range?'on':''}">${o[1]}</button>`).join('');
   $$('#expRate button').forEach(b=>b.classList.toggle('on',+b.dataset.r===EXP.rate));
   $('#expNotesRow').hidden=!(mode==='single');
@@ -4098,7 +4099,7 @@ function labelMap(m,w,h){ const lab=new Int32Array(m.length), st=[], info=[0]; l
 async function strobeRun(){
   if(STR.busy) return; STR.busy=true; const c=S.clip, [a,b,isLoop]=strobeRange(), n=STR.n;
   const prog=(f,t)=>{ $('#strProg i').style.width=(f*100)+'%'; $('#strProg span').textContent=t; };
-  $('#strProg').hidden=false; $('#strSave').disabled=true; $('#strInfo').textContent=(isLoop?'Loop-Bereich':'±0,7 s um das aktuelle Bild')+' · F '+a+' – '+b+' · '+n+' Positionen';
+  $('#strProg').hidden=false; $('#strSave').disabled=true; $('#strInfo').textContent=(isLoop?'Loop-Bereich':'±0.7 s um das aktuelle Bild')+' · F '+a+' – '+b+' · '+n+' Positionen';
   let v; try{ v=await loadV(c.url); }catch(e){ STR.busy=false; toast('Video konnte nicht geladen werden.'); return; }
   try{
     const vw=v.videoWidth, vh=v.videoHeight, W0=400, h0=Math.round(W0*vh/vw)&~1, OW=Math.min(960,vw), OH=Math.round(OW*vh/vw)&~1;
@@ -4170,7 +4171,7 @@ async function strobeRun(){
     const oc=$('#strCanvas'); oc.width=PW; oc.height=PH; const ox=oc.getContext('2d'); ox.putImageData(new ImageData(out,PW,PH),0,0);
     STR.res={cents,OW,OH:PH,base:ox.getImageData(0,0,OW,OH),fr,name:base(c.name)+'_Stroboskop_F'+a+'-'+b}; strobeDecor();
     $('#strProg').hidden=true; $('#strSave').disabled=false;
-    $('#strInfo').textContent=(isLoop?'Loop-Bereich':'±0,7 s um das aktuelle Bild')+' · F '+a+' – '+b+' · '+n+' Positionen · Abstand '+((b-a)/(n-1)/S.fps).toFixed(2)+' s'+(weak>n/3?' · Achtung: Kamera stark bewegt – Ergebnis prüfen':'');
+    $('#strInfo').textContent=(isLoop?'Loop-Bereich':'±0.7 s um das aktuelle Bild')+' · F '+a+' – '+b+' · '+n+' Positionen · Abstand '+((b-a)/(n-1)/S.fps).toFixed(2)+' s'+(weak>n/3?' · Achtung: Kamera stark bewegt – Ergebnis prüfen':'');
   }catch(e){ console.error(e); toast('Stroboskop konnte nicht berechnet werden.'); $('#strProg').hidden=true; }
   finally{ try{ v.removeAttribute('src'); v.load(); v.remove(); }catch(e){} STR.busy=false; }
 }
@@ -4548,7 +4549,7 @@ if(!LS.get('hint1',0)){ setTimeout(()=>{ toast(matchMedia('(pointer:coarse)').ma
 
 /* Update-Hinweis: prüft version.json auf GitHub Pages; «Aktualisieren» lädt die Seite ohne Cache neu */
 (()=>{
-  const BUILD='20261027201655'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
+  const BUILD='20261027203218'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
   // nach einem Update die ?v=… aus der Adresse entfernen
   try{ const u=new URL(location.href); if(u.searchParams.has('v')){ u.searchParams.delete('v'); history.replaceState(null,'',u.pathname+(u.search||'')+u.hash); } }catch(e){}
   const el=$('#upd'); let latest=null, snoozed=null, busy=false;
