@@ -1296,6 +1296,23 @@ body.m-cmp .lib.list .clip.row:hover .abtag{display:none}
 
 #sideOpen:not([hidden]){display:flex;flex-direction:column;min-height:0;flex:1 1 auto}
 #sideOpen .lib.list{flex:1 1 auto;min-height:0;overflow-y:auto!important;overscroll-behavior:contain;padding-right:2px!important}
+
+.lib-top{display:flex;gap:6px;align-items:center}
+.lib-top .lib-search{flex:1;min-width:0;margin:0}
+.lib-view{display:flex;gap:2px;padding:3px;border-radius:11px;background:color-mix(in srgb,var(--ink) 6%,transparent);flex:none}
+.lib-view button{width:30px;height:28px;border:none;border-radius:8px;background:none;color:var(--muted);display:grid;place-items:center;cursor:pointer;transition:background .2s,color .2s}
+.lib-view button svg{width:16px;height:16px}
+.lib-view button.on{background:var(--card);color:var(--ink);box-shadow:0 1px 2px rgba(13,16,20,.12)}
+#sideOpen .lib-top{margin-bottom:10px}
+/* nur Dateinamen */
+.lib.list.names{gap:0!important}
+.lib.list .clip.row .ndur{display:none}
+.lib.list.names .clip.row .ndur{display:block;font-family:var(--mono);font-size:10.5px;color:var(--muted)}
+.lib.list.names .clip.row{grid-template-columns:minmax(0,1fr) auto auto auto auto;padding:6px 8px;border-radius:9px;gap:8px}
+.lib.list.names .clip.row .thumb{display:none}
+.lib.list.names .clip.row .mt{display:none}
+.lib.list.names .clip.row .nm{font-family:var(--mono);font-size:11px;font-weight:500;white-space:normal;word-break:break-all;line-height:1.35}
+.lib.list.names .clip.row.on .nm{font-weight:700}
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
   .aurora{display:none}
@@ -1354,7 +1371,7 @@ body.m-cmp .lib.list .clip.row:hover .abtag{display:none}
       <div class="ft-busy" id="ftBusy" hidden><span></span></div>
     </div>
     <div id="sideOpen" class="side-pane" hidden>
-    <div class="lib-search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><input id="libQ" type="search" placeholder="Suchen: Athlet, Ort, Datum …" autocomplete="off"></div>
+    <div class="lib-top"><div class="lib-search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><input id="libQ" type="search" placeholder="Suchen: Athlet, Ort, Datum …" autocomplete="off"></div><div class="lib-view" id="libView" role="group" aria-label="Ansicht"><button data-lv="thumbs" title="Mit Vorschaubild"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="7" height="5" rx="1.2"/><rect x="3" y="14" width="7" height="5" rx="1.2"/><path d="M13 7h8M13 16h8"/></svg></button><button data-lv="names" title="Nur Dateinamen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button></div></div>
     <div class="lib-restore" id="libRestore" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg><span></span><button id="btnRestore">Öffnen</button></div>
     <div class="lib" id="lib"></div>
     </div>
@@ -1584,6 +1601,8 @@ body.m-cmp .lib.list .clip.row:hover .abtag{display:none}
         <dt><kbd>Enter</kbd></dt><dd>An aktuellen Bildern synchronisieren</dd>
         <dt><kbd>m</kbd> · <kbd>n</kbd></dt><dd>Tor in A · Tor in B markieren (Abschnittszeiten)</dd>
         <dt><kbd>Alt</kbd>+<kbd>←</kbd><kbd>→</kbd></dt><dd>Nur B bewegen (nachführen)</dd>
+        <dt>Overlay</dt><dd>1 Gemeinsamer Punkt (erstes Tor in beiden) · 2 je 2 Referenzpunkte in A und B · 3 «Overlay erstellen» – B folgt dem Kameraschwenk. Export und Standbild speichern das Overlay.</dd>
+        <dt>Anleitung</dt><dd>Knopf «Anleitung» im Vergleich: zeigt Side by Side bzw. Overlay Schritt für Schritt mit den Beispiel-Läufen</dd>
         <span class="h4">GPS-Daten</span>
         <dt>Format</dt><dd>CSV, GPX oder JSON mit Zeit (s oder ISO), <code>lat</code>, <code>lon</code>, optional <code>alt</code>, <code>speed</code> (m/s) bzw. <code>speed_kmh</code></dd>
         <dt>Sync</dt><dd>Bild beim Losfahren suchen → «GPS-Start = dieses Bild», fein mit ±1F</dd>
@@ -1619,6 +1638,29 @@ function toast(msg,ms=2600,undo){ const t=$('#toast'); $('span',t).textContent=m
 
 /* ---------- fps messen (¼-Tempo, damit auch 100/120 fps sauber erkannt werden) ---------- */
 const FPS_COMMON=[23.976,24,25,29.97,30,48,50,59.94,60,90,100,119.88,120,240];
+/* fps direkt aus der Datei lesen (MP4/MOV: Zeitbasis und Bilddauern der Videospur) – exakt und ohne Abspielen */
+async function readRange(src,start,len){
+  if(src instanceof Blob) return {d:new Uint8Array(await src.slice(start,start+len).arrayBuffer()),total:src.size};
+  const r=await fetch(src,{headers:{Range:'bytes='+start+'-'+(start+len-1)}}); if(r.status!==206) throw new Error('no range');
+  const cr=r.headers.get('content-range')||''; const total=+(cr.split('/')[1]||0); return {d:new Uint8Array(await r.arrayBuffer()),total}; }
+async function mp4Fps(url){
+  let src=url; if(/^blob:/.test(url)) src=await (await fetch(url)).blob();
+  const u32=(d,o)=>((d[o]<<24)>>>0)+(d[o+1]<<16)+(d[o+2]<<8)+d[o+3], typ=(d,o)=>String.fromCharCode(d[o],d[o+1],d[o+2],d[o+3]);
+  let off=0, total=Infinity, moov=null;
+  for(let k=0;k<64&&off<total;k++){ const {d,total:t}=await readRange(src,off,16); if(t) total=t; if(d.length<8) break;
+    let size=u32(d,0); const type=typ(d,4); if(size===1) size=u32(d,8)*4294967296+u32(d,12); else if(size===0) size=total-off;
+    if(type==='moov'){ if(size>40e6) return null; moov=(await readRange(src,off,size)).d; break; }
+    if(size<8) break; off+=size; }
+  if(!moov) return null;
+  const kids=(d,s,e)=>{ const out=[]; let o=s; while(o+8<=e){ let sz=u32(d,o); const tp=typ(d,o+4); let h=8; if(sz===1){ sz=u32(d,o+8)*4294967296+u32(d,o+12); h=16; } if(sz<8||o+sz>e) break; out.push({t:tp,s:o+h,e:o+sz}); o+=sz; } return out; };
+  const find=(d,b,t)=>kids(d,b.s,b.e).find(x=>x.t===t);
+  for(const tr of kids(moov,8,moov.length).filter(x=>x.t==='trak')){
+    const md=find(moov,tr,'mdia'); if(!md) continue; const hd=find(moov,md,'hdlr'); if(!hd||typ(moov,hd.s+8)!=='vide') continue;
+    const mh=find(moov,md,'mdhd'); const ts=moov[mh.s]===1?u32(moov,mh.s+20):u32(moov,mh.s+12);
+    const st=find(moov,find(moov,find(moov,md,'minf'),'stbl'),'stts'); if(!st||!ts) continue;
+    const n=u32(moov,st.s+4); let cnt=0,dur=0; for(let i=0;i<n;i++){ const c=u32(moov,st.s+8+i*8), dl=u32(moov,st.s+12+i*8); cnt+=c; dur+=c*dl; }
+    if(cnt>1&&dur>0){ const f=ts*cnt/dur; let best=f,bd=1e9; for(const c of FPS_COMMON){ const x=Math.abs(c-f); if(x<bd){ bd=x; best=c; } } return bd<=Math.max(0.05,best*0.004)?best:Math.round(f*1000)/1000; } }
+  return null; }
 function computeFps(ts){
   const d=[]; for(let i=1;i<ts.length;i++){ const x=ts[i]-ts[i-1]; if(x>0.0005&&x<0.25) d.push(x); }
   if(d.length<4) return null;
@@ -1663,9 +1705,10 @@ function addFiles(files){
   toast(added.length===1?'«'+added[0].name+'» geöffnet':added.length+' Videos geöffnet');
 }
 
+document.addEventListener('click',e=>{ const b=e.target.closest('#libView [data-lv]'); if(!b) return; LS.set('libview',b.dataset.lv); renderLib(); });
 function renderLib(){
   const el=$('#lib'); el.innerHTML=''; $('#libCount').textContent=clips.length; if(typeof renderDemoList==='function') setTimeout(renderDemoList,0);
-  el.classList.add('list');
+  el.classList.add('list'); const NAMES=LS.get('libview','thumbs')==='names'; el.classList.toggle('names',NAMES); $$('#libView button').forEach(b=>b.classList.toggle('on',b.dataset.lv===(NAMES?'names':'thumbs')));
   // nach Rennen/Training gruppieren (Ort · Disziplin · Datum), Reihenfolge wie geöffnet
   const gk=c=>{ const m=c.meta; return m&&m.ok&&(m.place||m.date)?[m.place||'',m.disc||'',m.date||''].join('|'):'~'; };
   const order=[]; clips.forEach(c=>{ const k=gk(c); if(!order.includes(k)) order.push(k); });
@@ -1673,19 +1716,19 @@ function renderLib(){
   const XI='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>';
   list.forEach(c=>{
     if(!libMatch(c)) return;
-    const g=gk(c); if(g!==lastG&&order.length>1){ lastG=g; const m=c.meta||{}, h=document.createElement('div'); h.className='lib-grp';
+    const g=gk(c); if(!NAMES&&g!==lastG&&order.length>1){ lastG=g; const m=c.meta||{}, h=document.createElement('div'); h.className='lib-grp';
       h.textContent=g==='~'?'Weitere Videos':[[m.place,m.date?m.date.slice(-4):''].filter(Boolean).join(' '),DISC_LONG[m.disc]||m.disc,m.cam].filter(Boolean).join(' · '); el.appendChild(h); }
     const on=mode==='single'?S.clip===c:mode==='gps'?GD.clip===c:(A.clip===c||B.clip===c);
     const card=document.createElement('div'); card.className='clip row'+(on?' on':''); card.tabIndex=0;
     card.innerHTML='<div class="thumb">'+(c.poster?'<img alt="" src="'+c.poster+'">':'<div class="ph"></div>')
       +'<canvas width="320" height="180"></canvas><div class="prog"></div>'
       +(c.dur?'<span class="dur">'+fmtDur(c.dur)+'</span>':'')+'</div>'
-      +'<div class="info"><div class="nm"></div><div class="mt"></div></div>'
+      +'<div class="info"><div class="nm"></div><div class="mt"></div></div>'+'<span class="ndur">'+(c.dur?fmtDur(c.dur):'')+'</span>'
       +'<span class="abtag">'+(A.clip===c?'<span class="ta">A</span>':'')+(B.clip===c?'<span class="tb">B</span>':'')+'</span>'
       +'<div class="ab"><button class="ba'+(A.clip===c?' on':'')+'" title="Als Video A">A</button><button class="bb'+(B.clip===c?' on':'')+'" title="Als Video B">B</button></div>'
       +'<button class="x" title="Aus der Liste entfernen (Datei bleibt auf dem Gerät)">'+XI+'</button>';
-    const mm=c.meta, grouped=order.length>1&&g!=='~'&&mm&&mm.ok;
-    $('.nm',card).textContent=grouped?mm.athlete:metaTitle(c); card.title=c.name;
+    const mm=c.meta, grouped=!NAMES&&order.length>1&&g!=='~'&&mm&&mm.ok;
+    $('.nm',card).textContent=NAMES?c.name:grouped?mm.athlete:metaTitle(c); card.title=c.name;
     $('.mt',card).textContent=grouped?[mm.run,c.fps?fmtFps(c.fps)+' fps':null].filter(Boolean).join(' · '):(c.demo?'Beispiel · ':'')+(metaLine(c)||[c.w?c.h+'p':null,c.fps?fmtFps(c.fps)+' fps':null,c.size?fmtMB(c.size):null].filter(Boolean).join(' · ')||'—');
     if(c.markers.length){ const mk=document.createElement('span'); mk.className='mk-count'; mk.innerHTML='<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 9-7 9-7-9z"/></svg>'+c.markers.length; $('.thumb',card).appendChild(mk); }
     const open=()=>{ if(mode==='single'){ S.setClip(c); refreshSingleHead(); } else if(mode==='gps'){ GD.setClip(c); if(typeof gpsSelects==='function') gpsSelects(); } else if(A.clip!==c&&B.clip!==c){ B.setClip(c); unlink(); syncSelects(); } renderLib(); };
@@ -1723,7 +1766,8 @@ class ThumbGen{
   destroy(){ this.dead=true; try{ this.v.removeAttribute('src'); this.v.load(); this.v.remove(); }catch(e){} this.map.clear(); }
   async detect(){
     const v=this.v,c=this.c; let fps=null;
-    if(HAS_RVFC){
+    try{ fps=await mp4Fps(c.url); if(!(fps>=5&&fps<=1000)) fps=null; }catch(e){ fps=null; }
+    if(!fps&&HAS_RVFC){
       fps=await new Promise(res=>{
         const ts=[]; let done=false;
         const fin=()=>{ if(done) return; done=true; try{v.pause();}catch(e){} res(computeFps(ts)); };
@@ -2275,6 +2319,8 @@ function snapshot(){
     if(mode==='gps'){ if(!GD.ready) return; const c=deckSnap(GD); const ov=$('canvas.gpsov',GD.stage); if(!ov.hidden){ const R0=GD.rect(), dd=ov.width/GD.stage.clientWidth; c.getContext('2d').drawImage(ov,R0.x*dd,R0.y*dd,R0.w*dd,R0.h*dd,0,0,c.width,c.height); }
       out=document.createElement('canvas'); const bar=Math.round(c.height*0.06); out.width=c.width; out.height=c.height+bar; const x=out.getContext('2d'); x.drawImage(c,0,0); footer(x,0,c.height,c.width,bar,GD); name=base(GD.clip.name)+'_GPS_F'+GD.frame; }
     else if(mode==='single'){ if(!S.ready) return; const c=deckSnap(S); out=document.createElement('canvas'); const bar=Math.round(c.height*0.06); out.width=c.width; out.height=c.height+bar; const x=out.getContext('2d'); x.drawImage(c,0,0); footer(x,0,c.height,c.width,bar,S); name=base(S.clip.name)+'_F'+S.frame; }
+    else if(typeof ovAligned==='function'&&ovAligned()){ const ca=deckSnap(A); const bar=Math.round(ca.height*0.06); out=document.createElement('canvas'); out.width=ca.width; out.height=ca.height+bar; const x=out.getContext('2d');
+      x.drawImage(ca,0,0); ovDrawB(x,0,0,ca.width,ca.height); footer(x,0,ca.height,ca.width,bar,A,'A','#2f6fd0'); name=base(A.clip.name)+'_overlay_'+base(B.clip.name)+'_F'+A.frame; }
     else{ if(!A.ready||!B.ready){ toast('Zuerst Video A und B wählen.'); return; } const ca=deckSnap(A), cb=deckSnap(B); const H=Math.min(1080,Math.max(ca.height,cb.height)); const wa=Math.round(ca.width*H/ca.height), wb=Math.round(cb.width*H/cb.height), gap=Math.round(H*0.01), bar=Math.round(H*0.06);
       out=document.createElement('canvas'); out.width=wa+wb+gap; out.height=H+bar; const x=out.getContext('2d'); x.fillStyle='#0d1116'; x.fillRect(0,0,out.width,out.height); x.drawImage(ca,0,0,wa,H); x.drawImage(cb,wa+gap,0,wb,H); footer(x,0,H,wa,bar,A,'A','#2f6fd0'); footer(x,wa+gap,H,wb,bar,B,'B','#e67e22'); name='Vergleich_A-F'+A.frame+'_B-F'+B.frame; }
     out.toBlob(bl=>{ const a=document.createElement('a'); a.href=URL.createObjectURL(bl); a.download=name+'.png'; document.body.appendChild(a); a.click(); setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); },2000); toast('Standbild gespeichert: '+name+'.png'); },'image/png');
@@ -2720,6 +2766,13 @@ function ovPoint(e){
     if(!T){ toast('Punkte liegen zu nah beieinander oder passen nicht zusammen – bitte nochmals.'); }
     else { OV.T=T; OV.follow=false; toast('B ist an A ausgerichtet. Bei Kameraschwenk: «Kamera folgen».',4000); } } }
   ovUI(); }
+function ovAligned(){ return ovActive()&&!OV.pick&&(!!OV.T||ovFollowOK())&&A.ready&&B.ready; }
+function ovDrawB(x,ox,oy,w,h){ // B ausgerichtet über ein A-Bild der Grösse w×h zeichnen (Export, Standbild)
+  x.save(); x.beginPath(); x.rect(ox,oy,w,h); x.clip(); x.globalAlpha=+$('#opRange').value||0.5;
+  if(ovFollowOK()){ const p=paramsAt(clamp(A.v.currentTime-GH.t0,0,GH.eEnd)), M=affInv(simToAff(p,GH.W0,GH.hA,GH.W0,GH.hB)), sc=w/GH.W0;
+    x.setTransform(sc*M[0],sc*M[3],sc*M[1],sc*M[4],sc*M[2]+ox,sc*M[5]+oy); x.drawImage(B.v,0,0,GH.W0,GH.hB); }
+  else { const k=w/A.v.videoWidth, M=OV.T; x.setTransform(k*M[0],k*M[3],k*M[1],k*M[4],k*M[2]+ox,k*M[5]+oy); x.drawImage(B.v,0,0,B.v.videoWidth,B.v.videoHeight); }
+  x.restore(); }
 function renderOv(){
   const cv=$('canvas.ovb',A.stage); if(!cv) return;
   const show=ovActive()&&!OV.pick&&(!!OV.T||ovFollowOK())&&A.ready&&B.ready;
@@ -3186,7 +3239,8 @@ async function startExport(){
   // Leinwand
   const vw=d=>d.v.videoWidth, vh=d=>d.v.videoHeight;
   let H=Math.min(1080,Math.max(...ds.map(vh))); if(ds.length>1) H=Math.min(H,720);
-  const ws=ds.map(d=>Math.round(vw(d)*H/vh(d))&~1), gap=ds.length>1?Math.round(H*0.012):0, bar=opt.info?Math.round(H*0.07)&~1:0;
+  const ovl=mode==='cmp'&&typeof ovAligned==='function'&&ovAligned(); if(ovl) H=Math.min(1080,vh(A));
+  const ws=(ovl?[A]:ds).map(d=>Math.round(vw(d)*H/vh(d))&~1), gap=!ovl&&ds.length>1?Math.round(H*0.012):0, bar=opt.info?Math.round(H*0.07)&~1:0;
   const W=(ws.reduce((a,b)=>a+b,0)+gap)&~1, cv=document.createElement('canvas'); cv.width=W; cv.height=(H+bar)&~1; const x=cv.getContext('2d');
   const types=['video/mp4;codecs=avc1.640028','video/mp4;codecs=avc1','video/mp4','video/webm;codecs=vp9','video/webm'];
   const mime=types.find(t=>MediaRecorder.isTypeSupported&&MediaRecorder.isTypeSupported(t))||'';
@@ -3197,8 +3251,8 @@ async function startExport(){
   ds.forEach(d=>d.pause()); const prevRate=D.rate, prevLoop=S.useLoop; S.useLoop=false; setRate(EXP.rate);
   D.seekFrame(r.a); if(mode==='cmp') B.seekFrame(r.bStart);
   await new Promise(res=>setTimeout(res,450));
-  const name=base(D.clip.name)+(mode==='cmp'?'_vs_'+base(B.clip.name):'')+'_F'+r.a+'-'+r.b+(EXP.rate<1?'_'+String(EXP.rate).replace('.',',')+'x':'');
-  Object.assign(EXP,{live:true,x,cv,W,H,bar,ws,gap,opt,ds,D,tEnd:(r.b+0.5)/D.fps,t0:r.a/D.fps,rec,chunks,prevRate,prevLoop,name,mime,started:false,cancel:false});
+  const name=base(D.clip.name)+(mode==='cmp'?(ovl?'_overlay_':'_vs_')+base(B.clip.name):'')+'_F'+r.a+'-'+r.b+(EXP.rate<1?'_'+String(EXP.rate).replace('.',',')+'x':'');
+  Object.assign(EXP,{live:true,ovl,x,cv,W,H,bar,ws,gap,opt,ds,D,tEnd:(r.b+0.5)/D.fps,t0:r.a/D.fps,rec,chunks,prevRate,prevLoop,name,mime,started:false,cancel:false});
   $('#expGo').textContent='Abbrechen'; $('#expProg').hidden=false;
   rec.start(250);
   if(mode==='cmp'){ if(G.linked){ G.playing=true; A.play(); } else { A.play(); B.play(); } } else D.play();
@@ -3208,10 +3262,10 @@ function exportFrame(){
   const E=EXP; if(!E.live||!E.started) return; const {x,W,H,bar,ws,gap,opt,ds,D}=E;
   x.fillStyle='#0d1116'; x.fillRect(0,0,W,H+bar);
   let ox=0;
-  ds.forEach((d,i)=>{ const w=ws[i]; drawVid(x,d,ox,0,w,H); const R=d.rect();
+  (E.ovl?[A]:ds).forEach((d,i)=>{ const w=ws[i]; drawVid(x,d,ox,0,w,H); if(E.ovl) ovDrawB(x,ox,0,w,H); const R=d.rect();
     if(opt.ann&&d.clip.anns.length) drawAnns(x,{x:ox,y:0,w,h:H},d.clip.anns,w/Math.max(1,R.w));
     if(mode==='gps'&&opt.gps){ const ov=$('canvas.gpsov',d.stage); if(ov&&!ov.hidden&&ov.width){ const dd=ov.width/d.stage.clientWidth; x.drawImage(ov,R.x*dd,R.y*dd,R.w*dd,R.h*dd,ox,0,w,H); } }
-    if(ds.length>1){ const k=H/540; x.fillStyle=i?'#e67e22':'#2f6fd0'; x.beginPath(); (x.roundRect?x.roundRect(ox+14*k,14*k,30*k,30*k,7*k):x.rect(ox+14*k,14*k,30*k,30*k)); x.fill(); x.fillStyle='#fff'; x.font=`800 ${17*k}px Geist,-apple-system,Segoe UI,Arial,sans-serif`; x.textAlign='center'; x.textBaseline='middle'; x.fillText(i?'B':'A',ox+29*k,30*k); }
+    if(ds.length>1&&!E.ovl){ const k=H/540; x.fillStyle=i?'#e67e22':'#2f6fd0'; x.beginPath(); (x.roundRect?x.roundRect(ox+14*k,14*k,30*k,30*k,7*k):x.rect(ox+14*k,14*k,30*k,30*k)); x.fill(); x.fillStyle='#fff'; x.font=`800 ${17*k}px Geist,-apple-system,Segoe UI,Arial,sans-serif`; x.textAlign='center'; x.textBaseline='middle'; x.fillText(i?'B':'A',ox+29*k,30*k); }
     ox+=w+gap; });
   const k=H/540, ff='Geist,-apple-system,Segoe UI,Roboto,Arial,sans-serif';
   // Marker-Notiz einblenden
@@ -3219,7 +3273,7 @@ function exportFrame(){
     if(m!=null){ const t=markerNote(c,m); x.font=`700 ${22*k}px ${ff}`; const tw=x.measureText(t).width+34*k; x.fillStyle='rgba(218,41,28,.92)'; x.beginPath(); (x.roundRect?x.roundRect((W-tw)/2,18*k,tw,42*k,12*k):x.rect((W-tw)/2,18*k,tw,42*k)); x.fill(); x.fillStyle='#fff'; x.textAlign='center'; x.textBaseline='middle'; x.fillText(t,W/2,40*k); } }
   // Info-Leiste
   if(bar){ x.fillStyle='#0f1216'; x.fillRect(0,H,W,bar); const fs=Math.round(bar*0.36); x.textBaseline='middle'; const y=H+bar/2;
-    x.font=`600 ${fs}px ${ff}`; x.fillStyle='#fff'; x.textAlign='left'; x.fillText(mode==='cmp'?'A: '+metaTitle(A.clip)+'   ·   B: '+metaTitle(B.clip):metaTitle(D.clip)+(metaLine(D.clip)?'  ·  '+metaLine(D.clip):''),bar*0.45,y);
+    x.font=`600 ${fs}px ${ff}`; x.fillStyle='#fff'; x.textAlign='left'; x.fillText(mode==='cmp'?(E.ovl?'Overlay  ·  ':'')+'A: '+metaTitle(A.clip)+'   ·   B: '+metaTitle(B.clip):metaTitle(D.clip)+(metaLine(D.clip)?'  ·  '+metaLine(D.clip):''),bar*0.45,y);
     x.textAlign='right'; x.font=`600 ${fs}px "Geist Mono",ui-monospace,Menlo,monospace`; x.fillStyle='#aeb6c1';
     const t=(D.frame/D.fps).toFixed(2)+' s · F '+D.frame+(EXP.rate<1?'  ·  '+fmtRate(EXP.rate)+' Zeitlupe':''); x.fillText(t+'   Swiss-Ski Video-Lab',W-bar*0.45,y);
     x.fillStyle='#DA291C'; x.fillRect(0,H,W*clamp((D.v.currentTime-E.t0)/(E.tEnd-E.t0),0,1),Math.max(2,Math.round(bar*0.05))); }
@@ -3735,7 +3789,7 @@ if(!LS.get('hint1',0)){ setTimeout(()=>{ toast(matchMedia('(pointer:coarse)').ma
 
 /* Update-Hinweis: prüft version.json auf GitHub Pages; «Aktualisieren» lädt die Seite ohne Cache neu */
 (()=>{
-  const BUILD='20261027124009'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
+  const BUILD='20261027124829'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
   // nach einem Update die ?v=… aus der Adresse entfernen
   try{ const u=new URL(location.href); if(u.searchParams.has('v')){ u.searchParams.delete('v'); history.replaceState(null,'',u.pathname+(u.search||'')+u.hash); } }catch(e){}
   const el=$('#upd'); let latest=null, snoozed=null, busy=false;

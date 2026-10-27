@@ -67,4 +67,8 @@ VideoLab.link(trackId, "Datei.mp4", offset)
 
 Nach jedem Push erscheint in offenen Fenstern der Hinweis «Neue Version verfügbar»; «Aktualisieren» lädt die neue Version ohne Cache (`version.json` gehört zum Push dazu).
 
+- **fps** werden direkt aus der Datei gelesen (MP4/MOV), auch am Handy exakt.
+- **«Geöffnet»**: kompakte Liste nach Rennen gruppiert, Umschalter auf «nur Dateinamen».
+- **Overlay exportieren**: Clip-Export und Standbild speichern im Overlay das ausgerichtete Bild.
+
 Tastenkürzel: in der App unter **?**.
