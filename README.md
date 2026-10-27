@@ -6,6 +6,10 @@ Video-Analyse für Coaches: Ski-Videos lokal öffnen, verlangsamen, Bild für Bi
 
 Videos werden nur im Browser geöffnet und **nie hochgeladen**. Alles steckt in einer Datei (`index.html`), ohne externe Bibliotheken.
 
+## Beispiel-Videos
+
+Beim Öffnen des Links sind drei Läufe aus Sölden (26.10.2025, Riesenslalom Herren: Meillard, Gratz, Braathen) geladen. Sie liegen im Ordner `demo/` (720p, 50 fps) und werden direkt von GitHub Pages abgespielt. Eigene Videos bleiben weiterhin nur auf dem Gerät.
+
 ## Modi
 
 - **Einzelvideo:** Zeitlupe, Bild für Bild, Zeitleiste mit Vorschaubildern, Loop-Bereich, Marker, Zeichnen & Winkel messen, Standbild (PNG).
@@ -59,5 +63,7 @@ VideoLab.link(trackId, "Datei.mp4", offset)
 ```
 
 `offset` = GPS-Zeit (Sekunden ab erstem Punkt) beim Video-Zeitpunkt 0.
+
+Nach jedem Push erscheint in offenen Fenstern der Hinweis «Neue Version verfügbar»; «Aktualisieren» lädt die neue Version ohne Cache (`version.json` gehört zum Push dazu).
 
 Tastenkürzel: in der App unter **?**.
