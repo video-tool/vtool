@@ -1382,6 +1382,14 @@ body.m-cmp .lib.list .clip.row:hover .abtag{display:none}
 .tour-b.pri{background:linear-gradient(135deg,#ff5a4a,#c81d12)!important;color:#fff!important;border:none!important}
 .tour-spot{box-shadow:0 0 0 9999px rgba(5,7,11,.62),0 0 0 2px #fff,0 0 0 5px rgba(255,90,74,.85),0 0 34px rgba(255,90,74,.5)!important}
 :root[data-theme="dark"] .tour-card{background:#f7f8fa!important}
+/* Knöpfe im Video-Bereich nochmals heller */
+.player .dock .ctl:not(.play):not(.rate-btn),.player .cmp-tools>.ctl,.player .gps-foot .ctl,.slot-flip{background:rgba(255,255,255,.13)!important;border-color:rgba(255,255,255,.2)!important;color:#fff!important}
+.player .dock .ctl:not(.play):not(.rate-btn):hover,.player .cmp-tools>.ctl:hover,.slot-flip:hover{background:rgba(255,255,255,.22)!important;border-color:rgba(255,255,255,.32)!important}
+.player .dock .ctl.on,.player .dock .ctl.active,#btnLink.on{background:#fff!important;color:#0d1014!important;border-color:#fff!important}
+.rate-btn{background:rgba(255,255,255,.15)!important;border-color:rgba(255,255,255,.24)!important}
+.player .ov-b:not(.pri):not(.ghost){background:rgba(255,255,255,.13);border-color:rgba(255,255,255,.2)}
+.tl-zoom button{background:rgba(40,46,56,.85)!important}
+.player .ctl-sep{background:rgba(255,255,255,.22)!important}
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
   .aurora{display:none}
@@ -3868,7 +3876,7 @@ if(!LS.get('hint1',0)){ setTimeout(()=>{ toast(matchMedia('(pointer:coarse)').ma
 
 /* Update-Hinweis: prüft version.json auf GitHub Pages; «Aktualisieren» lädt die Seite ohne Cache neu */
 (()=>{
-  const BUILD='20261027141418'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
+  const BUILD='20261027142558'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
   // nach einem Update die ?v=… aus der Adresse entfernen
   try{ const u=new URL(location.href); if(u.searchParams.has('v')){ u.searchParams.delete('v'); history.replaceState(null,'',u.pathname+(u.search||'')+u.hash); } }catch(e){}
   const el=$('#upd'); let latest=null, snoozed=null, busy=false;
