@@ -1538,6 +1538,65 @@ html.vt-back::view-transition-new(mainview){animation:vtInL .45s cubic-bezier(.2
 .ov-lay i{width:8px;height:8px;border-radius:50%}
 .ov-lay button{border:none;background:none;color:#cfd6df;width:18px;height:18px;display:grid;place-items:center;cursor:pointer;padding:0;border-radius:50%}
 .ov-lay button svg{width:11px;height:11px}
+
+.ov-tags .ov-lines{position:absolute;left:0;top:0;width:100%;height:100%;overflow:visible;pointer-events:none}
+.ov-tags .ov-lines line{stroke-width:1.2;stroke-linecap:round;transition:opacity .25s;filter:drop-shadow(0 0 1px rgba(0,0,0,.6))}
+.ov-tags:not(.on) .ov-lines line,.ov-tags:not(.on) .ov-tag{opacity:0!important}
+.ov-tag{gap:5px!important;padding:1px 7px 1px 5px!important;font-size:10.5px!important;font-weight:650!important;background:rgba(12,15,20,.34)!important;border-color:rgba(255,255,255,.2)!important}
+.ov-tag i{width:6px!important;height:6px!important;box-shadow:none!important}
+
+/* ---------- Ohne Kopfbalken (Laptop) ---------- */
+body.no-hdr header{display:none!important}
+body.no-hdr main.layout{padding-top:14px!important}
+body.no-hdr .player .eyebrow{display:none}
+.mode-slot:empty{display:none}
+.mode-slot{margin:0 0 6px}
+.mode-slot .tabs{margin:0!important;align-self:auto!important;background:rgba(255,255,255,.07)!important;border-radius:11px!important;padding:3px!important;gap:2px!important;display:inline-flex!important;position:relative}
+.mode-slot .tabs .tab{height:30px!important;padding:0 12px!important;font-size:12.5px!important;color:#b9c2cd!important;border-radius:8px!important;background:transparent}
+.mode-slot .tabs .tab:hover{color:#fff!important}
+.mode-slot .tabs .tab.on{color:#fff!important}
+.mode-slot .tabs.has-ind>.seg-ind{background:rgba(255,255,255,.16)!important;box-shadow:inset 0 0 0 1px rgba(255,255,255,.1)!important;border-radius:8px!important}
+.mode-slot .tabs .tab svg{width:15px;height:15px}
+.mode-slot .tabs .tab.on svg{color:#ff5a4a!important}
+.mode-slot .dev-tag{background:rgba(255,209,102,.16)!important;color:#ffd166!important}
+.side-top{display:flex;align-items:center;gap:8px}
+.side-top>#sideTabs{flex:1;min-width:0}
+.side-top .btn-add{height:36px!important;padding:0 11px!important;border-radius:11px!important;flex:none;font-size:12.5px!important}
+.lib-foot.app-foot{display:flex;align-items:center;gap:6px;font-size:11px;padding-top:10px}
+.app-foot .af-txt{display:none}
+.app-foot .brand{transform:scale(.82);transform-origin:left center;margin-right:-14px}
+.app-foot .local-chip{font-size:10.5px!important;white-space:nowrap}
+.app-foot .af-sp{flex:1}
+.app-foot .ham-btn{width:30px;height:30px;margin:0 2px}
+.app-foot .hdr-ico{width:32px!important;height:32px!important}
+/* Fokus-Rahmen überall dezent */
+.player .ctl:focus-visible,.ov-b:focus-visible,.tut-open:focus-visible,.hdr-ico:focus-visible,.ham-btn:focus-visible{outline:none!important;box-shadow:0 0 0 2px rgba(255,90,74,.45)!important}
+
+/* Bildnummer/Zeit im Bild ausblenden */
+.stage .osd{display:none!important}
+/* kein doppeltes A/B: Zuweisen-Knopf ausblenden, wenn schon zugewiesen */
+.ft-row:has(.ab-tags .ta) .ft-acts .ab-a,.ft-row:has(.ab-tags .tb) .ft-acts .ab-b{display:none!important}
+.clip.row:has(.abtag .ta) .ab .ba,.clip.row:has(.abtag .tb) .ab .bb{display:none!important}
+/* «+ Videos» kompakt in der Seitenleiste */
+.side-top .btn-add{width:36px!important;padding:0!important;justify-content:center}
+.side-top .btn-add span{display:none!important}
+/* Fusszeile mit Logo */
+.lib-foot.app-foot{gap:8px;padding:10px 2px 0;min-height:36px}
+.app-foot svg{width:auto;height:auto;color:inherit}
+.app-foot .brand{transform:none!important;margin:0!important;padding:0!important;gap:7px}
+.app-foot .logo{width:26px!important;height:26px!important;border-radius:8px!important;box-shadow:none!important}
+.app-foot .brand-txt{gap:2px}
+.app-foot .ss-word{height:11px!important;width:auto!important}
+.app-foot .brand-sub{font-size:6.5px!important;letter-spacing:.14em}
+.app-foot .local-chip{gap:4px;color:var(--muted)!important;font-weight:500!important}
+.app-foot .local-chip svg{width:12px!important;height:12px!important;color:var(--good)!important}
+.app-foot .ham-btn{width:26px!important;height:26px!important;margin:0 1px!important;box-shadow:0 0 0 1.5px #fff,0 2px 6px -2px rgba(0,0,0,.35)!important}
+.app-foot .ham-btn::after{inset:-2px;border-width:1.5px}
+.app-foot .hdr-ico{width:30px!important;height:30px!important}
+.app-foot .hdr-ico svg{width:17px!important;height:17px!important;color:var(--ink2)!important}
+
+body.no-hdr .toast{top:auto!important;bottom:118px!important;transform:translateX(-50%) translateY(12px)}
+body.no-hdr .toast.on{transform:translateX(-50%) translateY(0)}
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
   .aurora{display:none}
@@ -1596,13 +1655,13 @@ html.vt-back::view-transition-new(mainview){animation:vtInL .45s cubic-bezier(.2
     <div class="lib-restore" id="libRestore" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg><span></span><button id="btnRestore">Öffnen</button></div>
     <div class="lib" id="lib"></div>
     </div>
-    <div class="lib-foot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 3v6c0 4.5-3.4 8.3-8 9-4.6-.7-8-4.5-8-9V6z"/><path d="M8.5 12l2.5 2.5 4.5-5"/></svg>Alles bleibt auf deinem Gerät – nichts wird hochgeladen.</div>
+    <div class="lib-foot" id="appFoot"><span class="af-txt"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 3v6c0 4.5-3.4 8.3-8 9-4.6-.7-8-4.5-8-9V6z"/><path d="M8.5 12l2.5 2.5 4.5-5"/></svg>Alles bleibt auf deinem Gerät – nichts wird hochgeladen.</span></div>
   </section>
 
   <!-- Modus 1: Einzelvideo -->
   <section class="card player" id="viewSingle">
     <div class="pbar">
-      <div class="ttl-wrap">
+      <div class="ttl-wrap"><div class="mode-slot"></div>
         <div class="eyebrow">Einzelvideo</div>
         <div class="ttl" id="sTitle">Kein Video geöffnet</div>
       </div>
@@ -1637,7 +1696,7 @@ html.vt-back::view-transition-new(mainview){animation:vtInL .45s cubic-bezier(.2
   <!-- Modus 3: GPS -->
   <section class="card player" id="viewGps" hidden>
     <div class="pbar">
-      <div class="ttl-wrap"><div class="eyebrow">GPS · Video</div><div class="ttl" id="gpsTitle">Tempo &amp; Zeit</div></div>
+      <div class="ttl-wrap"><div class="mode-slot"></div><div class="eyebrow">GPS · Video</div><div class="ttl" id="gpsTitle">Tempo &amp; Zeit</div></div>
       <div class="gps-sel">
         <label class="ctl-lab" data-lab="Video">Video <select class="sel" id="gpsVideo"></select></label>
         <label class="ctl-lab" data-lab="GPS-Daten">GPS <select class="sel" id="gpsTrack"></select></label>
@@ -1676,7 +1735,7 @@ html.vt-back::view-transition-new(mainview){animation:vtInL .45s cubic-bezier(.2
   <!-- Modus 2: Vergleich -->
   <section class="card player" id="viewCmp" hidden>
     <div class="c-head">
-      <div><div class="eyebrow">Vergleich</div><h2>Lauf A <span class="vs">vs</span> Lauf B</h2></div>
+      <div><div class="mode-slot"></div><div class="eyebrow">Vergleich</div><h2>Lauf A <span class="vs">vs</span> Lauf B</h2></div>
       <div class="cmp-tools">
         <button class="tut-open" id="cmpReset" title="Vergleich leeren: A und B entfernen, Sync und Overlay zurücksetzen (Videos bleiben unter «In Arbeit»)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/></svg><span>Zurücksetzen</span></button><button class="tut-open" id="tutBtn" title="Anleitung direkt im Tool – zeigt Schritt für Schritt mit den Beispiel-Läufen, wie es geht"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M10 8.5l5.5 3.5-5.5 3.5z" fill="currentColor"/></svg><span>Anleitung</span></button><div class="seg" id="layoutSeg"><button data-layout="side" class="on"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="5" width="8.5" height="14" rx="2"/><rect x="13" y="5" width="8.5" height="14" rx="2"/></svg>Side by Side</button><button data-layout="overlay"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="13" height="11" rx="2"/><rect x="8" y="9" width="13" height="11" rx="2" fill="currentColor" fill-opacity=".25"/></svg>Overlay</button><button data-layout="ghost"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M5 20V10a7 7 0 0 1 14 0v10l-2.4-1.8L14.3 20 12 18.2 9.7 20l-2.3-1.8z"/><circle cx="9.5" cy="10.5" r=".9" fill="currentColor"/><circle cx="14.5" cy="10.5" r=".9" fill="currentColor"/></svg>Ghost</button></div>
         <button class="ctl ov-namebtn" id="ovNames" title="Namen im Bild ein / aus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12V5a2 2 0 0 1 2-2h7l9 9-9 9-9-9z"/><circle cx="8" cy="8" r="1.6"/></svg><span>Namen</span></button><label class="ctl-lab op-wrap">Deckkraft <input type="range" class="op" id="opRange" min="0.1" max="0.9" step="0.05" value="0.5"></label>
@@ -2604,7 +2663,7 @@ function setMode(m){
   [S,A,B,GD].forEach(d=>{ if(!(m==='single'&&d===S)&&!(m==='cmp'&&(d===A||d===B))&&!(m==='gps'&&d===GD)) d.pause(); });
   if(m==='gps') gpsSelects(); GPS.dirty=true;
   setRateUI(); renderLib(); syncSelects(); updSync(); splitsUI(); fxUI(); if(typeof ftRender==='function') ftRender();
-  decks.forEach(d=>{ d.dirty=true; d.annDirty=true; }); LS.set('mode',m);
+  decks.forEach(d=>{ d.dirty=true; d.annDirty=true; }); LS.set('mode',m); if(window.placeChrome) placeChrome();
   try{ history.replaceState(null,'',m==='cmp'?'#vergleich':m==='gps'?'#gps':'#einzel'); }catch(e){}
 }
 // Seitenwechsel: weicher Übergang in Richtung des Tabs (View Transitions, sonst Einblenden)
@@ -3044,7 +3103,7 @@ function ovUI(){
   const cutBtns=ovBtn('cuta','Start',OVI.cs,'','Start des Ausschnitts = aktuelles Bild von A')+ovBtn('cutb','Ende',OVI.ce,'','Ende des Ausschnitts = aktuelles Bild von A');
   let t='', acts='';
   if(!A.ready||!B.ready){ t='Oben <b>Lauf A</b> und <b>Lauf B</b> wählen – beide vom gleichen Kamerastandort gefilmt.'; }
-  else if(busy&&OV.fix){ t=`<b>Korrigieren</b> · B ziehen, bis die Tore übereinander liegen – ab hier rechnet die App mit deiner Lage weiter. <span class="ov-hint">Rechtsklick ziehen: drehen · Mausrad: Grösse · Pfeiltasten: fein <b class="ov-fixinfo" id="ovFixInfo"></b></span>`;
+  else if(busy&&OV.fix){ t=`<b>Korrigieren</b> · B auf die Tore ziehen – danach wird ab hier weitergerechnet. <span class="ov-hint">Rechtsklick ziehen: drehen · Mausrad: Grösse · Pfeiltasten: fein <b class="ov-fixinfo" id="ovFixInfo"></b></span>`;
     acts=ovBtn('fixreset','Auf 0',OVI.reset,'ghost','Handkorrektur zurücksetzen')+ovBtn('fixno','Abbrechen','','ghost')+ovBtn('fixok','Übernehmen & weiter',OVI.ok,'pri'); }
   else if(busy){ const P=GH.paused, pg=(($('#ghostBar .gprog span')||{}).textContent||'Kamera wird verfolgt …');
     t=`<b>Overlay wird erstellt</b>${P?' · <b>angehalten</b>':''} · ${pg} <span class="ov-hint">${P?'Liegt B falsch? «Zurück» bis vor den Fehler, dann «Korrigieren».':'Verrutscht oder verdreht sich B? Sofort «Pause».'}</span>`;
@@ -3053,19 +3112,19 @@ function ovUI(){
     t=OV.pick==='a'?`<b>Lauf A</b> · Punkt ${n} von 2 antippen – am besten ein Tor (Torflagge), zwei weit auseinander.`:`<b>Lauf B</b> · den <b>gleichen</b> Punkt ${n} antippen. Die gestrichelten Kreise zeigen die Lage in A.`;
     acts=ovBtn('cancel','Abbrechen'); }
   else if(OV.fix&&!done){ // von Hand übereinanderlegen (ohne Berechnung)
-    t=`<b>Übereinanderlegen</b> · B ziehen, bis die Tore übereinander liegen. Dann übernehmen und in der Zeitleiste vorklicken. <span class="ov-hint">Rechtsklick ziehen: drehen · Mausrad: Grösse · Pfeiltasten: fein <b class="ov-fixinfo" id="ovFixInfo"></b></span>`;
+    t=`<b>Übereinanderlegen</b> · B auf die Tore ziehen, dann übernehmen. <span class="ov-hint">Rechtsklick ziehen: drehen · Mausrad: Grösse · Pfeiltasten: fein <b class="ov-fixinfo" id="ovFixInfo"></b></span>`;
     acts=ovBtn('fixreset','Auf 0',OVI.reset,'ghost','Handkorrektur zurücksetzen')+ovBtn('fixno','Abbrechen','','ghost')+ovBtn('fixok','Übernehmen',OVI.ok,'pri'); }
   else if(OV.fix){ const near=OV.K.some(k=>Math.abs(k.e-ovE())<0.15);
-    t=`<b>Korrigieren</b> · B ziehen, bis die Tore genau übereinander liegen – danach rechnet die App ab hier mit deiner Lage neu. <span class="ov-hint">Rechtsklick ziehen: drehen · Mausrad: Grösse · Pfeiltasten: fein <b class="ov-fixinfo" id="ovFixInfo"></b></span>`;
+    t=`<b>Korrigieren</b> · B auf die Tore ziehen – ab hier wird neu gerechnet. <span class="ov-hint">Rechtsklick ziehen: drehen · Mausrad: Grösse · Pfeiltasten: fein <b class="ov-fixinfo" id="ovFixInfo"></b></span>`;
     acts=(near?ovBtn('fixdel','Korrektur löschen',OVI.trash,'ghost'):'')+ovBtn('fixreset','Auf 0',OVI.reset,'ghost','Handkorrektur zurücksetzen')+ovBtn('fixno','Abbrechen','','ghost')+ovBtn('fixok','Übernehmen & ab hier neu rechnen',OVI.ok,'pri','Ab diesem Bild wird mit deiner Lage neu berechnet – davor bleibt alles'); }
-  else if(st===1){ t=`<b>Beide Videos zum gleichen Moment schieben</b> – z. B. das erste Tor, das in beiden sichtbar ist. A und B einzeln ziehen. ${cut}`;
+  else if(st===1){ t=`<b>Gleicher Moment</b> · A und B einzeln zum ersten gemeinsamen Tor ziehen. ${cut}`;
     acts=cutBtns+ovBtn('hand','Übereinanderlegen',OVI.fix,'','A und B hier verbinden und B von Hand über A schieben')+ovBtn('sync','Gemeinsamer Punkt',OVI.pin,'pri','A und B an diesem Moment verbinden'); }
-  else if(st===2){ t=`<b>Synchron</b> <span class="ov-dim">B ${G.off>=0?'+':'−'}${Math.abs(G.off).toFixed(2)} s</span> · Jetzt in A und B je zwei gleiche Tore antippen. ${cut}`;
+  else if(st===2){ t=`<b>Synchron</b> <span class="ov-dim">B ${G.off>=0?'+':'−'}${Math.abs(G.off).toFixed(2)} s</span> · in A und B je zwei gleiche Tore antippen. ${cut}`;
     acts=ovBtn('edit','Punkt ändern',OVI.back,'ghost')+ovBtn('pick','Referenzpunkte setzen',OVI.pin,'pri','2 feste Punkte in A und B antippen'); }
-  else if(!done){ t=`<b>B liegt über A</b> · in der Zeitleiste vorklicken oder abspielen – so siehst du den Vorsprung. Schwenkt die Kamera: «Overlay erstellen», dann folgt B dem Schwenk. ${cut}`;
+  else if(!done){ t=`<b>B liegt über A</b> · vorklicken zeigt den Vorsprung – bei Kameraschwenk «Overlay erstellen». ${cut}`;
     acts=ovBtn('edit','Punkt ändern',OVI.back,'ghost')+ovBtn('pick','Punkte setzen',OVI.pin,'ghost','2 gleiche Tore in A und B antippen')+ovBtn('hand','Von Hand',OVI.fix,'','B von Hand nachschieben')+ovBtn('make','Overlay erstellen',OVI.go,'pri'); }
   else { const kc=OV.K.length?`<span class="ov-chip">${OVI.fix}${OV.K.length} Korrektur${OV.K.length>1?'en':''}<button data-ov="fixall" title="Alle Korrekturen entfernen">${OVI.x}</button></span>`:'';
-    t=`<b>Overlay fertig</b> · abspielen oder scrubben. Liegen die Tore irgendwo nicht übereinander: anhalten und «Hier korrigieren». ${cut} ${kc}`;
+    t=`<b>Overlay fertig</b> · Tore verrutscht? Anhalten und «Hier korrigieren». ${cut} ${kc}`;
     acts=ovBtn('edit','Neu beginnen',OVI.back,'ghost')+ovBtn('make','Neu berechnen',OVI.go,'ghost')+(LAY.length<3?ovBtn('addrun','Lauf hinzufügen',OVI.plus,'ghost','Diesen Lauf im Bild behalten und einen weiteren dazunehmen'):'')+ovBtn('fix','Hier korrigieren',OVI.fix,'pri','B an dieser Stelle von Hand nachschieben'); }
   // nur neu zeichnen, wenn sich etwas ändert – sonst gehen Klicks verloren
   if(LAY.length) t+=' <span class="ov-lays">'+LAY.map((L,i)=>`<span class="ov-lay"><i style="background:${L.col}"></i>${L.let} · ${L.name}<button data-ov="laydel" data-i="${i}" title="Lauf ${L.let} entfernen">${OVI.x}</button></span>`).join('')+'</span>';
@@ -3113,29 +3172,60 @@ function posAt(e,k,fb,L){ const S=L?L.S:GH.S, step=L?L.step:GH.step; if(!S||!S.l
   if(a<0&&b>=S.length){ if(!fb) return null; const j=Math.round(x), s=S[clamp(j,0,S.length-1)]; return s[fb]||null; } /* Kamera folgt der Fahrer:in → Bildmitte */ if(a<0) return S[b][k]; if(b>=S.length) return S[a][k];
   const f=clamp((e-S[a].e)/(S[b].e-S[a].e),0,1), p=S[a][k], q=S[b][k]; return [p[0]+(q[0]-p[0])*f,p[1]+(q[1]-p[1])*f]; }
 function ovTags(on){
-  let box=TAGS.el; if(!box){ box=TAGS.el=document.createElement('div'); box.className='ov-tags'; $('#cStages').append(box); }
-  const items=[{k:'a',col:'#3e8bff',name:lastName(A.clip),pk:'pa',fb:'ca',L:null}];
-  if(B.clip) items.push({k:'b',col:'#f08a3c',name:lastName(B.clip),pk:'pb',fb:'cb',L:null});
-  if(typeof LAY!=='undefined') LAY.forEach((L,i)=>items.push({k:'l'+i,col:L.col,name:L.name,pk:'pb',fb:'cb',L}));
-  const els={}; for(const it of items){ let el=box.querySelector('[data-k="'+it.k+'"]'); if(!el){ el=document.createElement('span'); el.className='ov-tag'; el.dataset.k=it.k; el.innerHTML='<i></i><b></b>'; box.appendChild(el); }
-    if($('b',el).textContent!==it.name) $('b',el).textContent=it.name; $('i',el).style.background=it.col; $('i',el).style.boxShadow='0 0 0 2px '+it.col+'55'; els[it.k]=el; }
-  [...box.children].forEach(el=>{ if(!els[el.dataset.k]) el.remove(); });
-  if(!on){ [...box.children].forEach(el=>el.classList.remove('on')); return; }
-  const st=A.stage, R=A.rect(), z=A.z, toS=p=>p?[st.offsetLeft+z.x+(R.x+p[0]/GH.W0*R.w)*z.s, st.offsetTop+z.y+(R.y+p[1]/GH.hA*R.h)*z.s]:null;
-  const P={}; for(const it of items){ const e=it.L?ovTA()-it.L.t0:ovE(); P[it.k]=(it.L&&(e<0||e>it.L.eEnd))?null:toS(posAt(it.L?e:e,it.pk,it.fb,it.L)); }
-  const rad=Math.max(16,R.w*z.s*0.045), placed=[], riders=Object.values(P).filter(Boolean);
-  const hit=(x,y,w,h)=>{ for(const r of riders){ const cx=clamp(r[0],x,x+w), cy=clamp(r[1],y,y+h); if(Math.hypot(r[0]-cx,r[1]-cy)<rad) return true; }
-    for(const q of placed){ if(x<q.x+q.w+6&&x+w+6>q.x&&y<q.y+q.h+4&&y+h+4>q.y) return true; } return false; };
-  const SW=st.offsetLeft, ST=st.offsetTop, SWW=st.offsetWidth, SHH=st.offsetHeight;
-  for(const it of items){ const el=els[it.k], S0=TAGS.st[it.k]||(TAGS.st[it.k]={x:0,y:0,c:0}), p=P[it.k];
-    if(!p){ el.classList.remove('on'); continue; }
-    const w=el.offsetWidth||70, h=el.offsetHeight||22, g=rad+6;
-    const C=[[-w/2,-g-h],[-w/2,g],[g,-h/2],[-g-w,-h/2],[g*0.7,-g*0.7-h],[-g*0.7-w,-g*0.7-h],[g*0.7,g*0.7],[-g*0.7-w,g*0.7]];
-    const fits=c=>{ const x=p[0]+c[0], y=p[1]+c[1]; return x>=SW+4&&y>=ST+4&&x+w<=SW+SWW-4&&y+h<=ST+SHH-4&&!hit(x,y,w,h); };
-    let ci=fits(C[S0.c])?S0.c:C.findIndex(fits); if(ci<0) ci=S0.c; S0.c=ci;
-    const tx=p[0]+C[ci][0], ty=p[1]+C[ci][1];
-    if(!el.classList.contains('on')){ S0.x=tx; S0.y=ty; } else { S0.x+=(tx-S0.x)*0.35; S0.y+=(ty-S0.y)*0.35; }
-    placed.push({x:S0.x,y:S0.y,w,h}); el.style.transform=`translate(${S0.x.toFixed(1)}px,${S0.y.toFixed(1)}px)`; el.classList.add('on'); } }
+  let box=TAGS.el; if(!box){ box=TAGS.el=document.createElement('div'); box.className='ov-tags'; box.innerHTML='<svg class="ov-lines"></svg>'; $('#cStages').append(box); }
+  const svg=$('svg',box);
+  const items=[{k:'a',col:'#3e8bff',name:lastName(A.clip),pk:'pa',L:null}];
+  if(B.clip&&B.ready) items.push({k:'b',col:'#f08a3c',name:lastName(B.clip),pk:'pb',L:null});
+  if(typeof LAY!=='undefined') LAY.forEach((L,i)=>items.push({k:'l'+i,col:L.col,name:L.name,pk:'pb',L}));
+  const els={}; for(const it of items){ let el=box.querySelector('.ov-tag[data-k="'+it.k+'"]'); if(!el){ el=document.createElement('span'); el.className='ov-tag'; el.dataset.k=it.k; el.innerHTML='<i></i><b></b>'; box.appendChild(el);
+      const ln=document.createElementNS('http://www.w3.org/2000/svg','line'); ln.dataset.k=it.k; svg.appendChild(ln); }
+    if($('b',el).textContent!==it.name) $('b',el).textContent=it.name; $('i',el).style.background=it.col; els[it.k]=el; }
+  [...box.querySelectorAll('.ov-tag')].forEach(el=>{ if(!els[el.dataset.k]){ el.remove(); const l=svg.querySelector('line[data-k="'+el.dataset.k+'"]'); if(l) l.remove(); delete TAGS.st[el.dataset.k]; } });
+  const lines={}; svg.querySelectorAll('line').forEach(l=>lines[l.dataset.k]=l);
+  if(!on){ box.classList.remove('on'); for(const k in TAGS.st) TAGS.st[k].vis=false; return; } box.classList.add('on');
+  const st=A.stage, R=A.rect(), z=A.z, SX=st.offsetLeft, SY=st.offsetTop, SW=st.offsetWidth, SH=st.offsetHeight;
+  const toS=uv=>[SX+z.x+(R.x+uv[0]*R.w)*z.s, SY+z.y+(R.y+uv[1]*R.h)*z.s];
+  tagsDetect(items);
+  const now=performance.now(), playing=!A.v.paused, rr=Math.max(5,R.w*z.s*0.016), gapL=12, out=[];
+  for(const it of items){ const S0=TAGS.st[it.k]||(TAGS.st[it.k]={vis:false}), el=els[it.k];
+    const lv=TAGS.live[it.k]; let uv=null;
+    if(lv&&now-lv.t<450&&Math.abs(lv.vt-A.v.currentTime)<0.5) uv=[lv.u,lv.v];
+    else { const e=it.L?ovTA()-it.L.t0:ovE(); if(!it.L||(e>=0&&e<=it.L.eEnd)){ const p=posAt(e,it.pk,null,it.L); if(p) uv=[p[0]/(it.L?it.L.W0:GH.W0),p[1]/(it.L?it.L.hA:GH.hA)]; } }
+    if(!uv){ if(S0.vis&&now-(S0.seen||0)<600) uv=S0.uv; else { S0.vis=false; el.classList.remove('on'); if(lines[it.k]) lines[it.k].style.opacity=0; continue; } } else S0.seen=now;
+    S0.uv=uv; const t=toS(uv);
+    if(!S0.vis){ S0.ax=t[0]; S0.ay=t[1]; } else { const f=playing?0.28:0.45, dx=t[0]-S0.ax, dy=t[1]-S0.ay; if(Math.hypot(dx,dy)>1.2){ S0.ax+=dx*f; S0.ay+=dy*f; } }
+    const w=el.offsetWidth||60, h=el.offsetHeight||18; out.push({it,el,S0,w,h,x:clamp(S0.ax-w/2,SX+4,SX+SW-w-4),y:Math.max(SY+4,S0.ay-rr-gapL-h)}); }
+  // überlappende Pillen nach oben staffeln (immer oberhalb der Athlet:innen)
+  out.sort((p,q)=>q.S0.ay-p.S0.ay);
+  for(let i=0;i<out.length;i++){ const p=out[i]; for(let j=0;j<i;j++){ const q=out[j]; if(p.x<q.x+q.w+4&&p.x+p.w+4>q.x&&p.y<q.y+q.h+3&&p.y+p.h+3>q.y){ const up=q.y-p.h-4; if(up>=SY+4) p.y=up; else p.x=q.x+q.w/2<p.x+p.w/2?q.x+q.w+6:q.x-p.w-6; } } }
+  for(const p of out){ const S0=p.S0;
+    if(!S0.vis||S0.px==null){ S0.px=p.x; S0.py=p.y; } else { S0.px+=(p.x-S0.px)*0.35; S0.py+=(p.y-S0.py)*0.35; }
+    S0.vis=true; p.el.style.transform=`translate(${S0.px.toFixed(1)}px,${S0.py.toFixed(1)}px)`; p.el.classList.add('on');
+    const ln=lines[p.it.k]; if(ln){ const x1=clamp(S0.ax,S0.px+6,S0.px+p.w-6), y1=S0.py+p.h, y2=S0.ay-rr*0.55;
+      ln.setAttribute('x1',x1.toFixed(1)); ln.setAttribute('y1',y1.toFixed(1)); ln.setAttribute('x2',S0.ax.toFixed(1)); ln.setAttribute('y2',Math.max(y1,y2).toFixed(1)); ln.style.opacity=y2-y1>2?0.75:0; ln.style.stroke=p.it.col; } } }
+/* Live-Erkennung: Fahrer:in = Stelle, wo sich A und das ausgerichtete B unterscheiden – nahe der erwarteten Position */
+const TGD={a:document.createElement('canvas'),b:document.createElement('canvas'),t:0,f:-1};
+TAGS.live={};
+function tagsDetect(items){
+  const now=performance.now(), fr=A.frame; if(A.v.paused?fr===TGD.f:now-TGD.t<70) return; TGD.t=now; TGD.f=fr;
+  if(!A.v.videoWidth||A.v.readyState<2) return;
+  const W=288, H=Math.round(W*A.v.videoHeight/A.v.videoWidth), n=W*H, sc=W/GH.W0;
+  for(const c of [TGD.a,TGD.b]) if(c.width!==W||c.height!==H){ c.width=W; c.height=H; }
+  const xa=TGD.a.getContext('2d',{willReadFrequently:true}), xb=TGD.b.getContext('2d',{willReadFrequently:true});
+  xa.drawImage(A.v,0,0,W,H); const dA=xa.getImageData(0,0,W,H).data;
+  const pick=(k,m,pred)=>{ const list=blobs(morph(morph(m,W,H,false),W,H,true),W,H,3); if(!list.length) return;
+    let best=null, bs=-1; for(const b of list){ const d=pred?Math.hypot(b.x-pred[0],b.y-pred[1]):0; if(pred&&d>W*0.14) continue; const sc2=b.a*Math.exp(-d/(W*0.05)); if(sc2>bs){ bs=sc2; best=b; } }
+    if(!best||(!pred&&best.a<12)) return; TAGS.live[k]={u:best.x/W,v:best.y/H,t:now,vt:A.v.currentTime}; };
+  const predOf=k=>{ const S0=TAGS.st[k], lv=TAGS.live[k]; if(lv&&now-lv.t<700) return [lv.u*W,lv.v*H]; if(S0&&S0.vis&&S0.uv) return [S0.uv[0]*W,S0.uv[1]*H]; return null; };
+  const runs=items.filter(it=>it.k!=='a'); let doneA=false;
+  for(const it of runs){ const L=it.L, v=L?L.v:B.v; if(!v||v.readyState<2) continue;
+    let M; if(L){ const e=ovTA()-L.t0; if(e<0||e>L.eEnd) continue; M=affInv(simToAff(paramsAtL(L,clamp(e,0,L.eEnd)),L.W0,L.hA,L.W0,L.hB)); }
+    else { const p=paramsAt(clamp(ovE(),0,GH.eEnd)); M=affMul(ovDMat(ovDAt(ovE()),GH.W0),affInv(simToAff(p,GH.W0,GH.hA,GH.W0,GH.hB))); }
+    xb.setTransform(1,0,0,1,0,0); xb.clearRect(0,0,W,H); xb.setTransform(sc*M[0],sc*M[3],sc*M[1],sc*M[4],sc*M[2],sc*M[5]); xb.drawImage(v,0,0,GH.W0,L?L.hB:GH.hB); xb.setTransform(1,0,0,1,0,0);
+    const dB=xb.getImageData(0,0,W,H).data, ok=new Uint8Array(n); for(let i=0;i<n;i++) ok[i]=dB[i*4+3]>200?1:0;
+    const c=L?0:(paramsAt(clamp(ovE(),0,GH.eEnd))[4]||0);
+    pick(it.k,ghostMask(dA,dB,ok,n,c,GH.sens+6,'B'),predOf(it.k));
+    if(!doneA){ doneA=true; pick('a',ghostMask(dA,dB,ok,n,c,GH.sens+6,'A'),predOf('a')); } } }
 
 /* ---------- Mehrere Läufe: fertige Overlays als Ebenen behalten (bis 4 Läufe) ---------- */
 const LAY=[]; const LCOL=['#2fbf71','#a66bff','#ff5fa2'], LLET=['C','D','E'];
@@ -3303,6 +3393,19 @@ setInterval(resTry,800);
   set(LS.get('ovnames',1)!==0); b.addEventListener('click',()=>set(!b.classList.contains('on'))); })();
 
 if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)) window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
+
+/* Laptop: kein Kopfbalken – Seitenwechsel in die Video-Karte, Logo & Schalter in die Fusszeile der Seitenleiste */
+(()=>{ const mq=matchMedia('(min-width:861px) and (min-height:520px)'), hd=$('header .head-in'), nav=$('nav.tabs');
+  const mov=['.brand','.local-chip','#hamBtn','#btnTheme','#btnHelp'].map(q=>$(q,hd)).filter(Boolean), add=$('.btn-add',hd);
+  const ph=new Map(); [nav,add,...mov].forEach(el=>{ const m=document.createComment('ph'); el.after(m); ph.set(el,m); });
+  const foot=$('#appFoot'), top=document.createElement('div'); top.className='side-top'; const st=$('#sideTabs'); st.before(top); top.appendChild(st);
+  const sp=document.createElement('span'); sp.className='af-sp';
+  window.placeChrome=()=>{ const desk=mq.matches; document.body.classList.toggle('no-hdr',desk); foot.classList.toggle('app-foot',desk);
+    if(desk){ const v=$(mode==='cmp'?'#viewCmp':mode==='gps'?'#viewGps':'#viewSingle'), slot=$('.mode-slot',v); if(slot&&nav.parentNode!==slot) slot.appendChild(nav);
+      if(add.parentNode!==top) top.appendChild(add); if(mov[0].parentNode!==foot) foot.append(mov[0],mov[1],sp,...mov.slice(2)); }
+    else { [nav,add,...mov].forEach(el=>{ const m=ph.get(el); if(el.nextSibling!==m) m.before(el); }); sp.remove(); }
+    requestAnimationFrame(()=>dispatchEvent(new Event('resize'))); };
+  mq.addEventListener('change',placeChrome); placeChrome(); })();
 function cmpReset(){
   A.pause(); B.pause(); G.playing=false;
   A.setClip(null); B.setClip(null); unlink(); G.off=0; G.syncA=0;
@@ -4351,7 +4454,7 @@ if(!LS.get('hint1',0)){ setTimeout(()=>{ toast(matchMedia('(pointer:coarse)').ma
 
 /* Update-Hinweis: prüft version.json auf GitHub Pages; «Aktualisieren» lädt die Seite ohne Cache neu */
 (()=>{
-  const BUILD='20261027175539'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
+  const BUILD='20261027184442'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
   // nach einem Update die ?v=… aus der Adresse entfernen
   try{ const u=new URL(location.href); if(u.searchParams.has('v')){ u.searchParams.delete('v'); history.replaceState(null,'',u.pathname+(u.search||'')+u.hash); } }catch(e){}
   const el=$('#upd'); let latest=null, snoozed=null, busy=false;
