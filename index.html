@@ -52,11 +52,11 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 h1,h2,h3{margin:0;font-weight:680;letter-spacing:-.01em;text-wrap:balance}
 button{font:inherit;color:inherit}
 [hidden]{display:none!important}
-.wrap{max-width:1680px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 32px}
+.wrap{max-width:2560px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 32px}
 
 /* ---------- Header ---------- */
 header{background:var(--hdr);position:sticky;top:env(safe-area-inset-top,0px);z-index:50;margin-bottom:14px;box-shadow:0 1px 0 var(--line)}
-.head-in{max-width:1680px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0;display:flex;align-items:center;gap:9px;min-height:54px;flex-wrap:wrap}
+.head-in{max-width:2560px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0;display:flex;align-items:center;gap:9px;min-height:54px;flex-wrap:wrap}
 .brand{display:flex;align-items:center;gap:9px;margin-right:6px;padding-block:9px}
 .logo{width:34px;height:34px;flex:none;display:block;filter:drop-shadow(0 2px 8px rgba(124,31,45,.45))}
 .brand-txt{display:flex;flex-direction:column;gap:3px;line-height:1}
@@ -1169,6 +1169,184 @@ svg.ic{width:15px;height:15px;flex:none;vertical-align:-2px;margin-right:5px}
 #viewCmp.ov-aligned .stages>.stage:nth-child(2){opacity:0!important}
 .zoomer canvas.ovb{position:absolute;pointer-events:none}
 @media (max-width:600px){ .ov-msg span{display:none} .ov-b span{display:none} .ov-b svg.ic{margin:0} .ov-b{padding:0 9px} }
+
+/* ---------- Overlay-Assistent ---------- */
+.ov-panel{display:none;flex-direction:column;gap:8px;margin:0 0 10px;padding:10px 12px;border-radius:16px;background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.03));border:1px solid rgba(255,255,255,.08)}
+#viewCmp.overlay .ov-panel{display:flex}
+#viewCmp.overlay .ov-panel{flex:none}
+.ov-steps{display:flex;align-items:center;gap:6px;margin:0;padding:0;list-style:none;counter-reset:none}
+.ov-steps li{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:600;color:#7f8893;cursor:pointer;padding:3px 10px 3px 3px;border-radius:999px;transition:background .2s,color .2s}
+.ov-steps li:hover{background:rgba(255,255,255,.06)}
+.ov-steps li+li::before{content:"";width:18px;height:1.5px;background:rgba(255,255,255,.14);margin:0 4px 0 -4px;border-radius:2px}
+.ov-steps li i{font-style:normal;width:22px;height:22px;border-radius:50%;display:grid;place-items:center;font-size:11px;font-weight:800;background:rgba(255,255,255,.08);color:#aab2bc;transition:background .3s,color .3s,transform .4s var(--ease-spring)}
+.ov-steps li i svg.ic{width:13px;height:13px;margin:0}
+.ov-steps li.on{color:#fff}
+.ov-steps li.on i{background:linear-gradient(135deg,#ff5a4a,#c81d12);color:#fff;box-shadow:0 0 0 4px rgba(218,41,28,.18);transform:scale(1.06)}
+.ov-steps li.done{color:#c9d1db}
+.ov-steps li.done i{background:#1f9d6b;color:#fff}
+.ov-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.ov-txt{flex:1 1 320px;font-size:13px;line-height:1.45;color:#c9d1db;min-width:0}
+.ov-txt b{color:#fff;font-weight:650}
+.ov-dim{font-family:var(--mono);font-size:12px;color:#5be39a;background:rgba(52,199,123,.12);padding:1px 7px;border-radius:6px}
+.ov-chip{display:inline-flex;align-items:center;gap:4px;margin-left:4px;font-family:var(--mono);font-size:11.5px;color:#fff;background:rgba(31,157,107,.22);border:1px solid rgba(52,199,123,.35);padding:1px 4px 1px 8px;border-radius:7px;white-space:nowrap}
+.ov-chip svg.ic{width:12px;height:12px;margin-right:2px}
+.ov-chip button{border:none;background:none;color:#cfe;cursor:pointer;width:18px;height:18px;display:grid;place-items:center;border-radius:5px;padding:0}
+.ov-chip button:hover{background:rgba(255,255,255,.12)}
+.ov-chip button svg.ic{margin:0;width:11px;height:11px}
+.ov-acts{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.ov-b{display:inline-flex;align-items:center;height:34px;padding:0 12px;border-radius:11px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.07);color:#fff;font:inherit;font-size:12.5px;font-weight:600;cursor:pointer;white-space:nowrap;transition:background .2s,transform .25s var(--ease-spring),box-shadow .25s}
+.ov-b:hover{background:rgba(255,255,255,.14)}
+.ov-b:active{transform:scale(.95)}
+.ov-b.ghost{background:transparent;border-color:transparent;color:#aab2bc}
+.ov-b.ghost:hover{color:#fff;background:rgba(255,255,255,.08)}
+.ov-b.pri{border:none;background:linear-gradient(135deg,#ff5a4a,#c81d12);box-shadow:0 10px 22px -10px rgba(218,41,28,.9)}
+.ov-b.pri:hover{transform:translateY(-1px);box-shadow:0 14px 26px -10px rgba(218,41,28,1)}
+.ov-prog{height:4px;border-radius:4px;background:rgba(255,255,255,.08);overflow:hidden}
+.ov-prog i{display:block;height:100%;width:0;border-radius:4px;background:linear-gradient(90deg,#ff5a4a,#ffb199);transition:width .4s var(--ease-out);box-shadow:0 0 12px rgba(255,90,74,.7)}
+#layoutSeg svg.ic{width:15px;height:15px}
+@media (max-width:600px){
+  .ov-steps li span{display:none}.ov-steps li.on span{display:inline}
+  .ov-txt{font-size:12.5px;flex-basis:100%}
+  .ov-acts{width:100%;justify-content:stretch}.ov-acts .ov-b{flex:1;justify-content:center;padding:0 8px}
+  .ov-acts .ov-b.ghost{flex:none}
+  #layoutSeg svg.ic{margin-right:3px}
+}
+
+/* breite Bildschirme: Arbeitsfläche nutzt die Breite */
+@media (min-width:1700px){ .wrap,.head-in{padding-left:28px;padding-right:28px} :root{--side-w:320px} .layout{grid-template-columns:var(--side-w) minmax(0,1fr)!important;gap:18px} }
+/* ---------- Kurzanleitung ---------- */
+.tut-open{display:inline-flex;align-items:center;gap:6px;height:30px;padding:0 10px 0 8px;border-radius:999px;border:1px solid rgba(255,255,255,.12);background:transparent;color:#aab2bc;font:inherit;font-size:12px;font-weight:600;cursor:pointer;transition:color .2s,background .2s,border-color .2s}
+.tut-open:hover{color:#fff;background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.2)}
+.tut-open svg{width:15px;height:15px}
+#viewCmp.ghost .tut-open{display:none}
+.tut{position:fixed;inset:0;z-index:300;display:grid;place-items:center;padding:16px;background:rgba(6,8,12,.55);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);opacity:0;transition:opacity .25s}
+.tut.on{opacity:1}
+.tut-card{width:min(600px,100%);background:#11151b;color:#e8ecf1;border:1px solid rgba(255,255,255,.08);border-radius:22px;box-shadow:0 40px 90px -30px rgba(0,0,0,.9);padding:18px 18px 16px;transform:translateY(14px) scale(.98);transition:transform .45s var(--ease-spring)}
+.tut.on .tut-card{transform:none}
+.tut-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:12px}
+.tut-eye{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#8a919c;font-weight:600}
+.tut-head h3{margin:2px 0 0;font-size:18px;font-weight:650;color:#fff}
+.tut-x{width:34px;height:34px;border-radius:11px;border:none;background:rgba(255,255,255,.06);color:#c9d1db;cursor:pointer;display:grid;place-items:center}
+.tut-x:hover{background:rgba(255,255,255,.14);color:#fff}.tut-x svg{width:16px;height:16px}
+.tut-stage{position:relative;height:250px;border-radius:16px;overflow:hidden;background:radial-gradient(120% 90% at 50% 0%,#1d2430,#0b0e13);border:1px solid rgba(255,255,255,.06)}
+.tut-scene{position:absolute;inset:0;padding:16px 20px 48px;display:flex;flex-direction:column;justify-content:center;gap:10px;animation:tutIn .45s var(--ease-out)}
+@keyframes tutIn{from{opacity:0;transform:translateY(8px)}}
+.tut-cap{margin:14px 2px 4px;min-height:62px}
+.tut-cap b{display:block;font-size:14.5px;color:#fff;margin-bottom:3px}
+.tut-cap p{margin:0;font-size:13px;line-height:1.5;color:#aab2bc}
+.tut-foot{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:8px}
+.tut-dots{display:flex;gap:6px}
+.tut-dots button{width:26px;height:6px;padding:0;border:none;border-radius:6px;background:rgba(255,255,255,.12);cursor:pointer;overflow:hidden;position:relative}
+.tut-dots button.on i{position:absolute;inset:0;background:linear-gradient(90deg,#ff5a4a,#ff9a8a);transform-origin:left;animation:tutDot 5.2s linear both}
+@keyframes tutDot{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+.tut-nav{display:flex;gap:8px}
+.tut-b{height:36px;padding:0 14px;border-radius:11px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.06);color:#fff;font:inherit;font-size:13px;font-weight:600;cursor:pointer}
+.tut-b:disabled{opacity:.35;cursor:default}
+.tut-b.pri{border:none;background:linear-gradient(135deg,#ff5a4a,#c81d12);box-shadow:0 10px 22px -10px rgba(218,41,28,.9)}
+
+/* Bausteine */
+.tut-two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.tut-one{display:grid;place-items:center}
+.tut-one .tut-frame{width:62%}
+.tut-frame{position:relative;aspect-ratio:16/9;border-radius:10px;overflow:hidden;box-shadow:0 10px 24px -12px rgba(0,0,0,.9),0 0 0 1px rgba(255,255,255,.08)}
+.tut-slope{position:absolute;inset:0;width:100%;height:100%;display:block}
+.tut-badge{position:absolute;left:6px;top:6px;z-index:3;font-size:9.5px;font-weight:800;color:#fff;padding:2px 6px;border-radius:5px}
+.tut-gate-ring{opacity:0}
+.tut-skier{position:absolute;z-index:2;width:9px;height:9px;left:20%;top:62%;border-radius:50%;background:var(--c);box-shadow:0 0 0 2px #fff,0 0 10px var(--c)}
+.tut-tl{position:relative;height:16px;border-radius:6px;background:repeating-linear-gradient(90deg,rgba(255,255,255,.12) 0 1px,transparent 1px 12px),rgba(255,255,255,.05)}
+.tut-tl.wide{margin:0 auto;width:80%}
+.tut-ph{position:absolute;top:-3px;bottom:-3px;left:8%;width:2px;background:var(--c);border-radius:2px;box-shadow:0 0 8px var(--c)}
+.tut-ph::before{content:"";position:absolute;top:-4px;left:-4px;border:5px solid transparent;border-top-color:var(--c)}
+.tut-pill{position:absolute;left:50%;bottom:14px;transform:translateX(-50%) scale(.6);opacity:0;display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:999px;font-size:12px;font-weight:700;color:#fff;background:#1f9d6b;box-shadow:0 10px 24px -10px rgba(31,157,107,.9)}
+.tut-pill svg{width:14px;height:14px}
+.tut-pill .tut-ico{font-weight:800}
+.tut-cur{position:absolute;width:22px;height:22px;z-index:6;filter:drop-shadow(0 3px 6px rgba(0,0,0,.6));opacity:0}
+
+/* Szene: Läufe wählen */
+.tut-sel{display:flex;align-items:center;gap:8px;height:30px;border-radius:9px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);padding:0 8px;font-size:12px;font-weight:600;color:#fff;overflow:hidden}
+.tut-sel em{font-style:normal;white-space:nowrap;overflow:hidden;width:0;animation:tutType 1s steps(18) forwards}
+.tut-sel.s2 em{animation-delay:1.1s}
+.tut-b-a,.tut-b-b{width:18px;height:18px;border-radius:5px;display:grid;place-items:center;font-size:10px;font-weight:800;color:#fff;background:#2f6fe4;flex:none}.tut-b-b{background:#f08a24}
+@keyframes tutType{to{width:160px}}
+.tut-scene>.tut-two:last-child .tut-frame{opacity:0;animation:tutFade .6s 2.2s forwards}
+@keyframes tutFade{to{opacity:1}}
+
+/* Szene: scrubben → gleicher Moment */
+.scrub .tut-world{animation:tutPan 2.6s var(--ease-out) forwards}
+.scrub .tut-frame:last-child .tut-world{animation-name:tutPanB}
+@keyframes tutPan{from{transform:translateX(26px)}to{transform:translateX(0)}}
+@keyframes tutPanB{from{transform:translate(-8px,-3px) rotate(-4deg) scale(1.06)}to{transform:translate(10px,-5px) rotate(-4deg) scale(1.06)}}
+.scrub .k-a{animation:tutSkA 2.6s var(--ease-out) forwards}
+.scrub .k-b{animation:tutSkB 2.6s var(--ease-out) forwards}
+@keyframes tutSkA{from{left:8%;top:72%}to{left:52%;top:40%}}
+@keyframes tutSkB{from{left:14%;top:70%}to{left:57%;top:37%}}
+.scrub .tut-gate-ring,.tut-scene .scrub~* .tut-gate-ring{animation:tutRing 1.2s 2.6s ease-out infinite}
+@keyframes tutRing{0%{opacity:.9;stroke-width:2}100%{opacity:0;stroke-width:.4}}
+.tut-tl.pa .tut-ph{animation:tutPhA 2.6s var(--ease-out) forwards}
+.tut-tl.pb .tut-ph{animation:tutPhB 2.6s var(--ease-out) forwards}
+@keyframes tutPhA{to{left:46%}}
+@keyframes tutPhB{to{left:58%}}
+.p-sync{animation:tutPop .5s 2.9s var(--ease-spring) forwards}
+@keyframes tutPop{to{opacity:1;transform:translateX(-50%) scale(1)}}
+.c-sync{animation:tutCurSync 3.2s ease-in-out forwards}
+@keyframes tutCurSync{0%{opacity:0;left:70%;top:20%}40%{opacity:1}80%{left:52%;top:82%;transform:scale(1)}88%{transform:scale(.8)}100%{opacity:1;left:52%;top:82%;transform:scale(1)}}
+
+/* Szene: zusammen abspielen */
+.play .k-a{animation:tutRunA 4s linear infinite}
+.play .k-b{animation:tutRunB 4s linear infinite}
+@keyframes tutRunA{from{left:10%;top:70%}to{left:86%;top:22%}}
+@keyframes tutRunB{from{left:16%;top:66%}to{left:92%;top:18%}}
+.tut-tl.pl .tut-ph{animation:tutPhRun 4s linear infinite}
+@keyframes tutPhRun{from{left:4%}to{left:94%}}
+.tut-dia{position:absolute;top:3px;width:8px;height:8px;background:#ffd166;transform:rotate(45deg) scale(0);border-radius:1px;animation:tutDia .4s var(--ease-spring) forwards}
+.tut-dia.d1{left:30%;animation-delay:1.2s}.tut-dia.d2{left:64%;animation-delay:2.6s}
+@keyframes tutDia{to{transform:rotate(45deg) scale(1)}}
+.p-link{background:#2f6fe4;box-shadow:0 10px 24px -10px rgba(47,111,228,.9);animation:tutPop .5s .4s var(--ease-spring) forwards;bottom:auto;top:12px}
+
+/* Szene: Ausschnitt */
+.ghostb{opacity:.6;left:26%!important;top:56%!important}
+.tut-one .k-a{left:20%;top:60%}
+.tut-tl.cut{height:18px}
+.tut-tl.cut .tut-ph{animation:tutPhCut 4.4s ease-in-out forwards}
+@keyframes tutPhCut{0%{left:6%}25%{left:18%}55%{left:18%}85%{left:80%}100%{left:80%}}
+.tut-br{position:absolute;top:-16px;font-style:normal;font-size:9.5px;font-weight:700;color:#5be39a;opacity:0;transform:translateY(-4px)}
+.tut-br::after{content:"";position:absolute;left:0;top:14px;width:3px;height:22px;background:#34c77b;border-radius:2px}
+.tut-br.bs{left:18%;animation:tutBr .4s 1.2s var(--ease-spring) forwards}
+.tut-br.be{left:80%;animation:tutBr .4s 3.8s var(--ease-spring) forwards}
+.tut-br.be::after{left:auto;right:0}
+@keyframes tutBr{to{opacity:1;transform:none}}
+.tut-range{position:absolute;left:18%;right:20%;top:0;bottom:0;background:rgba(52,199,123,.22);border-radius:4px;transform-origin:left;transform:scaleX(0);animation:tutRange .9s 3.2s ease-out forwards}
+@keyframes tutRange{to{transform:scaleX(1)}}
+.tut-one .tut-frame .tut-world{animation:tutPrev 4.4s ease-in-out forwards}
+@keyframes tutPrev{0%,55%{transform:none}100%{transform:translateX(-14px)}}
+
+/* Szene: Referenzpunkte */
+.tut-dot{position:absolute;z-index:4;width:16px;height:16px;margin:-8px 0 0 -8px;border-radius:50%;display:grid;place-items:center;font-style:normal;font-size:9px;font-weight:800;color:#fff;border:1.5px solid #fff;transform:scale(0);animation:tutDotIn .35s var(--ease-spring) forwards}
+.da1,.da2{background:#2f6fe4}.db1,.db2{background:#f08a24}
+.da1{left:56%;top:30%;animation-delay:.9s}.da2{left:80%;top:22%;animation-delay:1.7s}
+.db1{left:60%;top:26%;animation-delay:2.9s}.db2{left:85%;top:16%;animation-delay:3.7s}
+@keyframes tutDotIn{to{transform:scale(1)}}
+.c-pick{animation:tutCurPick 4.2s ease-in-out forwards}
+@keyframes tutCurPick{0%{opacity:0;left:40%;top:80%}12%{opacity:1}22%{left:29%;top:36%}26%{transform:scale(.8)}30%{transform:scale(1)}40%{left:41%;top:28%}44%{transform:scale(.8)}48%{transform:scale(1)}66%{left:81%;top:32%}70%{transform:scale(.8)}74%{transform:scale(1)}86%{left:94%;top:24%}90%{transform:scale(.8)}100%{opacity:1;left:94%;top:24%;transform:scale(1)}}
+
+/* Szene: Overlay erstellen */
+.merge{position:relative;height:100%}
+.merge .tut-frame{position:absolute;width:56%;left:22%;top:2%}
+.merge .over{opacity:.5;animation:tutMerge 2.4s .3s var(--ease-out) forwards;transform:translate(26px,-14px) rotate(6deg) scale(.9)}
+@keyframes tutMerge{to{transform:none}}
+.merge .tut-world{transform:none!important;animation:none!important}
+.merge .k-a{left:42%;top:52%}.merge .over .k-b{left:52%;top:44%}
+.tut-progress{position:absolute;left:22%;right:22%;bottom:20px;height:4px;border-radius:4px;background:rgba(255,255,255,.1);overflow:hidden}
+.tut-progress i{display:block;height:100%;width:0;background:linear-gradient(90deg,#ff5a4a,#ffb199);animation:tutProg 2.4s .3s ease-out forwards}
+@keyframes tutProg{to{width:100%}}
+.p-done{bottom:auto;top:12px;left:auto;right:12px;transform:scale(.6);animation:tutPop2 .5s 2.8s var(--ease-spring) forwards}
+@keyframes tutPop2{to{opacity:1;transform:scale(1)}}
+@media (max-width:600px){ .tut-stage{height:210px} .tut-scene{padding:12px} .tut-two{gap:8px} }
+@media (prefers-reduced-motion:reduce){ .tut-scene *{animation-duration:.01ms!important;animation-delay:0s!important} }
+
+
+@media (max-width:600px){ .ov-acts .ov-b.pri span{display:inline!important} .ov-acts .ov-b.pri svg.ic{margin-right:6px!important} .tut-open span{display:none} .tut-open{padding:0 8px} }
+.tut-pill{white-space:nowrap}
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
   .aurora{display:none}
@@ -1312,8 +1490,8 @@ svg.ic{width:15px;height:15px;flex:none;vertical-align:-2px;margin-right:5px}
     <div class="c-head">
       <div><div class="eyebrow">Vergleich</div><h2>Lauf A <span class="vs">vs</span> Lauf B</h2></div>
       <div class="cmp-tools">
-        <div class="seg" id="layoutSeg"><button data-layout="side" class="on">Nebeneinander</button><button data-layout="overlay">Überlagert</button><button data-layout="ghost"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M5 20V10a7 7 0 0 1 14 0v10l-2.4-1.8L14.3 20 12 18.2 9.7 20l-2.3-1.8z"/><circle cx="9.5" cy="10.5" r=".9" fill="currentColor"/><circle cx="14.5" cy="10.5" r=".9" fill="currentColor"/></svg>Ghost</button></div>
-        <label class="ctl-lab op-wrap">Deckkraft B <input type="range" class="op" id="opRange" min="0.1" max="0.9" step="0.05" value="0.5"></label>
+        <button class="tut-open" id="tutBtn" title="Kurzanleitung ansehen (animiert)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M10 8.5l5.5 3.5-5.5 3.5z" fill="currentColor"/></svg><span>Anleitung</span></button><div class="seg" id="layoutSeg"><button data-layout="side" class="on"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="5" width="8.5" height="14" rx="2"/><rect x="13" y="5" width="8.5" height="14" rx="2"/></svg>Side by Side</button><button data-layout="overlay"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="13" height="11" rx="2"/><rect x="8" y="9" width="13" height="11" rx="2" fill="currentColor" fill-opacity=".25"/></svg>Overlay</button><button data-layout="ghost"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M5 20V10a7 7 0 0 1 14 0v10l-2.4-1.8L14.3 20 12 18.2 9.7 20l-2.3-1.8z"/><circle cx="9.5" cy="10.5" r=".9" fill="currentColor"/><circle cx="14.5" cy="10.5" r=".9" fill="currentColor"/></svg>Ghost</button></div>
+        <label class="ctl-lab op-wrap">Deckkraft <input type="range" class="op" id="opRange" min="0.1" max="0.9" step="0.05" value="0.5"></label>
         <button class="ctl" data-act="shot" title="Standbild A | B als PNG speichern (p)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.6"/></svg></button>
         <button class="ctl" data-act="export" title="Vergleich als Video exportieren (e)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg></button>
         <button class="ctl" data-act="fs" title="Vollbild (f)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3M21 8V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3M16 21h3a2 2 0 0 0 2-2v-3"/></svg></button>
@@ -1323,13 +1501,19 @@ svg.ic{width:15px;height:15px;flex:none;vertical-align:-2px;margin-right:5px}
       <div class="slot-head"><span class="badge" style="background:var(--a)">A</span><select class="sel" id="selA" aria-label="Video A"></select><button class="slot-flip" id="flipA" title="A spiegeln (Links- mit Rechtsschwung vergleichen)"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18" stroke-dasharray="2 2.5"/><path d="M9 7L4 12l5 5z"/><path d="M15 7l5 5-5 5z"/></svg></button><span class="meta" id="metaA"></span></div>
       <div class="slot-head"><span class="badge" style="background:var(--b)">B</span><select class="sel" id="selB" aria-label="Video B"></select><button class="slot-flip" id="flipB" title="B spiegeln (Links- mit Rechtsschwung vergleichen)"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18" stroke-dasharray="2 2.5"/><path d="M9 7L4 12l5 5z"/><path d="M15 7l5 5-5 5z"/></svg></button><span class="meta" id="metaB"></span></div>
     </div>
-    <div class="stages" id="cStages"></div><div class="ov-bar" id="ovBar">
-      <span class="ov-msg" id="ovMsg"></span>
-      <button class="ov-b pri" id="ovAlign" title="B an A ausrichten: je 2 feste Punkte in A und B antippen (z. B. Torstangen, Zaunpfosten)"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="7" r="2.3"/><circle cx="18" cy="17" r="2.3"/><path d="M8 8.5l8 7" stroke-dasharray="2 2.5"/><path d="M14 4h6v6M10 20H4v-6"/></svg><span>Ausrichten</span></button>
-      <button class="ov-b" id="ovFollow" hidden title="Ausrichtung automatisch über den ganzen Lauf nachführen (folgt dem Kameraschwenk)"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h11v9H3z"/><path d="M14 11l6-3v9l-6-3"/><path d="M6 4l2 2M11 4l-2 2" opacity=".6"/></svg><span>Kamera folgen</span></button>
-      <button class="ov-b" id="ovCancel" hidden>Abbrechen</button>
-      <button class="ov-b ico" id="ovReset" hidden title="Ausrichtung entfernen"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
-    </div><div class="ov-marks" id="ovMarks"></div>
+    <div class="ov-panel" id="ovPanel">
+      <ol class="ov-steps" id="ovSteps">
+        <li data-st="1"><i>1</i><span>Gemeinsamer Punkt</span></li>
+        <li data-st="2"><i>2</i><span>Referenzpunkte</span></li>
+        <li data-st="3"><i>3</i><span>Overlay erstellen</span></li>
+      </ol>
+      <div class="ov-row">
+        <div class="ov-txt" id="ovTxt"></div>
+        <div class="ov-acts" id="ovActs"></div>
+      </div>
+      <div class="ov-prog" id="ovProg" hidden><i></i></div>
+    </div>
+    <div class="stages" id="cStages"></div><div class="ov-marks" id="ovMarks"></div>
     <div class="strips" id="cStrips"></div>
     <div class="dock dock3">
       <div class="dz dz-l"><button class="ctl link" id="btnLink" title="A und B gemeinsam steuern (l)">
@@ -1365,6 +1549,17 @@ svg.ic{width:15px;height:15px;flex:none;vertical-align:-2px;margin-right:5px}
 <div class="hov" id="hov"><canvas width="352" height="198"></canvas><span></span></div>
 <div class="drop-ov" id="dropOv"><div>Videos hier loslassen<small>Werden nur lokal geöffnet – nichts wird hochgeladen.</small></div></div>
 <div class="upd" id="upd" role="status" aria-live="polite"><div class="upd-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11a8 8 0 1 0-2.3 5.7"/><path d="M20 4v7h-7"/></svg></div><div class="upd-tx"><b>Neue Version verfügbar</b><span>Video-Lab wurde aktualisiert.</span></div><button class="upd-later" id="updLater">Später</button><button class="upd-go" id="updGo">Aktualisieren</button></div>
+<div class="tut" id="tut" hidden role="dialog" aria-modal="true" aria-labelledby="tutTtl">
+  <div class="tut-card">
+    <div class="tut-head"><div><div class="tut-eye" id="tutEye">So geht's</div><h3 id="tutTtl"></h3></div><button class="tut-x" id="tutX" title="Schliessen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+    <div class="tut-stage" id="tutStage"></div>
+    <div class="tut-cap"><b id="tutStep"></b><p id="tutTxt"></p></div>
+    <div class="tut-foot">
+      <div class="tut-dots" id="tutDots"></div>
+      <div class="tut-nav"><button class="tut-b" id="tutPrev">Zurück</button><button class="tut-b pri" id="tutNext">Weiter</button></div>
+    </div>
+  </div>
+</div>
 <div class="toast" id="toast"><span></span></div>
 <div class="modal" id="ftModal">
   <div class="help ftdlg" role="dialog">
@@ -1781,7 +1976,7 @@ class Deck{
   get fps(){ return (this.clip&&this.clip.fps)||50; }
   get dur(){ return this.v.duration||(this.clip&&this.clip.dur)||0; }
   get nF(){ return Math.max(1,Math.round(this.dur*this.fps)); }
-  get loop(){ return this.useLoop&&this.clip?this.clip.loop:null; }
+  get loop(){ if(this.loopOv) return this.loopOv; return this.useLoop&&this.clip?this.clip.loop:null; }
   time(){ return this.frame/this.fps; }
   setClip(c){
     if(this.clip===c) return;
@@ -2365,7 +2560,7 @@ function blobs(m,w,h,minA){ const lab=new Int32Array(m.length); const all=[]; le
 function pickBlob(list,pred,scale){ if(!list.length) return null; let best=null,bs=-1; for(const b of list){ const dist=pred?Math.hypot(b.x-pred[0],b.y-pred[1]):0; const sc=b.a*Math.exp(-dist/scale); if(sc>bs){ bs=sc; best=b; } } return best; }
 
 /* ---------- Berechnung ---------- */
-function ghostKey(){ return (A.clip&&B.clip&&G.linked)?A.clip.id+'|'+B.clip.id+'|'+G.off.toFixed(4)+'|'+G.syncA.toFixed(4):''; }
+function ghostKey(){ return (A.clip&&B.clip&&G.linked)?A.clip.id+'|'+B.clip.id+'|'+G.off.toFixed(4)+'|'+G.syncA.toFixed(4)+(typeof OV!=='undefined'&&ovActive()?'|ov'+OV.cut.a+'|'+OV.cut.b+'|'+(OV.T?OV.T.map(x=>x.toFixed(2)).join(','):''):''):''; }
 function seekV(v,t){ return new Promise(res=>{ let done=false; const h=()=>{ if(done) return; done=true; v.removeEventListener('seeked',h); res(); }; v.addEventListener('seeked',h); setTimeout(h,4000); v.currentTime=Math.max(0,t); }); }
 function loadV(url){ return new Promise((res,rej)=>{ const v=document.createElement('video'); v.muted=true; v.playsInline=true; v.preload='auto'; v.className='gen-vid'; document.body.appendChild(v);
   v.addEventListener('loadeddata',()=>res(v),{once:true}); v.addEventListener('error',()=>rej(new Error('video')),{once:true}); v.src=url; }); }
@@ -2376,8 +2571,11 @@ async function ghostCompute(){
   const key=ghostKey(); GH.state='busy'; GH.abort=false; GH.key=key; ghostUI();
   const W0=GH.W0, wA=A.v.videoWidth, hA0=A.v.videoHeight, wB=B.v.videoWidth, hB0=B.v.videoHeight;
   const hA=Math.round(W0*hA0/wA)&~1, hB=Math.round(W0*hB0/wB)&~1; GH.hA=hA; GH.hB=hB;
-  GH.t0=G.syncA; GH.off=G.off;
-  const eEnd=Math.min(A.dur-GH.t0, B.dur-(GH.t0+GH.off))-0.06; GH.eEnd=eEnd;
+  const useOv=ovActive(); GH.t0=useOv?ovT0():G.syncA; GH.off=G.off;
+  const eEnd=Math.min(A.dur-GH.t0, B.dur-(GH.t0+GH.off), useOv&&OV.cut.b!=null?OV.cut.b-GH.t0:1e9)-0.06; GH.eEnd=eEnd;
+  if(eEnd<0.3){ GH.state='idle'; ghostUI(); toast('Ausschnitt zu kurz.'); return; }
+  // Startwert aus den Referenzpunkten (B-Videopixel → A-Videopixel) in Analyse-Koordinaten A→B umrechnen
+  let refP=null; if(useOv&&OV.T){ const sA=W0/wA, sB=W0/wB, Ti=affInv(OV.T); const Mab=affMul(affMul([sB,0,0,0,sB,0],Ti),[1/sA,0,0,0,1/sA,0]); refP=affToSim(Mab,W0,hA,W0,hB); }
   const step=clamp(eEnd/300,0.08,0.25); GH.step=step;
   let va,vb;
   try{ va=await loadV(A.clip.url); vb=await loadV(B.clip.url); }catch(e){ GH.state='idle'; ghostUI(); toast('Videos konnten nicht geladen werden.'); return; }
@@ -2399,7 +2597,7 @@ async function ghostCompute(){
       const rb=align(prevPB,PB,lastQb,false,1); if(sane(rb)){ qb=simToAff(rb.p,W0,hB,W0,hB); lastQb=rb.p.slice(); lastQb[4]=0; } }
     // B → A: aus den Ketten vorhersagen, dann fein nachführen (nur übernehmen, wenn plausibel)
     let p, ok;
-    if(!prev){ const r=align(PA,PB,pInit,true); ok=r.ok&&r.inl>0.35; p=r.p.slice(); }
+    if(!prev){ let r=refP?align(PA,PB,refP,false):null; if(!r||!(r.ok&&r.inl>0.35)) r=align(PA,PB,refP||pInit,true); if(refP&&!(r.ok&&r.inl>0.35)){ r={ok:true,inl:0.4,p:refP.slice()}; } ok=r.ok&&r.inl>0.35; p=r.p.slice(); }
     else{ const Mp=affMul(affMul(qb,prev.M),affInv(q)), p0=affToSim(Mp,W0,hA,W0,hB); p0[4]=prev.p[4];
       const r=align(PA,PB,p0,false), ds=Math.abs((1+r.p[0])/(1+p0[0])-1), dt=Math.hypot(r.p[2]-p0[2],r.p[3]-p0[3]);
       ok=r.ok&&r.inl>0.45&&ds<0.04&&dt<W0*0.03&&r.p[0]>-0.5&&r.p[0]<1; p=ok?r.p.slice():p0; }
@@ -2427,7 +2625,7 @@ async function ghostCompute(){
   GH.timing={seek:Math.round(GH.tSeek||0),total:Math.round(performance.now()-t0)}; GH.tSeek=0;
   GH.S=S; ghostGap(); GH.state='ready'; GH.dirty=true; ghostUI();
   const bad=S.filter(s=>!s.ok).length/S.length;
-  toast(bad>0.3?'Ghost berechnet – an '+Math.round(bad*100)+' % der Stellen unsicher (Kamerastandort gleich?)':'Ghost berechnet',3500);
+  const nm=ovActive()?'Overlay':'Ghost'; toast(bad>0.3?nm+' erstellt – an '+Math.round(bad*100)+' % der Stellen unsicher (Kamerastandort gleich?)':nm+' erstellt',3500); if(ovActive()) ovUI();
 }
 function ghostGap(){
   const S=GH.S; let Gm=[1,0,0,0,1,0]; const PA=[],PB=[];
@@ -2489,28 +2687,55 @@ function ghostLayer(Wc){ // gibt Canvas (Wc×Hc) mit Geist-Ebene zurück, oder n
   return {cv:gcO,blend:false};
 }
 /* ---------- Überlagert: B über Referenzpunkte an A ausrichten ---------- */
-const OV={pa:[],pb:[],T:null,pick:null,follow:false,key:''};
+const OV={pa:[],pb:[],T:null,pick:null,follow:false,key:'',cut:{a:null,b:null},edit:false};
 function ovActive(){ return mode==='cmp'&&$('#viewCmp').classList.contains('overlay'); }
 function ovSim(pa,pb){ // Ähnlichkeits-Transformation B-Videopixel → A-Videopixel aus 2 Punktpaaren
   const [a1,a2]=pa,[b1,b2]=pb, dbx=b2[0]-b1[0], dby=b2[1]-b1[1], dax=a2[0]-a1[0], day=a2[1]-a1[1], den=dbx*dbx+dby*dby; if(den<4) return null;
   const re=(dax*dbx+day*dby)/den, im=(day*dbx-dax*dby)/den, sc=Math.hypot(re,im); if(sc<0.25||sc>4) return null;
   return [re,-im,a1[0]-(re*b1[0]-im*b1[1]),im,re,a1[1]-(im*b1[0]+re*b1[1])]; }
 function ovFollowOK(){ return OV.follow&&GH.state==='ready'&&ghostKey()===GH.key; }
+
+const OVI={side:`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="5" width="8.5" height="14" rx="2"/><rect x="13" y="5" width="8.5" height="14" rx="2"/></svg>`,cs:`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M8 4H5v16h3"/><path d="M11 12h8M16 9l3 3-3 3"/></svg>`,ce:`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h3v16h-3"/><path d="M13 12H5M8 9l-3 3 3 3"/></svg>`,ok:`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>`,pin:`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="10" r="3"/><path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0C18.5 15.4 12 21 12 21z"/></svg>`,go:`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/><path d="M19 16l.7 2 2 .7-2 .7-.7 2-.7-2-2-.7 2-.7z"/></svg>`,back:`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>`,x:`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"/></svg>`};
+function ovT0(){ return OV.cut.a!=null?Math.max(OV.cut.a,-G.off,0):G.syncA; }
+function ovStep(){ if(!G.linked||OV.edit) return 1; if(OV.pick||!OV.T) return 2; return 3; }
+function ovApplyCut(){ // Ausschnitt als Loop in beiden Zeitleisten anzeigen
+  const on=ovActive()&&(OV.cut.a!=null||OV.cut.b!=null)&&A.ready;
+  const mk=(d,sh)=>{ if(!on||!d.ready){ d.loopOv=null; d.dirty=true; return; } const a=OV.cut.a!=null?OV.cut.a:0, b=OV.cut.b!=null?OV.cut.b:A.dur;
+    d.loopOv={a:clamp(Math.round((a+sh)*d.fps),0,d.nF-1),b:clamp(Math.round((b+sh)*d.fps),0,d.nF-1),on:true}; d.dirty=true; };
+  mk(A,0); if(G.linked) mk(B,G.off); else { B.loopOv=null; B.dirty=true; } }
+function ovBtn(id,label,icon,cls,title){ return `<button class="ov-b ${cls||''}" data-ov="${id}" ${title?`title="${title}"`:''}>${icon||''}<span>${label}</span></button>`; }
 function ovUI(){
-  const v=$('#viewCmp'), k=A.clip&&B.clip?A.clip.id+'|'+B.clip.id:''; if(k!==OV.key){ OV.key=k; OV.T=null; OV.follow=false; OV.pick=null; }
+  const v=$('#viewCmp'), k=A.clip&&B.clip?A.clip.id+'|'+B.clip.id:''; if(k!==OV.key){ OV.key=k; OV.T=null; OV.follow=false; OV.pick=null; OV.cut={a:null,b:null}; OV.edit=false; }
   v.classList.toggle('ov-pick-a',OV.pick==='a'); v.classList.toggle('ov-pick-b',OV.pick==='b');
-  const busy=OV.follow&&GH.state==='busy', has=!!OV.T||ovFollowOK();
-  $('#ovAlign').hidden=!!OV.pick||busy; $('#ovAlign span').textContent=has?'Neu ausrichten':'Ausrichten';
-  $('#ovFollow').hidden=!!OV.pick||!has||OV.follow; $('#ovCancel').hidden=!OV.pick&&!busy; $('#ovReset').hidden=!!OV.pick||busy||!has;
-  const m=$('#ovMsg');
-  if(OV.pick==='a') m.innerHTML='<b>Lauf A:</b> Punkt '+(OV.pa.length+1)+' von 2 antippen <span>– fest im Gelände, z. B. Torstange, Zaunpfosten</span>';
-  else if(OV.pick==='b') m.innerHTML='<b>Lauf B:</b> den gleichen Punkt '+(OV.pb.length+1)+' antippen';
-  else if(busy) m.textContent=($('#ghostBar .gprog span')||{}).textContent||'Kamera wird verfolgt …';
-  else if(ovFollowOK()) m.innerHTML='<b>Ausgerichtet</b> <span>· folgt der Kamera</span>';
-  else if(OV.T) m.innerHTML='<b>Ausgerichtet</b> <span>· gilt für diesen Moment</span>';
-  else m.textContent='';
-  m.hidden=!m.textContent; ovMarks();
+  if(!ovActive()){ ovApplyCut(); return; }
+  const st=ovStep(), busy=OV.follow&&GH.state==='busy', done=ovFollowOK();
+  $$('#ovSteps li').forEach(li=>{ const n=+li.dataset.st; li.classList.toggle('on',n===st&&!done); li.classList.toggle('done',n<st||done); $('i',li).innerHTML=(n<st||done)?OVI.ok:n; });
+  const cut=(OV.cut.a!=null||OV.cut.b!=null)?`<span class="ov-chip">${OVI.cs}${OV.cut.a!=null?fmtS(OV.cut.a):'Anfang'} – ${OV.cut.b!=null?fmtS(OV.cut.b):'Ende'}<button data-ov="cutx" title="Ausschnitt entfernen">${OVI.x}</button></span>`:'';
+  const cutBtns=ovBtn('cuta','Start',OVI.cs,'','Start des Ausschnitts = aktuelles Bild von A')+ovBtn('cutb','Ende',OVI.ce,'','Ende des Ausschnitts = aktuelles Bild von A');
+  let t='', acts='';
+  if(!A.ready||!B.ready){ t='Oben <b>Lauf A</b> und <b>Lauf B</b> wählen – beide vom gleichen Kamerastandort gefilmt.'; }
+  else if(busy){ t='<b>Overlay wird erstellt</b> · '+(($('#ghostBar .gprog span')||{}).textContent||'Kamera wird verfolgt …'); acts=ovBtn('cancel','Abbrechen'); }
+  else if(OV.pick){ const n=(OV.pick==='a'?OV.pa:OV.pb).length+1;
+    t=OV.pick==='a'?`<b>Lauf A</b> · Punkt ${n} von 2 im Bild antippen – etwas Festes, z. B. Torstange, Zaunpfosten, Schild.`:`<b>Lauf B</b> · den <b>gleichen</b> Punkt ${n} antippen. Die gestrichelten Kreise zeigen die Lage in A.`;
+    acts=ovBtn('cancel','Abbrechen'); }
+  else if(st===1){ t=`<b>Beide Videos zum gleichen Moment schieben</b> – z. B. das erste Tor, das in beiden sichtbar ist. Zeitleiste A und B einzeln ziehen. ${cut}`;
+    acts=cutBtns+ovBtn('sync','Gemeinsamer Punkt',OVI.pin,'pri','A und B an diesem Moment verbinden'); }
+  else if(st===2){ t=`<b>Synchron</b> <span class="ov-dim">B ${G.off>=0?'+':'−'}${Math.abs(G.off).toFixed(2)} s</span> · Zeitleiste vorklicken: beide Videos folgen – so siehst du den Vorsprung. ${cut}`;
+    acts=ovBtn('edit','Punkt ändern',OVI.back,'ghost')+cutBtns+ovBtn('pick','Referenzpunkte setzen',OVI.pin,'pri','2 feste Punkte in A und B antippen'); }
+  else if(!done){ t=`<b>Referenzpunkte gesetzt</b> · Vorschau gilt für das Startbild. Jetzt für den ganzen Ausschnitt berechnen – B folgt dann dem Kameraschwenk. ${cut}`;
+    acts=ovBtn('pick','Punkte neu',OVI.back,'ghost')+ovBtn('make','Overlay erstellen',OVI.go,'pri'); }
+  else { t=`<b>Overlay fertig</b> · abspielen oder in der Zeitleiste scrubben. Deckkraft oben anpassen. ${cut}`;
+    acts=ovBtn('edit','Neu beginnen',OVI.back,'ghost')+ovBtn('make','Neu berechnen',OVI.go,''); }
+  $('#ovTxt').innerHTML=t; $('#ovActs').innerHTML=acts;
+  const pr=$('#ovProg'); pr.hidden=!busy; if(busy){ const w=($('#ghostBar .gprog i')||{style:{}}).style.width||'0%'; $('i',pr).style.width=w; }
+  ovApplyCut(); ovMarks();
 }
+function fmtS(t){ return t.toFixed(2).replace('.',',')+' s'; }
+function ovStart(){ if(!A.ready||!B.ready){ toast('Zuerst Video A und B wählen.'); return; } if(!G.linked){ toast('Zuerst den gemeinsamen Punkt setzen.'); return; }
+  A.pause(); B.pause(); const t0=ovT0(); A.seekTime(t0); B.seekTime(t0+G.off);
+  OV.pa=[]; OV.pb=[]; OV.T=null; OV.pick='a'; OV.follow=false; ovUI(); }
+function ovStop(){ OV.pick=null; if(OV.follow&&GH.state==='busy'){ GH.abort=true; OV.follow=false; } ovUI(); }
+
 function ovMarks(){
   const box=$('#ovMarks'); box.innerHTML=''; if(!OV.pick) return; const d=OV.pick==='a'?A:B, pts=OV.pick==='a'?OV.pa:OV.pb, R=d.rect(), z=d.z, st=d.stage;
   const ref=OV.pick==='b'?OV.pa:[]; // Lage der A-Punkte als Orientierung
@@ -2519,8 +2744,6 @@ function ovMarks(){
   ref.forEach((p,i)=>put([p[0]*B.v.videoWidth/A.v.videoWidth,p[1]*B.v.videoHeight/A.v.videoHeight],i,'ref'));
   pts.forEach((p,i)=>put(p,i,OV.pick));
 }
-function ovStart(){ if(!A.ready||!B.ready){ toast('Zuerst Video A und B wählen.'); return; } A.pause(); B.pause(); OV.pa=[]; OV.pb=[]; OV.pick='a'; OV.follow=false; ovUI(); }
-function ovStop(){ OV.pick=null; if(OV.follow&&GH.state==='busy'){ GH.abort=true; OV.follow=false; } ovUI(); }
 function ovPoint(e){
   const d=OV.pick==='a'?A:B, uv=d.toUV(e), pt=[uv[0]*d.v.videoWidth,uv[1]*d.v.videoHeight];
   if(OV.pick==='a'){ OV.pa.push(pt); if(OV.pa.length===2) OV.pick='b'; }
@@ -2541,17 +2764,28 @@ function renderOv(){
   else { const k=Wc/A.v.videoWidth, M=OV.T; x.setTransform(k*M[0],k*M[3],k*M[1],k*M[4],k*M[2],k*M[5]); x.drawImage(B.v,0,0,B.v.videoWidth,B.v.videoHeight); }
   x.setTransform(1,0,0,1,0,0); x.globalAlpha=1;
 }
-(()=>{ const st=$('#cStages'); st.append($('#ovBar'),$('#ovMarks'));
-  const block=e=>{ if(!OV.pick||e.target.closest('#ovBar')) return false; e.stopPropagation(); e.preventDefault(); return true; };
+(()=>{ const st=$('#cStages'); st.append($('#ovMarks'));
+  const block=e=>{ if(!OV.pick) return false; e.stopPropagation(); e.preventDefault(); return true; };
   st.addEventListener('pointerdown',e=>{ if(block(e)) ovPoint(e); },true);
   ['pointerup','pointermove','click','dblclick'].forEach(t=>st.addEventListener(t,e=>{ block(e); },true));
-  $('#ovAlign').addEventListener('click',ovStart); $('#ovCancel').addEventListener('click',ovStop);
-  $('#ovReset').addEventListener('click',()=>{ OV.T=null; OV.follow=false; ovUI(); });
-  $('#ovFollow').addEventListener('click',()=>{ if(!G.linked){ toast('Zuerst A und B synchronisieren (Sync).'); return; } OV.follow=true; ovUI(); if(!(GH.state==='ready'&&ghostKey()===GH.key)) ghostCompute(); });
+  $('#ovPanel').addEventListener('click',e=>{ const b=e.target.closest('[data-ov]'); if(!b) return; const a=b.dataset.ov;
+    if(a==='cuta'||a==='cutb'){ if(!A.ready) return; const t=A.time(); if(a==='cuta'){ OV.cut.a=t; if(OV.cut.b!=null&&OV.cut.b<=t) OV.cut.b=null; } else { OV.cut.b=t; if(OV.cut.a!=null&&OV.cut.a>=t) OV.cut.a=null; }
+      OV.T=null; OV.follow=false; toast((a==='cuta'?'Start':'Ende')+' des Ausschnitts: '+fmtS(t),1400); }
+    else if(a==='cutx'){ OV.cut={a:null,b:null}; OV.T=null; OV.follow=false; }
+    else if(a==='sync'){ doSync(); OV.edit=false; OV.T=null; OV.follow=false; }
+    else if(a==='edit'){ OV.edit=true; OV.T=null; OV.follow=false; OV.pick=null; unlink(); toast('A und B einzeln verschieben, dann «Gemeinsamer Punkt».',2600); }
+    else if(a==='pick') return ovStart();
+    else if(a==='cancel') return ovStop();
+    else if(a==='make'){ OV.follow=true; ovUI(); if(!(GH.state==='ready'&&ghostKey()===GH.key)) ghostCompute(); return; }
+    ovUI(); });
+  $('#ovSteps').addEventListener('click',e=>{ const li=e.target.closest('li'); if(!li||OV.pick||GH.state==='busy') return; const n=+li.dataset.st;
+    if(n===1&&G.linked){ OV.edit=true; OV.T=null; OV.follow=false; unlink(); } else if(n===2&&G.linked){ OV.edit=false; ovStart(); return; } ovUI(); });
   document.addEventListener('keydown',e=>{ if(e.key==='Escape'&&OV.pick){ e.stopPropagation(); ovStop(); } },true);
   addEventListener('resize',ovMarks);
-  setInterval(()=>{ if(ovActive()&&OV.follow) ovUI(); },400);
+  setInterval(()=>{ if(ovActive()&&(OV.follow||!G.linked)) ovUI(); },400);
+  const _sync=window.doSync;
 })();
+
 function renderGhost(){
   const gc=$('canvas.ghost',A.stage), gp=$('.gap',A.stage);
   const on=mode==='cmp'&&$('#viewCmp').classList.contains('ghost')&&GH.state==='ready'&&A.ready&&B.ready&&ghostKey()===GH.key;
@@ -2597,7 +2831,7 @@ function ghostUI(){
   btn.textContent=GH.state==='busy'?'Abbrechen':GH.state==='ready'?'Neu berechnen':'Ghost berechnen';
   btn.disabled=!key&&GH.state!=='busy';
   if(!A.ready||!B.ready) st.innerHTML='<b>Lauf A</b> (Kameraansicht) und <b>Lauf B</b> (Geist) oben wählen. Beide vom <b>gleichen Kamerastandort</b> gefilmt, Zoom darf variieren.';
-  else if(!G.linked) st.innerHTML='<b>Schritt 1:</b> Ghost aus, kurz «Nebeneinander» wählen, in A und B den <b>gleichen Moment</b> einstellen (z. B. Startbewegung oder erstes Tor) und <b>«Synchronisieren»</b> drücken.';
+  else if(!G.linked) st.innerHTML='<b>Schritt 1:</b> kurz «Side by Side» wählen, in A und B den <b>gleichen Moment</b> einstellen (z. B. Startbewegung oder erstes Tor) und <b>«Sync»</b> drücken.';
   else if(GH.state==='idle') st.innerHTML='<b>Schritt 2:</b> «Ghost berechnen» – die Kamerabewegung von B wird auf A umgerechnet. Dauer ca. '+Math.max(5,Math.round((Math.min(A.dur,B.dur))*0.5))+' s.';
   else if(GH.state==='busy') st.innerHTML='Berechnet lokal auf deinem Gerät …';
   else st.innerHTML='Lauf B als Geist in Lauf A · Zahl oben rechts = Zeitabstand (<span style="color:var(--good);font-weight:800">−</span> = A schneller). Gemessen nur, wo die Kamera der Fahrer:in folgt.';
@@ -3523,7 +3757,7 @@ if(!LS.get('hint1',0)){ setTimeout(()=>{ toast(matchMedia('(pointer:coarse)').ma
 
 /* Update-Hinweis: prüft version.json auf GitHub Pages; «Aktualisieren» lädt die Seite ohne Cache neu */
 (()=>{
-  const BUILD='20261027103705'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
+  const BUILD='20261027110552'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
   // nach einem Update die ?v=… aus der Adresse entfernen
   try{ const u=new URL(location.href); if(u.searchParams.has('v')){ u.searchParams.delete('v'); history.replaceState(null,'',u.pathname+(u.search||'')+u.hash); } }catch(e){}
   const el=$('#upd'); let latest=null, snoozed=null, busy=false;
@@ -3537,6 +3771,63 @@ if(!LS.get('hint1',0)){ setTimeout(()=>{ toast(matchMedia('(pointer:coarse)').ma
   setTimeout(check,4000); setInterval(check,2*60*1000);
   document.addEventListener('visibilitychange',()=>{ if(!document.hidden) check(); });
   window.addEventListener('focus',check);
+})();
+/* ---------- Kurzanleitung (animiert) für Side by Side und Overlay ---------- */
+(()=>{
+  // Mini-Piste als SVG; cam = Kameraversatz für B
+  const slope=(id,cam)=>`<svg class="tut-slope" viewBox="0 0 160 90" preserveAspectRatio="xMidYMid slice"><defs><linearGradient id="sn${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f4f7fb"/><stop offset="1" stop-color="#dfe7f0"/></linearGradient></defs>
+    <rect width="160" height="90" fill="url(#sn${id})"/>
+    <g class="tut-world" ${cam?`transform="${cam}"`:''}>
+      <path d="M-10 70 C 20 40, 45 85, 75 52 S 120 30, 175 18" fill="none" stroke="#5aa8d8" stroke-width="3.2" stroke-linecap="round" opacity=".55"/>
+      <path d="M0 8 L0 90" stroke="#e05a4f" stroke-width="1.2" opacity=".6"/><path d="M6 6 L6 90" stroke="#e05a4f" stroke-width="1.2" opacity=".45"/>
+      ${[[30,52,'#d8382c'],[62,66,'#2f6fe4'],[92,42,'#d8382c'],[124,33,'#2f6fe4'],[150,22,'#d8382c']].map(([x,y,c])=>`<g transform="translate(${x} ${y})"><path d="M0 0v-11" stroke="#555" stroke-width=".9"/><rect x="0" y="-11" width="7" height="5" rx=".6" fill="${c}"/></g>`).join('')}
+      <circle class="tut-gate-ring" cx="92" cy="38" r="9" fill="none" stroke="#1f9d6b" stroke-width="1.6"/>
+    </g>
+  </svg>`;
+  const skier=(cls,col)=>`<span class="tut-skier ${cls}" style="--c:${col}"><i></i></span>`;
+  const frame=(lab,col,id,cam,extra='')=>`<div class="tut-frame"><span class="tut-badge" style="background:${col}">${lab}</span>${slope(id,cam)}${extra}</div>`;
+  const tl=(cls,col,extra='')=>`<div class="tut-tl ${cls}"><span class="tut-ph" style="--c:${col}"></span>${extra}</div>`;
+  const cursor='<svg class="tut-cur" viewBox="0 0 24 24"><path d="M5 3l14 8-6.2 1.6L10 19z" fill="#fff" stroke="#0d1014" stroke-width="1.6" stroke-linejoin="round"/></svg>';
+  const pill=(cls,html)=>`<span class="tut-pill ${cls}">${html}</span>`;
+  const CHK='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
+  const camB='translate(10 -5) rotate(-4 80 45) scale(1.06)';
+  const SC={
+    side:[
+      {t:'Läufe wählen',x:'Oben Lauf A und Lauf B auswählen – oder links in der Liste auf «A» und «B» tippen.',
+       h:`<div class="tut-sel s1"><span class="tut-b-a">A</span><em>Meillard · Lauf 1</em></div><div class="tut-sel s2"><span class="tut-b-b">B</span><em>Gratz · Lauf 1</em></div><div class="tut-two">${frame('A','#2f6fe4','a1','')}${frame('B','#f08a24','b1',camB)}</div>`},
+      {t:'Gleichen Moment einstellen',x:'Beide Zeitleisten einzeln ziehen, bis A und B am gleichen Punkt sind – z. B. beim ersten Tor. Dann «Sync».',
+       h:`<div class="tut-two scrub">${frame('A','#2f6fe4','a2','',skier('k-a','#2f6fe4'))}${frame('B','#f08a24','b2',camB,skier('k-b','#f08a24'))}</div><div class="tut-two">${tl('pa','#2f6fe4')}${tl('pb','#f08a24')}</div>${pill('p-sync','<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg>Sync')}${cursor.replace('tut-cur','tut-cur c-sync')}`},
+      {t:'Gemeinsam abspielen',x:'Jetzt laufen beide zusammen. Wer vorne ist, siehst du direkt. Mit «Tore» misst du Abschnittszeiten.',
+       h:`<div class="tut-two play">${frame('A','#2f6fe4','a3','',skier('k-a','#2f6fe4'))}${frame('B','#f08a24','b3',camB,skier('k-b','#f08a24'))}</div><div class="tut-two">${tl('pl','#2f6fe4','<i class="tut-dia d1"></i><i class="tut-dia d2"></i>')}${tl('pl','#f08a24','<i class="tut-dia d1"></i><i class="tut-dia d2"></i>')}</div>${pill('p-link',CHK+'Verknüpft · B +0,32 s')}`}
+    ],
+    overlay:[
+      {t:'1 · Gemeinsamer Punkt',x:'A und B einzeln zum gleichen Moment schieben – am besten das erste Tor, das in beiden Videos sichtbar ist. Dann «Gemeinsamer Punkt».',
+       h:`<div class="tut-two scrub">${frame('A','#2f6fe4','a4','',skier('k-a','#2f6fe4'))}${frame('B','#f08a24','b4',camB,skier('k-b','#f08a24'))}</div><div class="tut-two">${tl('pa','#2f6fe4')}${tl('pb','#f08a24')}</div>${pill('p-sync',CHK+'Gemeinsamer Punkt')}`},
+      {t:'Ausschnitt & Vorschau',x:'Optional Start und Ende setzen. In der Zeitleiste vorklicken: beide Videos springen mit – so siehst du den Vorsprung, bevor gerechnet wird.',
+       h:`<div class="tut-one">${frame('A + B','#7a5cff','a5','',skier('k-a','#2f6fe4')+skier('k-b ghostb','#f08a24'))}</div>${tl('wide cut','#ff5a4a','<i class="tut-br bs">Start</i><i class="tut-br be">Ende</i><i class="tut-range"></i>')}`},
+      {t:'2 · Referenzpunkte',x:'In A zwei feste Punkte antippen (Torstange, Zaunpfosten). Danach die gleichen zwei Punkte in B.',
+       h:`<div class="tut-two pick">${frame('A','#2f6fe4','a6','','<i class="tut-dot da1">1</i><i class="tut-dot da2">2</i>')}${frame('B','#f08a24','b6',camB,'<i class="tut-dot db1">1</i><i class="tut-dot db2">2</i>')}</div>${cursor.replace('tut-cur','tut-cur c-pick')}`},
+      {t:'3 · Overlay erstellen',x:'«Overlay erstellen» – B wird auf A gelegt und folgt dem Kameraschwenk. Beide Fahrer:innen in einem Bild.',
+       h:`<div class="tut-one merge"><div class="tut-frame base"><span class="tut-badge" style="background:#2f6fe4">A</span>${slope('a7','')}${skier('k-a','#2f6fe4')}</div><div class="tut-frame over">${slope('b7','')}${skier('k-b','#f08a24')}</div></div><div class="tut-progress"><i></i></div>${pill('p-done',CHK+'Overlay fertig')}`}
+    ]
+  };
+  const T={kind:null,i:0,timer:null};
+  const el=$('#tut');
+  function show(i){
+    const L=SC[T.kind]; T.i=(i+L.length)%L.length; const s=L[T.i];
+    $('#tutStage').innerHTML='<div class="tut-scene">'+s.h+'</div>'; $('#tutStep').textContent=s.t; $('#tutTxt').textContent=s.x;
+    $('#tutDots').innerHTML=L.map((_,k)=>`<button class="${k===T.i?'on':''}" data-k="${k}" aria-label="Schritt ${k+1}"><i></i></button>`).join('');
+    $('#tutPrev').disabled=T.i===0; $('#tutNext').textContent=T.i===L.length-1?'Los geht’s':'Weiter';
+    clearTimeout(T.timer); T.timer=setTimeout(()=>{ if(!el.hidden&&T.i<L.length-1) show(T.i+1); else if(!el.hidden) show(0); },5200);
+  }
+  window.openTut=kind=>{ T.kind=kind; $('#tutTtl').textContent=kind==='overlay'?'Overlay':'Side by Side'; el.hidden=false; requestAnimationFrame(()=>el.classList.add('on')); show(0); };
+  const close=()=>{ clearTimeout(T.timer); el.classList.remove('on'); setTimeout(()=>{ el.hidden=true; },250); };
+  $('#tutX').addEventListener('click',close); el.addEventListener('click',e=>{ if(e.target===el) close(); });
+  $('#tutPrev').addEventListener('click',()=>show(T.i-1));
+  $('#tutNext').addEventListener('click',()=>{ if(T.i===SC[T.kind].length-1) close(); else show(T.i+1); });
+  $('#tutDots').addEventListener('click',e=>{ const b=e.target.closest('[data-k]'); if(b) show(+b.dataset.k); });
+  document.addEventListener('keydown',e=>{ if(el.hidden) return; if(e.key==='Escape'){ e.stopPropagation(); close(); } else if(e.key==='ArrowRight'){ e.stopPropagation(); e.preventDefault(); show(T.i+1); } else if(e.key==='ArrowLeft'){ e.stopPropagation(); e.preventDefault(); show(T.i-1); } },true);
+  $('#tutBtn').addEventListener('click',()=>openTut($('#viewCmp').classList.contains('overlay')?'overlay':'side'));
 })();
 </script>
 </body>

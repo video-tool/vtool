@@ -8,12 +8,13 @@ Videos werden nur im Browser geöffnet und **nie hochgeladen**. Alles steckt in 
 
 ## Beispiel-Videos
 
-Beim Öffnen des Links sind drei Läufe aus Sölden (26.10.2025, Riesenslalom Herren: Meillard, Gratz, Braathen) geladen. Sie liegen im Ordner `demo/` (720p, 50 fps) und werden direkt von GitHub Pages abgespielt. Eigene Videos bleiben weiterhin nur auf dem Gerät.
+Beim Öffnen des Links sind nur drei Läufe aus Sölden (26.10.2025, Riesenslalom Herren: Meillard, Gratz, Braathen) geladen. Sie liegen im Ordner `demo/` (720p, 50 fps) und werden direkt von GitHub Pages abgespielt. Eigene Videos bleiben weiterhin nur auf dem Gerät.
 
 ## Modi
 
 - **Einzelvideo:** Zeitlupe, Bild für Bild, Zeitleiste mit Vorschaubildern, Loop-Bereich, Marker, Zeichnen & Winkel messen, Standbild (PNG).
-- **Vergleich:** A und B nebeneinander oder überlagert, an einem Moment synchronisieren und gemeinsam abspielen.
+- **Vergleich:** A und B als **Side by Side** oder **Overlay**, an einem Moment synchronisieren und gemeinsam abspielen. «Anleitung» zeigt animiert, wie es geht.
+  - **Overlay** in 3 Schritten: (1) beide Videos zum gleichen Moment schieben (z. B. erstes gemeinsames Tor) → «Gemeinsamer Punkt», optional Start/Ende des Ausschnitts setzen; danach springen beim Vorklicken beide mit (Vorsprung sehen). (2) Je 2 feste Referenzpunkte in A und B antippen. (3) «Overlay erstellen» – B wird auf A gelegt und folgt dem Kameraschwenk.
   - **Ghost:** Zwei Läufe vom gleichen Kamerastandort in einem Bild. Die Kamerabewegung von B wird auf A umgerechnet (lokal im Browser), B erscheint als Geist, mit Zeitabstand live (nur dort gemessen, wo die Kamera der Fahrer:in folgt), Grafik «wo gewonnen/verloren» und MP4-Export.
 - **GPS:** GPS-Daten eines Laufs mit dem Video verknüpfen. Im Bild: Tempo & Beschleunigung, Fahrlinie (gefärbt nach Tempo, Beschleunigung oder Δ zur Referenz), Laufzeit und Differenz. Darunter das Profil über die Distanz.
 
