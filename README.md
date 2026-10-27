@@ -8,12 +8,12 @@ Videos werden nur im Browser geöffnet und **nie hochgeladen**. Alles steckt in 
 
 ## Beispiel-Videos
 
-Beim Öffnen des Links sind nur drei Läufe aus Sölden (26.10.2025, Riesenslalom Herren: Meillard, Gratz, Braathen) geladen. Sie liegen im Ordner `demo/` (720p, 50 fps) und werden direkt von GitHub Pages abgespielt. Eigene Videos bleiben weiterhin nur auf dem Gerät.
+Beim Öffnen des Links sind Beispiel-Läufe geladen: Sölden (26.10.2025, Riesenslalom Herren, Kamera auf der Piste: Meillard, Gratz, Braathen) und Courchevel (11.03.2026, Abfahrtstraining, Kamera am Gegenhang: Boisset, Kriechmayr, Allègre). Sie liegen im Ordner `demo/` (720p) und werden direkt von GitHub Pages abgespielt. Eigene Videos bleiben weiterhin nur auf dem Gerät.
 
 ## Modi
 
 - **Einzelvideo:** Zeitlupe, Bild für Bild, Zeitleiste mit Vorschaubildern, Loop-Bereich, Marker, Zeichnen & Winkel messen, Standbild (PNG).
-- **Vergleich:** A und B als **Side by Side** oder **Overlay**, an einem Moment synchronisieren und gemeinsam abspielen. «Anleitung» zeigt animiert, wie es geht.
+- **Vergleich:** A und B als **Side by Side** oder **Overlay**, an einem Moment synchronisieren und gemeinsam abspielen. «Anleitung» führt direkt im Tool mit den Beispiel-Läufen Schritt für Schritt durch Side by Side bzw. Overlay.
   - **Overlay** in 3 Schritten: (1) beide Videos zum gleichen Moment schieben (z. B. erstes gemeinsames Tor) → «Gemeinsamer Punkt», optional Start/Ende des Ausschnitts setzen; danach springen beim Vorklicken beide mit (Vorsprung sehen). (2) Je 2 feste Referenzpunkte in A und B antippen. (3) «Overlay erstellen» – B wird auf A gelegt und folgt dem Kameraschwenk.
   - **Ghost:** Zwei Läufe vom gleichen Kamerastandort in einem Bild. Die Kamerabewegung von B wird auf A umgerechnet (lokal im Browser), B erscheint als Geist, mit Zeitabstand live (nur dort gemessen, wo die Kamera der Fahrer:in folgt), Grafik «wo gewonnen/verloren» und MP4-Export.
 - **GPS:** GPS-Daten eines Laufs mit dem Video verknüpfen. Im Bild: Tempo & Beschleunigung, Fahrlinie (gefärbt nach Tempo, Beschleunigung oder Δ zur Referenz), Laufzeit und Differenz. Darunter das Profil über die Distanz.
@@ -27,7 +27,7 @@ Beim Öffnen des Links sind nur drei Läufe aus Sölden (26.10.2025, Riesenslalo
 
 ## Arbeitsablauf
 
-- **Dateinamen** im Format `Athlet_Ort_JJMMTT_Disziplin_Geschlecht_Lauf.mp4` (z. B. `Meillard_Adelboden_270110_GS_M_L1.mp4`) werden erkannt: Athlet, Ort, Datum, Disziplin und Lauf erscheinen in der Liste und sind durchsuchbar. `T1` = Training 1.
+- **Dateinamen** im Format `Athlet_Ort_JJMMTT_Disziplin_Geschlecht_Lauf.mp4` (z. B. `Meillard_Adelboden_270110_GS_M_L1.mp4`) werden erkannt: Athlet, Ort, Datum, Disziplin und Lauf erscheinen in der Liste und sind durchsuchbar. `T1`/`TR1` = Training 1. Auch die Reihenfolge `athlet_vgh_dh_tr1_ort_JJMMTT` wird erkannt (`vgh` = Kamera Gegenhang).
 - **Videos bleiben nach Neuladen** in der Liste (Chrome/Edge). Nach einem Neustart des Browsers genügt ein Klick auf «Öffnen».
 - **Marker mit Notizen** (`m`), Sprung zum vorherigen/nächsten Marker mit `,` / `.`. Notizen erscheinen im Bild, in der Zeitleiste und im Export.
 - **Clip-Export** (`e`): Loop-Bereich, ab aktuellem Bild oder ganzes Video, in 1× bis 0,1× Zeitlupe, mit Zeichnungen, Info-Leiste und Notizen. Im Vergleich A | B nebeneinander, im GPS-Modus mit GPS-Anzeigen. MP4, direkt teilbar.

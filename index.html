@@ -1219,134 +1219,46 @@ svg.ic{width:15px;height:15px;flex:none;vertical-align:-2px;margin-right:5px}
 .tut-open:hover{color:#fff;background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.2)}
 .tut-open svg{width:15px;height:15px}
 #viewCmp.ghost .tut-open{display:none}
-.tut{position:fixed;inset:0;z-index:300;display:grid;place-items:center;padding:16px;background:rgba(6,8,12,.55);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);opacity:0;transition:opacity .25s}
-.tut.on{opacity:1}
-.tut-card{width:min(600px,100%);background:#11151b;color:#e8ecf1;border:1px solid rgba(255,255,255,.08);border-radius:22px;box-shadow:0 40px 90px -30px rgba(0,0,0,.9);padding:18px 18px 16px;transform:translateY(14px) scale(.98);transition:transform .45s var(--ease-spring)}
-.tut.on .tut-card{transform:none}
-.tut-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:12px}
-.tut-eye{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#8a919c;font-weight:600}
-.tut-head h3{margin:2px 0 0;font-size:18px;font-weight:650;color:#fff}
-.tut-x{width:34px;height:34px;border-radius:11px;border:none;background:rgba(255,255,255,.06);color:#c9d1db;cursor:pointer;display:grid;place-items:center}
-.tut-x:hover{background:rgba(255,255,255,.14);color:#fff}.tut-x svg{width:16px;height:16px}
-.tut-stage{position:relative;height:250px;border-radius:16px;overflow:hidden;background:radial-gradient(120% 90% at 50% 0%,#1d2430,#0b0e13);border:1px solid rgba(255,255,255,.06)}
-.tut-scene{position:absolute;inset:0;padding:16px 20px 48px;display:flex;flex-direction:column;justify-content:center;gap:10px;animation:tutIn .45s var(--ease-out)}
-@keyframes tutIn{from{opacity:0;transform:translateY(8px)}}
-.tut-cap{margin:14px 2px 4px;min-height:62px}
-.tut-cap b{display:block;font-size:14.5px;color:#fff;margin-bottom:3px}
-.tut-cap p{margin:0;font-size:13px;line-height:1.5;color:#aab2bc}
-.tut-foot{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:8px}
-.tut-dots{display:flex;gap:6px}
-.tut-dots button{width:26px;height:6px;padding:0;border:none;border-radius:6px;background:rgba(255,255,255,.12);cursor:pointer;overflow:hidden;position:relative}
-.tut-dots button.on i{position:absolute;inset:0;background:linear-gradient(90deg,#ff5a4a,#ff9a8a);transform-origin:left;animation:tutDot 5.2s linear both}
-@keyframes tutDot{from{transform:scaleX(0)}to{transform:scaleX(1)}}
-.tut-nav{display:flex;gap:8px}
-.tut-b{height:36px;padding:0 14px;border-radius:11px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.06);color:#fff;font:inherit;font-size:13px;font-weight:600;cursor:pointer}
-.tut-b:disabled{opacity:.35;cursor:default}
-.tut-b.pri{border:none;background:linear-gradient(135deg,#ff5a4a,#c81d12);box-shadow:0 10px 22px -10px rgba(218,41,28,.9)}
 
-/* Bausteine */
-.tut-two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.tut-one{display:grid;place-items:center}
-.tut-one .tut-frame{width:62%}
-.tut-frame{position:relative;aspect-ratio:16/9;border-radius:10px;overflow:hidden;box-shadow:0 10px 24px -12px rgba(0,0,0,.9),0 0 0 1px rgba(255,255,255,.08)}
-.tut-slope{position:absolute;inset:0;width:100%;height:100%;display:block}
-.tut-badge{position:absolute;left:6px;top:6px;z-index:3;font-size:9.5px;font-weight:800;color:#fff;padding:2px 6px;border-radius:5px}
-.tut-gate-ring{opacity:0}
-.tut-skier{position:absolute;z-index:2;width:9px;height:9px;left:20%;top:62%;border-radius:50%;background:var(--c);box-shadow:0 0 0 2px #fff,0 0 10px var(--c)}
-.tut-tl{position:relative;height:16px;border-radius:6px;background:repeating-linear-gradient(90deg,rgba(255,255,255,.12) 0 1px,transparent 1px 12px),rgba(255,255,255,.05)}
-.tut-tl.wide{margin:0 auto;width:80%}
-.tut-ph{position:absolute;top:-3px;bottom:-3px;left:8%;width:2px;background:var(--c);border-radius:2px;box-shadow:0 0 8px var(--c)}
-.tut-ph::before{content:"";position:absolute;top:-4px;left:-4px;border:5px solid transparent;border-top-color:var(--c)}
-.tut-pill{position:absolute;left:50%;bottom:14px;transform:translateX(-50%) scale(.6);opacity:0;display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:999px;font-size:12px;font-weight:700;color:#fff;background:#1f9d6b;box-shadow:0 10px 24px -10px rgba(31,157,107,.9)}
-.tut-pill svg{width:14px;height:14px}
-.tut-pill .tut-ico{font-weight:800}
-.tut-cur{position:absolute;width:22px;height:22px;z-index:6;filter:drop-shadow(0 3px 6px rgba(0,0,0,.6));opacity:0}
-
-/* Szene: Läufe wählen */
-.tut-sel{display:flex;align-items:center;gap:8px;height:30px;border-radius:9px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);padding:0 8px;font-size:12px;font-weight:600;color:#fff;overflow:hidden}
-.tut-sel em{font-style:normal;white-space:nowrap;overflow:hidden;width:0;animation:tutType 1s steps(18) forwards}
-.tut-sel.s2 em{animation-delay:1.1s}
-.tut-b-a,.tut-b-b{width:18px;height:18px;border-radius:5px;display:grid;place-items:center;font-size:10px;font-weight:800;color:#fff;background:#2f6fe4;flex:none}.tut-b-b{background:#f08a24}
-@keyframes tutType{to{width:160px}}
-.tut-scene>.tut-two:last-child .tut-frame{opacity:0;animation:tutFade .6s 2.2s forwards}
-@keyframes tutFade{to{opacity:1}}
-
-/* Szene: scrubben → gleicher Moment */
-.scrub .tut-world{animation:tutPan 2.6s var(--ease-out) forwards}
-.scrub .tut-frame:last-child .tut-world{animation-name:tutPanB}
-@keyframes tutPan{from{transform:translateX(26px)}to{transform:translateX(0)}}
-@keyframes tutPanB{from{transform:translate(-8px,-3px) rotate(-4deg) scale(1.06)}to{transform:translate(10px,-5px) rotate(-4deg) scale(1.06)}}
-.scrub .k-a{animation:tutSkA 2.6s var(--ease-out) forwards}
-.scrub .k-b{animation:tutSkB 2.6s var(--ease-out) forwards}
-@keyframes tutSkA{from{left:8%;top:72%}to{left:52%;top:40%}}
-@keyframes tutSkB{from{left:14%;top:70%}to{left:57%;top:37%}}
-.scrub .tut-gate-ring,.tut-scene .scrub~* .tut-gate-ring{animation:tutRing 1.2s 2.6s ease-out infinite}
-@keyframes tutRing{0%{opacity:.9;stroke-width:2}100%{opacity:0;stroke-width:.4}}
-.tut-tl.pa .tut-ph{animation:tutPhA 2.6s var(--ease-out) forwards}
-.tut-tl.pb .tut-ph{animation:tutPhB 2.6s var(--ease-out) forwards}
-@keyframes tutPhA{to{left:46%}}
-@keyframes tutPhB{to{left:58%}}
-.p-sync{animation:tutPop .5s 2.9s var(--ease-spring) forwards}
-@keyframes tutPop{to{opacity:1;transform:translateX(-50%) scale(1)}}
-.c-sync{animation:tutCurSync 3.2s ease-in-out forwards}
-@keyframes tutCurSync{0%{opacity:0;left:70%;top:20%}40%{opacity:1}80%{left:52%;top:82%;transform:scale(1)}88%{transform:scale(.8)}100%{opacity:1;left:52%;top:82%;transform:scale(1)}}
-
-/* Szene: zusammen abspielen */
-.play .k-a{animation:tutRunA 4s linear infinite}
-.play .k-b{animation:tutRunB 4s linear infinite}
-@keyframes tutRunA{from{left:10%;top:70%}to{left:86%;top:22%}}
-@keyframes tutRunB{from{left:16%;top:66%}to{left:92%;top:18%}}
-.tut-tl.pl .tut-ph{animation:tutPhRun 4s linear infinite}
-@keyframes tutPhRun{from{left:4%}to{left:94%}}
-.tut-dia{position:absolute;top:3px;width:8px;height:8px;background:#ffd166;transform:rotate(45deg) scale(0);border-radius:1px;animation:tutDia .4s var(--ease-spring) forwards}
-.tut-dia.d1{left:30%;animation-delay:1.2s}.tut-dia.d2{left:64%;animation-delay:2.6s}
-@keyframes tutDia{to{transform:rotate(45deg) scale(1)}}
-.p-link{background:#2f6fe4;box-shadow:0 10px 24px -10px rgba(47,111,228,.9);animation:tutPop .5s .4s var(--ease-spring) forwards;bottom:auto;top:12px}
-
-/* Szene: Ausschnitt */
-.ghostb{opacity:.6;left:26%!important;top:56%!important}
-.tut-one .k-a{left:20%;top:60%}
-.tut-tl.cut{height:18px}
-.tut-tl.cut .tut-ph{animation:tutPhCut 4.4s ease-in-out forwards}
-@keyframes tutPhCut{0%{left:6%}25%{left:18%}55%{left:18%}85%{left:80%}100%{left:80%}}
-.tut-br{position:absolute;top:-16px;font-style:normal;font-size:9.5px;font-weight:700;color:#5be39a;opacity:0;transform:translateY(-4px)}
-.tut-br::after{content:"";position:absolute;left:0;top:14px;width:3px;height:22px;background:#34c77b;border-radius:2px}
-.tut-br.bs{left:18%;animation:tutBr .4s 1.2s var(--ease-spring) forwards}
-.tut-br.be{left:80%;animation:tutBr .4s 3.8s var(--ease-spring) forwards}
-.tut-br.be::after{left:auto;right:0}
-@keyframes tutBr{to{opacity:1;transform:none}}
-.tut-range{position:absolute;left:18%;right:20%;top:0;bottom:0;background:rgba(52,199,123,.22);border-radius:4px;transform-origin:left;transform:scaleX(0);animation:tutRange .9s 3.2s ease-out forwards}
-@keyframes tutRange{to{transform:scaleX(1)}}
-.tut-one .tut-frame .tut-world{animation:tutPrev 4.4s ease-in-out forwards}
-@keyframes tutPrev{0%,55%{transform:none}100%{transform:translateX(-14px)}}
-
-/* Szene: Referenzpunkte */
-.tut-dot{position:absolute;z-index:4;width:16px;height:16px;margin:-8px 0 0 -8px;border-radius:50%;display:grid;place-items:center;font-style:normal;font-size:9px;font-weight:800;color:#fff;border:1.5px solid #fff;transform:scale(0);animation:tutDotIn .35s var(--ease-spring) forwards}
-.da1,.da2{background:#2f6fe4}.db1,.db2{background:#f08a24}
-.da1{left:56%;top:30%;animation-delay:.9s}.da2{left:80%;top:22%;animation-delay:1.7s}
-.db1{left:60%;top:26%;animation-delay:2.9s}.db2{left:85%;top:16%;animation-delay:3.7s}
-@keyframes tutDotIn{to{transform:scale(1)}}
-.c-pick{animation:tutCurPick 4.2s ease-in-out forwards}
-@keyframes tutCurPick{0%{opacity:0;left:40%;top:80%}12%{opacity:1}22%{left:29%;top:36%}26%{transform:scale(.8)}30%{transform:scale(1)}40%{left:41%;top:28%}44%{transform:scale(.8)}48%{transform:scale(1)}66%{left:81%;top:32%}70%{transform:scale(.8)}74%{transform:scale(1)}86%{left:94%;top:24%}90%{transform:scale(.8)}100%{opacity:1;left:94%;top:24%;transform:scale(1)}}
-
-/* Szene: Overlay erstellen */
-.merge{position:relative;height:100%}
-.merge .tut-frame{position:absolute;width:56%;left:22%;top:2%}
-.merge .over{opacity:.5;animation:tutMerge 2.4s .3s var(--ease-out) forwards;transform:translate(26px,-14px) rotate(6deg) scale(.9)}
-@keyframes tutMerge{to{transform:none}}
-.merge .tut-world{transform:none!important;animation:none!important}
-.merge .k-a{left:42%;top:52%}.merge .over .k-b{left:52%;top:44%}
-.tut-progress{position:absolute;left:22%;right:22%;bottom:20px;height:4px;border-radius:4px;background:rgba(255,255,255,.1);overflow:hidden}
-.tut-progress i{display:block;height:100%;width:0;background:linear-gradient(90deg,#ff5a4a,#ffb199);animation:tutProg 2.4s .3s ease-out forwards}
-@keyframes tutProg{to{width:100%}}
-.p-done{bottom:auto;top:12px;left:auto;right:12px;transform:scale(.6);animation:tutPop2 .5s 2.8s var(--ease-spring) forwards}
-@keyframes tutPop2{to{opacity:1;transform:scale(1)}}
-@media (max-width:600px){ .tut-stage{height:210px} .tut-scene{padding:12px} .tut-two{gap:8px} }
-@media (prefers-reduced-motion:reduce){ .tut-scene *{animation-duration:.01ms!important;animation-delay:0s!important} }
 
 
 @media (max-width:600px){ .ov-acts .ov-b.pri span{display:inline!important} .ov-acts .ov-b.pri svg.ic{margin-right:6px!important} .tut-open span{display:none} .tut-open{padding:0 8px} }
 .tut-pill{white-space:nowrap}
+/* ---------- Geführte Anleitung ---------- */
+.tour{position:fixed;inset:0;z-index:400;pointer-events:none}
+.tour-block{position:absolute;inset:0;pointer-events:auto;background:transparent}
+.tour-spot{position:fixed;border-radius:16px;box-shadow:0 0 0 9999px rgba(5,7,11,.58),0 0 0 2px rgba(255,90,74,.9),0 0 30px rgba(255,90,74,.45);transition:left .55s var(--ease-out),top .55s var(--ease-out),width .55s var(--ease-out),height .55s var(--ease-out),opacity .3s;pointer-events:none;opacity:0}
+.tour:not(.on) .tour-spot{box-shadow:0 0 0 9999px rgba(5,7,11,0)}
+.tour-card{position:fixed;pointer-events:auto;background:rgba(17,21,27,.97);color:#e8ecf1;border:1px solid rgba(255,255,255,.1);border-radius:18px;padding:14px 16px 14px;box-shadow:0 30px 70px -24px rgba(0,0,0,.9);
+  transition:left .55s var(--ease-out),top .55s var(--ease-out),opacity .3s,transform .4s var(--ease-spring);opacity:0;transform:translateY(8px) scale(.98)}
+.tour.on .tour-card{opacity:1;transform:none}
+.tour-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px}
+.tour-n{font-family:var(--mono);font-size:11px;color:#ff8a7c;font-weight:600;letter-spacing:.04em}
+.tour-x{width:28px;height:28px;border-radius:9px;border:none;background:rgba(255,255,255,.06);color:#aab2bc;cursor:pointer;display:grid;place-items:center}
+.tour-x:hover{background:rgba(255,255,255,.14);color:#fff}.tour-x svg{width:14px;height:14px}
+.tour-t{display:block;font-size:15px;font-weight:650;color:#fff;margin-bottom:4px}
+.tour-p{margin:0 0 10px;font-size:13px;line-height:1.5;color:#b7c0ca}
+.tour-bar{height:3px;border-radius:3px;background:rgba(255,255,255,.08);overflow:hidden;margin-bottom:10px}
+.tour-bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,#ff5a4a,#ffb199)}
+.tour.busy .tour-bar{background:linear-gradient(90deg,rgba(255,255,255,.06) 25%,rgba(255,90,74,.5) 50%,rgba(255,255,255,.06) 75%);background-size:200% 100%;animation:tourBusy 1.1s linear infinite}
+@keyframes tourBusy{from{background-position:100% 0}to{background-position:-100% 0}}
+.tour-nav{display:flex;gap:8px;justify-content:flex-end}
+.tour-b{height:34px;padding:0 14px;border-radius:11px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.06);color:#fff;font:inherit;font-size:13px;font-weight:600;cursor:pointer;transition:transform .25s var(--ease-spring),box-shadow .25s}
+.tour-b:disabled{opacity:.35;cursor:default}
+.tour-b.pri{border:none;background:linear-gradient(135deg,#ff5a4a,#c81d12)}
+.tour-b.pri.ready{box-shadow:0 0 0 0 rgba(255,90,74,.6);animation:tourPulse 1.6s ease-out infinite}
+@keyframes tourPulse{0%{box-shadow:0 0 0 0 rgba(255,90,74,.55)}100%{box-shadow:0 0 0 12px rgba(255,90,74,0)}}
+.tour-cur{position:fixed;left:50%;top:70%;width:26px;height:26px;margin:-3px 0 0 -5px;z-index:2;opacity:0;pointer-events:none;filter:drop-shadow(0 4px 8px rgba(0,0,0,.6))}
+.tour-cur svg{width:26px;height:26px;transition:transform .15s}
+.tour-cur i{position:absolute;left:2px;top:0;width:12px;height:12px;margin:-6px 0 0 -6px;border-radius:50%;border:2px solid #ff5a4a;opacity:0}
+.tour-cur.tap svg{animation:tourTapC .26s ease}
+.tour-cur.tap i{animation:tourTap .55s ease-out}
+.tour-cur.drag svg{transform:scale(.88)}
+@keyframes tourTapC{50%{transform:scale(.8)}}
+@keyframes tourTap{0%{opacity:1;transform:scale(.6)}100%{opacity:0;transform:scale(3.2)}}
+body.touring .toast{z-index:450}
+@media (max-width:600px){ .tour-card{padding:12px 14px} .tour-p{font-size:12.5px} }
+
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
   .aurora{display:none}
@@ -1490,7 +1402,7 @@ svg.ic{width:15px;height:15px;flex:none;vertical-align:-2px;margin-right:5px}
     <div class="c-head">
       <div><div class="eyebrow">Vergleich</div><h2>Lauf A <span class="vs">vs</span> Lauf B</h2></div>
       <div class="cmp-tools">
-        <button class="tut-open" id="tutBtn" title="Kurzanleitung ansehen (animiert)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M10 8.5l5.5 3.5-5.5 3.5z" fill="currentColor"/></svg><span>Anleitung</span></button><div class="seg" id="layoutSeg"><button data-layout="side" class="on"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="5" width="8.5" height="14" rx="2"/><rect x="13" y="5" width="8.5" height="14" rx="2"/></svg>Side by Side</button><button data-layout="overlay"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="13" height="11" rx="2"/><rect x="8" y="9" width="13" height="11" rx="2" fill="currentColor" fill-opacity=".25"/></svg>Overlay</button><button data-layout="ghost"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M5 20V10a7 7 0 0 1 14 0v10l-2.4-1.8L14.3 20 12 18.2 9.7 20l-2.3-1.8z"/><circle cx="9.5" cy="10.5" r=".9" fill="currentColor"/><circle cx="14.5" cy="10.5" r=".9" fill="currentColor"/></svg>Ghost</button></div>
+        <button class="tut-open" id="tutBtn" title="Anleitung direkt im Tool – zeigt Schritt für Schritt mit den Beispiel-Läufen, wie es geht"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M10 8.5l5.5 3.5-5.5 3.5z" fill="currentColor"/></svg><span>Anleitung</span></button><div class="seg" id="layoutSeg"><button data-layout="side" class="on"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="5" width="8.5" height="14" rx="2"/><rect x="13" y="5" width="8.5" height="14" rx="2"/></svg>Side by Side</button><button data-layout="overlay"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="13" height="11" rx="2"/><rect x="8" y="9" width="13" height="11" rx="2" fill="currentColor" fill-opacity=".25"/></svg>Overlay</button><button data-layout="ghost"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M5 20V10a7 7 0 0 1 14 0v10l-2.4-1.8L14.3 20 12 18.2 9.7 20l-2.3-1.8z"/><circle cx="9.5" cy="10.5" r=".9" fill="currentColor"/><circle cx="14.5" cy="10.5" r=".9" fill="currentColor"/></svg>Ghost</button></div>
         <label class="ctl-lab op-wrap">Deckkraft <input type="range" class="op" id="opRange" min="0.1" max="0.9" step="0.05" value="0.5"></label>
         <button class="ctl" data-act="shot" title="Standbild A | B als PNG speichern (p)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.6"/></svg></button>
         <button class="ctl" data-act="export" title="Vergleich als Video exportieren (e)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg></button>
@@ -1549,17 +1461,6 @@ svg.ic{width:15px;height:15px;flex:none;vertical-align:-2px;margin-right:5px}
 <div class="hov" id="hov"><canvas width="352" height="198"></canvas><span></span></div>
 <div class="drop-ov" id="dropOv"><div>Videos hier loslassen<small>Werden nur lokal geöffnet – nichts wird hochgeladen.</small></div></div>
 <div class="upd" id="upd" role="status" aria-live="polite"><div class="upd-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11a8 8 0 1 0-2.3 5.7"/><path d="M20 4v7h-7"/></svg></div><div class="upd-tx"><b>Neue Version verfügbar</b><span>Video-Lab wurde aktualisiert.</span></div><button class="upd-later" id="updLater">Später</button><button class="upd-go" id="updGo">Aktualisieren</button></div>
-<div class="tut" id="tut" hidden role="dialog" aria-modal="true" aria-labelledby="tutTtl">
-  <div class="tut-card">
-    <div class="tut-head"><div><div class="tut-eye" id="tutEye">So geht's</div><h3 id="tutTtl"></h3></div><button class="tut-x" id="tutX" title="Schliessen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
-    <div class="tut-stage" id="tutStage"></div>
-    <div class="tut-cap"><b id="tutStep"></b><p id="tutTxt"></p></div>
-    <div class="tut-foot">
-      <div class="tut-dots" id="tutDots"></div>
-      <div class="tut-nav"><button class="tut-b" id="tutPrev">Zurück</button><button class="tut-b pri" id="tutNext">Weiter</button></div>
-    </div>
-  </div>
-</div>
 <div class="toast" id="toast"><span></span></div>
 <div class="modal" id="ftModal">
   <div class="help ftdlg" role="dialog">
@@ -3094,6 +2995,7 @@ function parseName(n){
     if(!m.disc&&DISC[u]){ m.disc=u; continue; }
     if(!m.sex&&/^(M|W|F|H|D|MEN|WOMEN|HERREN|DAMEN)$/.test(u)){ m.sex=/^(M|H|MEN|HERREN)$/.test(u)?'M':'W'; continue; }
     if(!m.run&&/^(L|R|RUN|LAUF|T|TR)\d{1,2}$/.test(u)){ m.run=(u.startsWith('T')?'Training ':'Lauf ')+u.match(/\d+/)[0]; continue; }
+    if(!m.cam&&/^(VGH|GH|GEGENHANG|VZ|VS|VST|VZI|VPI|PISTE|CAM\d*|POS\d+)$/.test(u)){ m.cam=/^(VGH|GH|GEGENHANG)$/.test(u)?'Gegenhang':/^(VZ|VZI)$/.test(u)?'Ziel':/^(VS|VST)$/.test(u)?'Start':/^(VPI|PISTE)$/.test(u)?'Piste':u; continue; }
     if(/^(BEISPIEL|GHOST|VIDEO|CLIP|KAMERA|FIX|FPS|LAUF)$/.test(u)) continue;
     if(/^[A-Za-zÄÖÜäöüéèàçñ]{2,}(-[A-Za-zÄÖÜäöüéèàçñ]{2,})*$/.test(t)) rest.push(t);
   }
@@ -3101,7 +3003,7 @@ function parseName(n){
   m.ok=!!m.athlete&&!!(m.date||m.disc||m.run);
   return m;
 }
-function metaLine(c){ const m=c.meta; if(!m||!m.ok) return null; return [m.date,m.disc?(m.disc+(m.sex?' '+m.sex:'')):null,m.run].filter(Boolean).join(' · '); }
+function metaLine(c){ const m=c.meta; if(!m||!m.ok) return null; return [m.date,m.disc?(m.disc+(m.sex?' '+m.sex:'')):null,m.run,m.cam].filter(Boolean).join(' · '); }
 function metaTitle(c){ const m=c.meta; return m&&m.ok?m.athlete+(m.place?' · '+m.place:''):c.name; }
 
 /* ---------- Videos merken (Datei-Zugriff des Browsers) ---------- */
@@ -3593,17 +3495,20 @@ function ftRender(){
   renderDemoList();
 }
 function renderDemoList(){
-  const el=$('#ftDemo'); if(!el) return; const ds=clips.filter(c=>c.demo&&/Soelden/.test(c.name));
+  const el=$('#ftDemo'); if(!el) return; const ds=clips.filter(c=>c.demo&&c.meta&&c.meta.ok);
   const show=ds.length>0&&!FT.roots.length; el.hidden=!show; const em=$('#ftEmpty'); if(em) em.classList.toggle('compact',show); if(!show) return;
-  el.innerHTML='<div class="ft-demo-h"><b>Beispiel-Läufe</b><span>Sölden 2025 · Riesenslalom Herren</span></div>';
+  el.innerHTML=''; let grp=null;
   ds.forEach(c=>{ const r=document.createElement('div'); const isOn=mode==='single'?S.clip===c:mode==='gps'?GD.clip===c:(A.clip===c||B.clip===c);
     r.className='ft-row file demo-row'+(isOn?' on':''); r.dataset.ci=clips.indexOf(c); const m=c.meta||{};
     r.innerHTML=`<span class="ft-th${c.poster?' has':''}" style="${c.poster?`background-image:url(${c.poster})`:''}"><i>${c.dur?fmtDur(c.dur):''}</i></span>`
       +`<span class="ft-tx"><span class="ft-nm"></span><span class="ft-sub"></span></span>`
       +(mode==='cmp'?`<span class="ab-tags">${A.clip===c?'<em class="ta">A</em>':''}${B.clip===c?'<em class="tb">B</em>':''}</span><span class="ft-acts"><button data-a="a" class="ab-a" title="Als Video A">A</button><button data-a="b" class="ab-b" title="Als Video B">B</button></span>`:'');
     $('.ft-nm',r).textContent=m.athlete||c.name; $('.ft-sub',r).textContent=[m.run,c.fps?fmtFps(c.fps)+' fps':null].filter(Boolean).join(' · ');
+    const g=(m.place||'')+'|'+(m.disc||'')+'|'+(m.date||''); if(g!==grp){ grp=g; const h=document.createElement('div'); h.className='ft-demo-h'; const yr=m.date?m.date.slice(-4):'';
+      h.innerHTML='<b>'+(grp===((ds[0].meta.place||'')+'|'+(ds[0].meta.disc||'')+'|'+(ds[0].meta.date||''))?'Beispiel-Läufe':'')+'</b><span></span>'; $('span',h).textContent=[m.place,yr].filter(Boolean).join(' ')+' · '+(DISC_LONG[m.disc]||m.disc||'')+(m.cam?' · '+m.cam:''); if(!$('b',h).textContent) $('b',h).remove(); el.appendChild(h); }
     el.appendChild(r); });
 }
+const DISC_LONG={GS:'Riesenslalom',SL:'Slalom',SG:'Super-G',DH:'Abfahrt',AC:'Kombination',PS:'Parallel'};
 function nodeById(id){ return ftFind(n=>n.id===+id); }
 
 /* ---------- Dialoge ---------- */
@@ -3650,7 +3555,7 @@ function ftWire(){
     else if(mode==='gps'){ GD.setClip(c); gpsSelects(); }
     else { const d=a?(a.dataset.a==='a'?A:B):(A.clip===c||B.clip===c?null:B); if(d){ d.setClip(c); unlink(); syncSelects();
       // Beispiel-Läufe starten alle im gleichen Moment → automatisch am Start synchronisieren
-      if(A.clip&&B.clip&&A.clip!==B.clip&&A.clip.demo&&B.clip.demo){ const ca=A.clip, cb=B.clip; const t=setInterval(()=>{ if(A.clip!==ca||B.clip!==cb){ clearInterval(t); return; } if(A.ready&&B.ready){ clearInterval(t); A.seekFrame(0); B.seekFrame(0); G.off=0; G.syncA=0; G.linked=true; linkBtn(); updSync(); toast('Beide Läufe am Start synchronisiert'); } },100); } } }
+      if(A.clip&&B.clip&&A.clip!==B.clip&&A.clip.demo&&B.clip.demo&&A.clip.meta.place===B.clip.meta.place){ const ca=A.clip, cb=B.clip; const t=setInterval(()=>{ if(A.clip!==ca||B.clip!==cb){ clearInterval(t); return; } if(A.ready&&B.ready){ clearInterval(t); const oa=DEMO_OFF[ca.name]||0, ob=DEMO_OFF[cb.name]||0; A.seekTime(oa); B.seekTime(ob); G.off=ob-oa; G.syncA=oa; G.linked=true; linkBtn(); updSync(); toast('Beide Läufe am Start synchronisiert'); } },100); } } }
     renderLib(); });
   $('#sideTabs').addEventListener('click',e=>{ const b=e.target.closest('[data-st]'); if(b) setSideTab(b.dataset.st); });
   $('#ftAdd').addEventListener('click',ftConnect); $('#ftAdd2').addEventListener('click',ftConnect);
@@ -3697,7 +3602,9 @@ try{ const demoG=addTracks(DEMO_GPS.map(o=>({...o,samples:normSamples(o.samples)
 setColor(LS.get('color',COLORS[0])); setTool('none');
 restoreSession();
 /* Beispiel-Rennvideos (Sölden 2025, RS Herren) – liegen neben der App im Ordner demo/ */
-const REAL_DEMO=[['Meillard_Soelden_251026_GS_M_L1.mp4',15588690],['Gratz_Soelden_251026_GS_M_L1.mp4',14558417],['Braathen_Soelden_251026_GS_M_L1.mp4',14943167]];
+const REAL_DEMO=[["Meillard_Soelden_251026_GS_M_L1.mp4", 15588690], ["Gratz_Soelden_251026_GS_M_L1.mp4", 14558417], ["Braathen_Soelden_251026_GS_M_L1.mp4", 14943167], ["boisset_vgh_dh_tr1_courchevel_260311.mp4", 21187378], ["kriechmayr_vgh_dh_tr1_courchevel_260311.mp4", 20042150], ["allegre_vgh_dh_tr1_courchevel_260311.mp4", 22402295]];
+// Zeitpunkt im Video, an dem alle Läufe derselben Serie am gleichen Ort sind (gemessen)
+const DEMO_OFF={'boisset_vgh_dh_tr1_courchevel_260311.mp4':0.7,'kriechmayr_vgh_dh_tr1_courchevel_260311.mp4':0.3,'allegre_vgh_dh_tr1_courchevel_260311.mp4':0};
 (async()=>{
   if(!/^https?:/.test(location.protocol)) return;
   try{ const r=await fetch('demo/'+REAL_DEMO[0][0],{method:'HEAD',cache:'no-store'}); if(!r.ok) return; }catch(e){ return; }
@@ -3757,7 +3664,7 @@ if(!LS.get('hint1',0)){ setTimeout(()=>{ toast(matchMedia('(pointer:coarse)').ma
 
 /* Update-Hinweis: prüft version.json auf GitHub Pages; «Aktualisieren» lädt die Seite ohne Cache neu */
 (()=>{
-  const BUILD='20261027110552'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
+  const BUILD='20261027114042'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
   // nach einem Update die ?v=… aus der Adresse entfernen
   try{ const u=new URL(location.href); if(u.searchParams.has('v')){ u.searchParams.delete('v'); history.replaceState(null,'',u.pathname+(u.search||'')+u.hash); } }catch(e){}
   const el=$('#upd'); let latest=null, snoozed=null, busy=false;
@@ -3772,62 +3679,119 @@ if(!LS.get('hint1',0)){ setTimeout(()=>{ toast(matchMedia('(pointer:coarse)').ma
   document.addEventListener('visibilitychange',()=>{ if(!document.hidden) check(); });
   window.addEventListener('focus',check);
 })();
-/* ---------- Kurzanleitung (animiert) für Side by Side und Overlay ---------- */
+
+/* ---------- Geführte Anleitung direkt im Tool, mit den Beispiel-Läufen ---------- */
+const PRE_OV={"t0": 3.0030030030030033, "off": -0.4004004004004007, "step": 0.15651226782337893, "eEnd": 46.95368034701368, "W0": 400, "hA": 224, "hB": 224, "S": [[0, [-0.0028, -0.0211, 51.3533, 6.8458, 17.657], 1], [0.1565, [0.0011, -0.0181, 72.431, 4.2857, 19.6672], 1], [0.313, [-0.0087, -0.0235, 74.8369, 0.2497, 21.6997], 1], [0.4695, [-0.0014, -0.0168, 74.8346, -2.8041, 27.7451], 1], [0.626, [-0.0061, -0.0178, 71.9562, -9.9022, 30.6773], 1], [0.7826, [0.0041, -0.0114, 67.1724, -16.3952, 24.892], 1], [0.9391, [0.0016, -0.0159, 46.0312, -18.9045, 26.0718], 1], [1.0956, [-0.0014, -0.0167, 39.0325, -20.8012, 22.1435], 1], [1.2521, [-0.0012, -0.0164, 29.2778, -18.0419, 17.3811], 1], [1.4086, [-0.0002, -0.0153, 23.2493, -17.2445, 13.2894], 1], [1.5651, [-0.0024, -0.0177, 11.9619, -12.1228, 17.0926], 1], [1.7216, [-0.0049, -0.0202, 14.3346, -6.1611, 19.2569], 1], [1.8781, [-0.0007, -0.0173, 16.3536, -7.8444, 12.655], 1], [2.0347, [0.0006, -0.0173, 13.6042, -12.3068, 13.2355], 1], [2.1912, [-0.0026, -0.0164, 12.3523, -12.6624, 14.5318], 1], [2.3477, [-0.0032, -0.0195, 16.5618, -12.8138, 20.2072], 1], [2.5042, [0.0012, -0.0166, 18.6801, -8.8124, 18.4455], 1], [2.6607, [-0.0025, -0.0167, 12.7264, -6.7239, 18.4166], 1], [2.8172, [-0.0005, -0.0191, 10.817, -4.0691, 18.8647], 1], [2.9737, [-0.0004, -0.0166, 15.5019, -1.6507, 15.6791], 1], [3.1302, [-0.0039, -0.0193, 19.2139, 1.4656, 12.8054], 1], [3.2868, [-0.005, -0.0194, 26.6166, -3.1691, 7.4961], 1], [3.4433, [-0.0027, -0.0181, 33.0673, -4.7273, 4.2085], 1], [3.5998, [-0.0028, -0.0193, 35.4235, -5.4822, 8.2809], 1], [3.7563, [0.0004, -0.0163, 39.6111, -0.2406, 15.2334], 1], [3.9128, [0.0005, -0.0171, 39.6243, 5.9319, 17.5847], 1], [4.0693, [0.0013, -0.0169, 36.0218, 1.6358, 18.3268], 1], [4.2258, [0.0024, -0.0148, 27.9205, 2.2282, 17.8289], 1], [4.3823, [-0.0011, -0.0182, 28.0519, 0.4379, 17.3663], 1], [4.5389, [-0.0033, -0.0206, 22.3389, 7.0478, 13.1561], 1], [4.6954, [-0.0017, -0.0179, 29.5216, 13.4289, 10.2575], 1], [4.8519, [-0.0008, -0.0176, 28.7821, 20.245, 10.4089], 1], [5.0084, [-0.0004, -0.0187, 27.1167, 20.8141, 16.6454], 1], [5.1649, [-0.0017, -0.0175, 27.6453, 22.4379, 13.845], 1], [5.3214, [-0.0027, -0.0171, 28.4635, 21.9981, 10.1889], 1], [5.4779, [-0.0027, -0.0171, 31.3467, 20.4345, 9.381], 1], [5.6344, [-0.0042, -0.0185, 39.5923, 18.0434, 10.6996], 1], [5.791, [-0.004, -0.0172, 47.992, 10.332, 7.9697], 1], [5.9475, [-0.0036, -0.0157, 50.0778, 3.135, 9.6075], 1], [6.104, [-0.0044, -0.0152, 50.9658, -6.8423, 9.4926], 1], [6.2605, [0.0018, -0.0029, 25.4262, -28.7788, 9.3577], 1], [6.417, [-0.0011, -0.0178, 26.3033, -32.0937, 7.6003], 1], [6.5735, [-0.0018, -0.0184, 35.4031, -39.5184, 3.2272], 1], [6.73, [-0.0016, -0.017, 34.4863, -45.9363, 2.5417], 1], [6.8865, [-0.0013, -0.0163, 43.711, -49.6966, -1.7569], 1], [7.0431, [-0.0032, -0.0173, 27.2845, -58.2146, -6.655], 1], [7.1996, [-0.0011, -0.0165, 18.4982, -62.5176, -7.5362], 1], [7.3561, [-0.0013, -0.017, 13.1221, -60.8946, -7.9263], 1], [7.5126, [-0.0014, -0.0174, 6.4549, -55.1936, -2.7899], 1], [7.6691, [-0.0018, -0.0178, 2.9071, -47.1925, -4.6067], 1], [7.8256, [-0.0033, -0.017, -10.5093, -53.429, -4.9497], 1], [7.9821, [-0.0021, -0.0172, -17.9614, -53.5034, -8.3264], 1], [8.1386, [-0.0013, -0.0175, -25.0465, -55.414, -9.2686], 1], [8.2952, [-0.0007, -0.0181, -32.7676, -46.8457, -14.2502], 1], [8.4517, [0.0003, -0.0188, -35.1403, -44.8653, -13.1987], 1], [8.6082, [0.0002, -0.0205, -17.1477, -31.0621, -14.0071], 1], [8.7647, [-0.0022, -0.0194, 4.0015, -21.0871, -8.0708], 1], [8.9212, [-0.0004, -0.0189, 10.4758, -20.8354, -10.0382], 1], [9.0777, [-0.0015, -0.0183, 13.8854, -20.6206, -8.2992], 1], [9.2342, [-0.0001, -0.0175, 13.4495, -22.3757, -6.6114], 1], [9.3907, [-0.0008, -0.0176, 9.6438, -23.2474, -5.7366], 1], [9.5472, [-0.0036, -0.0194, -3.6929, -31.247, -8.7277], 1], [9.7038, [-0.0036, -0.0156, -21.3219, -33.9838, -6.8194], 1], [9.8603, [0.0025, -0.0153, -14.695, -31.5046, -8.5813], 1], [10.0168, [-0.0007, -0.0161, -2.2805, -40.0726, -6.8234], 1], [10.1733, [-0.0015, -0.0172, -13.1305, -40.6775, -8.2742], 1], [10.3298, [-0.0027, -0.0186, -21.2098, -39.5325, -7.0442], 1], [10.4863, [-0.0032, -0.0154, -29.7979, -42.5729, -8.7483], 1], [10.6428, [-0.0005, -0.0171, -51.3353, -39.3892, -7.5184], 1], [10.7993, [-0.0017, -0.0189, -55.4325, -37.5962, -8.3198], 1], [10.9559, [-0.0011, -0.0203, -40.9906, -35.8904, -9.5074], 1], [11.1124, [-0.0026, -0.0197, -30.5717, -28.0875, -7.6423], 1], [11.2689, [-0.0009, -0.02, -22.3894, -23.4718, -7.7206], 1], [11.4254, [-0.0004, -0.0193, -16.5046, -20.9869, -5.4593], 1], [11.5819, [-0.0011, -0.0199, -10.9142, -18.1544, -0.0231], 1], [11.7384, [-0.0015, -0.0188, -8.6639, -10.14, 0.3199], 1], [11.8949, [-0.0021, -0.0193, -7.1448, -7.7328, -0.3647], 1], [12.0514, [-0.0, -0.0161, -4.6647, -1.478, -0.1685], 1], [12.208, [0.0008, -0.0166, -9.3558, 4.8809, 0.2447], 1], [12.3645, [0, -0.0176, -7.0663, 9.105, 3.3387], 1], [12.521, [-0.0003, -0.0171, -7.2155, 14.1408, 7.2639], 1], [12.6775, [-0.0003, -0.0155, -20.709, 20.827, 7.8888], 1], [12.834, [-0.0004, -0.0179, -22.4653, 26.7212, 7.5107], 1], [12.9905, [-0.001, -0.0176, -21.937, 25.6235, 7.0329], 1], [13.147, [-0.0028, -0.0173, -24.3073, 31.4011, 9.6996], 1], [13.3035, [-0.0011, -0.0173, -26.6071, 35.4658, 10.6787], 1], [13.4601, [-0.0021, -0.02, -31.942, 37.2236, 7.8255], 1], [13.6166, [-0.0023, -0.0184, -36.5861, 39.9828, 14.5138], 1], [13.7731, [0.0008, -0.0158, -30.011, 36.1729, 15.6949], 1], [13.9296, [-0.0017, -0.0192, -27.0867, 37.3651, 11.9192], 1], [14.0861, [-0.0002, -0.0195, -20.6971, 35.1098, 12.2165], 1], [14.2426, [0.0012, -0.0191, -9.6717, 33.6986, 10.8586], 1], [14.3991, [-0.0002, -0.0185, -4.5756, 36.7601, 10.4552], 1], [14.5556, [-0.002, -0.0171, -12.7704, 37.575, 11.0848], 1], [14.7122, [-0.0002, -0.0181, -9.8217, 38.2171, 11.8483], 1], [14.8687, [-0.0002, -0.0188, -2.6637, 38.0625, 12.1857], 1], [15.0252, [-0.0069, -0.0137, -4.3022, 31.057, 19.2259], 1], [15.1817, [-0.0015, -0.0188, -25.0051, 30.0153, 11.1096], 1], [15.3382, [-0.0006, -0.018, -25.7003, 27.3706, 12.0996], 1], [15.4947, [-0.0017, -0.018, -22.5181, 25.1531, 6.8931], 1], [15.6512, [-0.0012, -0.0176, -16.9339, 22.8296, 9.4541], 1], [15.8077, [-0.0036, -0.021, -20.121, 7.1185, 3.5973], 1], [15.9643, [-0.0019, -0.0195, -24.2784, -4.433, 4.4649], 1], [16.1208, [-0.0021, -0.0187, -24.9774, -13.7988, 1.798], 1], [16.2773, [0.0011, -0.0215, -21.4337, -19.1784, 0.7042], 1], [16.4338, [0.0004, -0.0189, -20.6387, -22.4258, 1.8331], 1], [16.5903, [-0.0007, -0.0186, -21.2335, -22.8255, 1.9256], 1], [16.7468, [-0.0015, -0.0186, -16.9568, -23.355, 1.4574], 1], [16.9033, [-0.0036, -0.0197, -14.7637, -22.0688, 1.328], 1], [17.0598, [-0.0004, -0.0184, -15.5009, -15.9114, 1.6328], 1], [17.2163, [0.0013, -0.0182, -18.3123, -3.2473, 3.9471], 1], [17.3729, [-0.0018, -0.0173, -15.5371, 6.6727, 1.5981], 1], [17.5294, [-0.0022, -0.015, -22.5482, 9.8299, 4.6356], 1], [17.6859, [-0.0067, -0.0206, -26.9246, 7.7707, 3.7729], 1], [17.8424, [-0.0006, -0.0193, -26.3892, 6.4596, 5.8051], 1], [17.9989, [-0.0007, -0.0193, -20.3517, 3.2677, 4.3133], 1], [18.1554, [-0.0018, -0.022, -14.5591, 2.2531, 6.5136], 1], [18.3119, [-0.0015, -0.0193, -9.2447, -2.1183, 5.6123], 1], [18.4684, [-0.005, -0.0139, -12.9986, -7.9857, 4.7329], 1], [18.625, [0.0025, -0.0193, -3.701, -15.2812, 2.1369], 1], [18.7815, [-0.0004, -0.0174, 7.7728, -23.6151, -2.3988], 1], [18.938, [-0.0024, -0.0167, 8.645, -31.8343, -3.937], 1], [19.0945, [-0.0004, -0.0183, 8.4359, -30.5985, -1.6099], 1], [19.251, [-0.0024, -0.0151, 0.7893, -30.9813, -3.7798], 1], [19.4075, [-0.0016, -0.0164, -7.4427, -28.8143, -2.4049], 1], [19.564, [-0.0011, -0.0167, -8.5771, -29.922, -3.7285], 1], [19.7205, [-0.0005, -0.0189, -7.0316, -26.8873, -3.144], 1], [19.8771, [-0.0002, -0.0226, 1.6708, -17.6356, -5.6436], 1], [20.0336, [-0.0022, -0.0212, 10.8458, -20.5707, -4.2196], 1], [20.1901, [-0.0021, -0.0195, 17.9406, -21.4709, -7.0935], 1], [20.3466, [-0.0009, -0.0189, 28.4935, -28.7223, 1.062], 1], [20.5031, [-0.0012, -0.02, 39.274, -28.9432, 4.4572], 1], [20.6596, [0.0024, -0.0214, 54.4378, -30.0606, 6.5104], 1], [20.8161, [-0.0019, -0.021, 60.0504, -31.9481, 8.8642], 1], [20.9726, [-0.002, -0.0178, 58.7537, -33.2776, 14.471], 1], [21.1292, [-0.0002, -0.0202, 57.4906, -32.4595, 15.3697], 1], [21.2857, [-0.0018, -0.0159, 40.9476, -36.3731, 16.9575], 1], [21.4422, [-0.0015, -0.02, 39.9637, -40.9132, 17.9739], 1], [21.5987, [0.0035, -0.0194, 45.9639, -40.6481, 18.6288], 1], [21.7552, [0.0009, -0.0165, 58.9264, -36.9869, 16.8508], 1], [21.9117, [-0.0006, -0.0188, 67.0262, -35.158, 17.6174], 1], [22.0682, [0.0075, -0.014, 64.3594, -27.933, 23.796], 1], [22.2247, [-0.0027, -0.0178, 72.0515, -19.481, 31.6612], 1], [22.3813, [-0.0002, -0.021, 73.6442, -19.6175, 35.5943], 1], [22.5378, [-0.0019, -0.019, 72.3552, -22.6881, 40.9404], 1], [22.6943, [-0.0038, -0.0202, 72.0181, -26.9413, 41.1648], 1], [22.8508, [-0.003, -0.0197, 71.5197, -32.361, 39.3607], 1], [23.0073, [-0.0024, -0.0193, 68.2553, -34.4181, 40.6103], 1], [23.1638, [-0.0009, -0.0175, 68.9575, -35.3995, 41.829], 1], [23.3203, [-0.0018, -0.0161, 52.5324, -41.1467, 44.7288], 1], [23.4768, [-0.004, -0.0175, 33.2882, -38.5481, 42.5613], 1], [23.6334, [-0.0002, -0.0177, 28.8782, -37.6428, 42.2469], 1], [23.7899, [-0.0056, -0.0156, 7.4978, -42.6371, 40.9054], 1], [23.9464, [-0.0017, -0.0153, -16.1509, -45.6339, 39.2628], 1], [24.1029, [-0.0008, -0.0188, -21.7992, -46.7732, 30.5527], 1], [24.2594, [0.0012, -0.0192, -25.3576, -48.2716, 21.635], 1], [24.4159, [0.0008, -0.0176, -25.4656, -46.4701, 17.3581], 1], [24.5724, [-0.0008, -0.0201, -25.8083, -44.3717, 10.5407], 1], [24.7289, [0.0008, -0.0199, -23.219, -37.4434, 5.6135], 1], [24.8855, [0.0001, -0.0182, -23.3861, -28.8638, 3.5704], 1], [25.042, [0.0036, -0.0198, -20.3458, -24.8615, 2.2361], 1], [25.1985, [0.0019, -0.0198, -16.9747, -17.406, 1.8978], 1], [25.355, [0.0032, -0.0146, -10.908, -5.1625, 2.254], 1], [25.5115, [-0.0018, -0.0162, -15.7488, 1.1981, 2.7303], 1], [25.668, [0.001, -0.0146, -17.8895, 4.3501, -2.4005], 1], [25.8245, [-0.0049, -0.0199, -23.5659, 1.7282, -2.3708], 1], [25.981, [-0.0013, -0.0175, -27.2043, 4.3918, -1.0237], 1], [26.1375, [-0.0004, -0.0188, -28.8357, 7.9601, -1.4924], 1], [26.2941, [-0.0044, -0.0203, -29.7817, 7.9056, -2.8718], 1], [26.4506, [-0.0014, -0.0197, -30.11, 3.2588, -3.8634], 1], [26.6071, [-0.0026, -0.02, -29.7863, -2.26, -5.0642], 1], [26.7636, [-0.0015, -0.0187, -20.7254, -6.9465, -6.1867], 1], [26.9201, [-0.0072, -0.0157, -36.8867, -9.959, -6.6056], 1], [27.0766, [-0.0075, -0.0218, -47.4584, -26.6077, -4.8054], 1], [27.2331, [-0.0013, -0.0229, -61.9511, -43.7015, -9.0749], 1], [27.3896, [0.0017, -0.0185, -57.2683, -54.0602, -9.7939], 1], [27.5462, [-0.0037, -0.0209, -59.5924, -68.9982, -11.1223], 1], [27.7027, [-0.0027, -0.0201, -63.35, -75.636, -14.8943], 1], [27.8592, [-0.0034, -0.0217, -60.3688, -85.5618, -18.201], 1], [28.0157, [-0.0013, -0.0182, -63.8135, -89.1781, -18.3967], 1], [28.1722, [-0.0042, -0.0184, -70.1705, -90.195, -19.8388], 1], [28.3287, [-0.0014, -0.0175, -73.5573, -89.2008, -16.1254], 1], [28.4852, [-0.0003, -0.02, -72.9286, -87.5444, -11.1432], 1], [28.6417, [-0.0018, -0.0202, -74.4582, -86.2609, -6.2334], 1], [28.7983, [-0.0009, -0.0204, -70.202, -71.8418, -0.6168], 1], [28.9548, [0.0005, -0.0199, -63.9531, -59.0586, 2.7165], 1], [29.1113, [0.0005, -0.0206, -57.1161, -58.6379, 7.5736], 1], [29.2678, [-0.0011, -0.0189, -51.1537, -55.8891, 4.968], 1], [29.4243, [-0.0019, -0.0203, -51.716, -57.8414, 2.7359], 1], [29.5808, [-0.0013, -0.02, -62.1074, -59.1324, 4.7597], 1], [29.7373, [0.002, -0.0196, -67.0492, -57.3927, -0.7449], 1], [29.8938, [-0.0009, -0.0202, -64.1655, -57.1572, -3.7788], 1], [30.0504, [-0.001, -0.019, -63.4609, -58.6664, -1.4904], 1], [30.2069, [-0.0029, -0.0194, -66.659, -64.3333, 1.0102], 1], [30.3634, [-0.0032, -0.0219, -52.8603, -65.1688, 4.7536], 1], [30.5199, [-0.0014, -0.021, -32.7038, -66.2292, 3.9898], 1], [30.6764, [-0.0003, -0.0184, -19.2118, -65.9807, 1.0442], 1], [30.8329, [-0.0022, -0.0208, -9.844, -66.5108, 1.0848], 1], [30.9894, [-0.002, -0.0212, -8.8696, -65.3701, 1.1478], 1], [31.1459, [-0.0024, -0.0197, -13.9383, -64.2368, -0.2565], 1], [31.3025, [-0.0017, -0.0186, -23.7432, -62.2967, 0.0513], 1], [31.459, [-0.0021, -0.0204, -33.3226, -59.0273, -1.3955], 1], [31.6155, [-0.0016, -0.0208, -40.6916, -54.6208, -5.0465], 1], [31.772, [-0.0039, -0.0181, -44.4684, -50.6984, -5.9037], 1], [31.9285, [-0.0027, -0.0193, -49.2207, -33.7362, -8.4455], 1], [32.085, [-0.0026, -0.0197, -54.2612, -20.5601, -10.5351], 1], [32.2415, [-0.0028, -0.0201, -54.9435, -18.6475, -10.2041], 1], [32.398, [-0.0024, -0.0191, -52.2159, -14.1469, -10.1012], 1], [32.5546, [0.0004, -0.0203, -46.8399, -8.4233, -10.44], 1], [32.7111, [-0.0004, -0.0199, -39.7864, -3.9403, -9.9983], 1], [32.8676, [-0.0019, -0.0217, -32.122, 4.4673, -9.2141], 1], [33.0241, [-0.0019, -0.0212, -23.6966, 10.1377, -9.8233], 1], [33.1806, [-0.0006, -0.0219, -17.2857, 7.1152, -10.8672], 1], [33.3371, [-0.0027, -0.0238, -7.1701, 14.6973, -8.0263], 1], [33.4936, [-0.0026, -0.0242, 5.7256, 29.0919, -2.7552], 1], [33.6501, [-0.0009, -0.0194, 8.739, 42.0291, -1.021], 1], [33.8066, [-0.0009, -0.0199, 11.407, 47.9488, 4.5155], 1], [33.9632, [-0.0011, -0.0211, 14.0671, 50.8283, 6.4805], 1], [34.1197, [-0.0011, -0.0195, 5.3531, 44.0905, 6.7877], 1], [34.2762, [0.0008, -0.0183, -0.0177, 37.3896, 5.6214], 1], [34.4327, [-0.001, -0.0182, 1.0479, 31.8172, 6.3986], 1], [34.5892, [-0.0, -0.0209, -0.971, 22.8734, 8.4361], 1], [34.7457, [-0.0026, -0.0207, -1.441, 19.2097, 8.0775], 1], [34.9022, [-0.0023, -0.0199, -3.0144, 12.2261, 7.2433], 1], [35.0587, [-0.0023, -0.0218, -6.172, 2.7639, 3.5409], 1], [35.2153, [-0.0024, -0.0214, -7.9283, -9.038, 2.3805], 1], [35.3718, [-0.0018, -0.0173, -9.0671, -18.0851, 0.4211], 1], [35.5283, [-0.0014, -0.0173, -23.6509, -31.8939, -3.5662], 1], [35.6848, [-0.0012, -0.0187, -29.2115, -38.2663, -4.6364], 1], [35.8413, [-0.0003, -0.024, -26.9661, -42.6331, -7.7644], 1], [35.9978, [-0.0021, -0.0203, -26.0895, -39.7572, -6.2839], 1], [36.1543, [-0.0014, -0.019, -27.0008, -42.297, -5.528], 1], [36.3108, [-0.0022, -0.0202, -31.322, -43.1091, -3.1092], 1], [36.4674, [-0.002, -0.019, -30.3539, -41.2567, -1.1855], 1], [36.6239, [-0.001, -0.0199, -36.2507, -44.8455, 0.2503], 1], [36.7804, [-0.001, -0.0236, -40.6561, -44.258, 0.0251], 1], [36.9369, [-0.0012, -0.0201, -42.3585, -45.9146, 5.1079], 1], [37.0934, [-0.0011, -0.0199, -33.9678, -46.6227, 13.0668], 1], [37.2499, [0.0016, -0.0256, -7.813, -48.0681, 13.8429], 1], [37.4064, [-0.0046, -0.0191, -2.9213, -49.9339, 14.1417], 1], [37.5629, [-0.0035, -0.0188, -17.3496, -54.8259, 14.4934], 1], [37.7195, [-0.0019, -0.0215, -28.8507, -60.2178, 14.1168], 1], [37.876, [-0.0006, -0.0192, -37.4112, -66.7531, 11.9235], 1], [38.0325, [-0.0015, -0.0198, -41.8263, -67.0852, 7.7487], 1], [38.189, [-0.0026, -0.0201, -34.6528, -65.9897, 9.6972], 1], [38.3455, [-0.003, -0.0201, -21.086, -65.2526, 12.2236], 1], [38.502, [-0.0019, -0.0203, -7.2576, -61.436, 9.1352], 1], [38.6585, [-0.001, -0.0197, 3.3825, -57.0776, 3.6973], 1], [38.815, [-0.0001, -0.0205, 11.1488, -56.1412, 2.9671], 1], [38.9716, [-0.0009, -0.019, 15.5759, -53.5386, 4.1353], 1], [39.1281, [-0.0003, -0.0204, 20.0185, -49.2958, 7.8381], 1], [39.2846, [-0.0008, -0.02, 25.2593, -46.8398, 10.739], 1], [39.4411, [-0.0046, -0.0192, 19.5861, -39.0349, 12.5886], 1], [39.5976, [-0.0026, -0.0178, 7.9937, -35.3861, 14.1696], 1], [39.7541, [0.0013, -0.0236, 11.9024, -30.0463, 15.8455], 1], [39.9106, [0.001, -0.0231, 14.5416, -10.5041, 9.1314], 1], [40.0671, [-0.0022, -0.0215, 12.8711, -2.092, 4.9126], 1], [40.2237, [0.0015, -0.0178, 5.706, -9.6454, 3.6693], 1], [40.3802, [-0.0001, -0.0178, 0.9222, -15.5494, 2.6096], 1], [40.5367, [-0.0014, -0.0193, -2.3033, -13.1792, -0.7195], 1], [40.6932, [0, -0.0188, -3.1451, -10.3421, -5.6606], 1], [40.8497, [0.0012, -0.0194, -3.2285, -4.3963, -6.7405], 1], [41.0062, [-0.0016, -0.0206, -5.5204, -1.0026, -6.5633], 1], [41.1627, [0.0027, -0.0106, -1.9301, 0.9552, -4.0988], 1], [41.3192, [-0.0002, -0.0122, -24.377, -1.5196, -1.7165], 1], [41.4758, [-0.0113, -0.0127, -38.9845, -18.2746, -2.462], 1], [41.6323, [-0.0029, -0.0285, -36.2454, -26.2548, 0.1428], 1], [41.7888, [-0.0027, -0.0246, -16.2918, -28.3914, 0.7192], 1], [41.9453, [-0.0067, -0.0289, 10.9827, -31.8077, 2.7546], 1], [42.1018, [-0.0056, -0.0213, 27.9205, -39.6403, 4.084], 1], [42.2583, [0.0011, -0.0185, 27.1261, -45.8498, 4.5914], 1], [42.4148, [0, -0.017, 24.9466, -45.9916, 3.1067], 1], [42.5713, [-0.0017, -0.0213, 22.3341, -45.4777, 0.4528], 1], [42.7278, [-0.0014, -0.0184, 21.5021, -45.2112, 2.2485], 1], [42.8844, [-0.0007, -0.0185, 23.753, -36.9799, 3.9111], 1], [43.0409, [-0.0019, -0.0225, 23.8692, -24.3572, 5.1473], 1], [43.1974, [0.0002, -0.0161, 26.0538, -18.2507, 9.0188], 1], [43.3539, [-0.0024, -0.0228, 36.6493, -19.8195, 10.8161], 1], [43.5104, [-0.0031, -0.0235, 45.6317, -21.8962, 11.873], 1], [43.6669, [-0.0011, -0.0179, 52.1403, -26.6066, 8.9172], 1], [43.8234, [-0.0008, -0.0197, 47.0178, -22.6612, 2.1842], 1], [43.9799, [-0.0012, -0.0196, 48.7684, -19.8074, -0.2204], 1], [44.1365, [-0.0012, -0.0197, 45.3355, -19.9943, -0.785], 1], [44.293, [-0.001, -0.0192, 49.6776, -22.8713, -0.2367], 1], [44.4495, [-0.0025, -0.0187, 61.6487, -26.3445, -1.3953], 1], [44.606, [0.0001, -0.0199, 86.8787, -32.2056, -5.9217], 1], [44.7625, [-0.0027, -0.0191, 92.9966, -45.7233, -12.3263], 1], [44.919, [0.0001, -0.0188, 94.8443, -48.7112, -12.2284], 1], [45.0755, [-0.0019, -0.0201, 93.3468, -52.8445, -13.358], 1], [45.232, [-0.0015, -0.0196, 92.4821, -55.7745, -11.4142], 1], [45.3886, [-0.0002, -0.0186, 93.5651, -57.3144, -10.9118], 1], [45.5451, [-0.0009, -0.0198, 86.3545, -55.8583, -8.2893], 1], [45.7016, [-0.0005, -0.0177, 79.8325, -53.5184, -11.2159], 1], [45.8581, [0.0012, -0.0169, 77.1263, -47.2884, -10.9439], 1], [46.0146, [-0.0003, -0.0186, 74.3711, -21.6571, -3.8413], 1], [46.1711, [0.0041, -0.021, 80.5276, -10.1978, -3.6975], 1], [46.3276, [-0.0, -0.0203, 90.6495, -8.4647, -2.0572], 1], [46.4841, [-0.0015, -0.0195, 92.5541, -8.6744, 5.8116], 1], [46.6407, [-0.002, -0.0184, 81.4746, -7.7491, 10.988], 1], [46.7972, [-0.0018, -0.0185, 71.0949, -7.8165, 20.5127], 1], [46.9537, [-0.0084, -0.017, 64.415, -8.845, 24.4153], 1]], "gapE": [0, 0.157, 0.313, 0.47, 0.626, 0.783, 0.939, 1.096, 1.252, 1.409, 1.565, 1.722, 1.878, 2.035, 2.191, 2.348, 2.504, 2.661, 2.817, 2.974, 3.13, 3.287, 3.443, 3.6, 3.756, 3.913, 4.069, 4.226, 4.382, 4.539, 4.695, 4.852, 5.008, 5.165, 5.321, 5.478, 5.634, 5.791, 5.947, 6.104, 6.26, 6.417, 6.574, 6.73, 6.887, 7.043, 7.2, 7.356, 7.513, 7.669, 7.826, 7.982, 8.139, 8.295, 8.452, 8.608, 8.765, 8.921, 9.078, 9.234, 9.391, 9.547, 9.704, 9.86, 10.017, 10.173, 10.33, 10.486, 10.643, 10.799, 10.956, 11.112, 11.269, 11.425, 11.582, 11.738, 11.895, 12.051, 12.208, 12.364, 12.521, 12.677, 12.834, 12.991, 13.147, 13.304, 13.46, 13.617, 13.773, 13.93, 14.086, 14.243, 14.399, 14.556, 14.712, 14.869, 15.025, 15.182, 15.338, 15.495, 15.651, 15.808, 15.964, 16.121, 16.277, 16.434, 16.59, 16.747, 16.903, 17.06, 17.216, 17.373, 17.529, 17.686, 17.842, 17.999, 18.155, 18.312, 18.468, 18.625, 18.781, 18.938, 19.094, 19.251, 19.408, 19.564, 19.721, 19.877, 20.034, 20.19, 20.347, 20.503, 20.66, 20.816, 20.973, 21.129, 21.286, 21.442, 21.599, 21.755, 21.912, 22.068, 22.225, 22.381, 22.538, 22.694, 22.851, 23.007, 23.164, 23.32, 23.477, 23.633, 23.79, 23.946, 24.103, 24.259, 24.416, 24.572, 24.729, 24.885, 25.042, 25.198, 25.355, 25.511, 25.668, 25.825, 25.981, 26.138, 26.294, 26.451, 26.607, 26.764, 26.92, 27.077, 27.233, 27.39, 27.546, 27.703, 27.859, 28.016, 28.172, 28.329, 28.485, 28.642, 28.798, 28.955, 29.111, 29.268, 29.424, 29.581, 29.737, 29.894, 30.05, 30.207, 30.363, 30.52, 30.676, 30.833, 30.989, 31.146, 31.302, 31.459, 31.615, 31.772, 31.929, 32.085, 32.242, 32.398, 32.555, 32.711, 32.868, 33.024, 33.181, 33.337, 33.494, 33.65, 33.807, 33.963, 34.12, 34.276, 34.433, 34.589, 34.746, 34.902, 35.059, 35.215, 35.372, 35.528, 35.685, 35.841, 35.998, 36.154, 36.311, 36.467, 36.624, 36.78, 36.937, 37.093, 37.25, 37.406, 37.563, 37.719, 37.876, 38.032, 38.189, 38.346, 38.502, 38.659, 38.815, 38.972, 39.128, 39.285, 39.441, 39.598, 39.754, 39.911, 40.067, 40.224, 40.38, 40.537, 40.693, 40.85, 41.006, 41.163, 41.319, 41.476, 41.632, 41.789, 41.945, 42.102, 42.258, 42.415, 42.571, 42.728, 42.884, 43.041, 43.197, 43.354, 43.51, 43.667, 43.823, 43.98, 44.136, 44.293, 44.449, 44.606, 44.763, 44.919, 45.076, 45.232, 45.389, 45.545, 45.702, 45.858, 46.015, 46.171, 46.328, 46.484, 46.641, 46.797, 46.954], "gapV": [null, null, null, null, null, null, null, null, null, null, null, null, null, -0.119, -0.282, -0.443, -0.609, -0.609, -0.817, -0.817, -0.817, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, -0.378, -0.378, -0.518, -0.518, -0.587, -0.587, -0.587, -0.626, -0.626, null, -0.47, -0.47, -0.47, -0.47, -0.47, -0.47, -0.409, -0.42, -0.47, -0.481, -0.481, -0.483, -0.483, -0.57, -0.699, -0.8, -0.92, -1.182, -1.182, -1.205, -1.34, -1.34, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, -0.229, -0.229, -0.387, -0.387, -0.387, -0.387, -0.543, null, null, -1.173, -1.327, -1.327, -1.264, -1.327, -1.476, -1.476, -1.578, -1.578, -1.779, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, -0.003, -0.003, -0.003, -0.003, -0.021, -0.025, -0.157, -0.157, -0.157, -0.217, -0.313, -0.349, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], "T": [1.0020996682518999, -0.019500054701289467, -158.6165953100301, 0.019500054701289467, 1.0020996682518999, -38.06801829773525], "cut": {"a": 3.0030030030030033, "b": 50.016683350016685}, "pa": [[384.0000575988606, 288.00002356317026], [921.5999130780831, 468.0000235631702]], "pb": [[547.604096849866, 314.728905726374], [1087.3684651474532, 483.84837623575737]]};
 (()=>{
-  // Mini-Piste als SVG; cam = Kameraversatz für B
-  const slope=(id,cam)=>`<svg class="tut-slope" viewBox="0 0 160 90" preserveAspectRatio="xMidYMid slice"><defs><linearGradient id="sn${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f4f7fb"/><stop offset="1" stop-color="#dfe7f0"/></linearGradient></defs>
-    <rect width="160" height="90" fill="url(#sn${id})"/>
-    <g class="tut-world" ${cam?`transform="${cam}"`:''}>
-      <path d="M-10 70 C 20 40, 45 85, 75 52 S 120 30, 175 18" fill="none" stroke="#5aa8d8" stroke-width="3.2" stroke-linecap="round" opacity=".55"/>
-      <path d="M0 8 L0 90" stroke="#e05a4f" stroke-width="1.2" opacity=".6"/><path d="M6 6 L6 90" stroke="#e05a4f" stroke-width="1.2" opacity=".45"/>
-      ${[[30,52,'#d8382c'],[62,66,'#2f6fe4'],[92,42,'#d8382c'],[124,33,'#2f6fe4'],[150,22,'#d8382c']].map(([x,y,c])=>`<g transform="translate(${x} ${y})"><path d="M0 0v-11" stroke="#555" stroke-width=".9"/><rect x="0" y="-11" width="7" height="5" rx=".6" fill="${c}"/></g>`).join('')}
-      <circle class="tut-gate-ring" cx="92" cy="38" r="9" fill="none" stroke="#1f9d6b" stroke-width="1.6"/>
-    </g>
-  </svg>`;
-  const skier=(cls,col)=>`<span class="tut-skier ${cls}" style="--c:${col}"><i></i></span>`;
-  const frame=(lab,col,id,cam,extra='')=>`<div class="tut-frame"><span class="tut-badge" style="background:${col}">${lab}</span>${slope(id,cam)}${extra}</div>`;
-  const tl=(cls,col,extra='')=>`<div class="tut-tl ${cls}"><span class="tut-ph" style="--c:${col}"></span>${extra}</div>`;
-  const cursor='<svg class="tut-cur" viewBox="0 0 24 24"><path d="M5 3l14 8-6.2 1.6L10 19z" fill="#fff" stroke="#0d1014" stroke-width="1.6" stroke-linejoin="round"/></svg>';
-  const pill=(cls,html)=>`<span class="tut-pill ${cls}">${html}</span>`;
-  const CHK='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
-  const camB='translate(10 -5) rotate(-4 80 45) scale(1.06)';
-  const SC={
+  const TR={on:false,i:0,steps:null,kind:null,saved:null,busy:false,timer:null,abort:false};
+  const el=document.createElement('div'); el.className='tour'; el.hidden=true;
+  el.innerHTML=`<div class="tour-block"></div><div class="tour-spot"></div>
+    <div class="tour-cur"><svg viewBox="0 0 24 24"><path d="M5 3l14 8-6.2 1.6L10 19z" fill="#fff" stroke="#0d1014" stroke-width="1.6" stroke-linejoin="round"/></svg><i></i></div>
+    <div class="tour-card"><div class="tour-top"><span class="tour-n"></span><button class="tour-x" title="Anleitung beenden"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+      <b class="tour-t"></b><p class="tour-p"></p>
+      <div class="tour-bar"><i></i></div>
+      <div class="tour-nav"><button class="tour-b" data-tr="prev">Zurück</button><button class="tour-b pri" data-tr="next">Weiter</button></div></div>`;
+  document.body.appendChild(el);
+  const spot=$('.tour-spot',el), card=$('.tour-card',el), cur=$('.tour-cur',el);
+  const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+  const stopped=()=>TR.abort||!TR.on;
+  const demo=n=>clips.find(c=>c.name===n);
+  const waitReady=async()=>{ for(let k=0;k<200&&!(A.ready&&B.ready);k++) await sleep(100); };
+  // Spotlight
+  function focus(target,pad=8){
+    let r=null; try{ if(typeof target==='function') r=target(); else if(target){ const e=typeof target==='string'?$(target):target; r=e?e.getBoundingClientRect():null; } }catch(err){ r=null; }
+    if(!r||!r.width){ spot.style.opacity='0'; placeCard(null); return; }
+    spot.style.opacity='1'; Object.assign(spot.style,{left:(r.left-pad)+'px',top:(r.top-pad)+'px',width:(r.width+2*pad)+'px',height:(r.height+2*pad)+'px'});
+    placeCard(r);
+  }
+  function placeCard(r){
+    const W=innerWidth,H=innerHeight, cw=Math.min(360,W-24); card.style.width=cw+'px'; const ch=card.offsetHeight||170;
+    let x,y; if(!r){ x=(W-cw)/2; y=H-ch-24; }
+    else { x=clamp(r.left+r.width/2-cw/2,12,W-cw-12); y=r.bottom+18; if(y+ch>H-12) y=r.top-ch-18; if(y<12){ y=clamp(r.top+16,12,H-ch-12); x=r.right+18+cw<W?r.right+18:clamp(r.left-cw-18,12,W-cw-12); } }
+    card.style.left=x+'px'; card.style.top=y+'px';
+  }
+  // Mauszeiger
+  const cpos={x:innerWidth/2,y:innerHeight*0.7};
+  async function moveTo(x,y,ms=650){ cur.style.opacity='1'; cur.style.transition=`left ${ms}ms cubic-bezier(.4,.1,.2,1),top ${ms}ms cubic-bezier(.4,.1,.2,1),opacity .3s`; cur.style.left=x+'px'; cur.style.top=y+'px'; cpos.x=x; cpos.y=y; await sleep(ms+40); }
+  async function tap(){ cur.classList.remove('tap'); void cur.offsetWidth; cur.classList.add('tap'); await sleep(260); }
+  const ctr=e=>{ const r=(typeof e==='string'?$(e):e).getBoundingClientRect(); return [r.left+r.width/2,r.top+r.height/2]; };
+  async function clickEl(sel){ let e=typeof sel==='string'?$(sel):sel; if(!e) return; const [x,y]=ctr(e); await moveTo(x,y); if(stopped()) return; await tap(); if(typeof sel==='string') e=$(sel); if(e) e.click(); await sleep(250); }
+  async function scrub(d,t,ms=1600){ // Zeitleiste ziehen: Zeiger gleitet, Video spult mit
+    const r=d.cv.getBoundingClientRect(); const y=r.top+r.height/2, x0=r.left+r.width*0.62; await moveTo(x0,y,500); if(stopped()) return;
+    cur.classList.add('drag'); const t0=d.time(), n=Math.max(8,Math.round(ms/90));
+    for(let k=1;k<=n&&!stopped();k++){ const f=k/n, e=f<.5?2*f*f:1-Math.pow(-2*f+2,2)/2; d.seekTime(t0+(t-t0)*e); if(d.onUserSeek&&G.linked) d.onUserSeek(d); cur.style.transition='none'; cur.style.left=(x0-r.width*0.22*e)+'px'; await sleep(ms/n); }
+    d.seekTime(t); if(d.onUserSeek&&G.linked) d.onUserSeek(d); cur.classList.remove('drag'); await sleep(400); }
+  async function tapVideo(d,px,py){ // Punkt im Video antippen (Videopixel)
+    const r=d.stage.getBoundingClientRect(), R=d.rect(), z=d.z, x=r.left+z.x+(R.x+px/d.v.videoWidth*R.w)*z.s, y=r.top+z.y+(R.y+py/d.v.videoHeight*R.h)*z.s;
+    await moveTo(x,y,600); if(stopped()) return; await tap();
+    $('#cStages').dispatchEvent(new PointerEvent('pointerdown',{clientX:x,clientY:y,bubbles:true,cancelable:true,pointerId:1}));
+    await sleep(420); }
+  const stage='#cStages', tlA=()=>A.cv, tlB=()=>B.cv;
+  const rectOf=(...els)=>()=>{ const rs=els.map(f=>(typeof f==='function'?f():$(f))).filter(Boolean).map(e=>e.getBoundingClientRect()); if(!rs.length) return null;
+    const l=Math.min(...rs.map(r=>r.left)),t=Math.min(...rs.map(r=>r.top)),R=Math.max(...rs.map(r=>r.right)),b=Math.max(...rs.map(r=>r.bottom)); return {left:l,top:t,right:R,bottom:b,width:R-l,height:b-t}; };
+
+  const M='Meillard_Soelden_251026_GS_M_L1.mp4', Gz='Gratz_Soelden_251026_GS_M_L1.mp4';
+  const BO='boisset_vgh_dh_tr1_courchevel_260311.mp4', KR='kriechmayr_vgh_dh_tr1_courchevel_260311.mp4';
+  const STEPS={
     side:[
-      {t:'Läufe wählen',x:'Oben Lauf A und Lauf B auswählen – oder links in der Liste auf «A» und «B» tippen.',
-       h:`<div class="tut-sel s1"><span class="tut-b-a">A</span><em>Meillard · Lauf 1</em></div><div class="tut-sel s2"><span class="tut-b-b">B</span><em>Gratz · Lauf 1</em></div><div class="tut-two">${frame('A','#2f6fe4','a1','')}${frame('B','#f08a24','b1',camB)}</div>`},
-      {t:'Gleichen Moment einstellen',x:'Beide Zeitleisten einzeln ziehen, bis A und B am gleichen Punkt sind – z. B. beim ersten Tor. Dann «Sync».',
-       h:`<div class="tut-two scrub">${frame('A','#2f6fe4','a2','',skier('k-a','#2f6fe4'))}${frame('B','#f08a24','b2',camB,skier('k-b','#f08a24'))}</div><div class="tut-two">${tl('pa','#2f6fe4')}${tl('pb','#f08a24')}</div>${pill('p-sync','<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg>Sync')}${cursor.replace('tut-cur','tut-cur c-sync')}`},
-      {t:'Gemeinsam abspielen',x:'Jetzt laufen beide zusammen. Wer vorne ist, siehst du direkt. Mit «Tore» misst du Abschnittszeiten.',
-       h:`<div class="tut-two play">${frame('A','#2f6fe4','a3','',skier('k-a','#2f6fe4'))}${frame('B','#f08a24','b3',camB,skier('k-b','#f08a24'))}</div><div class="tut-two">${tl('pl','#2f6fe4','<i class="tut-dia d1"></i><i class="tut-dia d2"></i>')}${tl('pl','#f08a24','<i class="tut-dia d1"></i><i class="tut-dia d2"></i>')}</div>${pill('p-link',CHK+'Verknüpft · B +0,32 s')}`}
+      {t:'Zwei Läufe wählen',p:'Oben wählst du Lauf A und Lauf B – hier Meillard und Gratz in Sölden. Alternativ links in der Liste auf «A» / «B» tippen.',f:'.cmp-head',
+       run:async()=>{ setLayout('side'); A.setClip(demo(M)); B.setClip(demo(Gz)); unlink(); syncSelects(); renderLib(); await waitReady(); A.seekTime(0); B.seekTime(0); await sleep(600); }},
+      {t:'A zum ersten Tor schieben',p:'Zeitleiste A ziehen, bis Meillard am ersten gut sichtbaren Tor ist. Feinschliff: ← / → für ein Bild.',f:()=>A.tl,
+       run:async()=>{ await scrub(A,4.0); }},
+      {t:'B zum gleichen Tor schieben',p:'Dasselbe mit Zeitleiste B: Gratz an genau dieselbe Stelle bringen.',f:()=>B.tl,
+       run:async()=>{ await scrub(B,4.0); }},
+      {t:'Sync drücken',p:'«Sync» verbindet A und B an diesem Moment. Ab jetzt bewegen sich beide gemeinsam.',f:'#btnSync',
+       run:async()=>{ await clickEl('#btnSync'); }},
+      {t:'Gemeinsam abspielen',p:'Abspielen – beide laufen synchron. So siehst du direkt, wer wo Zeit gewinnt. Mit «1×» auf Zeitlupe schalten.',f:'#viewCmp .ctl.play',
+       run:async()=>{ await clickEl('#viewCmp .ctl.play'); await sleep(3600); if(!A.v.paused) cmpToggle(); }},
+      {t:'Abschnittszeiten mit «Tore»',p:'Mit «Tore» markierst du Torpassagen in A und B und bekommst die Zeitdifferenz pro Abschnitt.',f:'#btnSplits',run:async()=>{ await moveTo(...ctr('#btnSplits')); }}
     ],
     overlay:[
-      {t:'1 · Gemeinsamer Punkt',x:'A und B einzeln zum gleichen Moment schieben – am besten das erste Tor, das in beiden Videos sichtbar ist. Dann «Gemeinsamer Punkt».',
-       h:`<div class="tut-two scrub">${frame('A','#2f6fe4','a4','',skier('k-a','#2f6fe4'))}${frame('B','#f08a24','b4',camB,skier('k-b','#f08a24'))}</div><div class="tut-two">${tl('pa','#2f6fe4')}${tl('pb','#f08a24')}</div>${pill('p-sync',CHK+'Gemeinsamer Punkt')}`},
-      {t:'Ausschnitt & Vorschau',x:'Optional Start und Ende setzen. In der Zeitleiste vorklicken: beide Videos springen mit – so siehst du den Vorsprung, bevor gerechnet wird.',
-       h:`<div class="tut-one">${frame('A + B','#7a5cff','a5','',skier('k-a','#2f6fe4')+skier('k-b ghostb','#f08a24'))}</div>${tl('wide cut','#ff5a4a','<i class="tut-br bs">Start</i><i class="tut-br be">Ende</i><i class="tut-range"></i>')}`},
-      {t:'2 · Referenzpunkte',x:'In A zwei feste Punkte antippen (Torstange, Zaunpfosten). Danach die gleichen zwei Punkte in B.',
-       h:`<div class="tut-two pick">${frame('A','#2f6fe4','a6','','<i class="tut-dot da1">1</i><i class="tut-dot da2">2</i>')}${frame('B','#f08a24','b6',camB,'<i class="tut-dot db1">1</i><i class="tut-dot db2">2</i>')}</div>${cursor.replace('tut-cur','tut-cur c-pick')}`},
-      {t:'3 · Overlay erstellen',x:'«Overlay erstellen» – B wird auf A gelegt und folgt dem Kameraschwenk. Beide Fahrer:innen in einem Bild.',
-       h:`<div class="tut-one merge"><div class="tut-frame base"><span class="tut-badge" style="background:#2f6fe4">A</span>${slope('a7','')}${skier('k-a','#2f6fe4')}</div><div class="tut-frame over">${slope('b7','')}${skier('k-b','#f08a24')}</div></div><div class="tut-progress"><i></i></div>${pill('p-done',CHK+'Overlay fertig')}`}
+      {t:'Overlay wählen',p:'Overlay legt Lauf B direkt auf Lauf A – ideal für Aufnahmen vom gleichen Standort, z. B. vom Gegenhang. Beispiel: Abfahrtstraining Courchevel, Boisset gegen Kriechmayr.',f:'#layoutSeg',
+       run:async()=>{ setLayout('side'); A.setClip(demo(BO)); B.setClip(demo(KR)); unlink(); syncSelects(); renderLib(); await waitReady(); A.seekTime(0.5); B.seekTime(1.5); await sleep(500); await clickEl('#layoutSeg [data-layout="overlay"]'); OV.cut={a:null,b:null}; OV.T=null; OV.follow=false; OV.edit=false; ovUI(); }},
+      {t:'1 · Beide zum gleichen Moment',p:'A und B einzeln in ihren Zeitleisten verschieben, bis beide am gleichen Punkt sind – z. B. beim ersten Tor, das in beiden Videos zu sehen ist.',f:rectOf(tlA,tlB),
+       run:async()=>{ await scrub(A,PRE_OV.cut.a,1400); await scrub(B,PRE_OV.cut.a+PRE_OV.off,1400); }},
+      {t:'Start des Ausschnitts',p:'Optional: «Start» setzt den Anfang des Overlays auf das aktuelle Bild.',f:'[data-ov="cuta"]',run:async()=>{ await clickEl('[data-ov="cuta"]'); }},
+      {t:'Gemeinsamer Punkt',p:'Jetzt sind A und B verbunden. Beim Vorklicken in der Zeitleiste springen beide mit.',f:'[data-ov="sync"]',run:async()=>{ await clickEl('[data-ov="sync"]'); }},
+      {t:'Vorsprung ansehen – vor dem Rechnen',p:'Vorklicken: beide Videos springen mit. Die Deckkraft zeigt beide Bilder – so siehst du schon, wie gross der Vorsprung ist. Dann «Ende» setzen.',f:rectOf(tlA,'#ovPanel'),
+       run:async()=>{ await scrub(A,24,1800); await sleep(900); await scrub(A,PRE_OV.cut.b,1400); await clickEl('[data-ov="cutb"]'); }},
+      {t:'2 · Referenzpunkte in A',p:'«Referenzpunkte setzen» springt an den Start. In A zwei feste Punkte antippen – etwas, das sich nicht bewegt: Torstange, Zaun, Baum, Schild.',f:stage,
+       run:async()=>{ await clickEl('[data-ov="pick"]'); await sleep(900); for(const q of PRE_OV.pa){ if(stopped()) return; await tapVideo(A,q[0],q[1]); } }},
+      {t:'Gleiche Punkte in B',p:'Dann dieselben zwei Punkte in B. Die gestrichelten Kreise zeigen, wo sie in A lagen. B wird sofort darauf ausgerichtet.',f:stage,
+       run:async()=>{ for(const q of PRE_OV.pb){ if(stopped()) return; await tapVideo(B,q[0],q[1]); } await sleep(500); }},
+      {t:'3 · Overlay erstellen',p:'«Overlay erstellen» – die App führt B über den ganzen Ausschnitt mit, auch wenn die Kamera schwenkt und zoomt. Das dauert etwa 2–3 Minuten (hier vorbereitet).',f:'[data-ov="make"]',
+       run:async()=>{ preloadOv(); await clickEl('[data-ov="make"]'); }},
+      {t:'Fertig: beide in einem Bild',p:'Abspielen oder scrubben: Boisset und Kriechmayr fahren im selben Bild. Mit «Deckkraft» oben das Mischverhältnis wählen.',f:stage,
+       run:async()=>{ A.seekTime(26); A.onUserSeek(A); await sleep(700); cmpToggle(); await sleep(4200); if(!A.v.paused) cmpToggle(); }}
     ]
   };
-  const T={kind:null,i:0,timer:null};
-  const el=$('#tut');
-  function show(i){
-    const L=SC[T.kind]; T.i=(i+L.length)%L.length; const s=L[T.i];
-    $('#tutStage').innerHTML='<div class="tut-scene">'+s.h+'</div>'; $('#tutStep').textContent=s.t; $('#tutTxt').textContent=s.x;
-    $('#tutDots').innerHTML=L.map((_,k)=>`<button class="${k===T.i?'on':''}" data-k="${k}" aria-label="Schritt ${k+1}"><i></i></button>`).join('');
-    $('#tutPrev').disabled=T.i===0; $('#tutNext').textContent=T.i===L.length-1?'Los geht’s':'Weiter';
-    clearTimeout(T.timer); T.timer=setTimeout(()=>{ if(!el.hidden&&T.i<L.length-1) show(T.i+1); else if(!el.hidden) show(0); },5200);
+  function preloadOv(){ const P=PRE_OV; GH.t0=P.t0; GH.off=P.off; GH.step=P.step; GH.eEnd=P.eEnd; GH.W0=P.W0; GH.hA=P.hA; GH.hB=P.hB;
+    GH.S=P.S.map(([e,p,ok])=>({e,p,ok:!!ok,pa:null,pb:null,ca:null,cb:null})); GH.gapE=P.gapE; GH.gapV=P.gapV; GH.state='ready'; GH.key=ghostKey(); GH.dirty=true; }
+  async function show(i){
+    const L=TR.steps; TR.i=clamp(i,0,L.length-1); const s=L[TR.i]; TR.abort=false; clearTimeout(TR.timer);
+    $('.tour-n',el).textContent=(TR.i+1)+' / '+L.length; $('.tour-t',el).textContent=s.t; $('.tour-p',el).textContent=s.p;
+    $('[data-tr="prev"]',el).disabled=TR.i===0; const nx=$('[data-tr="next"]',el); nx.textContent=TR.i===L.length-1?'Selbst ausprobieren':'Weiter'; nx.classList.remove('ready');
+    const bar=$('.tour-bar i',el); bar.style.transition='none'; bar.style.width='0';
+    focus(s.f); TR.busy=true; el.classList.add('busy');
+    try{ await s.run(); }catch(e){ console.error(e); }
+    TR.busy=false; el.classList.remove('busy'); if(!TR.on) return; focus(s.f); nx.classList.add('ready');
+    if(TR.i<L.length-1){ requestAnimationFrame(()=>{ bar.style.transition='width 3.4s linear'; bar.style.width='100%'; }); TR.timer=setTimeout(()=>{ if(TR.on&&!TR.busy) show(TR.i+1); },3400); }
   }
-  window.openTut=kind=>{ T.kind=kind; $('#tutTtl').textContent=kind==='overlay'?'Overlay':'Side by Side'; el.hidden=false; requestAnimationFrame(()=>el.classList.add('on')); show(0); };
-  const close=()=>{ clearTimeout(T.timer); el.classList.remove('on'); setTimeout(()=>{ el.hidden=true; },250); };
-  $('#tutX').addEventListener('click',close); el.addEventListener('click',e=>{ if(e.target===el) close(); });
-  $('#tutPrev').addEventListener('click',()=>show(T.i-1));
-  $('#tutNext').addEventListener('click',()=>{ if(T.i===SC[T.kind].length-1) close(); else show(T.i+1); });
-  $('#tutDots').addEventListener('click',e=>{ const b=e.target.closest('[data-k]'); if(b) show(+b.dataset.k); });
-  document.addEventListener('keydown',e=>{ if(el.hidden) return; if(e.key==='Escape'){ e.stopPropagation(); close(); } else if(e.key==='ArrowRight'){ e.stopPropagation(); e.preventDefault(); show(T.i+1); } else if(e.key==='ArrowLeft'){ e.stopPropagation(); e.preventDefault(); show(T.i-1); } },true);
-  $('#tutBtn').addEventListener('click',()=>openTut($('#viewCmp').classList.contains('overlay')?'overlay':'side'));
+  function saveState(){ return {a:A.clip,b:B.clip,lay:$('#viewCmp').classList.contains('overlay')?'overlay':$('#viewCmp').classList.contains('ghost')?'ghost':'side',G:{...G},ta:A.time(),tb:B.time()}; }
+  window.startTour=async kind=>{
+    if(!demo(M)||!demo(BO)){ toast('Die Anleitung braucht die Beispiel-Läufe (nur online verfügbar).'); return; }
+    TR.kind=kind; TR.steps=STEPS[kind]; TR.saved=saveState(); TR.on=true; el.hidden=false; document.body.classList.add('touring');
+    requestAnimationFrame(()=>el.classList.add('on')); cur.style.opacity='0'; show(0);
+  };
+  async function end(){ TR.on=false; TR.abort=true; clearTimeout(TR.timer); el.classList.remove('on'); document.body.classList.remove('touring'); setTimeout(()=>{ el.hidden=true; },300);
+    if(!A.v.paused||!B.v.paused){ A.pause(); B.pause(); G.playing=false; cmpPlayIcon(); } }
+  $('.tour-x',el).addEventListener('click',end);
+  $('[data-tr="next"]',el).addEventListener('click',()=>{ if(TR.i===TR.steps.length-1) return end(); TR.abort=true; show(TR.i+1); });
+  $('[data-tr="prev"]',el).addEventListener('click',()=>{ TR.abort=true; show(TR.i-1); });
+  document.addEventListener('keydown',e=>{ if(!TR.on) return; if(e.key==='Escape'){ e.stopPropagation(); e.preventDefault(); end(); } else if(e.key==='ArrowRight'&&!TR.busy){ e.stopPropagation(); e.preventDefault(); $('[data-tr="next"]',el).click(); } else { e.stopPropagation(); e.preventDefault(); } },true);
+  addEventListener('resize',()=>{ if(TR.on) focus(TR.steps[TR.i].f); });
+  setInterval(()=>{ if(TR.on) focus(TR.steps[TR.i].f); },500);
+  $('#tutBtn').addEventListener('click',()=>startTour($('#viewCmp').classList.contains('overlay')?'overlay':'side'));
 })();
 </script>
 </body>
