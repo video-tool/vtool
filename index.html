@@ -1510,6 +1510,8 @@ html.vt-back::view-transition-new(mainview){animation:vtInL .45s cubic-bezier(.2
 .ov-tag{position:absolute;left:0;top:0;display:inline-flex;align-items:center;gap:6px;padding:3px 9px 3px 7px;border-radius:999px;background:rgba(12,15,20,.38);border:1px solid rgba(255,255,255,.22);
   -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);color:rgba(255,255,255,.92);font:600 11.5px var(--font);letter-spacing:.01em;white-space:nowrap;opacity:0;transition:opacity .3s;will-change:transform}
 .ov-tag.on{opacity:.9}
+.ov-tag{transition:opacity .45s ease!important}
+.ov-lines line{transition:opacity .45s ease}
 .ov-tag i{width:7px;height:7px;border-radius:50%;flex:none}
 .ov-tag.a i{background:#3e8bff;box-shadow:0 0 0 2px rgba(62,139,255,.3)}
 .ov-tag.b i{background:#f08a3c;box-shadow:0 0 0 2px rgba(240,138,60,.3)}
@@ -2116,7 +2118,8 @@ canvas.strip:focus-visible{outline:2px solid rgba(255,255,255,.35)!important;out
       <span class="exp-l" id="expDurL">Dauer</span><div id="expDurRow"><input class="exp-num" id="expDur" type="number" min="0.5" max="120" step="0.5" value="3"> s</div>
       <span class="exp-l">Tempo</span><div class="seg" id="expRate"><button data-r="1">1×</button><button data-r="0.5">½×</button><button data-r="0.25">¼×</button><button data-r="0.1">0.1×</button></div>
       <span class="exp-l">Inhalt</span><div class="exp-checks">
-        <label><input type="checkbox" id="expAnn" checked> Zeichnungen</label>
+        <label id="expAnnRow"><input type="checkbox" id="expAnn" checked> Zeichnungen</label>
+        <label id="expNamesRow" hidden><input type="checkbox" id="expNames" checked> Namen der Fahrer:innen</label>
         <label><input type="checkbox" id="expInfo" checked> Info-Leiste (Name, Zeit, Tempo)</label>
         <label id="expNotesRow"><input type="checkbox" id="expNotes" checked> Marker-Notizen einblenden</label>
         <label id="expGps"><input type="checkbox" id="expGpsOv" checked> GPS-Anzeigen</label>
@@ -3379,9 +3382,17 @@ function motBlobs(cur,curOk,prv,prvOk,Qi,W,H){ const n=W*H, m=new Uint8Array(n);
 function trackViterbi(S,key,W,seeds){ // seeds: [{i,x,y}] – angetippte Ankerpunkte
   const SM=new Map((Array.isArray(seeds)?seeds:seeds?[seeds]:[]).map(q=>[q.i,q]));
   const N=S.length, sig=W*0.04, NEG=-1e18, K=6, layers=[], cw=TRK_CW;
+  // Feste Dinge (Zaun, Schneekanone, Bäume – durch Parallaxe «bewegt») bleiben in Weltkoordinaten am gleichen Ort,
+  // die Fahrer:in nicht: Flecken, die 1–5 s früher/später an derselben Stelle der Piste wieder auftauchen, sind keine Fahrer:in
+  const stat=new Map(); if(TRK_STATIC&&N>10){ const G=[[1,0,0,0,1,0]]; for(let i=1;i<N;i++) G.push(affMul(G[i-1],affInv(S[i].q||[1,0,0,0,1,0])));
+    const step=Math.max(0.02,S[1].e-S[0].e), k0=Math.max(2,Math.round(1.2/step)), k1=Math.round(5/step), rad=W*0.03;
+    for(let i=0;i<N;i++){ const L=S[i][key]||[]; if(!L.length) continue; const Gi=affInv(G[i]);
+      L.forEach((b,bi)=>{ let hit=0,tot=0; for(let d=k0;d<=k1;d+=2) for(const j of [i-d,i+d]){ if(j<0||j>=N) continue; const Lj=S[j][key]; if(!Lj) continue; tot++; const H=affMul(Gi,G[j]);
+          for(const c of Lj){ const u=affApply(H,c[0],c[1]); if(Math.hypot(u[0]-b[0],u[1]-b[1])<rad){ hit++; break; } } }
+        if(tot>=4&&hit/tot>0.3) stat.set(i+':'+bi,1); }); } }
   for(let i=0;i<N;i++){ const q=S[i].q||[1,0,0,0,1,0], c0=(key==='mb'?S[i].cb:S[i].ca)||[W/2,W*0.28];
     // Wer filmt, hält die Fahrer:in meist nahe der Bildmitte → Abstand zur Mitte kostet
-    let blobsI=(S[i][key]||[]).map(b=>{ const dc=Math.hypot(b[0]-c0[0],b[1]-c0[1])/(W*0.22); return {x:b[0],y:b[1],em:1+Math.log(1+b[2])-cw*dc*dc}; });
+    let blobsI=(S[i][key]||[]).map((b,bi)=>{ const dc=Math.hypot(b[0]-c0[0],b[1]-c0[1])/(W*0.22); return {x:b[0],y:b[1],em:1+Math.log(1+b[2])-cw*dc*dc-(stat.has(i+':'+bi)?6:0)}; });
     const seed=SM.get(i);
     if(seed){ blobsI=blobsI.filter(b=>Math.hypot(b.x-seed.x,b.y-seed.y)<W*0.05); blobsI.push({x:seed.x,y:seed.y,em:2}); blobsI.forEach(b=>b.em+=8); }
     const st=[]; const P=i?layers[i-1]:null;
@@ -3394,7 +3405,27 @@ function trackViterbi(S,key,W,seeds){ // seeds: [{i,x,y}] – angetippte Ankerpu
     if(seed) for(const x of st) if(!x.real) x.sc=NEG;
     layers.push(st.length?st:[{x:W/2,y:W*0.28,sc:i?(bestPrev?bestPrev.sc-2:0):0,from:bestPrev,coast:99,real:false}]); }
   let cur=null; for(const x of layers[N-1]) if(!cur||x.sc>cur.sc) cur=x;
-  const out=new Array(N); for(let i=N-1;i>=0;i--){ out[i]=cur&&cur.coast<=8?[cur.x,cur.y]:null; cur=cur?cur.from:null; }
+  const out=new Array(N), real=new Array(N); for(let i=N-1;i>=0;i--){ out[i]=cur&&cur.coast<=5?[cur.x,cur.y]:null; real[i]=!!(cur&&cur.real); cur=cur?cur.from:null; }
+  // Verlässlichkeit: Sprünge (gegenüber der Kamerabewegung) trennen die Bahn in Stücke. Kurze Stücke, Stücke weit weg von der Bildmitte
+  // oder mit wenig echten Treffern sind meist Bäume/Zuschauer → dort keine Pille (wird sanft ausgeblendet, statt hin und her zu springen)
+  if(TRK_REL){ const step=N>1?Math.max(0.02,S[1].e-S[0].e):0.1, segs=[]; let a=null;
+    const mv=[]; for(let i=1;i<N;i++) if(out[i]&&out[i-1]){ const q=S[i].q||[1,0,0,0,1,0], pp=affApply(q,out[i-1][0],out[i-1][1]); mv.push(Math.hypot(out[i][0]-pp[0],out[i][1]-pp[1])); }
+    mv.sort((u,v)=>u-v); const med=mv.length?mv[mv.length>>1]:W*0.02, jump=Math.max(W*0.06,med*3);
+    for(let i=0;i<N;i++){ if(!out[i]){ if(a!=null){ segs.push([a,i-1]); a=null; } continue; }
+      if(a!=null){ const q=S[i].q||[1,0,0,0,1,0], pp=affApply(q,out[i-1][0],out[i-1][1]); if(Math.hypot(out[i][0]-pp[0],out[i][1]-pp[1])>jump){ segs.push([a,i-1]); a=i; } }
+      else a=i; }
+    if(a!=null) segs.push([a,N-1]);
+    const G=[[1,0,0,0,1,0]]; for(let i=1;i<N;i++) G.push(affMul(G[i-1],affInv(S[i].q||[1,0,0,0,1,0])));
+    const map=(p,i,j)=>affApply(affMul(affInv(G[j]),G[i]),p[0],p[1]); // Punkt aus Bild i in Bild j
+    const info=segs.map(([i0,i1])=>{ let dc=0; for(let i=i0;i<=i1;i++){ const c0=(key==='mb'?S[i].cb:S[i].ca)||[W/2,W*0.28]; dc+=Math.hypot(out[i][0]-c0[0],out[i][1]-c0[1])/(W*0.22); } const n=i1-i0+1; let anch=false; for(const q of SM.values()) if(q.i>=i0&&q.i<=i1) anch=true; return {t:n*step,dc:dc/n,anch}; });
+    const hide=new Set();
+    segs.forEach(([i0,i1],k)=>{ const x=info[k]; if(x.anch) return;
+      if(x.t<0.35||x.dc>1.6){ hide.add(k); return; }
+      // Ausreisser: kurzes Stück, davor und danach eine Bahn, die zueinander passt (Fahrer:in war die ganze Zeit dort)
+      if(x.t<1.5&&k>0&&k<segs.length-1){ const [p0,p1]=segs[k-1], [n0]=segs[k+1], gap=(n0-p1)*step; if(gap<2.5){ const pr=map(out[p1],p1,n0), d=Math.hypot(pr[0]-out[n0][0],pr[1]-out[n0][1]); if(d<W*0.07+med*(n0-p1)) hide.add(k); } } });
+    segs.forEach(([i0,i1],k)=>{ if(hide.has(k)) for(let i=i0;i<=i1;i++) out[i]=null; });
+    // einzelne Lücken innerhalb einer guten Bahn (≤ 0,3 s) wieder schliessen, damit die Pille nicht flackert
+    for(let i=1;i<N-1;i++){ if(out[i]) continue; let j=i; while(j<N&&!out[j]) j++; if(i>0&&out[i-1]&&j<N&&out[j]&&(j-i)*step<=0.3){ for(let k=i;k<j;k++){ const f=(k-i+1)/(j-i+1); out[k]=[out[i-1][0]+(out[j][0]-out[i-1][0])*f,out[i-1][1]+(out[j][1]-out[i-1][1])*f]; } } i=j; } }
   if(SM.size){ // Kette Bild i → Bild 0 (Welt) aus den Kamerabewegungen
     const G=[[1,0,0,0,1,0]]; for(let i=1;i<N;i++) G.push(affMul(G[i-1],affInv(S[i].q||[1,0,0,0,1,0])));
     const toW=(i,p)=>affApply(G[i],p[0],p[1]), fromW=(i,p)=>affApply(affInv(G[i]),p[0],p[1]);
@@ -3405,9 +3436,22 @@ function trackViterbi(S,key,W,seeds){ // seeds: [{i,x,y}] – angetippte Ankerpu
     for(const a of an) out[a.i]=[a.x,a.y]; }
   const sm=out.map((p,i)=>{ if(!p) return null; let sx=0,sy=0,w=0; for(let k=-2;k<=2;k++){ const q=out[i+k]; if(!q) continue; const ww=3-Math.abs(k); sx+=q[0]*ww; sy+=q[1]*ww; w+=ww; } return [sx/w,sy/w]; });
   for(const a of SM.values()) if(a.i<N) sm[a.i]=[a.x,a.y]; // Anker exakt
-  return sm; }
+  // Sicherheit je Bild: genug echte Treffer in ±0,5 s und nahe der Bildmitte (wer filmt, hält die Fahrer:in mittig); Anker = sicher
+  const step=N>1?Math.max(0.02,S[1].e-S[0].e):0.1, hw=Math.max(2,Math.round(0.5/step)), conf=new Float32Array(N), anc=[...SM.keys()].sort((a,b)=>a-b);
+  for(let i=0;i<N;i++){ if(!sm[i]){ conf[i]=0; continue; } let r=0,n=0,dc=0; for(let j=Math.max(0,i-hw);j<=Math.min(N-1,i+hw);j++){ n++; if(real[j]) r++; if(sm[j]){ const c0=(key==='mb'?S[j].cb:S[j].ca)||[W/2,W*0.28]; dc+=Math.hypot(sm[j][0]-c0[0],sm[j][1]-c0[1])/(W*0.22); } }
+    const rf=r/n, dca=dc/n; let c=clamp((rf-0.45)/0.3,0,1)*clamp((1.35-dca)/0.5,0,1);
+    for(const a of anc){ const dd=Math.abs(a-i)*step; if(dd<4) c=Math.max(c,1-dd/4*0.4); } // in der Nähe eines Ankers vertrauen
+    conf[i]=c; }
+  sm.conf=conf; return sm; }
+let TRK_REL=true, TRK_STATIC=true; // Bahn-Stücke ohne verlässlichen Bezug ausblenden
 function tracksBuild(){ if(!GH.S||!GH.S.length||!GH.S.some(s=>s.ma)) { GH.trk=null; return; } const seeds=GH.seeds||{};
-  GH.trk={a:trackViterbi(GH.S,'ma',GH.W0,seeds.a),b:trackViterbi(GH.S,'mb',GH.W0,seeds.b)}; TGD.f=-1; }
+  GH.trk={a:trackViterbi(GH.S,'ma',GH.W0,seeds.a),b:trackViterbi(GH.S,'mb',GH.W0,seeds.b)}; GH.trkAl={a:trkAlpha(GH.trk.a,GH.S,GH.W0),b:trkAlpha(GH.trk.b,GH.S,GH.W0)}; for(const k of ['a','b']){ const C=GH.trk[k].conf; if(C) for(let i=0;i<C.length;i++){ const c=C[i]; GH.trkAl[k][i]=Math.min(GH.trkAl[k][i],c<0.35?0:Math.min(1,(c-0.35)/0.35)); } } TGD.f=-1; }
+// Deckkraft je Bild: bei Sprüngen und am Rand von Lücken sanft aus- und wieder einblenden, statt quer übers Bild zu gleiten
+function trkAlpha(T,S,W){ const N=T?T.length:0, al=new Float32Array(N); if(!N) return al; const bad=new Uint8Array(N);
+  for(let i=0;i<N;i++){ if(!T[i]){ bad[i]=1; continue; } if(i&&T[i-1]){ const q=S[i].q||[1,0,0,0,1,0], pp=affApply(q,T[i-1][0],T[i-1][1]); if(Math.hypot(T[i][0]-pp[0],T[i][1]-pp[1])>W*0.08){ bad[i]=1; bad[i-1]=Math.max(bad[i-1],2); } } }
+  const R=3; for(let i=0;i<N;i++){ if(!T[i]){ al[i]=0; continue; } let d=R; for(let k=0;k<R&&d===R;k++){ if((i-k>=0&&bad[i-k]===1&&!T[i-k])||(i+k<N&&bad[i+k]===1&&!T[i+k])) d=k; if((i-k>=0&&bad[i-k]&&T[i-k]&&k>0)||(i+k<N&&bad[i+k]&&T[i+k]&&k>0)) d=Math.min(d,k); } if(bad[i]&&T[i]) d=0; al[i]=Math.min(1,d/R); }
+  return al; }
+function alphaAt(A,step,e){ if(!A||!A.length) return 1; const x=e/step, i=clamp(Math.floor(x),0,A.length-1), j=Math.min(A.length-1,i+1), f=clamp(x-i,0,1); return A[i]+(A[j]-A[i])*f; }
 function trackAt(T,step,e){ if(!T) return null; const x=e/step, i=Math.floor(x), f=x-i, a=T[i], b=T[i+1]; if(a&&b) return [a[0]+(b[0]-a[0])*f,a[1]+(b[1]-a[1])*f]; if(a&&f<0.5) return a; if(b&&f>=0.5) return b; return null; }
 function ghostGap(){
   const S=GH.S; let Gm=[1,0,0,0,1,0]; const PA=[],PB=[];
@@ -3573,19 +3617,20 @@ function ovDrawB(x,ox,oy,w,h){ // B ausgerichtet über ein A-Bild der Grösse w�
   else { const k=w/A.v.videoWidth, M=OV.T; x.setTransform(k*M[0],k*M[3],k*M[1],k*M[4],k*M[2]+ox,k*M[5]+oy); x.drawImage(B.v,0,0,B.v.videoWidth,B.v.videoHeight); }
   x.restore(); x.save(); x.beginPath(); x.rect(ox,oy,w,h); x.clip(); layerDraw(x,ox,oy,w); x.restore(); tagsDrawTo(x,ox,oy,w,h); }
 function tagsDrawTo(x,ox,oy,w,h){ // Namens-Pillen ins exportierte Bild zeichnen
+  if(EXP.live&&EXP.opt&&EXP.opt.names===false) return;
   if(!$('#viewCmp').classList.contains('ov-names')) return;
-  const its=[{col:'#3e8bff',n:lastName(A.clip),T:GH.trk&&GH.trk.a,st:GH.step,t0:GH.t0,W0:GH.W0,h0:GH.hA,e1:GH.eEnd}];
-  if(B.clip&&ovFollowOK()) its.push({col:'#f08a3c',n:lastName(B.clip),T:GH.trk&&GH.trk.b,st:GH.step,t0:GH.t0,W0:GH.W0,h0:GH.hA,e1:GH.eEnd});
+  const its=[{col:'#3e8bff',n:lastName(A.clip),T:GH.trk&&GH.trk.a,AL:GH.trkAl&&GH.trkAl.a,st:GH.step,t0:GH.t0,W0:GH.W0,h0:GH.hA,e1:GH.eEnd}];
+  if(B.clip&&ovFollowOK()) its.push({col:'#f08a3c',n:lastName(B.clip),T:GH.trk&&GH.trk.b,AL:GH.trkAl&&GH.trkAl.b,st:GH.step,t0:GH.t0,W0:GH.W0,h0:GH.hA,e1:GH.eEnd});
   LAY.forEach(L=>its.push({col:L.col,n:L.name,T:L.trkB,st:L.step,t0:L.t0,W0:L.W0,h0:L.hA,e1:L.eEnd}));
   const k=w/1100, fs=Math.max(11,Math.round(13*k)), ph=Math.round(fs*1.75), rr=Math.max(5,w*0.016), placed=[];
   x.save(); x.font=`650 ${fs}px Geist,-apple-system,Segoe UI,Roboto,Arial,sans-serif`; x.textBaseline='middle';
-  for(const it of its){ const e=A.v.currentTime-it.t0; if(!it.T||e<0||e>it.e1) continue; const q=trackAt(it.T,it.st,e); if(!q) continue;
+  for(const it of its){ const e=A.v.currentTime-it.t0; if(!it.T||e<0||e>it.e1) continue; const q=trackAt(it.T,it.st,e); if(!q) continue; const ga=it.AL?alphaAt(it.AL,it.st,e):1; if(ga<0.05) continue;
     const px=ox+q[0]/it.W0*w, py=oy+q[1]/it.h0*h, tw=x.measureText(it.n).width+fs*2.1;
     let bx=clamp(px-tw/2,ox+4,ox+w-tw-4), by=Math.max(oy+4,py-rr-12*k-ph);
-    for(const p of placed) if(bx<p.x+p.w+4&&bx+tw+4>p.x&&by<p.y+p.h+3&&by+ph+3>p.y) by=p.y-ph-4;
-    placed.push({x:bx,y:by,w:tw,h:ph});
-    x.strokeStyle=it.col; x.globalAlpha=0.85; x.lineWidth=Math.max(1.2,1.4*k); x.beginPath(); x.moveTo(clamp(px,bx+6,bx+tw-6),by+ph); x.lineTo(px,py-rr*0.55); x.stroke();
-    x.globalAlpha=1; x.fillStyle='rgba(12,15,20,.55)'; x.beginPath(); (x.roundRect?x.roundRect(bx,by,tw,ph,ph/2):x.rect(bx,by,tw,ph)); x.fill();
+    for(const p of placed) if(bx<p.x+p.w+4&&bx+tw+4>p.x&&by<p.y+p.h+3&&by+ph+3>p.y){ const right=px>=p.px, xr=p.x+p.w+6, xl=p.x-tw-6; if((right||xl<ox+4)&&xr+tw<=ox+w-4) bx=xr; else if(xl>=ox+4) bx=xl; else { by=p.y-ph-4; continue; } by=p.y-Math.round(ph*0.35); }
+    placed.push({x:bx,y:by,w:tw,h:ph,px});
+    x.strokeStyle=it.col; x.globalAlpha=0.85*ga; x.lineWidth=Math.max(1.2,1.4*k); x.beginPath(); x.moveTo(clamp(px,bx+6,bx+tw-6),by+ph); x.lineTo(px,py-rr*0.55); x.stroke();
+    x.globalAlpha=ga; x.fillStyle='rgba(12,15,20,.55)'; x.beginPath(); (x.roundRect?x.roundRect(bx,by,tw,ph,ph/2):x.rect(bx,by,tw,ph)); x.fill();
     x.fillStyle=it.col; x.beginPath(); x.arc(bx+fs*0.8,by+ph/2,fs*0.27,0,7); x.fill();
     x.fillStyle='#fff'; x.textAlign='left'; x.fillText(it.n,bx+fs*1.3,by+ph/2+0.5); }
   x.restore(); }
@@ -3619,7 +3664,10 @@ function ovTags(on){
   for(const it of items){ const S0=TAGS.st[it.k]||(TAGS.st[it.k]={vis:false}), el=els[it.k];
     let uv=null; { const L=it.L, e=L?ovTA()-L.t0:ovE(), T=L?L.trkB:(GH.trk&&GH.trk[it.k]), st=L?L.step:GH.step, W0=L?L.W0:GH.W0, h0=L?L.hA:GH.hA;
       if(T&&e>=0&&e<=(L?L.eEnd:GH.eEnd)){ const q=trackAt(T,st,e); if(q) uv=[q[0]/W0,q[1]/h0]; } }
-    if(!uv){ S0.vis=false; el.classList.remove('on'); if(lines[it.k]) lines[it.k].style.opacity=0; continue; }
+    let alv=1; if(!it.L&&GH.trkAl&&GH.trkAl[it.k]) alv=alphaAt(GH.trkAl[it.k],GH.step,ovE());
+    if(uv&&alv<0.15){ uv=null; }
+    if(!uv){ S0.vis=false; el.classList.remove('on'); el.style.opacity=''; if(lines[it.k]) lines[it.k].style.opacity=0; continue; }
+    S0.al=alv;
     if(el.classList.contains('drag')){ out.push({it,el,S0,w:el.offsetWidth,h:el.offsetHeight,x:S0.px,y:S0.py,fixed:1}); continue; }
     S0.uv=uv; const t=toS(uv);
     // ruhige Feder: kleine Bewegungen ignorieren, grössere weich nachziehen
@@ -3632,13 +3680,15 @@ function ovTags(on){
     const w=el.offsetWidth||60, h=el.offsetHeight||18; out.push({it,el,S0,w,h,x:clamp(S0.lx-w/2,SX+4,SX+SW-w-4),y:Math.max(SY+4,Math.min(S0.ly,S0.ay)-rr-gapL-h-6)}); }
   // überlappende Pillen nach oben staffeln (immer oberhalb der Athlet:innen)
   out.sort((p,q)=>p.it.k<q.it.k?-1:1); // feste Reihenfolge – Pillen tauschen beim Kreuzen nicht die Plätze
-  for(let i=0;i<out.length;i++){ const p=out[i]; for(let j=0;j<i;j++){ const q=out[j]; if(p.x<q.x+q.w+4&&p.x+p.w+4>q.x&&p.y<q.y+q.h+3&&p.y+p.h+3>q.y){ const up=q.y-p.h-4; if(up>=SY+4) p.y=up; else p.x=q.x+q.w/2<p.x+p.w/2?q.x+q.w+6:q.x-p.w-6; } } }
+  for(let i=0;i<out.length;i++){ const p=out[i]; for(let j=0;j<i;j++){ const q=out[j]; if(p.x<q.x+q.w+4&&p.x+p.w+4>q.x&&p.y<q.y+q.h+3&&p.y+p.h+3>q.y){ // nah beieinander: leicht seitlich versetzt statt übereinander
+      const right=(p.S0.ax||0)>=(q.S0.ax||0), xr=q.x+q.w+6, xl=q.x-p.w-6, okR=xr+p.w<=SX+SW-4, okL=xl>=SX+4;
+      if(right?okR:!okL&&okR){ p.x=xr; } else if(okL){ p.x=xl; } else { const up=q.y-p.h-4; if(up>=SY+4) p.y=up; continue; } p.y=q.y-Math.round(p.h*0.35); } } }
   for(const p of out){ const S0=p.S0;
     if(p.fixed){ continue; }
     if(!S0.vis||S0.px==null){ S0.px=p.x; S0.py=p.y; } else { const dx=p.x-S0.px, dy=p.y-S0.py; S0.px+=dx*0.25; S0.py+=dy*0.25; }
-    S0.vis=true; p.el.style.transform=`translate(${S0.px.toFixed(1)}px,${S0.py.toFixed(1)}px)`; p.el.classList.add('on');
+    S0.vis=true; p.el.style.transform=`translate(${S0.px.toFixed(1)}px,${S0.py.toFixed(1)}px)`; p.el.classList.add('on'); p.el.style.opacity=(0.9*(S0.al==null?1:S0.al)).toFixed(2);
     const ln=lines[p.it.k]; if(ln){ const x1=clamp(S0.ax,S0.px+6,S0.px+p.w-6), y1=S0.py+p.h, y2=S0.ay-rr*0.55;
-      ln.setAttribute('x1',x1.toFixed(1)); ln.setAttribute('y1',y1.toFixed(1)); ln.setAttribute('x2',S0.ax.toFixed(1)); ln.setAttribute('y2',Math.max(y1,y2).toFixed(1)); ln.style.opacity=y2-y1>2?0.75:0; ln.style.stroke=p.it.col; } } }
+      ln.setAttribute('x1',x1.toFixed(1)); ln.setAttribute('y1',y1.toFixed(1)); ln.setAttribute('x2',S0.ax.toFixed(1)); ln.setAttribute('y2',Math.max(y1,y2).toFixed(1)); ln.style.opacity=y2-y1>2?(0.75*(S0.al==null?1:S0.al)).toFixed(2):0; ln.style.stroke=p.it.col; } } }
 /* Verfolgung: Vorhersage aus Tempo/Richtung, nur Treffer im engen Fenster um die Vorhersage (Rutscher & Zuschauer fallen weg) */
 const TGD={a:document.createElement('canvas'),b:document.createElement('canvas'),t:0,f:-1};
 const TRK={}; TAGS.live={}; TAGS.path={}; TAGS.seed=null;
@@ -4590,6 +4640,8 @@ function openExport(){
   $('#expRange').innerHTML=opts.map(o=>`<button data-er="${o[0]}" class="${o[0]===EXP.range?'on':''}">${o[1]}</button>`).join('');
   $$('#expRate button').forEach(b=>b.classList.toggle('on',+b.dataset.r===EXP.rate));
   $('#expNotesRow').hidden=!(mode==='single');
+  $('#expAnnRow').hidden=!ds.some(d=>d.clip&&d.clip.anns&&d.clip.anns.length); // nur zeigen, wenn es Zeichnungen gibt
+  const ovN=mode==='cmp'&&$('#viewCmp').classList.contains('overlay')&&$('#viewCmp').classList.contains('ov-names'); $('#expNamesRow').hidden=!ovN; if(ovN) $('#expNames').checked=LS.get('expNames',true);
   $('#expGps').hidden=mode!=='gps';
   $('#expProg').hidden=true; $('#expGo').disabled=false; $('#expGo').textContent='Exportieren';
   expSummary(); $('#expModal').classList.add('on');
@@ -4618,7 +4670,7 @@ async function startExport(){
   if(EXP.live) return;
   if(typeof MediaRecorder==='undefined'||!HTMLCanvasElement.prototype.captureStream){ toast('Export wird in diesem Browser nicht unterstützt (Chrome oder Edge verwenden).',4000); return; }
   const ds=expDecks(), D=ds[0], r=expRangeFrames(); if(r.b<=r.a){ toast('Ausschnitt ist zu kurz.'); return; }
-  const opt={ann:$('#expAnn').checked,info:$('#expInfo').checked,notes:$('#expNotes').checked,gps:$('#expGpsOv').checked};
+  const opt={names:$('#expNames').checked,ann:$('#expAnn').checked,info:$('#expInfo').checked,notes:$('#expNotes').checked,gps:$('#expGpsOv').checked};
   // Leinwand
   const vw=d=>d.v.videoWidth, vh=d=>d.v.videoHeight;
   let H=Math.min(1080,Math.max(...ds.map(vh))); if(ds.length>1) H=Math.min(H,720);
@@ -4715,6 +4767,7 @@ $('#expModal').addEventListener('click',e=>{ if(e.target.id==='expModal'&&!EXP.l
 $('#expRange').addEventListener('click',e=>{ const b=e.target.closest('[data-er]'); if(!b||EXP.live) return; EXP.range=b.dataset.er; $$('#expRange button').forEach(x=>x.classList.toggle('on',x===b)); expSummary(); });
 $('#expRate').addEventListener('click',e=>{ const b=e.target.closest('[data-r]'); if(!b||EXP.live) return; EXP.rate=+b.dataset.r; $$('#expRate button').forEach(x=>x.classList.toggle('on',x===b)); expSummary(); });
 $('#expDur').addEventListener('input',e=>{ const v=parseFloat(e.target.value); if(v>0){ EXP.dur=v; expSummary(); } });
+$('#expNames').addEventListener('change',e=>LS.set('expNames',e.target.checked));
 $('#expGo').addEventListener('click',()=>{ if(EXP.live){ EXP.cancel=true; return; } dirPrep((expDecks()[0]||{}).clip); startExport(); });
 
 /* =========================================================
@@ -5254,7 +5307,7 @@ if(!LS.get('hint1',0)){ setTimeout(()=>{ toast(matchMedia('(pointer:coarse)').ma
 
 /* Update-Hinweis: prüft version.json auf GitHub Pages; «Aktualisieren» lädt die Seite ohne Cache neu */
 (()=>{
-  const BUILD='20261028161754'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
+  const BUILD='20261028195238'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
   // nach einem Update die ?v=… aus der Adresse entfernen
   try{ const u=new URL(location.href); if(u.searchParams.has('v')){ u.searchParams.delete('v'); history.replaceState(null,'',u.pathname+(u.search||'')+u.hash); } }catch(e){}
   const el=$('#upd'); let latest=null, snoozed=null, busy=false;
