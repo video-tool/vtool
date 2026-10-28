@@ -1,0 +1,16 @@
+# macOS
+.DS_Store
+
+# Original-Videos (zu gross für GitHub) – verkleinerte Fassungen liegen als *_camGH_*.mp4 daneben
+demo/blanc sg camGH1 cortina 260212 .MP4
+demo/brignone sg camGH1 cortina 260212.MP4
+demo/schmitt sg camGH1 cortina 260212.MP4
+demo/curtoni camgh.MP4
+demo/delago na camgh.MP4
+demo/durrer camgh.MP4
+demo/ming camgh.MP4
+# alte Zwischennamen (ersetzt durch *_wc_dh_tr1_camGH_valdisere_251218.mp4)
+demo/curtoni_camGH_251218.mp4
+demo/delago_camGH_251218.mp4
+demo/durrer_camGH_251218.mp4
+demo/ming_camGH_251218.mp4
