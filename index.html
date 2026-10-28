@@ -1711,6 +1711,39 @@ body.no-hdr .gps-sel>label.ctl[for="gpsIn"]{height:40px!important;padding:0 12px
 .tim-pill em:empty{display:none}
 .tim-pill[data-res="win"] em{color:#34c77b}.tim-pill[data-res="lose"] em{color:#ff5a4a}
 .stage .osd-r{right:auto!important;left:12px}
+
+/* Aufnahme */
+.rec-btn svg circle:last-child{color:#ff4b3e}
+body.recording .rec-btn{background:#ff3b30!important;color:#fff!important;border-color:#ff3b30!important;animation:recPulse 1.4s ease-in-out infinite}
+body.recording .rec-btn svg circle:last-child{color:#fff}
+@keyframes recPulse{50%{box-shadow:0 0 0 6px rgba(255,59,48,.25)}}
+.rec-bar{position:fixed;left:50%;top:14px;z-index:9300;transform:translate(-50%,-140%);display:flex;align-items:center;gap:10px;padding:7px 8px 7px 14px;border-radius:999px;background:rgba(15,18,22,.92);color:#fff;
+  -webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);box-shadow:0 18px 40px -16px rgba(0,0,0,.7),0 0 0 1px rgba(255,59,48,.45);transition:transform .35s cubic-bezier(.22,1.2,.36,1);font:600 13px var(--font)}
+.rec-bar.on{transform:translate(-50%,0)}
+.rec-bar .rb-dot{width:10px;height:10px;border-radius:50%;background:#ff3b30;box-shadow:0 0 0 0 rgba(255,59,48,.6);animation:recDot 1.2s ease-in-out infinite}
+.rec-bar.paused .rb-dot{animation:none;background:#9aa3ae}
+@keyframes recDot{50%{box-shadow:0 0 0 7px rgba(255,59,48,0)}}
+.rec-bar b{letter-spacing:.12em;font-size:11.5px;color:#ff6b62}
+.rec-bar .rb-t{font:700 14px var(--mono);font-variant-numeric:tabular-nums;min-width:42px}
+.rec-bar .rb-lv{display:inline-flex;align-items:center;gap:6px;color:#cfd6df}
+.rec-bar .rb-lv svg{width:15px;height:15px}
+.rec-bar .rb-lv i{width:46px;height:5px;border-radius:3px;background:#34c77b;transform-origin:left;transform:scaleX(0);transition:transform .08s}
+.rec-bar button{height:32px;padding:0 12px;border-radius:999px;border:none;background:rgba(255,255,255,.1);color:#fff;font:600 12.5px var(--font);cursor:pointer}
+.rec-bar button:hover{background:rgba(255,255,255,.18)}
+.rec-bar button.pri{background:#ff3b30}
+.rec-count{position:fixed;inset:0;z-index:9290;display:grid;place-items:center;pointer-events:none;font:800 140px var(--font);color:#fff;text-shadow:0 10px 40px rgba(0,0,0,.5);opacity:0}
+.rec-count.on{animation:recCountA .65s ease-out both}
+@keyframes recCountA{0%{opacity:0;transform:scale(1.6)}30%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(.8)}}
+
+/* Dateiliste: Spalten */
+.ft-sub i{font-style:normal}
+.ft-sub i+i:not(:empty)::before{content:" · "}
+#sideTree.names .ft-row.file .ft-tx{display:grid!important;grid-template-columns:minmax(0,1fr) 68px 74px;align-items:baseline;column-gap:8px}
+#sideTree.names .ft-row.file .ft-sub{display:contents}
+#sideTree.names .ft-row.file .ft-sub i{font:500 10.5px var(--mono);color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#sideTree.names .ft-row.file .ft-sub i::before{content:none!important}
+#sideTree.names .ft-row.file .ft-sub .c1{text-align:right}
+#sideTree.names .ft-row.file .ft-nm{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
   .aurora{display:none}
@@ -1800,7 +1833,7 @@ body.no-hdr .gps-sel>label.ctl[for="gpsIn"]{height:40px!important;padding:0 12px
         <label class="ctl-lab fps-edit" title="Bilder pro Sekunde – wird beim Laden gemessen">fps <input class="num" id="sFps" type="number" min="1" max="1000" step="0.01"></label>
         <button class="ctl" data-act="sound" title="Ton ein / aus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5L6 9H2v6h4l5 4z"/><path class="snd-on" d="M15.5 8.5a5 5 0 0 1 0 7" hidden/><path class="snd-off" d="M16 9l5 6M21 9l-5 6"/></svg></button>
         <button class="ctl" data-act="shot" title="Standbild mit Zeichnungen als PNG speichern (p)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.6"/></svg></button>
-        <button class="ctl" data-act="export" title="Clip exportieren – z. B. Schwung in Zeitlupe (e)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg></button>
+        <button class="ctl rec-btn" data-act="rec" title="Aufnahme: alles, was du jetzt zeigst, zeichnest und sagst, als Video aufnehmen (r)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4" fill="currentColor" stroke="none"/></svg></button><button class="ctl" data-act="export" title="Clip exportieren – z. B. Schwung in Zeitlupe (e)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg></button>
         <button class="ctl" data-act="fs" title="Vollbild (f)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3M21 8V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3M16 21h3a2 2 0 0 0 2-2v-3"/></svg></button>
       </div></div>
     </div>
@@ -1838,7 +1871,7 @@ body.no-hdr .gps-sel>label.ctl[for="gpsIn"]{height:40px!important;padding:0 12px
         
         
         <button class="ctl" data-act="shot" title="Standbild mit GPS-Anzeigen speichern (p)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.6"/></svg></button>
-        <button class="ctl" data-act="export" title="Video mit GPS-Anzeigen exportieren (e)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg></button>
+        <button class="ctl rec-btn" data-act="rec" title="Aufnahme: alles, was du jetzt zeigst, zeichnest und sagst, als Video aufnehmen (r)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4" fill="currentColor" stroke="none"/></svg></button><button class="ctl" data-act="export" title="Video mit GPS-Anzeigen exportieren (e)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg></button>
         <button class="ctl" data-act="fs" title="Vollbild (f)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3M21 8V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3M16 21h3a2 2 0 0 0 2-2v-3"/></svg></button>
       </div></div>
     </div>
@@ -1854,7 +1887,7 @@ body.no-hdr .gps-sel>label.ctl[for="gpsIn"]{height:40px!important;padding:0 12px
         <button class="tut-open" id="cmpReset" title="Vergleich leeren: A und B entfernen, Sync und Overlay zurücksetzen (Videos bleiben unter «In Arbeit»)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/></svg><span>Zurücksetzen</span></button><button class="tut-open" id="tutBtn" title="Anleitung direkt im Tool – zeigt Schritt für Schritt mit den Beispiel-Läufen, wie es geht"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M10 8.5l5.5 3.5-5.5 3.5z" fill="currentColor"/></svg><span>Anleitung</span></button><div class="seg" id="layoutSeg"><button data-layout="side" class="on" title="Einzelvergleich: A und B nebeneinander"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="5" width="8.5" height="14" rx="2"/><rect x="13" y="5" width="8.5" height="14" rx="2"/></svg>Basic</button><button data-layout="overlay"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="13" height="11" rx="2"/><rect x="8" y="9" width="13" height="11" rx="2" fill="currentColor" fill-opacity=".25"/></svg>Overlay</button><button data-layout="ghost"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M5 20V10a7 7 0 0 1 14 0v10l-2.4-1.8L14.3 20 12 18.2 9.7 20l-2.3-1.8z"/><circle cx="9.5" cy="10.5" r=".9" fill="currentColor"/><circle cx="14.5" cy="10.5" r=".9" fill="currentColor"/></svg>Ghost</button></div>
         <button class="ctl ov-namebtn" id="ovNames" title="Namen im Bild ein / aus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12V5a2 2 0 0 1 2-2h7l9 9-9 9-9-9z"/><circle cx="8" cy="8" r="1.6"/></svg><span>Namen</span></button><label class="ctl-lab op-wrap">Deckkraft <input type="range" class="op" id="opRange" min="0.1" max="0.9" step="0.05" value="0.5"></label>
         <button class="ctl" data-act="shot" title="Standbild A | B als PNG speichern (p)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.6"/></svg></button>
-        <button class="ctl" data-act="export" title="Vergleich als Video exportieren (e)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg></button>
+        <button class="ctl rec-btn" data-act="rec" title="Aufnahme: alles, was du jetzt zeigst, zeichnest und sagst, als Video aufnehmen (r)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4" fill="currentColor" stroke="none"/></svg></button><button class="ctl" data-act="export" title="Vergleich als Video exportieren (e)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg></button>
         <button class="ctl" data-act="fs" title="Vollbild (f)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3M21 8V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3M16 21h3a2 2 0 0 0 2-2v-3"/></svg></button>
       </div>
     </div>
@@ -1998,6 +2031,7 @@ body.no-hdr .gps-sel>label.ctl[for="gpsIn"]{height:40px!important;padding:0 12px
         <dt><kbd>Alt</kbd>+<kbd>←</kbd><kbd>→</kbd></dt><dd>Nur B bewegen (nachführen)</dd>
         <dt>Overlay</dt><dd>1 Gemeinsamer Punkt (erstes Tor in beiden) · 2 je 2 gleiche Tore in A und B antippen – oder «Von Hand» und B von Hand schieben · 3 «Overlay erstellen» – B folgt dem Kameraschwenk. Export und Standbild speichern das Overlay.</dd>
         <dt>Korrigieren</dt><dd>Während «Overlay erstellen»: Pause · 1 s zurück · Korrigieren – die Berechnung läuft mit deiner Lage weiter. Im fertigen Overlay: anhalten → «Hier korrigieren». B ziehen, Rechtsklick ziehen (oder Ctrl/Alt + ziehen) = drehen, Mausrad = Grösse, Pfeiltasten = fein, Enter = übernehmen</dd>
+        <dt>Aufnahme</dt><dd>Rote Aufnahme-Taste oben (oder <kbd>r</kbd>): nach 3-2-1 wird alles aufgenommen, was du abspielst, scrubbst und zeichnest – mit deiner Stimme übers Mikrofon. Oben: Pause · Verwerfen · Stopp &amp; speichern (landet neben dem Video)</dd>
         <dt>Mehrere Läufe</dt><dd>Fertiges Overlay → «Lauf hinzufügen»: der Lauf bleibt im Bild, bei B den nächsten wählen und ausrichten (bis 4 Läufe). × am Lauf-Chip entfernt ihn</dd>
         <dt>Namen</dt><dd>Knopf «Namen» oben: blasse Namens-Pillen folgen den Fahrer:innen im Overlay</dd>
         <dt>Gespeichert</dt><dd>Fertige Overlays und Ghosts werden gemerkt (im Browser und als Begleitdatei im Ordner von A) – beim nächsten Öffnen der gleichen Videos sofort da</dd>
@@ -3675,6 +3709,59 @@ function timDrawTo(x,d,ox,oy,w,h){ if(!(TIM.on&&G.linked&&!$('#viewCmp').classLi
   x.textBaseline='middle'; x.fillStyle='#fff'; x.fillText(r.txt,bx+fs*0.65,by+ph/2+1);
   if(dl){ x.fillStyle=dl[0]==='−'?'#34c77b':'#ff5a4a'; x.fillText(dl,bx+fs*0.65+tw+fs*0.8,by+ph/2+1); } x.restore(); }
 setInterval(()=>{ if(TIM.on) timUI(); },120);
+
+/* ---------- Aufnahme-Modus: Bild (inkl. Zeichnungen, Overlay, Namen, Zeit) + Stimme als Video ---------- */
+const REC={on:false};
+function recDecks(){ if(mode==='single') return [S]; if(mode==='gps') return [GD]; return $('#viewCmp').classList.contains('overlay')?[A]:[A,B]; }
+function recDrawDeck(x,d,ox,oy,W,H){ const st=d.stage, sw=st.clientWidth, sh=st.clientHeight; if(!sw||!sh) return; const R0=d.rect(), k=Math.min(W/R0.w,H/R0.h), dx=ox+(W-R0.w*k)/2-R0.x*k, dy=oy+(H-R0.h*k)/2-R0.y*k; // Bildausschnitt = Video
+  x.save(); x.beginPath(); x.rect(ox,oy,W,H); x.clip(); x.fillStyle='#0a0c0f'; x.fillRect(ox,oy,W,H);
+  const z=d.z||{x:0,y:0,s:1}, R=d.rect(); x.translate(dx,dy); x.scale(k,k); x.translate(z.x,z.y); x.scale(z.s,z.s);
+  if(d.ready){ drawVid(x,d,R.x,R.y,R.w,R.h);
+    for(const q of ['canvas.ovlay','canvas.ovb','canvas.ovlive','canvas.ghost']){ const c=$(q,st); if(c&&!c.hidden&&c.width&&c.offsetParent!==null) x.drawImage(c,R.x,R.y,R.w,R.h); }
+    if(d.ann&&d.ann.width) x.drawImage(d.ann,0,0,sw,sh); }
+  x.restore();
+  const g=$('canvas.gpsov',st); if(g&&!g.hidden&&g.width) x.drawImage(g,dx,dy,sw*k,sh*k);
+  if(d.ready){ const vx=dx+(z.x+R.x*z.s)*k, vy=dy+(z.y+R.y*z.s)*k, vw=R.w*z.s*k, vh=R.h*z.s*k;
+    if(mode==='cmp'&&d===A&&$('#viewCmp').classList.contains('overlay')&&typeof tagsDrawTo==='function') tagsDrawTo(x,vx,vy,vw,vh);
+    if(mode==='cmp'&&typeof timDrawTo==='function') timDrawTo(x,d,vx,vy,vw,vh); } }
+async function recStart(){
+  const ds=recDecks(); if(ds.some(d=>!d.ready)){ toast(mode==='cmp'?'Zuerst Video A und B wählen.':'Zuerst ein Video öffnen.'); return; }
+  if(typeof MediaRecorder==='undefined'||!HTMLCanvasElement.prototype.captureStream){ toast('Aufnahme wird in diesem Browser nicht unterstützt.',3500); return; }
+  let mic=null; try{ mic=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true,autoGainControl:true}}); }catch(e){ toast('Kein Mikrofon-Zugriff – Aufnahme läuft ohne Ton.',3500); }
+  const H=ds.length>1?720:1080, asp=ds.map(d=>{ const r=d.rect(); return r.w/Math.max(1,r.h); }), gap=ds.length>1?12:0;
+  const ws=asp.map(a=>Math.round(H*a)&~1), W=(ws.reduce((a,b)=>a+b,0)+gap)&~1, cv=document.createElement('canvas'); cv.width=W; cv.height=H; const x=cv.getContext('2d');
+  const vs=cv.captureStream(30), tracks=[...vs.getVideoTracks()]; let ac=null, an=null;
+  if(mic){ tracks.push(...mic.getAudioTracks()); try{ ac=new (window.AudioContext||window.webkitAudioContext)(); an=ac.createAnalyser(); an.fftSize=512; ac.createMediaStreamSource(mic).connect(an); }catch(e){} }
+  const types=['video/mp4;codecs=avc1.640028,mp4a.40.2','video/mp4;codecs=avc1,mp4a.40.2','video/mp4;codecs=avc1.42E01E,mp4a.40.2','video/mp4;codecs=avc1,opus','video/webm;codecs=vp9,opus','video/webm;codecs=vp8,opus','video/mp4','video/webm'];
+  const mime=types.find(t=>MediaRecorder.isTypeSupported&&MediaRecorder.isTypeSupported(t))||'';
+  const rec=new MediaRecorder(new MediaStream(tracks),mime?{mimeType:mime,videoBitsPerSecond:W*H>1.5e6?12e6:8e6,audioBitsPerSecond:128000}:{}), chunks=[];
+  rec.ondataavailable=e=>{ if(e.data&&e.data.size) chunks.push(e.data); };
+  Object.assign(REC,{on:true,cv,x,W,H,ws,gap,ds,rec,chunks,mic,ac,an,t0:0,paused:false,mime,clip:ds[0].clip});
+  document.body.classList.add('recording'); recBar(true);
+  for(const n of [3,2,1]){ recCount(n); await new Promise(r=>setTimeout(r,650)); if(!REC.on) return; } recCount(0);
+  REC.t0=performance.now(); REC.acc=0; rec.start(500); recLoop(); }
+function recLoop(){ if(!REC.on) return; const {x,W,H,ws,gap}=REC; x.fillStyle='#0a0c0f'; x.fillRect(0,0,W,H); let ox=0;
+  const ds=recDecks(); ds.forEach((d,i)=>{ const w=ws[i]||ws[0]; recDrawDeck(x,d,ox,0,w,H); if(ds.length>1){ const k=H/540; x.fillStyle=i?'#e67e22':'#2f6fd0'; x.beginPath(); (x.roundRect?x.roundRect(ox+12*k,H-38*k,24*k,24*k,6*k):x.rect(ox+12*k,H-38*k,24*k,24*k)); x.fill(); x.fillStyle='#fff'; x.font=`800 ${14*k}px Geist,-apple-system,Arial,sans-serif`; x.textAlign='center'; x.textBaseline='middle'; x.fillText(i?'B':'A',ox+24*k,H-26*k); } ox+=w+gap; });
+  const el=REC.paused?REC.acc:REC.acc+(performance.now()-REC.t0); const t=$('#recBar .rb-t'); if(t){ const s=Math.floor(el/1000); t.textContent=Math.floor(s/60)+':'+String(s%60).padStart(2,'0'); }
+  if(REC.an){ const a=new Uint8Array(REC.an.fftSize); REC.an.getByteTimeDomainData(a); let m=0; for(const v of a) m=Math.max(m,Math.abs(v-128)); const lv=$('#recBar .rb-lv i'); if(lv) lv.style.transform='scaleX('+Math.min(1,m/70).toFixed(2)+')'; }
+  requestAnimationFrame(recLoop); }
+function recPause(){ if(!REC.on||!REC.rec||REC.rec.state==='inactive') return; if(REC.paused){ REC.rec.resume(); REC.t0=performance.now(); REC.paused=false; } else { REC.rec.pause(); REC.acc+=performance.now()-REC.t0; REC.paused=true; } recBar(true); }
+function recStop(save=true){ if(!REC.on) return; const R0=REC; REC.on=false; document.body.classList.remove('recording'); recBar(false); recCount(0);
+  const done=()=>{ try{ R0.mic&&R0.mic.getTracks().forEach(t=>t.stop()); R0.ac&&R0.ac.close(); }catch(e){} };
+  if(!R0.rec||R0.rec.state==='inactive'){ done(); return; }
+  R0.rec.onstop=()=>{ done(); if(!save){ toast('Aufnahme verworfen.'); return; } const type=R0.rec.mimeType||R0.mime||'video/webm', ext=type.includes('mp4')?'mp4':'webm', bl=new Blob(R0.chunks,{type});
+    const d=new Date(), stamp=d.getFullYear().toString().slice(2)+String(d.getMonth()+1).padStart(2,'0')+String(d.getDate()).padStart(2,'0')+'_'+String(d.getHours()).padStart(2,'0')+String(d.getMinutes()).padStart(2,'0');
+    const nm=base(R0.clip.name)+(R0.ds.length>1&&B.clip?'_vs_'+base(B.clip.name):'')+'_Analyse_'+stamp+'.'+ext; saveOut(bl,nm,R0.clip,'Aufnahme'); };
+  try{ R0.rec.stop(); }catch(e){ done(); } }
+function recBar(on){ let b=$('#recBar'); if(!b){ b=document.createElement('div'); b.id='recBar'; b.className='rec-bar';
+    b.innerHTML='<span class="rb-dot"></span><b>REC</b><span class="rb-t">0:00</span><span class="rb-lv" title="Mikrofon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg><i></i></span><button data-rb="pause">Pause</button><button data-rb="x" title="Verwerfen">Verwerfen</button><button data-rb="stop" class="pri">Stopp &amp; speichern</button>';
+    document.body.appendChild(b); b.addEventListener('click',e=>{ const t=e.target.closest('[data-rb]'); if(!t) return; const a=t.dataset.rb; if(a==='pause') recPause(); else if(a==='stop') recStop(true); else recStop(false); }); }
+  b.classList.toggle('on',on); b.classList.toggle('paused',!!REC.paused); $('[data-rb="pause"]',b).textContent=REC.paused?'Weiter':'Pause'; $('.rb-lv',b).hidden=!REC.an; }
+function recCount(n){ let c=$('#recCount'); if(!c){ c=document.createElement('div'); c.id='recCount'; c.className='rec-count'; document.body.appendChild(c); } c.textContent=n||''; c.classList.toggle('on',!!n); if(n){ c.style.animation='none'; void c.offsetWidth; c.style.animation=''; } }
+document.addEventListener('click',e=>{ const b=e.target.closest('[data-act="rec"]'); if(!b) return; e.preventDefault(); REC.on?recStop(true):recStart(); });
+document.addEventListener('keydown',e=>{ if(e.key!=='r'||e.metaKey||e.ctrlKey||e.altKey||/INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName)) return; e.preventDefault(); REC.on?recStop(true):recStart(); });
+
+function subCols(el,parts){ el.textContent=''; parts.forEach((t,i)=>{ const x=document.createElement('i'); x.className='c'+i; x.textContent=t||''; el.appendChild(x); }); }
 function cmpReset(){
   A.pause(); B.pause(); G.playing=false;
   A.setClip(null); B.setClip(null); unlink(); G.off=0; G.syncA=0;
@@ -4542,7 +4629,7 @@ function ftRender(){
       r.innerHTML=(isV?`<span class="ft-th${th?' has':''}" data-tid="${n.id}" style="${th?`background-image:url(${th})`:''}"><i>${n.dur?fmtDur(n.dur):''}</i></span>`:`<span class="ft-ic gps">${ICN.gps}</span>`)
         +`<span class="ft-tx"><span class="ft-nm"></span><span class="ft-sub"></span></span>`
         +`<span class="ft-acts">${mode==='cmp'&&isV?'<button data-a="a" class="ab-a" title="Als Video A">A</button><button data-a="b" class="ab-b" title="Als Video B">B</button>':''}${n.ro?'':`<button data-a="label" title="Beschriften / umbenennen">${ICN.tag}</button><button data-a="move" title="Verschieben">${ICN.move}</button>`}</span>`;
-      $('.ft-nm',r).textContent=ttl; $('.ft-sub',r).textContent=sub; r.title=n.name+(n.size?' · '+fmtMB(n.size):'');
+      $('.ft-nm',r).textContent=ttl; if(m&&m.ok) subCols($('.ft-sub',r),[m.run,m.date]); else $('.ft-sub',r).textContent=sub; r.title=n.name+(n.size?' · '+fmtMB(n.size):'');
       if(isV&&!th) ftThumb(n);
     }
     el.appendChild(r);
@@ -4563,7 +4650,7 @@ function renderDemoList(){
     r.innerHTML=`<span class="ft-th${c.poster?' has':''}" style="${c.poster?`background-image:url(${c.poster})`:''}"><i>${c.dur?fmtDur(c.dur):''}</i></span>`
       +`<span class="ft-tx"><span class="ft-nm"></span><span class="ft-sub"></span></span>`
       +(mode==='cmp'?`<span class="ab-tags">${A.clip===c?'<em class="ta">A</em>':''}${B.clip===c?'<em class="tb">B</em>':''}</span><span class="ft-acts"><button data-a="a" class="ab-a" title="Als Video A">A</button><button data-a="b" class="ab-b" title="Als Video B">B</button></span>`:'');
-    $('.ft-nm',r).textContent=m.athlete||c.name; $('.ft-sub',r).textContent=[m.run,m.date].filter(Boolean).join(' · ');
+    $('.ft-nm',r).textContent=m.athlete||c.name; subCols($('.ft-sub',r),[m.run,m.date]);
     const g=(m.place||'')+'|'+(m.disc||'')+'|'+(m.date||''); if(g!==grp){ grp=g; const h=document.createElement('div'); h.className='ft-demo-h'; const yr=m.date?m.date.slice(-4):'';
       h.innerHTML='<b>'+(grp===((ds[0].meta.place||'')+'|'+(ds[0].meta.disc||'')+'|'+(ds[0].meta.date||''))?'Beispiel-Läufe':'')+'</b><span></span>'; $('span',h).textContent=[m.place,yr].filter(Boolean).join(' ')+' · '+(DISC_LONG[m.disc]||m.disc||'')+(m.cam?' · '+m.cam:''); if(!$('b',h).textContent) $('b',h).remove(); el.appendChild(h); }
     el.appendChild(r); });
@@ -4724,7 +4811,7 @@ if(!LS.get('hint1',0)){ setTimeout(()=>{ toast(matchMedia('(pointer:coarse)').ma
 
 /* Update-Hinweis: prüft version.json auf GitHub Pages; «Aktualisieren» lädt die Seite ohne Cache neu */
 (()=>{
-  const BUILD='20261028072728'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
+  const BUILD='20261028073910'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
   // nach einem Update die ?v=… aus der Adresse entfernen
   try{ const u=new URL(location.href); if(u.searchParams.has('v')){ u.searchParams.delete('v'); history.replaceState(null,'',u.pathname+(u.search||'')+u.hash); } }catch(e){}
   const el=$('#upd'); let latest=null, snoozed=null, busy=false;
