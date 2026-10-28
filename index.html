@@ -1744,6 +1744,19 @@ body.recording .rec-btn svg circle:last-child{color:#fff}
 #sideTree.names .ft-row.file .ft-sub i::before{content:none!important}
 #sideTree.names .ft-row.file .ft-sub .c1{text-align:right}
 #sideTree.names .ft-row.file .ft-nm{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+.sbs-btn{gap:6px;padding:0 11px!important}
+@media (max-width:1100px){ .sbs-btn span{display:none} .sbs-btn{padding:0!important;width:36px} }
+
+/* Loop entfernt */
+#viewSingle [data-act="in"],#viewSingle [data-act="out"],#viewSingle [data-act="loop"],.pill.lp{display:none!important}
+.strobo-btn svg{width:18px;height:18px}
+/* Dateien: Suche immer sichtbar */
+#sideTree #ftTools{display:flex!important}
+#sideTree #ftTools .ft-addmini{display:none}
+#sideTree.has-roots #ftTools .ft-addmini{display:grid}
+
+.ft-none{padding:14px 10px;font-size:12px;color:var(--muted);text-align:center}
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
   .aurora{display:none}
@@ -1761,7 +1774,7 @@ body.recording .rec-btn svg circle:last-child{color:#fff}
       </div>
     </div>
     <nav class="tabs" role="tablist">
-      <button class="tab on" data-mode="single" role="tab" id="tabSingle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="5" width="19" height="14" rx="2.5"/><path d="M10 9.5v5l4.5-2.5z"/></svg>Einzelvideo</button>
+      <button class="tab on" data-mode="single" role="tab" id="tabSingle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="5" width="19" height="14" rx="2.5"/><path d="M10 9.5v5l4.5-2.5z"/></svg>Basic</button>
       <button class="tab" data-mode="cmp" role="tab" id="tabCmp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="9" height="12" rx="2"/><rect x="13" y="6" width="9" height="12" rx="2"/></svg>Analyse</button>
       <button class="tab" data-mode="gps" role="tab" id="tabGps"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.2 7-11.5A7 7 0 0 0 5 9.5C5 14.8 12 21 12 21z"/><path d="M8.5 10.5l2.2-2 1.8 2.6 3-3.6"/></svg>GPS<span class="dev-tag" title="Ist in Entwicklung">Beta</span></button>
     </nav>
@@ -1781,7 +1794,7 @@ body.recording .rec-btn svg circle:last-child{color:#fff}
     <div id="sideTree" class="side-pane">
       <div class="side-hrow"><p class="side-hint">Deine Ordner auf dem Gerät – Änderungen gelten für die echten Dateien.</p><div class="lib-view" id="ftView" role="group" aria-label="Ansicht"><button data-fv="thumbs" title="Mit Vorschaubild"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="7" height="5" rx="1.2"/><rect x="3" y="14" width="7" height="5" rx="1.2"/><path d="M13 7h8M13 16h8"/></svg></button><button data-fv="names" title="Nur Dateinamen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button></div></div>
       <div class="ft-tools" id="ftTools" hidden>
-        <div class="lib-search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><input id="ftQ" type="search" placeholder="Suchen in Ordnern …" autocomplete="off"></div>
+        <div class="lib-search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><input id="ftQ" type="search" placeholder="Suchen: Name, Ort, Disziplin, Datum …" autocomplete="off"></div>
         <button class="ft-addmini" id="ftAdd" title="Weiteren Ordner verbinden"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"><path d="M12 6v12M6 12h12"/></svg></button>
       </div>
       <div class="ftree" id="ftree"></div>
@@ -1809,7 +1822,7 @@ body.recording .rec-btn svg circle:last-child{color:#fff}
   <section class="card player" id="viewSingle">
     <div class="pbar">
       <div class="ttl-wrap"><div class="mode-slot"></div>
-        <div class="eyebrow">Einzelvideo</div>
+        <div class="eyebrow">Basic</div>
         <div class="ttl" id="sTitle">Kein Video geöffnet</div>
       </div>
       <div class="chips" id="sChips"></div>
@@ -1829,11 +1842,11 @@ body.recording .rec-btn svg circle:last-child{color:#fff}
         <button class="ctl" data-act="step" data-n="1" title="1 Bild vor (→ / x)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/><path d="M18 6v12" opacity=".55"/></svg></button>
         <button class="ctl" data-act="step" data-n="10" title="10 Bilder vor (Shift+→ / s)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.5 17l5-5-5-5"/><path d="M6 17l5-5-5-5"/></svg></button>
       <button class="ctl rate-btn" data-act="rate" title="Tempo: Klick wechselt 1× → ½× → ¼× → 0.1× (↑ / ↓ auch 1.5× und 2×)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 16a8 8 0 1 1 15 0"/><path d="M12 12.5l3.5-4"/><circle cx="12" cy="13" r="1.3" fill="currentColor"/></svg><span>1×</span></button></div></div>
-      <div class="dz dz-r"><button class="ctl" data-act="marker" title="Marker setzen / entfernen (m) – z. B. Torwechsel, Kantenwechsel"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><path d="M12 3l7 9-7 9-7-9z"/></svg></button><button class="ctl" data-act="strobe" title="Stroboskop-Bild: mehrere Positionen in einem Bild (Loop-Bereich oder ±0.7 s)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><circle cx="5" cy="15" r="2.2" opacity=".45"/><circle cx="10.5" cy="11" r="2.2" opacity=".7"/><circle cx="17" cy="8" r="2.6"/><path d="M3 20c5-1 10-5 15-12" opacity=".5"/></svg></button><div class="ctl-sep"></div><div class="grp">
+      <div class="dz dz-r"><button class="ctl" data-act="marker" title="Marker setzen / entfernen (m) – z. B. Torwechsel, Kantenwechsel"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><path d="M12 3l7 9-7 9-7-9z"/></svg></button><div class="ctl-sep"></div><div class="grp">
         <label class="ctl-lab fps-edit" title="Bilder pro Sekunde – wird beim Laden gemessen">fps <input class="num" id="sFps" type="number" min="1" max="1000" step="0.01"></label>
         <button class="ctl" data-act="sound" title="Ton ein / aus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5L6 9H2v6h4l5 4z"/><path class="snd-on" d="M15.5 8.5a5 5 0 0 1 0 7" hidden/><path class="snd-off" d="M16 9l5 6M21 9l-5 6"/></svg></button>
         <button class="ctl" data-act="shot" title="Standbild mit Zeichnungen als PNG speichern (p)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.6"/></svg></button>
-        <button class="ctl rec-btn" data-act="rec" title="Aufnahme: alles, was du jetzt zeigst, zeichnest und sagst, als Video aufnehmen (r)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4" fill="currentColor" stroke="none"/></svg></button><button class="ctl" data-act="export" title="Clip exportieren – z. B. Schwung in Zeitlupe (e)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg></button>
+        <button class="ctl sbs-btn" data-act="sbs" title="Side by Side: dieses Video als A in die Analyse übernehmen und ein zweites danebenstellen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="5" width="8.5" height="14" rx="2"/><rect x="13" y="5" width="8.5" height="14" rx="2"/></svg><span>Side by Side</span></button><button class="ctl rec-btn" data-act="rec" title="Aufnahme: alles, was du jetzt zeigst, zeichnest und sagst, als Video aufnehmen (r)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4" fill="currentColor" stroke="none"/></svg></button><button class="ctl" data-act="export" title="Clip exportieren – z. B. Schwung in Zeitlupe (e)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg></button>
         <button class="ctl" data-act="fs" title="Vollbild (f)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3M21 8V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3M16 21h3a2 2 0 0 0 2-2v-3"/></svg></button>
       </div></div>
     </div>
@@ -1884,10 +1897,10 @@ body.recording .rec-btn svg circle:last-child{color:#fff}
     <div class="c-head">
       <div><div class="mode-slot"></div><div class="eyebrow">Analyse</div><h2>Lauf A <span class="vs">vs</span> Lauf B</h2></div>
       <div class="cmp-tools">
-        <button class="tut-open" id="cmpReset" title="Vergleich leeren: A und B entfernen, Sync und Overlay zurücksetzen (Videos bleiben unter «In Arbeit»)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/></svg><span>Zurücksetzen</span></button><button class="tut-open" id="tutBtn" title="Anleitung direkt im Tool – zeigt Schritt für Schritt mit den Beispiel-Läufen, wie es geht"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M10 8.5l5.5 3.5-5.5 3.5z" fill="currentColor"/></svg><span>Anleitung</span></button><div class="seg" id="layoutSeg"><button data-layout="side" class="on" title="Einzelvergleich: A und B nebeneinander"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="5" width="8.5" height="14" rx="2"/><rect x="13" y="5" width="8.5" height="14" rx="2"/></svg>Basic</button><button data-layout="overlay"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="13" height="11" rx="2"/><rect x="8" y="9" width="13" height="11" rx="2" fill="currentColor" fill-opacity=".25"/></svg>Overlay</button><button data-layout="ghost"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M5 20V10a7 7 0 0 1 14 0v10l-2.4-1.8L14.3 20 12 18.2 9.7 20l-2.3-1.8z"/><circle cx="9.5" cy="10.5" r=".9" fill="currentColor"/><circle cx="14.5" cy="10.5" r=".9" fill="currentColor"/></svg>Ghost</button></div>
+        <button class="tut-open" id="cmpReset" title="Vergleich leeren: A und B entfernen, Sync und Overlay zurücksetzen (Videos bleiben unter «In Arbeit»)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/></svg><span>Zurücksetzen</span></button><button class="tut-open" id="tutBtn" title="Anleitung direkt im Tool – zeigt Schritt für Schritt mit den Beispiel-Läufen, wie es geht"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M10 8.5l5.5 3.5-5.5 3.5z" fill="currentColor"/></svg><span>Anleitung</span></button><div class="seg" id="layoutSeg"><button data-layout="side" class="on"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="5" width="8.5" height="14" rx="2"/><rect x="13" y="5" width="8.5" height="14" rx="2"/></svg>Side by Side</button><button data-layout="overlay"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="13" height="11" rx="2"/><rect x="8" y="9" width="13" height="11" rx="2" fill="currentColor" fill-opacity=".25"/></svg>Overlay</button><button data-layout="ghost"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M5 20V10a7 7 0 0 1 14 0v10l-2.4-1.8L14.3 20 12 18.2 9.7 20l-2.3-1.8z"/><circle cx="9.5" cy="10.5" r=".9" fill="currentColor"/><circle cx="14.5" cy="10.5" r=".9" fill="currentColor"/></svg>Ghost</button></div>
         <button class="ctl ov-namebtn" id="ovNames" title="Namen im Bild ein / aus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12V5a2 2 0 0 1 2-2h7l9 9-9 9-9-9z"/><circle cx="8" cy="8" r="1.6"/></svg><span>Namen</span></button><label class="ctl-lab op-wrap">Deckkraft <input type="range" class="op" id="opRange" min="0.1" max="0.9" step="0.05" value="0.5"></label>
         <button class="ctl" data-act="shot" title="Standbild A | B als PNG speichern (p)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.6"/></svg></button>
-        <button class="ctl rec-btn" data-act="rec" title="Aufnahme: alles, was du jetzt zeigst, zeichnest und sagst, als Video aufnehmen (r)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4" fill="currentColor" stroke="none"/></svg></button><button class="ctl" data-act="export" title="Vergleich als Video exportieren (e)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg></button>
+        <button class="ctl strobo-btn" data-act="strobe" title="Strobo: mehrere Positionen von A in einem Bild (±0.7 s um das aktuelle Bild)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><circle cx="5" cy="15" r="2.2" opacity=".45"/><circle cx="10.5" cy="11" r="2.2" opacity=".7"/><circle cx="17" cy="8" r="2.6"/><path d="M3 20c5-1 10-5 15-12" opacity=".5"/></svg></button><button class="ctl rec-btn" data-act="rec" title="Aufnahme: alles, was du jetzt zeigst, zeichnest und sagst, als Video aufnehmen (r)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4" fill="currentColor" stroke="none"/></svg></button><button class="ctl" data-act="export" title="Vergleich als Video exportieren (e)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg></button>
         <button class="ctl" data-act="fs" title="Vollbild (f)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3M21 8V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3M16 21h3a2 2 0 0 0 2-2v-3"/></svg></button>
       </div>
     </div>
@@ -1952,8 +1965,8 @@ body.recording .rec-btn svg circle:last-child{color:#fff}
   </div>
 </div>
 <div class="modal" id="strobeModal">
-  <div class="help strobe" role="dialog" aria-label="Stroboskop">
-    <h3>Stroboskop <button class="hdr-ico" id="strX" title="Schliessen">✕</button></h3>
+  <div class="help strobe" role="dialog" aria-label="Strobo">
+    <h3>Strobo <button class="hdr-ico" id="strX" title="Schliessen">✕</button></h3>
     <div class="str-view"><canvas id="strCanvas" width="960" height="540"></canvas><div class="gprog str-prog" id="strProg"><div class="gprog-bar"><i></i></div><span></span></div></div>
     <div class="str-bar">
       <span class="exp-l">Positionen</span><div class="seg" id="strN"><button data-n="6">6</button><button data-n="8">8</button><button data-n="10">10</button><button data-n="12">12</button><button data-n="16">16</button></div>
@@ -2036,7 +2049,7 @@ body.recording .rec-btn svg circle:last-child{color:#fff}
         <dt>Namen</dt><dd>Knopf «Namen» oben: blasse Namens-Pillen folgen den Fahrer:innen im Overlay</dd>
         <dt>Gespeichert</dt><dd>Fertige Overlays und Ghosts werden gemerkt (im Browser und als Begleitdatei im Ordner von A) – beim nächsten Öffnen der gleichen Videos sofort da</dd>
         <dt>iPhone / iPad</dt><dd>«+» öffnet Videos aus Fotos oder Dateien · Export und Standbild über «Teilen» → «In Fotos sichern» · im Safari-Menü «Zum Home-Bildschirm» → App, auch offline</dd>
-        <dt>Anleitung</dt><dd>Knopf «Anleitung» im Vergleich: zeigt Basic, Overlay bzw. Ghost Schritt für Schritt mit den Beispiel-Läufen · Leertaste = Pause</dd>
+        <dt>Anleitung</dt><dd>Knopf «Anleitung» im Vergleich: zeigt Side by Side bzw. Overlay Schritt für Schritt mit den Beispiel-Läufen · Leertaste = Pause</dd>
         <span class="h4">GPS-Daten</span>
         <dt>Format</dt><dd>CSV, GPX oder JSON mit Zeit (s oder ISO), <code>lat</code>, <code>lon</code>, optional <code>alt</code>, <code>speed</code> (m/s) bzw. <code>speed_kmh</code></dd>
         <dt>Sync</dt><dd>Bild beim Losfahren suchen → «GPS-Start = dieses Bild», fein mit ±1F</dd>
@@ -2660,7 +2673,7 @@ function showHov(d,f,x,top){
 }
 
 /* ---------- Aufbau ---------- */
-const S=new Deck('s',$('#sHost'),$('#sStrip')); S.useLoop=true;
+const S=new Deck('s',$('#sHost'),$('#sStrip')); S.useLoop=false; // Loop entfernt
 $('#sHost').insertAdjacentHTML('beforeend',railHTML(false));
 const A=new Deck('a',$('#cStages'),$('#cStrips'),'A','var(--a)');
 const B=new Deck('b',$('#cStages'),$('#cStrips'),'B','var(--b)');
@@ -3762,6 +3775,45 @@ document.addEventListener('click',e=>{ const b=e.target.closest('[data-act="rec"
 document.addEventListener('keydown',e=>{ if(e.key!=='r'||e.metaKey||e.ctrlKey||e.altKey||/INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName)) return; e.preventDefault(); REC.on?recStop(true):recStart(); });
 
 function subCols(el,parts){ el.textContent=''; parts.forEach((t,i)=>{ const x=document.createElement('i'); x.className='c'+i; x.textContent=t||''; el.appendChild(x); }); }
+
+/* Basic → Side by Side: aktuelles Video als A, zweites wählen */
+document.addEventListener('click',e=>{ const b=e.target.closest('[data-act="sbs"]'); if(!b) return; e.preventDefault();
+  if(!S.ready||!S.clip){ toast('Zuerst ein Video öffnen.'); return; } const c=S.clip, t=S.time(); S.pause();
+  switchMode('cmp'); setLayout('side'); if(A.clip!==c){ A.setClip(c); if(B.clip===c) B.setClip(null); } unlink(); syncSelects(); renderLib();
+  const go=()=>{ if(A.ready){ A.seekTime(t); } else setTimeout(go,120); }; go();
+  setTimeout(()=>{ if(!B.clip){ const sel=$('#selB'); sel&&sel.focus(); toast('Jetzt Video B wählen – oben bei B oder in der Liste «B» drücken.',3600); } else toast('Side by Side: '+lastName(A.clip)+' vs '+lastName(B.clip)+'. Gleichen Moment einstellen, dann «Sync».',3200); },450); });
+
+/* ---------- Auto-Sync beim Einfügen von B: gleicher Kamerastandort → gleiche Kameralage = gleicher Ort der Fahrer:in ---------- */
+const AS={key:'',busy:false};
+async function autoSyncFind(ca,cb){
+  const W=64, H=36, cv=document.createElement('canvas'); cv.width=W; cv.height=H; const x=cv.getContext('2d',{willReadFrequently:true});
+  const grab=v=>{ x.drawImage(v,0,0,W,H); const d=x.getImageData(0,0,W,H).data, g=new Float32Array(W*H); let m=0; for(let i=0,j=0;i<g.length;i++,j+=4){ g[i]=0.299*d[j]+0.587*d[j+1]+0.114*d[j+2]; m+=g[i]; } m/=g.length; for(let i=0;i<g.length;i++) g[i]-=m; return g; }; // Helligkeit ausgleichen
+  const va=await loadV(ca.url), vb=await loadV(cb.url); const st=0.2;
+  try{
+    // A: ersten Moment finden, an dem die Kamera sich bewegt (Fahrer:in ist losgefahren / im Bild)
+    const A0=[]; let mvAt=-1; for(let t=0;t<Math.min(va.duration-0.5,25);t+=st){ if(AS.abort) return null; await seekV(va,t); A0.push({t,g:grab(va)}); const L=A0.length; if(mvAt<0&&L>1){ const p=A0[L-2].g, q=A0[L-1].g; let s=0; for(let i=0;i<p.length;i+=2){ const d=p[i]-q[i]; s+=d*d; } if(s/(p.length/2)>60) mvAt=L-2; } if(mvAt>=0&&L>=mvAt+21) break; }
+    const diff=(p,q)=>{ let s=0; for(let i=0;i<p.length;i+=2){ const d=p[i]-q[i]; s+=d*d; } return s/(p.length/2); };
+    let i0=0; for(let i=1;i<A0.length;i++){ if(diff(A0[i].g,A0[i-1].g)>60){ i0=Math.max(0,i-1); break; } }
+    const ref=A0.slice(i0,i0+20); if(ref.length<6) return null; // ~4 s ab Bewegungsbeginn
+    const tA=ref[0].t, Bmax=Math.min(vb.duration-0.3,tA+16), B0=[]; const bStep=0.1;
+    for(let t=Math.max(0,tA-8);t<Bmax;t+=bStep){ if(AS.abort) return null; await seekV(vb,t); B0.push({t,g:grab(vb)}); }
+    if(B0.length<10) return null; const bAt=t=>{ const k=Math.round((t-B0[0].t)/bStep); return B0[k]; };
+    let best=null, bs=1e18, sc=[];
+    for(let off=B0[0].t-tA; off<=B0[B0.length-1].t-ref[ref.length-1].t; off+=bStep){ let s=0,n=0; for(const r of ref){ const b=bAt(r.t+off); if(!b) { n=0; break; } s+=diff(r.g,b.g); n++; } if(!n) continue; s/=n; sc.push(s); if(s<bs){ bs=s; best=off; } }
+    if(best==null) return null; sc.sort((a,b)=>a-b); const med=sc[sc.length>>1]||bs; // Eindeutigkeit prüfen
+    return {tA, off:best, conf:med>0?1-bs/med:0}; }
+  finally{ [va,vb].forEach(v=>{ try{ v.removeAttribute('src'); v.load(); v.remove(); }catch(e){} }); } }
+async function autoSyncRun(){ const ca=A.clip, cb=B.clip; AS.busy=true; AS.abort=false; toast('Suche den gemeinsamen Startpunkt …',2500);
+  let r=null; try{ r=await autoSyncFind(ca,cb); }catch(e){ r=null; } AS.busy=false;
+  if(A.clip!==ca||B.clip!==cb||G.linked||AS.abort) return;
+  if(!r||r.conf<0.45){ toast('Kein eindeutiger gemeinsamer Punkt gefunden – A und B von Hand zum gleichen Tor ziehen, dann «Sync».',4200); return; }
+  A.pause(); B.pause(); A.seekTime(r.tA); B.seekTime(Math.max(0,r.tA+r.off)); setTimeout(()=>{ if(A.clip===ca&&B.clip===cb&&!G.linked){ doSync(); toast('Automatisch synchronisiert (B '+(r.off>=0?'+':'−')+Math.abs(r.off).toFixed(2)+' s) – bitte kurz prüfen, bei Bedarf A/B nachziehen und neu «Sync».',4600); } },350); }
+setInterval(()=>{ if(mode!=='cmp'||document.body.classList.contains('touring')||!A.ready||!B.ready||!A.clip||!B.clip||A.clip===B.clip) return;
+  const key=A.clip.id+'|'+B.clip.id; if(key===AS.key) return; AS.key=key; if(G.linked||AS.busy) return;
+  if(A.clip.demo&&B.clip.demo) return; // Beispiel-Läufe haben feste Startpunkte
+  autoSyncRun(); },500);
+// Nutzer verschiebt selbst → Suche abbrechen
+['pointerdown','keydown'].forEach(t=>document.addEventListener(t,e=>{ if(AS.busy&&e.target.closest&&e.target.closest('#cStrips,#cStages')) AS.abort=true; },true));
 function cmpReset(){
   A.pause(); B.pause(); G.playing=false;
   A.setClip(null); B.setClip(null); unlink(); G.off=0; G.syncA=0;
@@ -3815,7 +3867,7 @@ function ghostUI(){
   btn.textContent=GH.state==='busy'?'Abbrechen':GH.state==='ready'?'Neu berechnen':'Ghost berechnen';
   btn.disabled=!key&&GH.state!=='busy';
   if(!A.ready||!B.ready) st.innerHTML='<b>Lauf A</b> und <b>Lauf B</b> oben wählen – gleicher Kamerastandort, Zoom darf variieren.';
-  else if(!G.linked) st.innerHTML='<b>1 · Gleicher Moment</b> · in «Basic» A und B zum gleichen Tor ziehen, dann «Sync».';
+  else if(!G.linked) st.innerHTML='<b>1 · Gleicher Moment</b> · in «Side by Side» A und B zum gleichen Tor ziehen, dann «Sync».';
   else if(GH.state==='idle') st.innerHTML='<b>2 · Ghost berechnen</b> · dauert ca. '+Math.max(5,Math.round((Math.min(A.dur,B.dur))*0.5))+' s.';
   else if(GH.state==='busy') st.innerHTML='Berechnet lokal auf deinem Gerät …';
   else st.innerHTML='<b>Ghost fertig</b> · Zeitabstand oben rechts (<span style="color:var(--good);font-weight:800">−</span> = A schneller)';
@@ -4347,10 +4399,11 @@ function splitMark(d){ if(!d.ready) return; SPL.open=true; const m=d.clip.marker
   toast((d===A?'A':'B')+': Tor '+(m.indexOf(d.frame)+1||'entfernt')+(m.includes(d.frame)?' bei F '+d.frame:''),1100); }
 function bOnlyStep(n){ if(!B.ready) return; B.pause(); A.pause(); B.seekFrame(B.frame+n); if(G.linked){ G.off=B.time()-A.time(); } updSync(); splitsUI(); }
 
-/* ---------- Stroboskop ---------- */
+/* ---------- Strobo ---------- */
+let SD=null;
 const STR={n:8,trail:true,num:true,busy:false,res:null};
-function strobeRange(){ const c=S.clip, L=c.loop; if(L&&L.a!=null&&L.b!=null&&L.b-L.a>=4) return [L.a,L.b,true]; const h=Math.round(S.fps*0.7); return [Math.max(0,S.frame-h),Math.min(S.nF-1,S.frame+h),false]; }
-function openStrobe(){ if(mode!=='single'||!S.ready){ toast('Zuerst im Einzelvideo ein Video öffnen.'); return; } S.pause(); $('#strobeModal').classList.add('on'); strobeRun(); }
+function strobeRange(){ const c=SD.clip, L=c.loop; if(L&&L.a!=null&&L.b!=null&&L.b-L.a>=4) return [L.a,L.b,true]; const h=Math.round(SD.fps*0.7); return [Math.max(0,SD.frame-h),Math.min(SD.nF-1,SD.frame+h),false]; }
+function openStrobe(){ SD=mode==='cmp'?A:S; if(!SD.ready){ toast(mode==='cmp'?'Zuerst Video A wählen.':'Zuerst ein Video öffnen.'); return; } A.pause(); B.pause(); SD.pause(); $('#strobeModal').classList.add('on'); strobeRun(); }
 function labelMap(m,w,h){ const lab=new Int32Array(m.length), st=[], info=[0]; let id=0;
   for(let i=0;i<m.length;i++){ if(!m[i]||lab[i]) continue; id++; let a=0,sx=0,sy=0; st.push(i); lab[i]=id;
     while(st.length){ const k=st.pop(); a++; sx+=k%w; sy+=(k/w)|0; const x=k%w;
@@ -4359,7 +4412,7 @@ function labelMap(m,w,h){ const lab=new Int32Array(m.length), st=[], info=[0]; l
     info.push({id,a,x:sx/a,y:sy/a}); }
   return {lab,info}; }
 async function strobeRun(){
-  if(STR.busy) return; STR.busy=true; const c=S.clip, [a,b,isLoop]=strobeRange(), n=STR.n;
+  if(STR.busy) return; STR.busy=true; const c=SD.clip, [a,b,isLoop]=strobeRange(), n=STR.n;
   const prog=(f,t)=>{ $('#strProg i').style.width=(f*100)+'%'; $('#strProg span').textContent=t; };
   $('#strProg').hidden=false; $('#strSave').disabled=true; $('#strInfo').textContent=(isLoop?'Loop-Bereich':'±0.7 s um das aktuelle Bild')+' · F '+a+' – '+b+' · '+n+' Positionen';
   let v; try{ v=await loadV(c.url); }catch(e){ STR.busy=false; toast('Video konnte nicht geladen werden.'); return; }
@@ -4368,9 +4421,9 @@ async function strobeRun(){
     const cs=document.createElement('canvas'); cs.width=W0; cs.height=h0; const xs=cs.getContext('2d',{willReadFrequently:true});
     // Ausgabebilder + dichte Zwischenbilder (alle ~0,08 s) für eine genaue Verkettung der Kamerabewegung
     const fr=[]; for(let i=0;i<n;i++) fr.push(Math.round(a+(b-a)*i/(n-1)));
-    const stepF=Math.max(1,Math.round(S.fps*0.08)), AFs=new Set(fr); for(let f=a;f<=b;f+=stepF) AFs.add(f); const AF=[...AFs].sort((p,q)=>p-q);
+    const stepF=Math.max(1,Math.round(SD.fps*0.08)), AFs=new Set(fr); for(let f=a;f<=b;f+=stepF) AFs.add(f); const AF=[...AFs].sort((p,q)=>p-q);
     const P=[], F=[], outIdx=[];
-    for(let k=0;k<AF.length;k++){ const f=AF[k]; await seekV(v,(f+0.5)/S.fps);
+    for(let k=0;k<AF.length;k++){ const f=AF[k]; await seekV(v,(f+0.5)/SD.fps);
       xs.drawImage(v,0,0,W0,h0); P.push(pyramid(grayOf(xs.getImageData(0,0,W0,h0)),W0,h0));
       if(fr.includes(f)&&!outIdx.some(o=>AF[o]===f)){ const ff=document.createElement('canvas'); ff.width=OW; ff.height=OH; const fx=ff.getContext('2d'); if(fxCss(c)) fx.filter=fxCss(c); fx.drawImage(v,0,0,OW,OH); F.push(ff); outIdx.push(k); }
       prog((k+1)/AF.length*0.4,'Bilder lesen …'); if(k%3===2) await new Promise(r=>setTimeout(r,0)); }
@@ -4431,10 +4484,10 @@ async function strobeRun(){
       cents.push([sx/sa,sy/sa]);
       if(i%2===1){ prog(0.92+0.07*i/n,'Fahrer:in freistellen …'); await new Promise(r=>setTimeout(r,0)); } }
     const oc=$('#strCanvas'); oc.width=PW; oc.height=PH; const ox=oc.getContext('2d'); ox.putImageData(new ImageData(out,PW,PH),0,0);
-    STR.res={cents,OW,OH:PH,base:ox.getImageData(0,0,OW,OH),fr,name:base(c.name)+'_Stroboskop_F'+a+'-'+b}; strobeDecor();
+    STR.res={cents,OW,OH:PH,base:ox.getImageData(0,0,OW,OH),fr,name:base(c.name)+'_Strobo_F'+a+'-'+b}; strobeDecor();
     $('#strProg').hidden=true; $('#strSave').disabled=false;
-    $('#strInfo').textContent=(isLoop?'Loop-Bereich':'±0.7 s um das aktuelle Bild')+' · F '+a+' – '+b+' · '+n+' Positionen · Abstand '+((b-a)/(n-1)/S.fps).toFixed(2)+' s'+(weak>n/3?' · Achtung: Kamera stark bewegt – Ergebnis prüfen':'');
-  }catch(e){ console.error(e); toast('Stroboskop konnte nicht berechnet werden.'); $('#strProg').hidden=true; }
+    $('#strInfo').textContent=(isLoop?'Loop-Bereich':'±0.7 s um das aktuelle Bild')+' · F '+a+' – '+b+' · '+n+' Positionen · Abstand '+((b-a)/(n-1)/SD.fps).toFixed(2)+' s'+(weak>n/3?' · Achtung: Kamera stark bewegt – Ergebnis prüfen':'');
+  }catch(e){ console.error(e); toast('Strobo konnte nicht berechnet werden.'); $('#strProg').hidden=true; }
   finally{ try{ v.removeAttribute('src'); v.load(); v.remove(); }catch(e){} STR.busy=false; }
 }
 function strobeDecor(){ const R=STR.res; if(!R) return; const oc=$('#strCanvas'), x=oc.getContext('2d'); x.putImageData(R.base,0,0); const k=R.OW/960;
@@ -4612,7 +4665,7 @@ function ftMatch(n){ if(!FT.q) return true; if(n.kind==='directory') return ftHa
 function ftHasMatch(n){ if(!n.children) return false; return n.children.some(k=>k.kind==='directory'?ftHasMatch(k):ftMatch(k)); }
 function ftRender(){
   const el=$('#ftree'); if(!el) return; el.innerHTML='';
-  $('#ftEmpty').hidden=!!FT.roots.length||!(DIR_OK||DIR_RO); $('#ftNote').hidden=DIR_OK||DIR_RO; $('#ftRo').hidden=!FT.roots.some(r=>r.ro); $('#ftTools').hidden=!FT.roots.length;
+  $('#ftEmpty').hidden=!!FT.roots.length||!(DIR_OK||DIR_RO); $('#ftNote').hidden=DIR_OK||DIR_RO; $('#ftRo').hidden=!FT.roots.some(r=>r.ro); $('#ftTools').hidden=false; $('#sideTree').classList.toggle('has-roots',!!FT.roots.length);
   const openIds=new Set([S,A,B,GD].map(d=>d.clip&&d.clip._node&&d.clip._node.id).filter(Boolean));
   const row=(n,depth)=>{
     const r=document.createElement('div'); r.className='ft-row '+(n.kind==='directory'?'dir':'file')+(n.root?' root':'')+(openIds.has(n.id)?' on':''); r.dataset.id=n.id; r.style.setProperty('--d',depth);
@@ -4640,9 +4693,9 @@ function ftRender(){
   renderDemoList();
 }
 function renderDemoList(){
-  const el=$('#ftDemo'); if(!el) return; const ds=clips.filter(c=>c.demo&&c.meta&&c.meta.ok);
-  const show=ds.length>0&&!FT.roots.length; el.hidden=!show; const em=$('#ftEmpty'); if(em) em.classList.toggle('compact',show); if(!show) return;
-  const sig=mode+'|'+[S,A,B,GD].map(d=>d.clip&&d.clip.id).join(',')+'|'+ds.map(c=>c.id+':'+(c.poster?1:0)).join(',');
+  const el=$('#ftDemo'); if(!el) return; const q=FT.q||''; const ds=clips.filter(c=>c.demo&&c.meta&&c.meta.ok&&(!q||[c.name,c.meta.athlete,c.meta.place,c.meta.disc,c.meta.date,c.meta.run,DISC_LONG[c.meta.disc]].join(' ').toLowerCase().includes(q)));
+  const any=clips.some(c=>c.demo&&c.meta&&c.meta.ok), show=any&&!FT.roots.length; el.hidden=!show; if(show&&!ds.length){ if(el._sig!=='none:'+q){ el._sig='none:'+q; el.innerHTML='<div class="ft-none">Keine Treffer für «'+q.replace(/[<>&]/g,'')+'»</div>'; } return; } const em=$('#ftEmpty'); if(em) em.classList.toggle('compact',show); if(!show) return;
+  const sig=q+'|'+mode+'|'+[S,A,B,GD].map(d=>d.clip&&d.clip.id).join(',')+'|'+ds.map(c=>c.id+':'+(c.poster?1:0)).join(',');
   if(el._sig===sig) return; el.classList.toggle('first',!el._sig); el._sig=sig;
   el.innerHTML=''; let grp=null;
   ds.forEach(c=>{ const r=document.createElement('div'); const isOn=mode==='single'?S.clip===c:mode==='gps'?GD.clip===c:(A.clip===c||B.clip===c);
@@ -4706,7 +4759,7 @@ function ftWire(){
     renderLib(); });
   $('#sideTabs').addEventListener('click',e=>{ const b=e.target.closest('[data-st]'); if(b) setSideTab(b.dataset.st); });
   $('#ftAdd').addEventListener('click',ftConnect); $('#ftAdd2').addEventListener('click',ftConnect);
-  $('#ftQ').addEventListener('input',e=>{ FT.q=e.target.value.trim().toLowerCase(); ftRender(); });
+  $('#ftQ').addEventListener('input',e=>{ FT.q=e.target.value.trim().toLowerCase(); ftRender(); renderDemoList(); });
   $('#ftX').addEventListener('click',ftClose); $('#ftCancel').addEventListener('click',ftClose);
   $('#ftModal').addEventListener('click',e=>{ if(e.target.id==='ftModal') ftClose(); });
   $('#ftOk').addEventListener('click',async()=>{ if(!FT.dlg) return; const b=$('#ftOk'); b.disabled=true; try{ const ok=await FT.dlg(); if(ok!==false) ftClose(); }finally{ b.disabled=false; } });
@@ -4811,7 +4864,7 @@ if(!LS.get('hint1',0)){ setTimeout(()=>{ toast(matchMedia('(pointer:coarse)').ma
 
 /* Update-Hinweis: prüft version.json auf GitHub Pages; «Aktualisieren» lädt die Seite ohne Cache neu */
 (()=>{
-  const BUILD='20261028073910'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
+  const BUILD='20261028075626'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
   // nach einem Update die ?v=… aus der Adresse entfernen
   try{ const u=new URL(location.href); if(u.searchParams.has('v')){ u.searchParams.delete('v'); history.replaceState(null,'',u.pathname+(u.search||'')+u.hash); } }catch(e){}
   const el=$('#upd'); let latest=null, snoozed=null, busy=false;
