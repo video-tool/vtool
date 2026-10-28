@@ -2172,7 +2172,7 @@ canvas.strip:focus-visible{outline:2px solid rgba(255,255,255,.35)!important;out
       <dt>Side by Side</dt><dd>Knopf «Side by Side» übernimmt das Video als A in die Analyse – dann B wählen</dd>
     </dl></section>
     <section class="hp" data-hp="analyse" hidden><dl>
-      <dt>Side by Side</dt><dd>A und B wählen – die App sucht den gemeinsamen Startpunkt selbst. Sonst beide zum gleichen Tor ziehen und «Sync».</dd>
+      <dt>Side by Side</dt><dd>A und B wählen, beide zum gleichen Tor ziehen und «Sync» drücken</dd>
       <dt>Zeitmessung</dt><dd>Stoppuhr-Knopf: Start = Sync-Punkt · Fahne A / B setzt das Ziel · Zeit und Differenz stehen im Bild</dd>
       <dt>Tore</dt><dd><kbd>m</kbd> Tor in A · <kbd>n</kbd> Tor in B → Abschnittszeiten · <kbd>Alt</kbd> + ← → bewegt nur B</dd>
       <dt>Overlay</dt><dd>1 «Automatisch finden» sucht die gleiche Stelle der Strecke (oder A und B von Hand zum gleichen Tor) · 2 «Overlay erstellen» – B folgt dem Kameraschwenk; nur bei stark unterschiedlichem Zoom vorher zwei gleiche Tore als Referenz antippen · Braucht eine durchgehende Kamera vom gleichen Standort (kein TV-Schnitt)</dd>
@@ -3576,12 +3576,12 @@ function ovUI(){
   else if(st===1){ t=`<b>Gleicher Moment</b> · A und B einzeln zum ersten gemeinsamen Tor ziehen. ${cut}`;
     acts=cutBtns+ovBtn('auto',AS.busy?'Sucht …':'Automatisch finden',OVI.go,'ghost','Gleiche Stelle der Strecke in A und B automatisch suchen (gleicher Kamerastandort)')+ovBtn('hand','Von Hand',OVI.fix,'','A und B hier verbinden und B von Hand über A schieben')+ovBtn('sync','Gemeinsamer Punkt',OVI.pin,'pri','A und B an diesem Moment verbinden'); }
   else if(st===2){ t=`<b>Synchron</b> <span class="ov-dim">B ${G.off>=0?'+':'−'}${Math.abs(G.off).toFixed(2)} s</span> · «Overlay erstellen» richtet B selbst aus. Liegt es daneben: zwei gleiche Tore als Referenz antippen. ${cut}`;
-    acts=ovBtn('edit','Punkt ändern',OVI.back,'ghost')+ovBtn('pick','Referenzpunkte',OVI.pin,'ghost','2 feste Punkte in A und B antippen – hilft bei stark unterschiedlichem Zoom')+ovBtn('make','Overlay erstellen',OVI.go,'pri','B automatisch über A legen und der Kamera folgen'); }
+    acts=cutBtns+ovBtn('edit','Punkt ändern',OVI.back,'ghost')+ovBtn('pick','Referenzpunkte',OVI.pin,'ghost','2 feste Punkte in A und B antippen – hilft bei stark unterschiedlichem Zoom')+ovBtn('make','Overlay erstellen',OVI.go,'pri','B automatisch über A legen und der Kamera folgen'); }
   else if(!done){ t=`<b>B liegt über A</b> · vorklicken zeigt den Vorsprung – bei Kameraschwenk «Overlay erstellen». ${cut}`;
-    acts=ovBtn('edit','Punkt ändern',OVI.back,'ghost')+ovBtn('pick','Punkte setzen',OVI.pin,'ghost','2 gleiche Tore in A und B antippen')+ovBtn('hand','Von Hand',OVI.fix,'','B von Hand nachschieben')+ovBtn('make','Overlay erstellen',OVI.go,'pri'); }
+    acts=cutBtns+ovBtn('edit','Punkt ändern',OVI.back,'ghost')+ovBtn('pick','Punkte setzen',OVI.pin,'ghost','2 gleiche Tore in A und B antippen')+ovBtn('hand','Von Hand',OVI.fix,'','B von Hand nachschieben')+ovBtn('make','Overlay erstellen',OVI.go,'pri'); }
   else { const kc=OV.K.length?`<span class="ov-chip">${OVI.fix}${OV.K.length} Korrektur${OV.K.length>1?'en':''}<button data-ov="fixall" title="Alle Korrekturen entfernen">${OVI.x}</button></span>`:'';
-    t=`<b>Overlay fertig</b> · Tore verrutscht? Anhalten und «Hier korrigieren». ${cut} ${kc}`;
-    acts=ovBtn('edit','Neu beginnen',OVI.back,'ghost')+ovBtn('make','Neu berechnen',OVI.go,'ghost')+ovBtn('nameset','Namen setzen',OVI.tag,'ghost','Fahrer:innen antippen – die Namens-Pillen folgen dann genau ihnen')+(LAY.length<3?ovBtn('addrun','Lauf hinzufügen',OVI.plus,'ghost','Diesen Lauf im Bild behalten und einen weiteren dazunehmen'):'')+ovBtn('fix','Hier korrigieren',OVI.fix,'pri','B an dieser Stelle von Hand nachschieben'); }
+    t=`<b>Overlay fertig</b> ${cut} ${kc}`;
+    acts=cutBtns+ovBtn('edit','Neu beginnen',OVI.back,'ghost')+ovBtn('make','Neu berechnen',OVI.go,'ghost')+ovBtn('nameset','Namen setzen',OVI.tag,'ghost','Fahrer:innen antippen – die Namens-Pillen folgen dann genau ihnen')+(LAY.length<3?ovBtn('addrun','Lauf hinzufügen',OVI.plus,'ghost','Diesen Lauf im Bild behalten und einen weiteren dazunehmen'):'')+ovBtn('fix','Hier korrigieren',OVI.fix,'pri','B an dieser Stelle von Hand nachschieben'); }
   // nur neu zeichnen, wenn sich etwas ändert – sonst gehen Klicks verloren
   if(LAY.length) t+=' <span class="ov-lays">'+LAY.map((L,i)=>`<span class="ov-lay"><i style="background:${L.col}"></i>${L.let} · ${L.name}<button data-ov="laydel" data-i="${i}" title="Lauf ${L.let} entfernen">${OVI.x}</button></span>`).join('')+'</span>';
   const tx=$('#ovTxt'), ac=$('#ovActs'); if(tx._h!==t){ tx.innerHTML=t; tx._h=t; tx.title=tx.textContent.replace(/\s+/g,' ').trim(); } if(ac._h!==acts){ ac.innerHTML=acts; ac._h=acts; }
@@ -3834,9 +3834,10 @@ function renderOv(){
     else if(e.key==='Escape'){ e.stopPropagation(); e.preventDefault(); $('[data-ov="fixno"]').click(); } },true);
   ['pointerup','pointermove','click','dblclick'].forEach(t=>st.addEventListener(t,e=>{ block(e); },true));
   $('#ovPanel').addEventListener('click',e=>{ const b=e.target.closest('[data-ov]'); if(!b) return; const a=b.dataset.ov; if(/^(fixok|fixdel|fixall)$/.test(a)) setTimeout(resSave,50);
-    if(a==='cuta'||a==='cutb'){ if(!A.ready) return; const t=A.time(); if(a==='cuta'){ OV.cut.a=t; if(OV.cut.b!=null&&OV.cut.b<=t) OV.cut.b=null; } else { OV.cut.b=t; if(OV.cut.a!=null&&OV.cut.a>=t) OV.cut.a=null; }
-      OV.T=null; OV.follow=false; toast((a==='cuta'?'Start':'Ende')+' des Ausschnitts: '+fmtS(t),1400); }
-    else if(a==='cutx'){ OV.cut={a:null,b:null}; OV.T=null; OV.follow=false; }
+    if(a==='cuta'||a==='cutb'){ if(!A.ready) return; const t=A.time(), dn=ovFollowOK(); if(a==='cuta'){ OV.cut.a=t; if(OV.cut.b!=null&&OV.cut.b<=t) OV.cut.b=null; } else { OV.cut.b=t; if(OV.cut.a!=null&&OV.cut.a>=t) OV.cut.a=null; }
+      const inside=dn&&t>=GH.t0-0.05&&t<=GH.t0+GH.eEnd+0.05; // fertiges Overlay: Start/Ende nur zum Abspielen und Exportieren – keine Neuberechnung nötig
+      if(dn){ GH.key=ghostKey(); } else { OV.T=null; OV.follow=false; } toast((a==='cuta'?'Start':'Ende')+' des Overlays: '+fmtS(t)+(dn&&!inside?' – ausserhalb der Berechnung, «Neu berechnen»':''),dn&&!inside?3200:1400); ovApplyCut(); }
+    else if(a==='cutx'){ const dn=ovFollowOK(); OV.cut={a:null,b:null}; if(dn) GH.key=ghostKey(); else { OV.T=null; OV.follow=false; } ovApplyCut(); }
     else if(a==='sync'){ doSync(); OV.edit=false; OV.T=null; OV.follow=false; return ovStart(); }
     else if(a==='edit'){ ovKill(); tagsReset(); OV.edit=true; OV.T=null; OV.follow=false; OV.pick=null; unlink(); toast('A und B einzeln verschieben, dann «Gemeinsamer Punkt».',2600); }
     else if(a==='auto'){ if(AS.busy||!A.ready||!B.ready) return; A.pause(); B.pause(); AS.busy=true; AS.abort=false; ovUI(); const ca=A.clip, cb=B.clip;
@@ -4072,7 +4073,8 @@ async function autoSyncRun(){ const ca=A.clip, cb=B.clip; AS.busy=true; AS.abort
 setInterval(()=>{ if(mode!=='cmp'||document.body.classList.contains('touring')||!A.ready||!B.ready||!A.clip||!B.clip||A.clip===B.clip) return;
   const key=A.clip.id+'|'+B.clip.id; if(key===AS.key) return; AS.key=key; if(G.linked||AS.busy) return;
   const fixed=c=>c.demo&&(/_Soelden_251026_/.test(c.name)||(typeof DEMO_OFF!=='undefined'&&c.name in DEMO_OFF)); if(fixed(A.clip)&&fixed(B.clip)) return; // vermessene Beispiel-Läufe haben feste Startpunkte
-  autoSyncRun(); },500);
+  if(AUTO_SYNC) autoSyncRun(); },500);
+var AUTO_SYNC=false; // automatisches Synchronisieren beim Einfügen von B ist aus – «Sync» bzw. im Overlay «Automatisch finden» von Hand
 // Nutzer verschiebt selbst → Suche abbrechen
 ['pointerdown','keydown'].forEach(t=>document.addEventListener(t,e=>{ if(AS.busy&&e.target.closest&&e.target.closest('#cStrips,#cStages')) AS.abort=true; },true));
 
@@ -4635,8 +4637,8 @@ function openExport(){
   const ds=expDecks(); if(ds.some(d=>!d.ready)){ toast(mode==='cmp'?'Zuerst Video A und B wählen.':'Zuerst ein Video öffnen.'); return; }
   if(EXP.live) return;
   const L=mode==='single'&&S.clip.loop, hasLoop=!!(L&&(L.a!=null||L.b!=null));
-  const opts=[]; if(hasLoop) opts.push(['loop','In – Out']); if(mode==='cmp'&&G.linked) opts.push(['sync','Ab Sync-Punkt']); opts.push(['here','Ab aktuellem Bild'],['all','Ganzes Video']);
-  EXP.range=hasLoop?'loop':'all'; EXP.rate=1; // Standard: Schnitt (falls gesetzt), sonst ganzes Video, Normaltempo
+  const opts=[]; if(hasLoop) opts.push(['loop','In – Out']); const ovCut=mode==='cmp'&&ovActive()&&(OV.cut.a!=null||OV.cut.b!=null); if(ovCut) opts.push(['ovcut','Start – Ende']); if(mode==='cmp'&&G.linked) opts.push(['sync','Ab Sync-Punkt']); opts.push(['here','Ab aktuellem Bild'],['all','Ganzes Video']);
+  EXP.range=hasLoop?'loop':ovCut?'ovcut':'all'; EXP.rate=1; // Standard: Schnitt (falls gesetzt), sonst ganzes Video, Normaltempo
   $('#expRange').innerHTML=opts.map(o=>`<button data-er="${o[0]}" class="${o[0]===EXP.range?'on':''}">${o[1]}</button>`).join('');
   $$('#expRate button').forEach(b=>b.classList.toggle('on',+b.dataset.r===EXP.rate));
   $('#expNotesRow').hidden=!(mode==='single');
@@ -4651,6 +4653,7 @@ function expRangeFrames(){
   let a=D.frame, b;
   if(EXP.range==='loop'){ const L=S.clip.loop; a=L.a!=null?L.a:0; b=L.b!=null?L.b:D.nF-1; }
   else if(EXP.range==='sync'){ a=Math.round(G.syncA*fps); }
+  else if(EXP.range==='ovcut'){ a=Math.round((OV.cut.a!=null?OV.cut.a:0)*fps); b=OV.cut.b!=null?Math.round(OV.cut.b*fps):D.nF-1; }
   else if(EXP.range==='all'){ a=0; }
   if(b==null){ b=EXP.range==='all'?D.nF-1:Math.min(D.nF-1,a+Math.round(EXP.dur*fps)); }
   if(mode==='cmp'){ // B muss mitlaufen
@@ -4661,7 +4664,7 @@ function expRangeFrames(){
 }
 function expSummary(){
   const r=expRangeFrames(), D=expDecks()[0], len=(r.b-r.a)/D.fps;
-  $('#expDurRow').hidden=$('#expDurL').hidden=EXP.range==='loop'||EXP.range==='all';
+  $('#expDurRow').hidden=$('#expDurL').hidden=EXP.range==='loop'||EXP.range==='all'||EXP.range==='ovcut';
   $('#expDur').value=EXP.dur;
   const vid=len/EXP.rate, fmt=t=>t>=60?Math.floor(t/60)+':'+String(Math.floor(t%60)).padStart(2,'0')+' min':t.toFixed(1)+' s', fast=typeof VideoEncoder!=='undefined';
   $('#expSum').innerHTML=`<span class="es-r"><span>Ausschnitt</span><b>${(r.a/D.fps).toFixed(2)} – ${(r.b/D.fps).toFixed(2)} s</b></span><span class="es-arrow">→</span><span class="es-r"><span>Video${EXP.rate<1?' · Zeitlupe':''}</span><b>${fmt(vid)}</b></span><span class="es-r"><span>Format</span><b>MP4</b></span><span class="es-r"><span>Dauer Export</span><b>ca. ${fmt(fast?len*1.1:vid)}</b></span>`;
@@ -5177,7 +5180,7 @@ function ftWire(){
     else if(mode==='gps'){ GD.setClip(c); gpsSelects(); }
     else { const d=a?(a.dataset.a==='a'?A:B):(A.clip===c||B.clip===c?null:B); if(d){ d.setClip(c); unlink(); syncSelects();
       // Beispiel-Läufe starten alle im gleichen Moment → automatisch am Start synchronisieren
-      const fixD=c=>/_Soelden_251026_/.test(c.name)||c.name in DEMO_OFF; if(A.clip&&B.clip&&A.clip!==B.clip&&A.clip.demo&&B.clip.demo&&A.clip.meta.place===B.clip.meta.place&&fixD(A.clip)&&fixD(B.clip)){ const ca=A.clip, cb=B.clip; const t=setInterval(()=>{ if(A.clip!==ca||B.clip!==cb){ clearInterval(t); return; } if(A.ready&&B.ready){ clearInterval(t); const oa=DEMO_OFF[ca.name]||0, ob=DEMO_OFF[cb.name]||0; A.seekTime(oa); B.seekTime(ob); G.off=ob-oa; G.syncA=oa; G.linked=true; linkBtn(); updSync(); toast('Beide Läufe am Start synchronisiert'); } },100); } } }
+      const fixD=c=>/_Soelden_251026_/.test(c.name)||c.name in DEMO_OFF; if(A.clip&&B.clip&&A.clip!==B.clip&&A.clip.demo&&B.clip.demo&&A.clip.meta.place===B.clip.meta.place&&fixD(A.clip)&&fixD(B.clip)&&AUTO_SYNC){ const ca=A.clip, cb=B.clip; const t=setInterval(()=>{ if(A.clip!==ca||B.clip!==cb){ clearInterval(t); return; } if(A.ready&&B.ready){ clearInterval(t); const oa=DEMO_OFF[ca.name]||0, ob=DEMO_OFF[cb.name]||0; A.seekTime(oa); B.seekTime(ob); G.off=ob-oa; G.syncA=oa; G.linked=true; linkBtn(); updSync(); toast('Beide Läufe am Start synchronisiert'); } },100); } } }
     renderLib(); });
   $('#sideTabs').addEventListener('click',e=>{ const b=e.target.closest('[data-st]'); if(b) setSideTab(b.dataset.st); });
   $('#ftAdd').addEventListener('click',ftConnect); $('#ftAdd2').addEventListener('click',ftConnect);
@@ -5257,7 +5260,7 @@ const DEMO_OFF={'boisset_vgh_dh_tr1_courchevel_260311.mp4':0.7,'kriechmayr_vgh_d
   if(!S.clip||S.clip.demo){ S.setClip(real[0]); }
   if(!GD.clip||GD.clip.demo){ GD.setClip(real[0]); if(typeof gpsSelects==='function') gpsSelects(); }
   if((!A.clip||A.clip.demo)&&(!B.clip||B.clip.demo)){ A.setClip(real[0]); B.setClip(real[1]);
-    Promise.all([A,B].map(d=>new Promise(r=>{ const t=setInterval(()=>{ if(d.ready){ clearInterval(t); r(); } },100); }))).then(()=>{ if(A.clip===real[0]&&B.clip===real[1]&&!G.linked){ G.off=0; G.syncA=0; G.linked=true; linkBtn(); updSync(); } }); }
+    Promise.all([A,B].map(d=>new Promise(r=>{ const t=setInterval(()=>{ if(d.ready){ clearInterval(t); r(); } },100); }))).then(()=>{ if(AUTO_SYNC&&A.clip===real[0]&&B.clip===real[1]&&!G.linked){ G.off=0; G.syncA=0; G.linked=true; linkBtn(); updSync(); } }); }
   syncSelects(); renderLib(); refreshSingleHead();
 })();
 setSideTab(LS.get('side',(DIR_OK||DIR_RO)?'tree':'open')); ftRestore();
@@ -5307,7 +5310,7 @@ if(!LS.get('hint1',0)){ setTimeout(()=>{ toast(matchMedia('(pointer:coarse)').ma
 
 /* Update-Hinweis: prüft version.json auf GitHub Pages; «Aktualisieren» lädt die Seite ohne Cache neu */
 (()=>{
-  const BUILD='20261028195238'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
+  const BUILD='20261028201844'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
   // nach einem Update die ?v=… aus der Adresse entfernen
   try{ const u=new URL(location.href); if(u.searchParams.has('v')){ u.searchParams.delete('v'); history.replaceState(null,'',u.pathname+(u.search||'')+u.hash); } }catch(e){}
   const el=$('#upd'); let latest=null, snoozed=null, busy=false;
