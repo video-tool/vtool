@@ -1889,6 +1889,14 @@ body:not(.tl-slim) .tl-zoom .tl-film{background:rgba(255,255,255,.28)!important}
 
 canvas.strip:focus{outline:none!important;box-shadow:none}
 canvas.strip:focus-visible{outline:2px solid rgba(255,255,255,.35)!important;outline-offset:1px}
+
+/* Export: Ausschnitt als übersichtliches Raster */
+#expRange.rgrid{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;padding:4px;justify-self:stretch;width:100%}
+#expRange.rgrid button{height:auto!important;min-height:48px;padding:7px 12px!important;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:2px;text-align:left;border-radius:10px!important;font-family:var(--font)!important}
+#expRange.rgrid button b{font-size:13px;font-weight:700}
+#expRange.rgrid button small{font:600 11px var(--mono);color:var(--muted);opacity:.9}
+#expRange.rgrid button.on small{color:var(--ink2)}
+#expRange.rgrid .seg-ind{display:none!important}
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
   .aurora{display:none}
@@ -3255,7 +3263,7 @@ async function ghostCompute(opt){ // opt.resume: ab Bild opt.j mit fester Lage o
   GH.dbg=[]; const hist=[]; let fail=0; const S=[]; let prev=null, prevPA=null, prevPB=null, pInit=[0,0,0,0,0], lastQa=[0,0,0,0,0], lastQb=[0,0,0,0,0]; const trk={a:null,b:null};
   const n=Math.max(2,Math.floor(eEnd/step)+1), t0=performance.now();
   GH.paused=false; GH.rewind=null; GH.fixApply=null;
-  const lv=useOv?ovLiveCanvas():null;
+  const lv=useOv&&!(opt&&opt.resume)?ovLiveCanvas():null; // beim Nachrechnen nach einer Korrektur bleibt das Bild an der korrigierten Stelle stehen
   // Bildpaare für die Live-Vorschau zwischenspeichern (die Videos springen schon zum nächsten Bild)
   const lbA=document.createElement('canvas'), lbB=document.createElement('canvas');
   if(lv){ lbA.width=lv.width; lbA.height=lv.height; lbB.width=lv.width; lbB.height=Math.round(lv.width*hB/W0); }
@@ -3736,15 +3744,16 @@ function tagsDetect(items){
 /* Pille auf die richtige Person ziehen */
 function tagDrag(el){
   el.addEventListener('pointerdown',e=>{ e.stopPropagation(); e.preventDefault(); const k=el.dataset.k, S0=TAGS.st[k]; if(!S0) return;
-    const box=$('#cStages').getBoundingClientRect(), ox=e.clientX-box.left-S0.px, oy=e.clientY-box.top-S0.py; el.classList.add('drag'); el.setPointerCapture(e.pointerId);
-    const mv=ev=>{ S0.px=ev.clientX-box.left-ox; S0.py=ev.clientY-box.top-oy; el.style.transform=`translate(${S0.px}px,${S0.py}px)`;
+    const box=$('#cStages').getBoundingClientRect(), ox=e.clientX-box.left-S0.px, oy=e.clientY-box.top-S0.py, x0=e.clientX, y0=e.clientY; let moved=false, done=false; el.classList.add('drag'); try{ el.setPointerCapture(e.pointerId); }catch(_){}
+    const mv=ev=>{ if(!moved&&Math.hypot(ev.clientX-x0,ev.clientY-y0)<4) return; moved=true; S0.px=ev.clientX-box.left-ox; S0.py=ev.clientY-box.top-oy; el.style.transform=`translate(${S0.px}px,${S0.py}px)`;
       const ln=$('.ov-lines line[data-k="'+k+'"]'); if(ln){ const cx=S0.px+el.offsetWidth/2, ty=S0.py+el.offsetHeight; ln.setAttribute('x1',cx); ln.setAttribute('y1',ty); ln.setAttribute('x2',cx); ln.setAttribute('y2',ty+22); ln.style.opacity=.9; } };
-    const up=ev=>{ el.releasePointerCapture(ev.pointerId); el.removeEventListener('pointermove',mv); el.removeEventListener('pointerup',up); el.classList.remove('drag');
+    const up=ev=>{ if(done) return; done=true; try{ el.releasePointerCapture(ev.pointerId); }catch(_){} ['pointermove'].forEach(t=>{ el.removeEventListener(t,mv); window.removeEventListener(t,mv); }); ['pointerup','pointercancel','lostpointercapture'].forEach(t=>{ el.removeEventListener(t,up); window.removeEventListener(t,up); }); el.classList.remove('drag');
+      if(!moved||ev.type!=='pointerup'){ S0.vis=false; return; } // nur angetippt oder abgebrochen: loslassen, nichts ändern
       const g=TAGS.geo; if(!g) return; const px=S0.px+el.offsetWidth/2, py=S0.py+el.offsetHeight+22; // Spitze des Strichs = Person
       const u=((px-g.SX-g.z.x)/g.z.s-g.R.x)/g.R.w, v=((py-g.SY-g.z.y)/g.z.s-g.R.y)/g.R.h;
       if(u<0||u>1||v<0||v>1) return; tagSeed(k,u,v); S0.ax=null; S0.vis=false;
       toast('Pille sitzt jetzt auf dieser Person.',1600); };
-    el.addEventListener('pointermove',mv); el.addEventListener('pointerup',up); });
+    el.addEventListener('pointermove',mv); window.addEventListener('pointermove',mv); ['pointerup','pointercancel','lostpointercapture'].forEach(t=>{ el.addEventListener(t,up); window.addEventListener(t,up); }); });
 }
 
 /* ---------- Mehrere Läufe: fertige Overlays als Ebenen behalten (bis 4 Läufe) ---------- */
@@ -4639,7 +4648,9 @@ function openExport(){
   const L=mode==='single'&&S.clip.loop, hasLoop=!!(L&&(L.a!=null||L.b!=null));
   const opts=[]; if(hasLoop) opts.push(['loop','In – Out']); const ovCut=mode==='cmp'&&ovActive()&&(OV.cut.a!=null||OV.cut.b!=null); if(ovCut) opts.push(['ovcut','Start – Ende']); if(mode==='cmp'&&G.linked) opts.push(['sync','Ab Sync-Punkt']); opts.push(['here','Ab aktuellem Bild'],['all','Ganzes Video']);
   EXP.range=hasLoop?'loop':ovCut?'ovcut':'all'; EXP.rate=1; // Standard: Schnitt (falls gesetzt), sonst ganzes Video, Normaltempo
-  $('#expRange').innerHTML=opts.map(o=>`<button data-er="${o[0]}" class="${o[0]===EXP.range?'on':''}">${o[1]}</button>`).join('');
+  const keep=EXP.range, D0=expDecks()[0], sub=k=>{ if(k==='here') return 'Dauer wählbar'; EXP.range=k; const r=expRangeFrames(); EXP.range=keep; return (r.a/D0.fps).toFixed(1)+' – '+(r.b/D0.fps).toFixed(1)+' s'; };
+  $('#expRange').innerHTML=opts.map(o=>`<button data-er="${o[0]}" class="${o[0]===EXP.range?'on':''}"><b>${o[1]}</b><small>${sub(o[0])}</small></button>`).join('');
+  $('#expRange').classList.add('rgrid');
   $$('#expRate button').forEach(b=>b.classList.toggle('on',+b.dataset.r===EXP.rate));
   $('#expNotesRow').hidden=!(mode==='single');
   $('#expAnnRow').hidden=!ds.some(d=>d.clip&&d.clip.anns&&d.clip.anns.length); // nur zeigen, wenn es Zeichnungen gibt
@@ -4657,7 +4668,8 @@ function expRangeFrames(){
   else if(EXP.range==='all'){ a=0; }
   if(b==null){ b=EXP.range==='all'?D.nF-1:Math.min(D.nF-1,a+Math.round(EXP.dur*fps)); }
   if(mode==='cmp'){ // B muss mitlaufen
-    const bStart=EXP.range==='all'?0:G.linked?Math.round((a/fps+G.off)*B.fps):B.frame;
+    if(G.linked&&a/fps+G.off<0) a=Math.ceil(-G.off*fps); // B beginnt später: erst ab dort, wo beide laufen
+    const bStart=G.linked?Math.round((a/fps+G.off)*B.fps):EXP.range==='all'?0:B.frame;
     const lenB=(B.nF-1-bStart)/B.fps; b=Math.min(b,a+Math.floor(lenB*fps)); return {a,b,bStart};
   }
   return {a,b};
@@ -4697,7 +4709,7 @@ async function startExport(){
         spd=Math.max(0.15,spd*0.6); setRate(spd); D.seekFrame(lastF+1);
         if(mode==='cmp'&&G.linked&&B.ready){ B.v.currentTime=(lastF+1)/D.fps+G.off; } D.v.requestVideoFrameCallback(onF); return; }
       if(lastF!=null&&fr<=lastF){ D.v.requestVideoFrameCallback(onF); return; } lastF=fr;
-      D.frame=clamp(fr,0,D.nF-1); exportFrame(); if(!E.live) return;
+      E.lastCb=performance.now(); D.frame=clamp(fr,0,D.nF-1); exportFrame(); if(!E.live) return;
       if(spd<1&&++E.okN%12===0){ spd=Math.min(1,spd*1.12); setRate(spd); }
       const t=(md.mediaTime-E.t0)/EXP.rate;
       if(t>=-0.01) for(let k=0;k<dup;k++){ const ts=Math.round((Math.max(0,t)+k*fdt/dup)*1e6); if(ts<=E.lastTs) continue; E.lastTs=ts;
@@ -4705,7 +4717,7 @@ async function startExport(){
       D.v.requestVideoFrameCallback(onF); };
     D.v.requestVideoFrameCallback(onF);
     if(mode==='cmp'){ if(G.linked){ G.playing=true; A.play(); } else { A.play(); B.play(); } } else D.play();
-    return; }
+    expWatch(); return; }
   const types=['video/mp4;codecs=avc1.640028','video/mp4;codecs=avc1','video/mp4','video/webm;codecs=vp9','video/webm'];
   const mime=types.find(t=>MediaRecorder.isTypeSupported&&MediaRecorder.isTypeSupported(t))||'';
   const ofps=D.fps*EXP.rate>=45?60:30, stream=cv.captureStream(ofps);
@@ -4720,10 +4732,14 @@ async function startExport(){
   $('#expGo').textContent='Abbrechen'; $('#expProg').hidden=false;
   rec.start(250);
   if(mode==='cmp'){ if(G.linked){ G.playing=true; A.play(); } else { A.play(); B.play(); } } else D.play();
-  EXP.started=true;
+  EXP.started=true; expWatch();
 }
+// Am Ende kommt kein neues Bild mehr – darum separat prüfen, ob das Video fertig ist (sonst bleibt der Export bei 100 % stehen)
+function expWatch(){ const E=EXP; clearInterval(E.wd); E.lastCb=null; E.wd=setInterval(()=>{ if(!EXP.live){ clearInterval(E.wd); return; } const D=E.D, v=D&&D.v; if(!v) return;
+    const stuck=E.lastCb!=null&&performance.now()-E.lastCb>4000, end=v.ended||v.currentTime>=E.tEnd-0.6/D.fps||(mode==='cmp'&&B.v.ended);
+    if(end||(stuck&&v.currentTime>=E.tEnd-1)) finishExport(); else if(stuck&&v.paused&&!E.cancel){ E.lastCb=performance.now(); try{ v.play(); }catch(e){} } },300); } // nur am Schluss beenden – sonst bei Stillstand weiterlaufen lassen
 function exportFrame(){
-  const E=EXP; if(!E.live||!E.started) return; const {x,W,H,bar,ws,gap,opt,ds,D}=E;
+  const E=EXP; if(!E.live||!E.started) return; E.lastCb=performance.now(); const {x,W,H,bar,ws,gap,opt,ds,D}=E;
   x.fillStyle='#0d1116'; x.fillRect(0,0,W,H+bar);
   let ox=0;
   (E.ovl?[A]:ds).forEach((d,i)=>{ const w=ws[i]; drawVid(x,d,ox,0,w,H); if(E.ovl) ovDrawB(x,ox,0,w,H); else if(mode==='cmp'){ timDrawTo(x,d,ox,0,w,H); gateDrawTo(x,d,ox,0,w,H); } const R=d.rect();
@@ -4748,7 +4764,7 @@ async function wcConfig(w,h,fps){ if(typeof VideoEncoder==='undefined'||typeof V
   for(const codec of ['avc1.640028','avc1.640033','avc1.4d0033','avc1.42003e']){ const c={codec,width:w,height:h,bitrate:w*h>1e6?14e6:9e6,framerate:Math.max(25,Math.round(fps)),avc:{format:'avc'}};
     try{ const r=await VideoEncoder.isConfigSupported(c); if(r&&r.supported) return c; }catch(e){} } return null; }
 function finishExport(){
-  const E=EXP; if(!E.live) return; E.live=false; E.started=false;
+  const E=EXP; if(!E.live) return; E.live=false; E.started=false; clearInterval(E.wd);
   expDecks().forEach(d=>d.pause()); G.playing=false; S.useLoop=E.prevLoop; setRate(E.prevRate);
   if(E.wc){ (async()=>{ $('#expGo').textContent='Exportieren'; $('#expProg').hidden=true;
       if(E.cancel){ try{ E.enc.close(); }catch(e){} toast('Export abgebrochen.'); return; }
@@ -5310,7 +5326,7 @@ if(!LS.get('hint1',0)){ setTimeout(()=>{ toast(matchMedia('(pointer:coarse)').ma
 
 /* Update-Hinweis: prüft version.json auf GitHub Pages; «Aktualisieren» lädt die Seite ohne Cache neu */
 (()=>{
-  const BUILD='20261028201844'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
+  const BUILD='20261028211925'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
   // nach einem Update die ?v=… aus der Adresse entfernen
   try{ const u=new URL(location.href); if(u.searchParams.has('v')){ u.searchParams.delete('v'); history.replaceState(null,'',u.pathname+(u.search||'')+u.hash); } }catch(e){}
   const el=$('#upd'); let latest=null, snoozed=null, busy=false;
