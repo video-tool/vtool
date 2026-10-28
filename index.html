@@ -2209,6 +2209,7 @@ canvas.strip:focus-visible{outline:2px solid rgba(255,255,255,.35)!important;out
       <dt><kbd>?</kbd></dt><dd>Diese Hilfe</dd>
     </dl></div></section>
     <section class="hp" data-hp="mobile" hidden><dl>
+      <dt>Am Hang</dt><dd>Für den Einsatz draussen gibt es die schlanke Handy-App <a href="field/" target="_blank" rel="noopener" style="color:var(--red);font-weight:700">Video-Lab Field</a>: filmen, sofort in Zeitlupe ansehen, Side by Side, aufs Handy sichern</dd>
       <dt>Videos</dt><dd>«+» öffnet Videos aus Fotos oder Dateien – sie erscheinen unter «In Arbeit»</dd>
       <dt>Bedienen</dt><dd>Tippen = Abspielen · Zeitleiste wischen = Bild für Bild · zwei Finger = Lupe</dd>
       <dt>Sichern</dt><dd>Nach Export oder Standbild: «Teilen · In Fotos sichern»</dd>
@@ -5253,7 +5254,7 @@ if(!LS.get('hint1',0)){ setTimeout(()=>{ toast(matchMedia('(pointer:coarse)').ma
 
 /* Update-Hinweis: prüft version.json auf GitHub Pages; «Aktualisieren» lädt die Seite ohne Cache neu */
 (()=>{
-  const BUILD='20261028160037'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
+  const BUILD='20261028161754'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
   // nach einem Update die ?v=… aus der Adresse entfernen
   try{ const u=new URL(location.href); if(u.searchParams.has('v')){ u.searchParams.delete('v'); history.replaceState(null,'',u.pathname+(u.search||'')+u.hash); } }catch(e){}
   const el=$('#upd'); let latest=null, snoozed=null, busy=false;
