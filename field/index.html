@@ -58,7 +58,17 @@ svg{display:block}
 .sec h2{margin:0;font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
 .sec span{font:600 12px var(--mono);color:var(--muted)}
 .list{flex:1;overflow:auto;margin:0 -16px;padding:0 16px calc(var(--sb) + 110px);-webkit-overflow-scrolling:touch}
-.day{font-size:12px;font-weight:650;color:var(--muted);margin:14px 2px 7px}
+.day{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:650;color:var(--muted);margin:16px 2px 7px}
+.day span{flex:1}
+.dayb{height:30px;padding:0 10px;border-radius:9px;background:var(--card);border:1px solid var(--line);display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:650;color:var(--ink2)}
+.dayb .ic{width:15px;height:15px}
+.dayb.dm{width:30px;padding:0;justify-content:center}
+.clip .th .sv{position:absolute;left:5px;bottom:5px;width:18px;height:18px;border-radius:50%;background:var(--ok);display:flex;align-items:center;justify-content:center}
+.clip .th .sv .ic{width:12px;height:12px;color:#fff}
+.warn{margin:6px 0 4px;padding:12px 14px;border-radius:16px;background:rgba(240,138,36,.14);border:1px solid rgba(240,138,36,.4)}
+.warn[hidden]{display:none}
+.warn b{display:block;font-size:14.5px;color:#ffb366}
+.warn span{display:block;font-size:12.5px;color:var(--ink2);margin-top:3px;line-height:1.4}
 .clip{display:grid;grid-template-columns:104px minmax(0,1fr) 40px;gap:12px;align-items:center;padding:8px;border-radius:16px;background:var(--card);border:1px solid var(--line);margin-bottom:8px;position:relative;transition:background .15s,border-color .15s}
 .clip:active{background:var(--card2)}
 .clip .th{width:104px;aspect-ratio:16/9;border-radius:11px;background:#222935 center/cover no-repeat;position:relative;overflow:hidden}
@@ -101,6 +111,8 @@ svg{display:block}
 .recording .shut i{width:32px;height:32px;border-radius:9px}
 .cambot .side{display:flex;justify-content:flex-start}
 .cambot .side.r{justify-content:flex-end}
+.natcam{display:flex;flex-direction:column;align-items:center;gap:4px;color:#fff;font-size:10.5px;font-weight:650;text-align:center;line-height:1.2;text-shadow:0 1px 3px rgba(0,0,0,.6)}
+.natcam svg{width:44px;height:44px;padding:9px;border-radius:50%;background:rgba(0,0,0,.42);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
 .lastth{width:52px;height:52px;border-radius:14px;background:#222 center/cover;border:2px solid rgba(255,255,255,.7)}
 .camerr{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:30px;text-align:center;color:var(--ink2);font-size:14.5px;line-height:1.5}
 .camerr.on{display:flex}
@@ -141,6 +153,15 @@ svg{display:block}
 .cb.txt{font-size:12px;font-weight:700;flex-direction:column;gap:2px}
 .cb.txt .ic{width:20px;height:20px}
 
+/* Zoom */
+.stage video,.pane video{transform-origin:50% 50%;will-change:transform}
+.zchip{position:absolute;right:12px;top:12px;z-index:5;display:flex;align-items:center;gap:6px;height:34px;padding:0 12px 0 10px;border-radius:999px;background:rgba(0,0,0,.6);color:#fff;-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+.zchip[hidden]{display:none}
+.zchip svg{width:16px;height:16px}
+.zchip b{font:800 13px var(--mono)}
+.zchip i{font-style:normal;font-size:12px;font-weight:650;color:var(--ink2);padding-left:6px;border-left:1px solid rgba(255,255,255,.25)}
+#pair{position:relative}
+#sZoom{left:50%;right:auto;top:50%;transform:translate(-50%,-50%)}
 /* ---------- Side by Side ---------- */
 .pair{flex:1;min-height:0;display:flex;flex-direction:column;gap:3px;background:#000}
 @media (orientation:landscape){ .pair{flex-direction:row} }
@@ -173,6 +194,15 @@ svg{display:block}
 .sh .opt.del{color:#ff6b5f} .sh .opt.del .ic{color:#ff6b5f}
 .sh input{width:100%;height:52px;border-radius:14px;border:1px solid var(--line2);background:var(--card);color:#fff;font:600 17px var(--font);padding:0 14px;outline:none;-webkit-user-select:text;user-select:text}
 .chips{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0 16px}
+.chips.ath{max-height:38vh;overflow:auto}
+.chips .chh{flex-basis:100%;font-style:normal;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:8px 2px 0}
+.chips .chh:first-child{margin-top:0}
+.chips .noh{margin:6px 2px;font-size:13.5px;color:var(--ink2)}
+.segs{display:flex;gap:4px;margin-top:12px;padding:3px;border-radius:13px;background:var(--card)}
+.segs button{flex:1;height:36px;border-radius:10px;font-size:14px;font-weight:650;color:var(--ink2)}
+.segs button.on{background:var(--card2);color:#fff;box-shadow:0 1px 0 rgba(255,255,255,.06) inset}
+.segs button[hidden]{display:none}
+.chips button[hidden]{display:none}
 .chips button{height:36px;padding:0 14px;border-radius:999px;background:var(--card2);border:1px solid var(--line);font-size:14px;font-weight:600;color:var(--ink2)}
 .sh .row{display:flex;gap:10px}
 .sh .row>*{flex:1;justify-content:center}
@@ -215,6 +245,24 @@ svg{display:block}
 .inst-go{height:36px;padding:0 13px;border-radius:11px;background:#3b82f6;color:#fff;font-weight:700;font-size:13.5px;flex:none}
 .inst-x{width:32px;height:32px;border-radius:10px;display:flex;align-items:center;justify-content:center;color:var(--muted);flex:none;align-self:flex-start}
 .inst-x svg{width:16px;height:16px}
+
+/* Trainingstag */
+.sess{display:flex;align-items:center;gap:12px;width:100%;margin:10px 0 0;padding:11px 12px;border-radius:18px;background:var(--card);border:1px solid var(--line);text-align:left}
+.sess.need{border-color:rgba(218,41,28,.55);background:rgba(218,41,28,.09)}
+.sess-ic{width:38px;height:38px;border-radius:12px;background:var(--card2);display:flex;align-items:center;justify-content:center;flex:none;color:var(--ink2)}
+.sess-ic svg{width:20px;height:20px}
+.sess.need .sess-ic{background:var(--red);color:#fff}
+.sess-tx{flex:1;min-width:0}
+.sess-tx small{display:block;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.sess-tx b{display:block;font-size:15.5px;font-weight:700;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sess-go{font-size:13px;font-weight:650;color:var(--ink2);padding:7px 11px;border-radius:10px;background:var(--card2)}
+.sh label.fl{display:block;font-size:12px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);margin:14px 4px 7px}
+.sh input[type=date]{-webkit-appearance:none;appearance:none}
+.chips.disc button.on,.chips.run button.on{background:#fff;color:#0b0e13;border-color:#fff}
+.chips.run{margin:10px 0 4px;align-items:center}
+.chips.run .rl{font-size:12px;font-weight:700;color:var(--muted);margin-right:2px;letter-spacing:.04em;text-transform:uppercase}
+.chips.run{gap:6px;flex-wrap:nowrap;overflow-x:auto}
+.chips.run button{min-width:36px;padding:0 10px;flex:none}
 </style>
 </head>
 <body>
@@ -236,6 +284,7 @@ svg{display:block}
     <button class="big imp" id="goImp"><span class="bi"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="3"/><circle cx="9" cy="10" r="2"/><path d="M21 16l-5-5-9 9"/></svg></span><div class="bt"><b>Hinzufügen</b><small>Aus Fotos oder Dateien</small></div></button>
   </div>
   <input type="file" id="fileIn" accept="video/*" multiple hidden>
+  <button class="sess" id="sess"><span class="sess-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M8 3v4M16 3v4M3.5 10h17"/></svg></span><span class="sess-tx"><small>Trainingstag</small><b id="sessT"></b></span><span class="sess-go">Ändern</span></button>
   <div class="sec"><h2>Läufe</h2><span id="cnt"></span></div>
   <div class="list" id="list"></div>
   <div class="selbar"><p id="selTxt">Zwei Läufe antippen</p><button class="ghost" id="selX">Abbrechen</button><button class="pri" id="selGo" disabled>Vergleichen</button></div>
@@ -254,7 +303,7 @@ svg{display:block}
   <div class="cambot">
     <div class="side"><button class="lastth" id="camLast" aria-label="Letzte Aufnahme" hidden></button></div>
     <button class="shut" id="shut" aria-label="Aufnahme starten"><i></i></button>
-    <div class="side r"></div>
+    <div class="side r"><button class="natcam" id="camNat"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5" stroke-dasharray="1.6 2.2"/><circle cx="12" cy="12" r="3.2"/></svg><span>Zeitlupe<br>iPhone-Kamera</span></button><input type="file" id="natIn" accept="video/*" capture="environment" hidden></div>
   </div>
 </section>
 
@@ -265,7 +314,7 @@ svg{display:block}
     <button class="ttl" id="pName"><b></b><span></span></button>
     <button class="ib" id="pMore" aria-label="Mehr"><svg class="ic" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg></button>
   </div>
-  <div class="stage" id="pStage"><video id="pV" playsinline muted preload="auto"></video><span class="ratechip" id="pRateChip">1×</span><div class="flash" id="pFlash"></div><div class="hint" id="pHint">Über das Video wischen = Bild für Bild</div></div>
+  <div class="stage" id="pStage"><video id="pV" playsinline muted preload="auto"></video><span class="ratechip" id="pRateChip">1×</span><button class="zchip" id="pZoom" hidden aria-label="Zoom zurücksetzen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.2-4.2"/></svg><b>1×</b><i>Zurück</i></button><div class="flash" id="pFlash"></div><div class="hint" id="pHint">Wischen = Bild für Bild · 2 Finger = Zoom</div></div>
   <div class="dock">
     <div class="timer"><b id="pT">0.00 s</b><span id="pD">0.00 s</span></div>
     <div class="bar" id="pBar"><div class="tr"></div><div class="fi"></div><div class="kn"></div></div>
@@ -288,7 +337,7 @@ svg{display:block}
     <div class="ttl"><b>Side by Side</b><span id="sSub">Beide zum gleichen Tor, dann «Sync»</span></div>
     <button class="ib" id="sSwap" aria-label="A und B tauschen"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4v16M4 7l3-3 3 3M17 20V4M14 17l3 3 3-3"/></svg></button>
   </div>
-  <div class="pair unl" id="pair">
+  <div class="pair unl" id="pair"><button class="zchip" id="sZoom" hidden aria-label="Zoom zurücksetzen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.2-4.2"/></svg><b>1×</b><i>Zurück</i></button>
     <div class="pane pa act" data-k="a"><video playsinline muted preload="auto"></video><div class="tag"><i>A</i><span></span></div><span class="pt">0.00</span><div class="flash"></div></div>
     <div class="pane pb" data-k="b"><video playsinline muted preload="auto"></video><div class="tag"><i>B</i><span></span></div><span class="pt">0.00</span><div class="flash"></div></div>
   </div>
@@ -323,6 +372,7 @@ const IC={
   edit:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9a2.8 2.8 0 0 0-4-4L4 16z"/></svg>',
   sbs:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="5" width="8.5" height="14" rx="2"/><rect x="13" y="5" width="8.5" height="14" rx="2"/></svg>',
   del:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg>',
+  ok:'<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>',
   film:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="13" height="14" rx="2.5"/><path d="M16 10l5-3v10l-5-3"/></svg>'
 };
 $('#pPlay').innerHTML=IC.play; $('#sPlay').innerHTML=IC.play;
@@ -347,6 +397,30 @@ function urlOf(c){ if(!URLS.has(c.id)) URLS.set(c.id,URL.createObjectURL(c.blob)
 async function load(){ try{ CLIPS=(await dbAll()).sort((a,b)=>b.created-a.created); }catch(e){ CLIPS=[]; toast('Speicher nicht verfügbar – privates Fenster?'); } render(); }
 
 /* ---------- Video-Hilfen ---------- */
+const FPS_COMMON=[23.976,24,25,29.97,30,48,50,59.94,60,90,100,119.88,120,240];
+async function readRange(src,start,len){
+  if(src instanceof Blob) return {d:new Uint8Array(await src.slice(start,start+len).arrayBuffer()),total:src.size};
+  const r=await fetch(src,{headers:{Range:'bytes='+start+'-'+(start+len-1)}}); if(r.status!==206) throw new Error('no range');
+  const cr=r.headers.get('content-range')||''; const total=+(cr.split('/')[1]||0); return {d:new Uint8Array(await r.arrayBuffer()),total}; }
+async function mp4Fps(url){
+  let src=url; if(/^blob:/.test(url)) src=await (await fetch(url)).blob();
+  const u32=(d,o)=>((d[o]<<24)>>>0)+(d[o+1]<<16)+(d[o+2]<<8)+d[o+3], typ=(d,o)=>String.fromCharCode(d[o],d[o+1],d[o+2],d[o+3]);
+  let off=0, total=Infinity, moov=null;
+  for(let k=0;k<64&&off<total;k++){ const {d,total:t}=await readRange(src,off,16); if(t) total=t; if(d.length<8) break;
+    let size=u32(d,0); const type=typ(d,4); if(size===1) size=u32(d,8)*4294967296+u32(d,12); else if(size===0) size=total-off;
+    if(type==='moov'){ if(size>40e6) return null; moov=(await readRange(src,off,size)).d; break; }
+    if(size<8) break; off+=size; }
+  if(!moov) return null;
+  const kids=(d,s,e)=>{ const out=[]; let o=s; while(o+8<=e){ let sz=u32(d,o); const tp=typ(d,o+4); let h=8; if(sz===1){ sz=u32(d,o+8)*4294967296+u32(d,o+12); h=16; } if(sz<8||o+sz>e) break; out.push({t:tp,s:o+h,e:o+sz}); o+=sz; } return out; };
+  const find=(d,b,t)=>kids(d,b.s,b.e).find(x=>x.t===t);
+  for(const tr of kids(moov,8,moov.length).filter(x=>x.t==='trak')){
+    const md=find(moov,tr,'mdia'); if(!md) continue; const hd=find(moov,md,'hdlr'); if(!hd||typ(moov,hd.s+8)!=='vide') continue;
+    const mh=find(moov,md,'mdhd'); const ts=moov[mh.s]===1?u32(moov,mh.s+20):u32(moov,mh.s+12);
+    const st=find(moov,find(moov,find(moov,md,'minf'),'stbl'),'stts'); if(!st||!ts) continue;
+    const n=u32(moov,st.s+4); let cnt=0,dur=0; for(let i=0;i<n;i++){ const c=u32(moov,st.s+8+i*8), dl=u32(moov,st.s+12+i*8); cnt+=c; dur+=c*dl; }
+    if(cnt>1&&dur>0){ const f=ts*cnt/dur; let best=f,bd=1e9; for(const c of FPS_COMMON){ const x=Math.abs(c-f); if(x<bd){ bd=x; best=c; } } return bd<=Math.max(0.05,best*0.004)?best:Math.round(f*1000)/1000; } }
+  return null; }
+
 function vidFrom(url){ return new Promise((res,rej)=>{ const v=document.createElement('video'); v.muted=true; v.playsInline=true; v.preload='auto'; v.src=url; v.onloadedmetadata=()=>res(v); v.onerror=()=>rej(new Error('video')); }); }
 function seekTo(v,t){ return new Promise(res=>{ let done=false; const f=()=>{ if(done) return; done=true; v.removeEventListener('seeked',f); res(); }; v.addEventListener('seeked',f); setTimeout(f,2500); v.currentTime=Math.max(0,t); }); }
 async function fixDur(v){ if(isFinite(v.duration)&&v.duration>0) return v.duration; // aufgenommenes WebM hat keine Länge im Kopf
@@ -356,7 +430,7 @@ async function meta(blob){ const url=URL.createObjectURL(blob); try{ const v=awa
     return {dur, w:v.videoWidth, h:v.videoHeight, thumb:cv.toDataURL('image/jpeg',0.72)}; }
   catch(e){ return {dur:0,w:0,h:0,thumb:''}; } finally{ URL.revokeObjectURL(url); } }
 const nextName=()=>{ const n=CLIPS.filter(c=>/^Lauf \d+$/.test(c.name)).map(c=>+c.name.slice(5)); return 'Lauf '+((n.length?Math.max(...n):0)+1); };
-async function addClip(blob,o){ const m=await meta(blob); const c={id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),name:o.name||nextName(),created:o.created||Date.now(),blob,mime:blob.type||'video/mp4',fps:o.fps||null,...m};
+async function addClip(blob,o){ const m=await meta(blob); if(!o.fps){ try{ o.fps=await mp4Fps(URL.createObjectURL(blob))||null; }catch(e){} } const c={sess:o.sess||(typeof SESS!=='undefined'&&SESS.disc?{...SESS}:null),id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),name:o.name||nextName(),created:o.created||Date.now(),blob,mime:blob.type||'video/mp4',fps:o.fps||null,...m};
   try{ await dbPut(c); }catch(e){ toast('Speicher voll – alte Läufe löschen.',3500); return null; } CLIPS.unshift(c); CLIPS.sort((a,b)=>b.created-a.created); render(); return c; }
 
 /* ---------- Startseite ---------- */
@@ -364,13 +438,18 @@ const SEL={on:false,a:null,b:null};
 function dayLabel(ts){ const d=new Date(ts), n=new Date(); const k=x=>x.toDateString(); if(k(d)===k(n)) return 'Heute'; const y=new Date(n); y.setDate(n.getDate()-1); if(k(d)===k(y)) return 'Gestern'; return d.toLocaleDateString('de-CH',{weekday:'long',day:'numeric',month:'long'}); }
 const hhmm=ts=>new Date(ts).toLocaleTimeString('de-CH',{hour:'2-digit',minute:'2-digit'});
 function clipRow(c,opts={}){ const r=document.createElement('div'); r.className='clip'+(SEL.a===c.id?' pa':SEL.b===c.id?' pb':''); r.dataset.id=c.id;
-  r.innerHTML=`<span class="th" style="${c.thumb?`background-image:url(${c.thumb})`:''}"><em>${fmtDur(c.dur)}</em></span><span class="tx"><b>${esc(c.name)}</b><span>${hhmm(c.created)}${c.fps?' · '+Math.round(c.fps)+' fps':''}</span></span>`+(opts.noMore?'':`<button class="more" aria-label="Optionen">${IC.more}</button>`)+`<span class="ck">${SEL.a===c.id?'A':SEL.b===c.id?'B':''}</span>`;
+  r.innerHTML=`<span class="th" style="${c.thumb?`background-image:url(${c.thumb})`:''}"><em>${fmtDur(c.dur)}</em>${c.saved?'<i class="sv" title="In Fotos gesichert">'+IC.ok+'</i>':''}</span><span class="tx"><b>${esc(c.ath?[c.ath,c.run?'Lauf '+c.run:''].filter(Boolean).join(' · '):c.name)}</b><span>${c.ath&&c.sess?esc([c.sess.place,c.sess.disc].filter(Boolean).join(' ')+' · '):''}${hhmm(c.created)}${c.fps?' · '+Math.round(c.fps)+' fps':''}</span></span>`+(opts.noMore?'':`<button class="more" aria-label="Optionen">${IC.more}</button>`)+`<span class="ck">${SEL.a===c.id?'A':SEL.b===c.id?'B':''}</span>`;
   return r; }
 function render(){ const el=$('#list'); el.innerHTML=''; $('#cnt').textContent=CLIPS.length?CLIPS.length+(CLIPS.length===1?' Lauf':' Läufe'):'';
   if(!CLIPS.length){ el.innerHTML=`<div class="empty">${IC.film}Noch keine Läufe.<br>«Filmen» drücken oder ein Video aus Fotos hinzufügen.</div>`; return; }
-  let day=null; CLIPS.forEach(c=>{ const d=dayLabel(c.created); if(d!==day){ day=d; const h=document.createElement('div'); h.className='day'; h.textContent=d; el.appendChild(h); } el.appendChild(clipRow(c)); });
+  const warn=document.createElement('div'); warn.className='warn'; warn.id='stWarn'; warn.hidden=true; el.appendChild(warn);
+  let day=null; CLIPS.forEach(c=>{ const d=dayLabel(c.created); if(d!==day){ day=d; const k=new Date(c.created).toDateString(), n=CLIPS.filter(x=>new Date(x.created).toDateString()===k), ok=n.every(x=>x.saved);
+      const h=document.createElement('div'); h.className='day'; h.innerHTML=`<span>${esc(d)}</span><button class="dayb" data-day="${esc(k)}">${ok?IC.ok+'Gesichert':IC.save+'Alle sichern'}</button><button class="dayb dm" data-daym="${esc(k)}" aria-label="Optionen für diesen Tag">${IC.more}</button>`; el.appendChild(h); } el.appendChild(clipRow(c)); });
+  storageUI();
   $('#home').classList.toggle('sel',SEL.on); $('#selGo').disabled=!(SEL.a&&SEL.b); $('#selTxt').textContent=!SEL.a?'Lauf A antippen':!SEL.b?'Lauf B antippen':'Bereit zum Vergleichen'; }
-$('#list').addEventListener('click',e=>{ const r=e.target.closest('.clip'); if(!r) return; const c=CLIPS.find(x=>x.id===r.dataset.id); if(!c) return;
+$('#list').addEventListener('click',e=>{ const db=e.target.closest('[data-day]'), dm=e.target.closest('[data-daym]');
+  if(db){ saveDay(db.dataset.day); return; } if(dm){ dayMenu(dm.dataset.daym); return; }
+  const r=e.target.closest('.clip'); if(!r) return; const c=CLIPS.find(x=>x.id===r.dataset.id); if(!c) return;
   if(SEL.on){ if(SEL.a===c.id) SEL.a=null; else if(SEL.b===c.id) SEL.b=null; else if(!SEL.a) SEL.a=c.id; else if(!SEL.b) SEL.b=c.id; else SEL.b=c.id; render(); return; }
   if(e.target.closest('.more')){ clipMenu(c); return; } openPlayer(c); });
 $('#btnSbs').addEventListener('click',()=>{ if(CLIPS.length<2){ toast('Für Side by Side braucht es mindestens zwei Läufe.'); return; } SEL.on=!SEL.on; SEL.a=SEL.b=null; render(); });
@@ -400,18 +479,63 @@ function renameSheet(c,after){ const recent=LS.get('names',[]).filter(n=>n!==c.n
     async(o,b)=>{ if(o==='chip'){ $('#nmIn').value=b.dataset.n; o='ok'; } if(o==='x'){ closeSheet(); return; } if(o!=='ok') return;
       const v=$('#nmIn').value.trim(); closeSheet(); if(!v||v===c.name) return; c.name=v; await dbPut(c); const L=LS.get('names',[]); LS.set('names',[v,...L.filter(n=>n!==v)].slice(0,12)); render(); if(after) after(); });
   setTimeout(()=>{ const i=$('#nmIn'); if(i){ i.focus(); i.select(); } i&&i.addEventListener('keydown',e=>{ if(e.key==='Enter') $('[data-o="ok"]').click(); }); },120); }
+/* Athlet:innen (vorläufige Liste – wird durch die komplette Kaderliste ersetzt) */
+const ROSTER=[["Kohler","Marco","Kohler","Mastery WC Speed","M"],["Miggiano","Alessio","Miggiano","Mastery WC Speed","M"],["Monney","Alexis","Monney","Mastery WC Speed","M"],["Murisier","Justin","Murisier","Mastery WC Speed","M"],["Rösti","Lars","Rösti","Mastery WC Speed","M"],["Rogentin","Stefan","Rogentin","Mastery WC Speed","M"],["von Allmen","Franjo","von Allmen","Mastery WC Speed","M"],["Caviezel","Gino","Caviezel","Mastery WC GS","M"],["Hächler","Lenz","Hächler","Mastery WC GS","M"],["Odermatt","Marco","Odermatt","Mastery WC GS","M"],["Tumler","Thomas","Tumler","Mastery WC GS","M"],["Aerni","Luca","Aerni","Mastery WC SL","M"],["Iten","Matthias","Iten","Mastery WC SL","M"],["L. Meillard","Loïc","Meillard","Mastery WC SL","M"],["Nef","Tanguy","Nef","Mastery WC SL","M"],["Yule","Daniel","Yule","Mastery WC SL","M"],["Boisset","Arnaud","Boisset","Elite WC Speed","M"],["Hiltbrand","Livio","Hiltbrand","Elite WC Speed","M"],["Manser","Sandro","Manser","Elite WC Speed","M"],["Mettler","Josua","Mettler","Elite WC Speed","M"],["Zulauf","Gaël","Zulauf","Elite WC Speed","M"],["Lehto","Elian","Lehto","Elite WC Speed","M"],["Janutin","Fadri","Janutin","Elite WC GS","M"],["Zurbrügg","Sandro","Zurbrügg","Elite WC GS","M"],["Fux","Giuliano","Fux","Elite WC SL","M"],["Lütolf","Joel","Lütolf","Elite WC SL","M"],["R. Mächler","Reto","Mächler","Elite WC SL","M"],["Vogt","Florian","Vogt","Elite WC SL","M"],["Chable","Loïc","Chable","Elite EC Speed","M"],["Cuche","Remi","Cuche","Elite EC Speed","M"],["Kälin","Philipp","Kälin","Elite EC Speed","M"],["Ott","Dominic","Ott","Elite EC Speed","M"],["Torrent","Christophe","Torrent","Elite EC Speed","M"],["Trummer","Niklas","Trummer","Elite EC Speed","M"],["Wyler","Eric","Wyler","Elite EC Speed","M"],["Janet","Gabin","Janet","Elite EC GS","M"],["Schrag","Yann","Schrag","Elite EC GS","M"],["Wyrsch","Aurelio","Wyrsch","Elite EC GS","M"],["Zippert","Thomas","Zippert","Elite EC GS","M"],["Bebi","Joel","Bebi","Elite Nachwuchs 1","M"],["Clarke","Robert","Clarke","Elite Nachwuchs 1","M"],["Kusano","Toru","Kusano","Elite Nachwuchs 1","M"],["Rickenbach","Nick","Rickenbach","Elite Nachwuchs 1","M"],["Sinnesberger","Lenny","Sinnesberger","Elite Nachwuchs 1","M"],["Spencer","Jack","Spencer","Elite Nachwuchs 1","M"],["Glassey","Mathieu","Glassey","Elite Nachwuchs 2","M"],["Hannart","Aymeric","Hannart","Elite Nachwuchs 2","M"],["Kretz","Ben","Kretz","Elite Nachwuchs 2","M"],["Küng","Joel","Küng","Elite Nachwuchs 2","M"],["Moser","Sven","Moser","Elite Nachwuchs 2","M"],["Schaer","Maxime","Schaer","Elite Nachwuchs 2","M"],["Stucky","Luis","Stucky","Elite Nachwuchs 2","M"],["Salvetti","Igor","Salvetti","Elite Nachwuchs 2","M"],["Blanc","Malorie","Blanc","Mastery WC 1","F"],["Flury","Jasmine","Flury","Mastery WC 1","F"],["Schmitt","Janine","Schmitt","Mastery WC 1","F"],["C. Suter","Corinne","Suter","Mastery WC 1","F"],["J. Suter","Jasmina","Suter","Mastery WC 1","F"],["Gut-Behrami","Lara","Gut-Behrami","Mastery WC 1","F"],["Durrer","Delia","Durrer","Mastery WC 1","F"],["Gisin","Michelle","Gisin","Mastery WC 1","F"],["Allenbach","Dania","Allenbach","Mastery WC 2","F"],["Darbellay","Delphine","Darbellay","Mastery WC 2","F"],["Kasper","Vanessa","Kasper","Mastery WC 2","F"],["Piller","Sue","Piller","Mastery WC 2","F"],["S. Zehnder","Shaienne","Zehnder","Mastery WC 2","F"],["Grob","Stefanie","Grob","Mastery WC 2","F"],["Holdener","Wendy","Holdener","Mastery WC 3","F"],["M. Meillard","Mélanie","Meillard","Mastery WC 3","F"],["Rast","Camille","Rast","Mastery WC 3","F"],["Christen","Eliane","Christen","Mastery WC 3","F"],["J. Mächler","Janine","Mächler","Mastery WC 3","F"],["Höpli","Aline","Höpli","Mastery WC 3","F"],["Mathis","Jasmin","Mathis","Elite EC 1","F"],["Zurlinden","Daria","Zurlinden","Elite EC 1","F"],["Reichenbach","Celine","Reichenbach","Elite EC 1","F"],["Wenger","Fabienne","Wenger","Elite EC 1","F"],["Stucki","Elena","Stucki","Elite EC 1","F"],["Elsa","Sina","Elsa","Elite EC 1","F"],["Frei","Allegra","Frei","Elite EC 1","F"],["Jenal","Stephanie","Jenal","Elite EC 1","F"],["Mannhart","Zoé","Mannhart","Elite EC 1","F"],["Willi","Alina","Willi","Elite EC 2","F"],["Pedrazzi","Isabella","Pedrazzi","Elite EC 2","F"],["Fausch","Sina","Fausch","Elite EC 2","F"],["Huber","Laura","Huber","Elite EC 2","F"],["Rossi","Livia","Rossi","Elite EC 2","F"],["Läubli","Aisha","Läubli","Elite EC 2","F"],["Fournier","Juliette","Fournier","Elite EC 3","F"],["Bianchi","Lara","Bianchi","Elite EC 3","F"],["Bont","Minna","Bont","Elite EC 3","F"],["A. Flatscher","Anna","Flatscher","Elite EC 3","F"],["Phillips","Mathilde","Phillips","Elite EC 3","F"],["Egloff","Selina","Egloff","Elite EC 4","F"],["Klopfenstein","Amélie","Klopfenstein","Elite EC 4","F"],["Danioth","Aline","Danioth","Elite EC 4","F"],["Brändli","Anuk","Brändli","Elite EC 4","F"],["Kuster","Elyssa","Kuster","Elite EC 4","F"],["Buff","Faye","Buff","Elite EC 4","F"],["S. Flatscher","Sophia","Flatscher","Elite Nachwuchs","F"],["Herzog","Justine","Herzog","Elite Nachwuchs","F"],["Romer","Elin","Romer","Elite Nachwuchs","F"],["Wienert","Julie","Wienert","Elite Nachwuchs","F"],["Lanz","Chiara","Lanz","Elite Nachwuchs","F"],["L. Zehnder","Leandra","Zehnder","Elite Nachwuchs","F"]]; // Swiss-Ski Alpin 26/27, Rolle «Athlete» (nur Namen und Trainingsgruppe)
+function nextRun(ath,me){ const d=new Date(me.created).toDateString(); const L=CLIPS.filter(c=>c!==me&&c.ath===ath&&new Date(c.created).toDateString()===d&&c.created<me.created); const mx=Math.max(0,...L.map(c=>c.run||0)); return Math.max(mx,L.length)+1; }
+function clipTitle(c){ if(!c.ath) return c.name; const S=c.sess, mid=S?[S.place,S.disc].filter(Boolean).join(' '):''; return [c.ath,mid,c.run?'Lauf '+c.run:''].filter(Boolean).join(' · '); }
+function runName(ath,me){ return clipTitle({...me,ath,run:me.run}); }
+const RN=ROSTER.map(r=>r[0]);
+function askName(c){ const recent=LS.get('aths',[]).filter(Boolean).slice(0,10); let seg=LS.get('athSeg',recent.length?'r':'M'); let run='auto';
+  sheet(`<h3>Wer ist gefahren?</h3><input id="athIn" placeholder="Name suchen (Vor- oder Nachname)" maxlength="40" autocomplete="off" enterkeyhint="done">
+    <div class="chips run" id="athRun"><span class="rl">Lauf</span><button data-o="run" data-r="auto" class="on">Auto</button><button data-o="run" data-r="0">ohne</button>${[1,2,3,4,5,6].map(n=>`<button data-o="run" data-r="${n}">${n}</button>`).join('')}</div>
+    <div class="segs" id="athSeg"><button data-s="r">Zuletzt</button><button data-s="M">Männer</button><button data-s="F">Frauen</button></div>
+    <div class="chips ath" id="athChips"></div>
+    <div class="row"><button class="ghost" data-o="skip">Später</button><button class="pri" data-o="ok">Übernehmen</button></div>`,
+    async(o,b)=>{ if(o==='run'){ run=b.dataset.r; $$('#athRun button').forEach(x=>x.classList.toggle('on',x===b)); return; } if(o==='skip'){ closeSheet(); return; } if(o==='seg'){ seg=b.dataset.s; LS.set('athSeg',seg); draw(); return; } let v=o==='ath'?b.dataset.n:($('#athIn').value||'').trim(); if(o!=='ath'&&o!=='ok') return; if(!v){ closeSheet(); return; }
+      const hit=ROSTER.find(r=>[r[0],r[2],r[1]+' '+r[2]].some(x=>x.toLowerCase()===v.toLowerCase())); if(hit) v=hit[0]; closeSheet(); c.ath=v; c.run=run==='auto'?nextRun(v,c):(+run||null); c.name=clipTitle(c); await dbPut(c); LS.set('aths',[v,...LS.get('aths',[]).filter(n=>n!==v)].slice(0,10)); render();
+      if(P.c===c){ $('#pName b').textContent=c.name; } toast(c.name,1400); });
+  const chip=n=>`<button data-o="ath" data-n="${esc(n)}">${esc(n)}</button>`;
+  const draw=()=>{ const q=($('#athIn').value||'').trim().toLowerCase(); $$('#athSeg button').forEach(x=>{ x.classList.toggle('on',!q&&x.dataset.s===seg); x.dataset.o='seg'; x.hidden=x.dataset.s==='r'&&!recent.length; });
+    let h=''; if(q){ const L=ROSTER.filter(r=>(r[1]+' '+r[2]).toLowerCase().includes(q)||r[0].toLowerCase().includes(q)); h=L.length?L.map(r=>chip(r[0])).join(''):`<p class="noh">Nicht in der Liste – «Übernehmen» speichert «${esc($('#athIn').value.trim())}».</p>`; }
+    else if(seg==='r'){ h=recent.map(chip).join(''); }
+    else { let g=null; ROSTER.filter(r=>r[4]===seg).forEach(r=>{ if(r[3]!==g){ g=r[3]; h+=`<i class="chh">${esc(g)}</i>`; } h+=chip(r[0]); }); }
+    $('#athChips').innerHTML=h; };
+  draw(); const inp=$('#athIn'); inp.addEventListener('input',draw);
+  inp.addEventListener('keydown',e=>{ if(e.key==='Enter'){ const vis=$$('#athChips button'); if(vis.length===1) vis[0].click(); else $('[data-o="ok"]').click(); } }); }
 function pickOther(c){ const others=CLIPS.filter(x=>x!==c); if(!others.length){ toast('Noch kein zweiter Lauf vorhanden.'); return; }
   sheet(`<h3>Vergleichen mit …</h3><div class="pick" id="pickL"></div>`); const L=$('#pickL'); others.forEach(x=>{ const r=clipRow(x,{noMore:true}); r.dataset.o='pick'; L.appendChild(r); });
   L.onclick=e=>{ const r=e.target.closest('.clip'); if(!r) return; const b=CLIPS.find(x=>x.id===r.dataset.id); closeSheet(); openSbs(c,b); }; }
 
 /* ---------- Sichern aufs Handy (Fotos / Dateien) ---------- */
 const extOf=c=>/mp4/.test(c.mime)?'mp4':/quicktime/.test(c.mime)?'mov':/webm/.test(c.mime)?'webm':'mp4';
-const fileName=c=>(c.name.replace(/[^\wäöüÄÖÜéèà\- ]+/g,'').trim().replace(/\s+/g,'_')||'Lauf')+'_'+new Date(c.created).toISOString().slice(0,10)+'.'+extOf(c);
+const fileNameOld=c=>(c.name.replace(/[^\wäöüÄÖÜéèà\- ]+/g,'').trim().replace(/\s+/g,'_')||'Lauf')+'_'+new Date(c.created).toISOString().slice(0,10)+'.'+extOf(c);
+function fileName(c){ if(!c.ath) return fileNameOld(c); const cl=t=>String(t||'').trim().replace(/\s+/g,'-').replace(/[\\/:*?"<>|_.]+/g,'-').replace(/-+/g,'-').replace(/^-|-$/g,'');
+  const r=ROSTER.find(x=>x[0]===c.ath), dup=r&&ROSTER.filter(x=>x[2]===r[2]).length>1, ath=r?(dup?r[2]+'-'+r[1]:r[2]):c.ath;
+  const S=c.sess||{}, d=(S.date||isoDay(c.created)).replace(/-/g,'').slice(2), sex=r?(r[4]==='F'?'W':'M'):'';
+  return [cl(ath),cl(S.place),d,S.disc||'',sex,c.run?'L'+c.run:''].filter(Boolean).join('_')+'.'+extOf(c); }
 async function saveBlob(blob,name){
   const f=new File([blob],name,{type:blob.type||'video/mp4'});
   if(navigator.canShare&&navigator.canShare({files:[f]})){ try{ await navigator.share({files:[f]}); return true; }catch(e){ if(e&&e.name==='AbortError') return false; } }
   const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=name; document.body.appendChild(a); a.click(); setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); },4000); toast('Gespeichert in Downloads: '+name,3000); return true; }
-function saveClip(c){ saveBlob(c.blob,fileName(c)); }
+async function saveClip(c){ if(await saveBlob(c.blob,fileName(c))){ c.saved=true; dbPut(c).catch(()=>{}); render(); } }
+const dayClips=k=>CLIPS.filter(x=>new Date(x.created).toDateString()===k).sort((a,b)=>a.created-b.created);
+async function saveDay(k){ const L=dayClips(k); if(!L.length) return; const files=L.map(c=>new File([c.blob],fileName(c),{type:c.blob.type||'video/mp4'}));
+  let ok=false; if(navigator.canShare&&navigator.canShare({files})){ try{ await navigator.share({files}); ok=true; }catch(e){ if(e&&e.name==='AbortError') return; } }
+  if(!ok){ for(const c of L){ await saveBlob(c.blob,fileName(c)); await new Promise(r=>setTimeout(r,500)); } ok=true; }
+  if(ok){ L.forEach(c=>{ c.saved=true; dbPut(c).catch(()=>{}); }); render(); toast(L.length+(L.length===1?' Lauf':' Läufe')+' gesichert',2200); } }
+function dayMenu(k){ const L=dayClips(k), mb=L.reduce((a,c)=>a+(c.blob.size||0),0); const unsaved=L.filter(c=>!c.saved).length;
+  sheet(`<h3>${esc(dayLabel(L[0].created))} · ${L.length} ${L.length===1?'Lauf':'Läufe'} · ${fmtMB(mb)}</h3>
+    <button class="opt" data-o="save">${IC.save}Alle in Fotos sichern</button>
+    <button class="opt del" data-o="del">${IC.del}Alle löschen${unsaved?' <small style="color:var(--muted);font-weight:500">('+unsaved+' noch nicht gesichert)</small>':''}</button>`, async o=>{ closeSheet();
+    if(o==='save') saveDay(k);
+    else if(o==='del'){ if(!window.confirm(L.length+(L.length===1?' Lauf':' Läufe')+' löschen?'+(unsaved?' '+unsaved+' davon sind noch nicht gesichert.':''))) return;
+      for(const c of L){ await dbDel(c.id); if(URLS.has(c.id)){ URL.revokeObjectURL(URLS.get(c.id)); URLS.delete(c.id); } } CLIPS=CLIPS.filter(c=>!L.includes(c)); render(); toast('Gelöscht – '+fmtMB(mb)+' frei'); } }); }
+const fmtMB=b=>b>=1e9?(b/1e9).toFixed(1)+' GB':Math.max(1,Math.round(b/1e6))+' MB';
+async function storageUI(){ const used=CLIPS.reduce((a,c)=>a+(c.blob&&c.blob.size||0),0); let free=null;
+  try{ if(navigator.storage&&navigator.storage.estimate){ const e=await navigator.storage.estimate(); if(e.quota) free=Math.max(0,e.quota-(e.usage||used)); } }catch(e){}
+  $('#cnt').textContent=CLIPS.length?CLIPS.length+(CLIPS.length===1?' Lauf':' Läufe')+' · '+fmtMB(used)+(free!=null?' · noch '+fmtMB(free)+' frei':''):'';
+  const w=$('#stWarn'); if(!w) return; const low=free!=null&&(free<1.5e9||used/(used+free)>0.85), uns=CLIPS.filter(c=>!c.saved).length;
+  w.hidden=!low; if(low) w.innerHTML=`<b>Speicher fast voll</b><span>Nur noch ${fmtMB(free)} frei. Läufe sichern (Fotos) und danach in der App löschen.${uns?' '+uns+' Läufe sind noch nicht gesichert.':''}</span>`; }
 
 /* ---------- Navigation ---------- */
 let SCR='home';
@@ -424,7 +548,7 @@ document.addEventListener('visibilitychange',()=>{ if(document.hidden&&SCR==='ca
 const CAM={stream:null,facing:LS.get('facing','environment'),fps:null}, REC={on:false,mr:null,chunks:[],t0:0,tick:null}; let wake=null;
 async function camStart(){ $('#camErr').classList.remove('on');
   if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){ camErr('Dieser Browser kann nicht auf die Kamera zugreifen. Bitte Safari (iPhone) oder Chrome (Android) verwenden – oder «Hinzufügen» nutzen.'); return; }
-  const tries=[{width:{ideal:1920},height:{ideal:1080},frameRate:{ideal:60,min:30}},{width:{ideal:1920},height:{ideal:1080},frameRate:{ideal:60}},{width:{ideal:1280},height:{ideal:720}},{}];
+  const tries=[{width:{ideal:1920},height:{ideal:1080},frameRate:{exact:60}},{width:{ideal:1280},height:{ideal:720},frameRate:{exact:60}},{width:{ideal:1920},height:{ideal:1080},frameRate:{min:50,ideal:60}},{width:{ideal:1920},height:{ideal:1080},frameRate:{ideal:60}},{width:{ideal:1280},height:{ideal:720}},{}]; // zuerst echte 60 fps verlangen
   for(const t of tries){ try{ CAM.stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:CAM.facing},...t},audio:false}); break; }catch(e){ CAM.stream=null; if(e&&(e.name==='NotAllowedError'||e.name==='SecurityError')){ camErr('Bitte den Kamera-Zugriff erlauben (iPhone: Einstellungen › Safari › Kamera › Erlauben).'); return; } } }
   if(!CAM.stream){ camErr('Keine Kamera gefunden.'); return; }
   const v=$('#camV'); v.srcObject=CAM.stream; v.style.transform=CAM.facing==='user'?'scaleX(-1)':''; try{ await v.play(); }catch(e){}
@@ -442,20 +566,22 @@ function recStart(){ if(!CAM.stream||REC.on) return; const mime=recMime(); let m
 function recStop(keep=true){ if(!REC.on) return; REC.on=false; clearInterval(REC.tick); $('#cam').classList.remove('recording'); const pill=$('#camInfo'); pill.classList.remove('live');
   const mr=REC.mr, fps=CAM.fps; mr.onstop=async()=>{ if(!keep) return; const type=(mr.mimeType||'video/mp4').split(';')[0]; const blob=new Blob(REC.chunks,{type}); REC.chunks=[];
     if(blob.size<2000){ toast('Aufnahme zu kurz.'); return; } busy(true,'Wird gespeichert …'); const c=await addClip(blob,{fps}); busy(false);
-    if(c){ $('#camLast').hidden=false; $('#camLast').style.backgroundImage=c.thumb?`url(${c.thumb})`:''; $('#camLast').dataset.id=c.id; openPlayer(c,{fresh:true}); } };
+    if(c){ $('#camLast').hidden=false; $('#camLast').style.backgroundImage=c.thumb?`url(${c.thumb})`:''; $('#camLast').dataset.id=c.id; openPlayer(c,{fresh:true}); askName(c); } };
   try{ mr.stop(); }catch(e){} if(navigator.vibrate) navigator.vibrate([20,40,20]); if(!keep) setTimeout(()=>{ $('#camInfo').textContent='Kamera'; },0); }
-$('#goCam').addEventListener('click',()=>{ show('cam'); camStart(); });
+$('#goCam').addEventListener('click',()=>{ const go=()=>{ show('cam'); camStart(); }; if(!SESS.disc&&!LS.get('sessAsk',0)){ LS.set('sessAsk',1); sessSheet(go); return; } go(); });
 $('#camX').addEventListener('click',()=>show('home'));
 $('#camRetry').addEventListener('click',camStart);
 $('#shut').addEventListener('click',()=>REC.on?recStop(true):recStart());
 $('#camFlip').addEventListener('click',()=>{ if(REC.on) return; CAM.facing=CAM.facing==='environment'?'user':'environment'; LS.set('facing',CAM.facing); camStop(); camStart(); });
+$('#camNat').addEventListener('click',()=>{ if(REC.on) return; $('#natIn').click(); });
+$('#natIn').addEventListener('change',async e=>{ const f=e.target.files[0]; e.target.value=''; if(!f) return; busy(true,'Video wird übernommen …'); const c=await addClip(f,{}); busy(false); if(c){ openPlayer(c,{fresh:true}); askName(c); } });
 $('#camLast').addEventListener('click',()=>{ const c=CLIPS.find(x=>x.id===$('#camLast').dataset.id); if(c) openPlayer(c); });
 
 /* ---------- Player ---------- */
 const RATES=[1,0.5,0.25,0.125];
 const rateTxt=r=>r===1?'1×':r===0.5?'½×':r===0.25?'¼×':'⅛×';
 const P={v:$('#pV'),c:null,rate:LS.get('rate',0.5),fps:30,scrub:null};
-async function openPlayer(c,o={}){ P.c=c; show('play'); const v=P.v; v.src=urlOf(c); P.fps=c.fps||30; $('#pName b').textContent=c.name; $('#pName span').textContent=hhmm(c.created)+(c.fps?' · '+Math.round(c.fps)+' fps':'');
+async function openPlayer(c,o={}){ P.c=c; if(typeof ZP!=='undefined'){ ZP.s=1; ZP.x=ZP.y=0; zpApply(); } show('play'); const v=P.v; v.src=urlOf(c); P.fps=c.fps||30; $('#pName b').textContent=c.name; $('#pName span').textContent=hhmm(c.created)+(c.fps?' · '+Math.round(c.fps)+' fps':'');
   v.onloadedmetadata=async()=>{ if(!isFinite(v.duration)||!v.duration){ await fixDur(v); } setRate(o.fresh?LS.get('rate',0.5):P.rate,true); pUI(); if(o.fresh){ v.currentTime=0; v.play().catch(()=>{}); } else { v.currentTime=Math.min(0.01,v.duration||0); } };
   if(!c.fps) measureFps(v,f=>{ if(P.c===c&&f){ P.fps=f; c.fps=f; dbPut(c).catch(()=>{}); $('#pName span').textContent=hhmm(c.created)+' · '+Math.round(f)+' fps'; } });
   const h=$('#pHint'); h.style.opacity=LS.get('hint',0)<3?1:0; LS.set('hint',LS.get('hint',0)+1); setTimeout(()=>h.style.opacity=0,3500); }
@@ -473,7 +599,7 @@ function holdBtn(el,fn){ let t1=null,t2=null; const stop=()=>{ clearTimeout(t1);
 $$('[data-st]').forEach(b=>holdBtn(b,()=>stepV(P.v,P.fps,+b.dataset.st)));
 $('#pBack').addEventListener('click',()=>show('home'));
 $('#pMore').addEventListener('click',()=>P.c&&clipMenu(P.c,true));
-$('#pName').addEventListener('click',()=>P.c&&renameSheet(P.c,()=>{ $('#pName b').textContent=P.c.name; }));
+$('#pName').addEventListener('click',()=>P.c&&askName(P.c));
 $('#pSave').addEventListener('click',()=>P.c&&saveClip(P.c));
 // Zeitleiste ziehen
 function barDrag(bar,getV,onSeek){ let on=false; const pos=e=>{ const r=bar.getBoundingClientRect(); return clamp((e.clientX-r.left)/r.width,0,1); };
@@ -481,17 +607,36 @@ function barDrag(bar,getV,onSeek){ let on=false; const pos=e=>{ const r=bar.getB
   bar.addEventListener('pointermove',e=>{ if(on) onSeek(pos(e)); }); bar.addEventListener('pointerup',()=>on=false); bar.addEventListener('pointercancel',()=>on=false); }
 barDrag($('#pBar'),()=>P.v,f=>{ P.v.currentTime=f*dur(P.v); });
 // Über das Video wischen = Bild für Bild, Tippen = Abspielen/Pause
-function swipeScrub(el,onStep,onTap){ let s=null;
-  el.addEventListener('pointerdown',e=>{ s={x:e.clientX,y:e.clientY,acc:0,moved:false,t:performance.now()}; el.setPointerCapture(e.pointerId); });
-  el.addEventListener('pointermove',e=>{ if(!s) return; const dx=e.clientX-s.x; if(!s.moved&&Math.abs(dx)>8) s.moved=true; if(!s.moved) return; const k=Math.trunc(dx/9); if(k){ onStep(k); s.x+=k*9; } });
-  el.addEventListener('pointerup',e=>{ if(s&&!s.moved&&performance.now()-s.t<400) onTap(e); s=null; }); el.addEventListener('pointercancel',()=>s=null); }
-swipeScrub($('#pStage'),k=>stepV(P.v,P.fps,k),pToggle);
+/* Gesten auf dem Video: 1 Finger wischen = Bild für Bild · Tippen = Abspielen/Pause · 2 Finger = zoomen & verschieben · Doppeltippen = Zoom an/aus */
+function Zm(){ return {s:1,x:0,y:0}; }
+function zClamp(Z,el){ const W=el.clientWidth, H=el.clientHeight; Z.s=clamp(Z.s,1,6); const mx=(Z.s-1)*W/2, my=(Z.s-1)*H/2; Z.x=clamp(Z.x,-mx,mx); Z.y=clamp(Z.y,-my,my); if(Z.s<1.02){ Z.s=1; Z.x=0; Z.y=0; } }
+function zApply(Z,vids,chip){ vids.forEach(v=>{ v.style.transform=Z.s>1?`translate(${Z.x}px,${Z.y}px) scale(${Z.s})`:''; }); if(chip){ chip.hidden=Z.s<=1; const b=$('b',chip); if(b) b.textContent=Z.s.toFixed(1)+'×'; } }
+function gesture(el,o){ const pts=new Map(); let sc=null, pin=null, lastTap=0, tapT=null;
+  const rel=e=>{ const r=el.getBoundingClientRect(); return [e.clientX-r.left-r.width/2, e.clientY-r.top-r.height/2]; };
+  el.addEventListener('pointerdown',e=>{ el.setPointerCapture(e.pointerId); pts.set(e.pointerId,rel(e));
+    if(pts.size===1){ sc={x:e.clientX,y:e.clientY,moved:false,t:performance.now()}; }
+    if(pts.size===2){ sc=null; const [a,b]=[...pts.values()], Z=o.zoom(); pin={d:Math.hypot(a[0]-b[0],a[1]-b[1])||1,m:[(a[0]+b[0])/2,(a[1]+b[1])/2],z:{...Z},el:o.zel?o.zel():el}; } });
+  el.addEventListener('pointermove',e=>{ if(!pts.has(e.pointerId)) return; pts.set(e.pointerId,rel(e));
+    if(pin&&pts.size>=2){ const [a,b]=[...pts.values()], d=Math.hypot(a[0]-b[0],a[1]-b[1])||1, m=[(a[0]+b[0])/2,(a[1]+b[1])/2], Z=o.zoom();
+      const s1=clamp(pin.z.s*d/pin.d,1,6), px=(pin.m[0]-pin.z.x)/pin.z.s, py=(pin.m[1]-pin.z.y)/pin.z.s; Z.s=s1; Z.x=m[0]-px*s1; Z.y=m[1]-py*s1; zClamp(Z,pin.el); o.apply(); return; }
+    if(!sc) return; const dx=e.clientX-sc.x; if(!sc.moved&&Math.abs(dx)>8) sc.moved=true; if(!sc.moved) return; const k=Math.trunc(dx/9); if(k){ o.step(k); sc.x+=k*9; } });
+  const up=e=>{ const had=pts.has(e.pointerId); pts.delete(e.pointerId); if(pts.size<2) pin=null;
+    if(had&&sc&&!sc.moved&&e.type==='pointerup'&&performance.now()-sc.t<400&&pts.size===0){ const now=performance.now(), p=rel(e);
+      if(now-lastTap<300){ clearTimeout(tapT); lastTap=0; const Z=o.zoom(), zel=o.zel?o.zel():el; if(Z.s>1){ Z.s=1; Z.x=0; Z.y=0; } else { Z.s=2.5; Z.x=-p[0]*1.5; Z.y=-p[1]*1.5; zClamp(Z,zel); } o.apply(); }
+      else { lastTap=now; tapT=setTimeout(()=>o.tap(e),260); } }
+    if(pts.size===0) sc=null; };
+  el.addEventListener('pointerup',up); el.addEventListener('pointercancel',up);
+  el.addEventListener('wheel',e=>{ if(!e.ctrlKey) return; e.preventDefault(); const Z=o.zoom(), p=rel(e), s0=Z.s, s1=clamp(s0*Math.exp(-e.deltaY*0.01),1,6), px=(p[0]-Z.x)/s0, py=(p[1]-Z.y)/s0; Z.s=s1; Z.x=p[0]-px*s1; Z.y=p[1]-py*s1; zClamp(Z,o.zel?o.zel():el); o.apply(); },{passive:false}); }
+const ZP=Zm(); const zpApply=()=>zApply(ZP,[P.v],$('#pZoom'));
+gesture($('#pStage'),{step:k=>stepV(P.v,P.fps,k),tap:pToggle,zoom:()=>ZP,apply:zpApply});
+$('#pZoom').addEventListener('click',e=>{ e.stopPropagation(); ZP.s=1; ZP.x=ZP.y=0; zpApply(); });
+$('#pZoom').addEventListener('pointerdown',e=>e.stopPropagation());
 function pUI(){ const v=P.v, d=dur(v), t=v.currentTime||0, f=d?t/d:0; $('#pT').textContent=fmt(t); $('#pD').textContent=fmt(d)+' · Bild '+Math.round(t*P.fps);
   $('#pBar .fi').style.width=(f*100)+'%'; $('#pBar .kn').style.left=(f*100)+'%'; const pl=!v.paused; if($('#pPlay')._pl!==pl){ $('#pPlay')._pl=pl; $('#pPlay').innerHTML=pl?IC.pause:IC.play; } }
 
 /* ---------- Side by Side ---------- */
 const SB={a:null,b:null,va:$('.pane.pa video'),vb:$('.pane.pb video'),act:'a',linked:false,off:0,rate:LS.get('rate',0.5),fa:30,fb:30};
-function openSbs(a,b){ SB.a=a; SB.b=b; SB.linked=false; SB.off=0; SB.act='a'; show('sbs'); SB.va.src=urlOf(a); SB.vb.src=urlOf(b); SB.fa=a.fps||30; SB.fb=b.fps||30;
+function openSbs(a,b){ if(typeof ZS!=='undefined'){ ZS.s=1; ZS.x=ZS.y=0; zsApply(); } SB.a=a; SB.b=b; SB.linked=false; SB.off=0; SB.act='a'; show('sbs'); SB.va.src=urlOf(a); SB.vb.src=urlOf(b); SB.fa=a.fps||30; SB.fb=b.fps||30;
   $('.pane.pa .tag span').textContent=a.name; $('.pane.pb .tag span').textContent=b.name;
   [SB.va,SB.vb].forEach(v=>{ v.onloadedmetadata=async()=>{ if(!isFinite(v.duration)||!v.duration) await fixDur(v); v.currentTime=0.01; v.playbackRate=SB.rate; }; });
   sRateSet(SB.rate); sUI(); }
@@ -506,7 +651,9 @@ function sToggle(){ if(sPlaying()){ SB.va.pause(); SB.vb.pause(); return; }
 $('#sPlay').addEventListener('click',sToggle);
 function sStep(n){ if(SB.linked){ stepV(SB.va,SB.fa,n); SB.vb.pause(); SB.vb.currentTime=clamp(SB.va.currentTime+SB.off,0,dur(SB.vb)); } else stepV(sAct(),SB.act==='a'?SB.fa:SB.fb,n); }
 $$('[data-ss]').forEach(b=>holdBtn(b,()=>sStep(+b.dataset.ss)));
-$$('.pane').forEach(p=>swipeScrub(p,k=>{ if(!SB.linked){ SB.act=p.dataset.k; } sStep(k); },()=>{ if(!SB.linked&&SB.act!==p.dataset.k){ SB.act=p.dataset.k; sUI(); return; } sToggle(); flash($('.flash',p),sPlaying()); }));
+const ZS=Zm(); const zsApply=()=>zApply(ZS,[SB.va,SB.vb],$('#sZoom'));
+$('#sZoom').addEventListener('click',e=>{ e.stopPropagation(); ZS.s=1; ZS.x=ZS.y=0; zsApply(); });
+$$('.pane').forEach(p=>gesture(p,{zoom:()=>ZS,apply:zsApply,zel:()=>p,step:k=>{ if(!SB.linked){ SB.act=p.dataset.k; } sStep(k); },tap:()=>{ if(!SB.linked&&SB.act!==p.dataset.k){ SB.act=p.dataset.k; sUI(); return; } sToggle(); flash($('.flash',p),sPlaying()); }}));
 $('#sSync').addEventListener('click',()=>{ SB.va.pause(); SB.vb.pause(); if(SB.linked){ SB.linked=false; toast('Getrennt – A und B einzeln einstellen.'); } else { SB.off=SB.vb.currentTime-SB.va.currentTime; SB.linked=true; toast('Synchron – beide laufen jetzt zusammen.'); } sUI(); });
 $('#sSwap').addEventListener('click',()=>{ if(SB.a&&SB.b) openSbs(SB.b,SB.a); });
 $('#sBack').addEventListener('click',()=>show('home'));
@@ -529,9 +676,11 @@ async function sbsExport(){ if(!SB.a||!SB.b) return; if(!SB.linked){ toast('Zuer
   va.pause(); vb.pause(); await Promise.all([seekTo(va,start),seekTo(vb,start+SB.off)]);
   let stop=false; busy(true,'Vergleich wird als Video gesichert … (Tippen = Stopp)'); $('#busy').onclick=()=>{ stop=true; };
   const lab=(t,c,X,Y)=>{ x.font='700 26px Geist,-apple-system,sans-serif'; const w=x.measureText(t).width+54; x.fillStyle='rgba(0,0,0,.6)'; x.beginPath(); x.roundRect?x.roundRect(X,Y,w,40,20):x.rect(X,Y,w,40); x.fill(); x.fillStyle=c; x.beginPath(); x.arc(X+20,Y+20,12,0,7); x.fill(); x.fillStyle='#fff'; x.fillText(t,X+40,Y+29); };
+  const crop=(v,el)=>{ const vw=v.videoWidth||16, vh=v.videoHeight||9; if(ZS.s<=1) return [0,0,vw,vh]; const k=Math.min(el.clientWidth/vw,el.clientHeight/vh)||1, cx=vw/2-ZS.x/ZS.s/k, cy=vh/2-ZS.y/ZS.s/k, w=vw/ZS.s, h=vh/ZS.s; return [clamp(cx-w/2,0,vw-w),clamp(cy-h/2,0,vh-h),w,h]; };
+  const pa=$('.pane.pa'), pb=$('.pane.pb'), dI=(v,el,X,Y,W,H)=>{ const c=crop(v,el); x.drawImage(v,c[0],c[1],c[2],c[3],X,Y,W,H); }; // Zoom wird mitgesichert
   const draw=()=>{ x.fillStyle='#000'; x.fillRect(0,0,cv.width,cv.height);
-    if(land){ const H=cv.height; const fit=(v,X)=>{ const s=Math.min(1280/(v.videoWidth||16),H/(v.videoHeight||9)), w=(v.videoWidth||16)*s, h=(v.videoHeight||9)*s; x.drawImage(v,X+(1280-w)/2,(H-h)/2,w,h); }; fit(va,0); fit(vb,1288); lab(SB.a.name,'#3b82f6',16,16); lab(SB.b.name,'#f08a24',1304,16); }
-    else { x.drawImage(va,0,0,W1,hA); x.drawImage(vb,0,hA+8,W1,hB); lab(SB.a.name,'#3b82f6',16,16); lab(SB.b.name,'#f08a24',16,hA+24); }
+    if(land){ const H=cv.height; const fit=(v,X,el)=>{ const s=Math.min(1280/(v.videoWidth||16),H/(v.videoHeight||9)), w=(v.videoWidth||16)*s, h=(v.videoHeight||9)*s; dI(v,el,X+(1280-w)/2,(H-h)/2,w,h); }; fit(va,0,pa); fit(vb,1288,pb); lab(SB.a.name,'#3b82f6',16,16); lab(SB.b.name,'#f08a24',1304,16); }
+    else { dI(va,pa,0,0,W1,hA); dI(vb,pb,0,hA+8,W1,hB); lab(SB.a.name,'#3b82f6',16,16); lab(SB.b.name,'#f08a24',16,hA+24); }
     x.font='700 24px "Geist Mono",ui-monospace,monospace'; x.textAlign='right'; x.fillStyle='rgba(0,0,0,.6)'; const tt=(va.currentTime-start).toFixed(2)+' s'+(SB.rate<1?'  '+rateTxt(SB.rate):''); const tw=x.measureText(tt).width+24; x.fillRect(cv.width-tw-14,14,tw,38); x.fillStyle='#fff'; x.fillText(tt,cv.width-26,42); x.textAlign='left'; };
   mr.start(500); va.playbackRate=SB.rate; vb.playbackRate=SB.rate; await Promise.all([va.play(),vb.play()]).catch(()=>{});
   await new Promise(res=>{ const loop=()=>{ draw(); if(Math.abs(vb.currentTime-(va.currentTime+SB.off))>0.08) vb.currentTime=va.currentTime+SB.off; if(stop||va.ended||vb.ended||va.currentTime>=hi-0.02){ res(); return; } requestAnimationFrame(loop); }; loop(); });
@@ -542,6 +691,24 @@ async function sbsExport(){ if(!SB.a||!SB.b) return; if(!SB.linked){ toast('Zuer
 (function tick(){ if(SCR==='play'&&P.c) pUI(); else if(SCR==='sbs'&&SB.a){ if(SB.linked&&!SB.va.paused&&Math.abs(SB.vb.currentTime-(SB.va.currentTime+SB.off))>0.08){ SB.vb.currentTime=SB.va.currentTime+SB.off; } sUI(); } requestAnimationFrame(tick); })();
 
 /* ---------- Start ---------- */
+/* ---------- Trainingstag: Datum + Disziplin (Pflicht), Ort (optional) ---------- */
+const DISC=[['SL','Slalom'],['GS','Riesenslalom'],['SG','Super-G'],['DH','Abfahrt'],['PAR','Parallel']];
+const isoDay=d=>{ const x=new Date(d); return x.getFullYear()+'-'+String(x.getMonth()+1).padStart(2,'0')+'-'+String(x.getDate()).padStart(2,'0'); };
+let SESS=LS.get('sess',{date:isoDay(Date.now()),disc:'',place:''}); if(SESS.date<isoDay(Date.now())){ SESS.date=isoDay(Date.now()); LS.set('sess',SESS); } // neuer Tag: Datum von selbst auf heute
+const sessDay=d=>new Date(d+'T12:00').toLocaleDateString('de-CH',{weekday:'short',day:'numeric',month:'numeric'});
+function sessUI(){ const el=$('#sess'); el.classList.toggle('need',!SESS.disc); $('#sessT').textContent=SESS.disc?[sessDay(SESS.date),SESS.disc,SESS.place].filter(Boolean).join(' · '):'Disziplin wählen'; $('.sess-go',el).textContent=SESS.disc?'Ändern':'Einrichten'; }
+function sessSheet(after){ const places=LS.get('places',[]);
+  sheet(`<h3>Trainingstag</h3><label class="fl">Datum</label><input type="date" id="sdDate" value="${SESS.date}">
+    <label class="fl">Disziplin</label><div class="chips disc" id="sdDisc">${DISC.map(([k,l])=>`<button data-o="disc" data-k="${k}" class="${SESS.disc===k?'on':''}" title="${l}">${k} <span style="opacity:.6;font-weight:500">${l}</span></button>`).join('')}</div>
+    <label class="fl">Ort <span style="text-transform:none;letter-spacing:0;font-weight:500">(optional)</span></label><input id="sdPlace" value="${esc(SESS.place)}" placeholder="z. B. Saas-Fee" maxlength="30" autocomplete="off">
+    ${places.length?`<div class="chips" style="margin-top:8px">${places.map(p=>`<button data-o="pl" data-p="${esc(p)}">${esc(p)}</button>`).join('')}</div>`:'<div style="height:14px"></div>'}
+    <div class="row"><button class="ghost" data-o="x">Abbrechen</button><button class="pri" data-o="ok">Speichern</button></div>`,
+    (o,b)=>{ if(o==='disc'){ $$('#sdDisc button').forEach(x=>x.classList.toggle('on',x===b)); return; } if(o==='pl'){ $('#sdPlace').value=b.dataset.p; return; } if(o==='x'){ closeSheet(); return; } if(o!=='ok') return;
+      const d=$('#sdDisc button.on'); if(!d){ toast('Bitte eine Disziplin wählen.'); return; } const pl=$('#sdPlace').value.trim();
+      SESS={date:$('#sdDate').value||isoDay(Date.now()),disc:d.dataset.k,place:pl}; LS.set('sess',SESS); if(pl) LS.set('places',[pl,...places.filter(x=>x!==pl)].slice(0,8)); closeSheet(); sessUI(); if(after) after(); }); }
+$('#sess').addEventListener('click',()=>sessSheet());
+sessUI();
+
 /* ---------- Hinweis: als App auf den Home-Bildschirm ---------- */
 (()=>{ const standalone=matchMedia('(display-mode: standalone)').matches||navigator.standalone===true; if(standalone||LS.get('instNo',0)>Date.now()) return;
   const ua=navigator.userAgent, ios=/iPhone|iPad|iPod/.test(ua)||(/Macintosh/.test(ua)&&navigator.maxTouchPoints>1), safari=ios&&!/CriOS|FxiOS|EdgiOS|OPiOS|GSA\//.test(ua);
