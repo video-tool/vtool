@@ -1757,6 +1757,14 @@ body.recording .rec-btn svg circle:last-child{color:#fff}
 #sideTree.has-roots #ftTools .ft-addmini{display:grid}
 
 .ft-none{padding:14px 10px;font-size:12px;color:var(--muted);text-align:center}
+
+/* Basic-Dock: keine Überlappung nach Entfernen von Loop */
+#viewSingle .dock.dock3{display:flex!important;align-items:center;justify-content:center;gap:10px 14px;flex-wrap:wrap}
+#viewSingle .dock.dock3 .dz-l{display:none!important}
+#viewSingle .dock.dock3 .dz-c{flex:0 0 auto}
+#viewSingle .dock.dock3 .dz-r{flex:1 1 auto;justify-content:flex-end;display:flex;min-width:0}
+/* doppelte Zeitleisten-Beschriftung weg (Name steht jetzt in der Leiste) */
+.tl-lab{display:none!important}
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
   .aurora{display:none}
@@ -3191,11 +3199,14 @@ function motBlobs(cur,curOk,prv,prvOk,Qi,W,H){ const n=W*H, m=new Uint8Array(n);
   const D=new Float64Array((W+1)*(H+1)); for(let y=0;y<H;y++){ let rs=0; for(let x=0;x<W;x++){ rs+=lum[y*W+x]<110?1:0; D[(y+1)*(W+1)+x+1]=D[y*(W+1)+x+1]+rs; } }
   const dk=(x,y,r)=>{ x=Math.round(x); y=Math.round(y); const x0=Math.max(0,x-r),y0=Math.max(0,y-r),x1=Math.min(W,x+r+1),y1=Math.min(H,y+r+1); return (D[y1*(W+1)+x1]-D[y0*(W+1)+x1]-D[y1*(W+1)+x0]+D[y0*(W+1)+x0])/((x1-x0)*(y1-y0)); };
   return blobs(morph(m,W,H,true),W,H,3).filter(b=>b.a<n*0.03&&(b.a>=60||dk(b.x,b.y,10)<0.16)).sort((a,b)=>b.a-a.a).slice(0,10).map(b=>[Math.round(b.x*10)/10,Math.round(b.y*10)/10,b.a]); }
-function trackViterbi(S,key,W,seed){ // seed: {i,x,y}
-  const N=S.length, sig=W*0.04, NEG=-1e18, K=6, layers=[];
-  for(let i=0;i<N;i++){ const q=S[i].q||[1,0,0,0,1,0];
-    let blobsI=(S[i][key]||[]).map(b=>({x:b[0],y:b[1],em:1+Math.log(1+b[2])}));
-    if(seed&&i===seed.i){ blobsI=blobsI.filter(b=>Math.hypot(b.x-seed.x,b.y-seed.y)<W*0.05); blobsI.push({x:seed.x,y:seed.y,em:2}); blobsI.forEach(b=>b.em+=8); }
+function trackViterbi(S,key,W,seeds){ // seeds: [{i,x,y}] – angetippte Ankerpunkte
+  const SM=new Map((Array.isArray(seeds)?seeds:seeds?[seeds]:[]).map(q=>[q.i,q]));
+  const N=S.length, sig=W*0.04, NEG=-1e18, K=6, layers=[], cw=TRK_CW;
+  for(let i=0;i<N;i++){ const q=S[i].q||[1,0,0,0,1,0], c0=(key==='mb'?S[i].cb:S[i].ca)||[W/2,W*0.28];
+    // Wer filmt, hält die Fahrer:in meist nahe der Bildmitte → Abstand zur Mitte kostet
+    let blobsI=(S[i][key]||[]).map(b=>{ const dc=Math.hypot(b[0]-c0[0],b[1]-c0[1])/(W*0.22); return {x:b[0],y:b[1],em:1+Math.log(1+b[2])-cw*dc*dc}; });
+    const seed=SM.get(i);
+    if(seed){ blobsI=blobsI.filter(b=>Math.hypot(b.x-seed.x,b.y-seed.y)<W*0.05); blobsI.push({x:seed.x,y:seed.y,em:2}); blobsI.forEach(b=>b.em+=8); }
     const st=[]; const P=i?layers[i-1]:null;
     let bestPrev=null; if(P) for(const p of P) if(!bestPrev||p.sc>bestPrev.sc) bestPrev=p;
     for(const c of blobsI){ let sc=i?NEG:c.em-4, from=null;
@@ -3203,11 +3214,20 @@ function trackViterbi(S,key,W,seed){ // seed: {i,x,y}
       if(P&&bestPrev){ const v=bestPrev.sc+c.em-14; if(v>sc){ sc=v; from=bestPrev; } } // neu fassen (teuer)
       st.push({x:c.x,y:c.y,sc,from,coast:0,real:true}); }
     if(P){ const top=[...P].sort((u,v)=>v.sc-u.sc).slice(0,K); for(const p of top){ if(p.coast>=10) continue; const pp=affApply(q,p.x,p.y); st.push({x:pp[0],y:pp[1],sc:p.sc-0.9-(p.coast*0.15),from:p,coast:p.coast+1,real:false}); } }
-    if(seed&&i===seed.i) for(const x of st) if(!x.real) x.sc=NEG;
+    if(seed) for(const x of st) if(!x.real) x.sc=NEG;
     layers.push(st.length?st:[{x:W/2,y:W*0.28,sc:i?(bestPrev?bestPrev.sc-2:0):0,from:bestPrev,coast:99,real:false}]); }
   let cur=null; for(const x of layers[N-1]) if(!cur||x.sc>cur.sc) cur=x;
   const out=new Array(N); for(let i=N-1;i>=0;i--){ out[i]=cur&&cur.coast<=8?[cur.x,cur.y]:null; cur=cur?cur.from:null; }
+  if(SM.size){ // Kette Bild i → Bild 0 (Welt) aus den Kamerabewegungen
+    const G=[[1,0,0,0,1,0]]; for(let i=1;i<N;i++) G.push(affMul(G[i-1],affInv(S[i].q||[1,0,0,0,1,0])));
+    const toW=(i,p)=>affApply(G[i],p[0],p[1]), fromW=(i,p)=>affApply(affInv(G[i]),p[0],p[1]);
+    const an=[...SM.values()].sort((a,b)=>a.i-b.i);
+    for(let k=0;k<an.length-1;k++){ const a=an[k], b=an[k+1], wa=toW(a.i,[a.x,a.y]), wb=toW(b.i,[b.x,b.y]);
+      for(let i=a.i;i<=b.i;i++){ const f=(i-a.i)/Math.max(1,b.i-a.i), wp=[wa[0]+(wb[0]-wa[0])*f,wa[1]+(wb[1]-wa[1])*f], ip=fromW(i,wp);
+        if(!out[i]||Math.hypot(out[i][0]-ip[0],out[i][1]-ip[1])>W*0.04) out[i]=ip; } }
+    for(const a of an) out[a.i]=[a.x,a.y]; }
   const sm=out.map((p,i)=>{ if(!p) return null; let sx=0,sy=0,w=0; for(let k=-2;k<=2;k++){ const q=out[i+k]; if(!q) continue; const ww=3-Math.abs(k); sx+=q[0]*ww; sy+=q[1]*ww; w+=ww; } return [sx/w,sy/w]; });
+  for(const a of SM.values()) if(a.i<N) sm[a.i]=[a.x,a.y]; // Anker exakt
   return sm; }
 function tracksBuild(){ if(!GH.S||!GH.S.length||!GH.S.some(s=>s.ma)) { GH.trk=null; return; } const seeds=GH.seeds||{};
   GH.trk={a:trackViterbi(GH.S,'ma',GH.W0,seeds.a),b:trackViterbi(GH.S,'mb',GH.W0,seeds.b)}; TGD.f=-1; }
@@ -3687,7 +3707,7 @@ if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)) window.add
 /* Namen setzen: Fahrer:in einmal antippen – ab dort wird genau diese Person verfolgt */
 function tagSeed(k,u,v){ const e=ovE(); if(!GH.S||!GH.S.length) return;
   if(k[0]==='l'){ const L=LAY[+k.slice(1)]; if(!L||!L.S[0]||!L.S.some(s=>s.mb)) return; const i=clamp(Math.round((ovTA()-L.t0)/L.step),0,L.S.length-1); L.trkB=trackViterbi(L.S,'mb',L.W0,{i,x:u*L.W0,y:v*L.hA}); return; }
-  const i=clamp(Math.round(e/GH.step),0,GH.S.length-1); (GH.seeds=GH.seeds||{})[k]={i,x:u*GH.W0,y:v*GH.hA}; tracksBuild(); if(typeof resSave==='function') resSave(); }
+  const i=clamp(Math.round(e/GH.step),0,GH.S.length-1); GH.seeds=GH.seeds||{}; let L=GH.seeds[k]; if(!Array.isArray(L)) L=GH.seeds[k]=L?[L]:[]; const near=L.findIndex(q=>Math.abs(q.i-i)<=2); if(near>=0) L.splice(near,1); L.push({i,x:u*GH.W0,y:v*GH.hA}); tracksBuild(); if(typeof resSave==='function') resSave(); }
 function tagKeys(){ const L=[{k:'a',n:lastName(A.clip)}]; if(B.clip) L.push({k:'b',n:lastName(B.clip)}); LAY.forEach((l,i)=>L.push({k:'l'+i,n:l.name})); return L; }
 function tagsReset(){ TAGS.path={}; TAGS.seedPts={}; TAGS.cand={}; MOV.prev=null; for(const k in TRK) delete TRK[k]; GH.seeds={}; if(GH.S&&GH.S.length) tracksBuild(); }
 function nameSetStart(){ if(!ovFollowOK()&&!LAY.length){ toast('Zuerst «Overlay erstellen».'); return; } A.pause(); B.pause(); G.playing=false; cmpPlayIcon();
@@ -3784,7 +3804,7 @@ document.addEventListener('click',e=>{ const b=e.target.closest('[data-act="sbs"
   setTimeout(()=>{ if(!B.clip){ const sel=$('#selB'); sel&&sel.focus(); toast('Jetzt Video B wählen – oben bei B oder in der Liste «B» drücken.',3600); } else toast('Side by Side: '+lastName(A.clip)+' vs '+lastName(B.clip)+'. Gleichen Moment einstellen, dann «Sync».',3200); },450); });
 
 /* ---------- Auto-Sync beim Einfügen von B: gleicher Kamerastandort → gleiche Kameralage = gleicher Ort der Fahrer:in ---------- */
-const AS={key:'',busy:false};
+const AS={key:'',busy:false}; var TRK_CW=3;
 async function autoSyncFind(ca,cb){
   const W=64, H=36, cv=document.createElement('canvas'); cv.width=W; cv.height=H; const x=cv.getContext('2d',{willReadFrequently:true});
   const grab=v=>{ x.drawImage(v,0,0,W,H); const d=x.getImageData(0,0,W,H).data, g=new Float32Array(W*H); let m=0; for(let i=0,j=0;i<g.length;i++,j+=4){ g[i]=0.299*d[j]+0.587*d[j+1]+0.114*d[j+2]; m+=g[i]; } m/=g.length; for(let i=0;i<g.length;i++) g[i]-=m; return g; }; // Helligkeit ausgleichen
@@ -4864,7 +4884,7 @@ if(!LS.get('hint1',0)){ setTimeout(()=>{ toast(matchMedia('(pointer:coarse)').ma
 
 /* Update-Hinweis: prüft version.json auf GitHub Pages; «Aktualisieren» lädt die Seite ohne Cache neu */
 (()=>{
-  const BUILD='20261028075626'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
+  const BUILD='20261028085408'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
   // nach einem Update die ?v=… aus der Adresse entfernen
   try{ const u=new URL(location.href); if(u.searchParams.has('v')){ u.searchParams.delete('v'); history.replaceState(null,'',u.pathname+(u.search||'')+u.hash); } }catch(e){}
   const el=$('#upd'); let latest=null, snoozed=null, busy=false;
