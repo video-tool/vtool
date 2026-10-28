@@ -1873,6 +1873,20 @@ body.tl-slim .tl-zoom{top:2px;right:5px}
 body.tl-slim .tl-zoom button{height:18px!important;width:22px!important;font-size:12px;border-radius:6px!important}
 .tl-zoom .tl-film svg{width:13px;height:13px}
 body:not(.tl-slim) .tl-zoom .tl-film{background:rgba(255,255,255,.28)!important}
+
+/* Video aus der Liste in A / B / Basic ziehen */
+.vd-on .stage{transition:box-shadow .15s}
+.vd-on .stage.vd-target{box-shadow:inset 0 0 0 2px rgba(255,255,255,.22)}
+.stage.vd-over{box-shadow:inset 0 0 0 3px #DA291C,0 0 0 4px rgba(218,41,28,.18)!important}
+.stage.vd-over::after{content:attr(data-vd);position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:30;pointer-events:none;
+  font:700 15px var(--font);color:#fff;background:rgba(218,41,28,.92);padding:10px 18px;border-radius:999px;box-shadow:0 10px 30px -10px rgba(0,0,0,.6);white-space:nowrap}
+.vd-ghost{position:fixed;left:-999px;top:-999px;padding:7px 12px;border-radius:999px;background:#14181f;color:#fff;font:700 12.5px var(--font);white-space:nowrap}
+
+/* Eine Zeitleiste: ganze Länge + Lupe in einem (Übersicht entfällt) */
+.tl .ov-wrap{display:none!important}
+
+canvas.strip:focus{outline:none!important;box-shadow:none}
+canvas.strip:focus-visible{outline:2px solid rgba(255,255,255,.35)!important;outline-offset:1px}
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
   .aurora{display:none}
@@ -2149,7 +2163,7 @@ body:not(.tl-slim) .tl-zoom .tl-film{background:rgba(255,255,255,.28)!important}
     <section class="hp" data-hp="basic" hidden><dl>
       <dt>Abspielen</dt><dd>Leertaste oder Klick ins Video · Tempo-Knopf wechselt 1× → ½× → ¼× → 0.1×</dd>
       <dt>Bild für Bild</dt><dd>← → oder Mausrad über Video bzw. Zeitleiste · Shift = 10 Bilder</dd>
-      <dt>Zeitleiste</dt><dd>Oben die Übersicht des ganzen Videos, darunter die Bildleiste · + / − zoomt bis auf einzelne Bilder</dd>
+      <dt>Zeitleiste</dt><dd>Eine Leiste für das ganze Video – antippen oder ziehen springt dorthin · + / − (oder Ctrl + Mausrad) zoomt bis auf einzelne Bilder, oben zeigt dann ein feiner Balken, wo du bist · Film-Knopf: Vorschaubilder ein/aus</dd>
       <dt>Marker</dt><dd>Raute-Knopf oder <kbd>m</kbd> setzt einen Marker mit Notiz · <kbd>,</kbd> <kbd>.</kbd> springt zum vorherigen / nächsten</dd>
       <dt>Lupe</dt><dd><kbd>z</kbd>, Pinch oder Ctrl + Mausrad · ziehen = schwenken · Doppelklick = zurück</dd>
       <dt>Side by Side</dt><dd>Knopf «Side by Side» übernimmt das Video als A in die Analyse – dann B wählen</dd>
@@ -2158,7 +2172,8 @@ body:not(.tl-slim) .tl-zoom .tl-film{background:rgba(255,255,255,.28)!important}
       <dt>Side by Side</dt><dd>A und B wählen – die App sucht den gemeinsamen Startpunkt selbst. Sonst beide zum gleichen Tor ziehen und «Sync».</dd>
       <dt>Zeitmessung</dt><dd>Stoppuhr-Knopf: Start = Sync-Punkt · Fahne A / B setzt das Ziel · Zeit und Differenz stehen im Bild</dd>
       <dt>Tore</dt><dd><kbd>m</kbd> Tor in A · <kbd>n</kbd> Tor in B → Abschnittszeiten · <kbd>Alt</kbd> + ← → bewegt nur B</dd>
-      <dt>Overlay</dt><dd>1 gemeinsamer Punkt · 2 je zwei gleiche Tore antippen oder «Von Hand» schieben · 3 «Overlay erstellen» – B folgt dem Kameraschwenk</dd>
+      <dt>Overlay</dt><dd>1 «Automatisch finden» sucht die gleiche Stelle der Strecke (oder A und B von Hand zum gleichen Tor) · 2 «Overlay erstellen» – B folgt dem Kameraschwenk; nur bei stark unterschiedlichem Zoom vorher zwei gleiche Tore als Referenz antippen · Braucht eine durchgehende Kamera vom gleichen Standort (kein TV-Schnitt)</dd>
+      <dt>Hineinziehen</dt><dd>Ein Video aus der Liste links direkt auf Basic, A oder B ziehen</dd>
       <dt>Korrigieren</dt><dd>Während der Berechnung: Pause · 1 s zurück · Korrigieren. Im fertigen Overlay: anhalten → «Hier korrigieren» – ab dort wird neu gerechnet</dd>
       <dt>Von Hand</dt><dd>B ziehen · Rechtsklick ziehen (oder Ctrl / Alt) = drehen · Mausrad = Grösse · Pfeiltasten = fein · Enter = übernehmen</dd>
       <dt>Namen</dt><dd>«Namen setzen»: Fahrer:innen einmal antippen. Sitzt eine Pille falsch, auf die Person ziehen – jede Korrektur wird zum Anker</dd>
@@ -2322,7 +2337,7 @@ function renderLib(){
     const g=gk(c); if(!NAMES&&g!==lastG&&order.length>1){ lastG=g; const m=c.meta||{}, h=document.createElement('div'); h.className='lib-grp';
       h.textContent=g==='~'?'Weitere Videos':[[m.place,m.date?m.date.slice(-4):''].filter(Boolean).join(' '),DISC_LONG[m.disc]||m.disc,m.cam].filter(Boolean).join(' · '); el.appendChild(h); }
     const on=mode==='single'?S.clip===c:mode==='gps'?GD.clip===c:(A.clip===c||B.clip===c);
-    const card=document.createElement('div'); card.className='clip row'+(on?' on':''); card.tabIndex=0;
+    const card=document.createElement('div'); card.className='clip row'+(on?' on':''); card.tabIndex=0; card.draggable=true; card.addEventListener('dragstart',e=>vdStart(e,{clip:c},card));
     card.innerHTML='<div class="thumb">'+(c.poster?'<img alt="" src="'+c.poster+'">':'<div class="ph"></div>')
       +'<canvas width="320" height="180"></canvas><div class="prog"></div>'
       +(c.dur?'<span class="dur">'+fmtDur(c.dur)+'</span>':'')+'</div>'
@@ -2572,7 +2587,7 @@ class Deck{
   get dur(){ return this.v.duration||(this.clip&&this.clip.dur)||0; }
   get nF(){ return Math.max(1,Math.round(this.dur*this.fps)); }
   get loop(){ if(this.loopOv) return this.loopOv; return this.useLoop&&this.clip?this.clip.loop:null; }
-  cutHit(e){ const L=this.useLoop&&this.clip&&this.clip.loop; if(!L||!this.ready) return null; const r=this.cv.getBoundingClientRect(), x=e.clientX-r.left, cx=r.width/2, X=f=>cx+(f-this.fpos)*this.ppf;
+  cutHit(e){ const L=this.useLoop&&this.clip&&this.clip.loop; if(!L||!this.ready) return null; const r=this.cv.getBoundingClientRect(), x=e.clientX-r.left, cx=r.width/2, vc=this.vc(), X=f=>cx+(f-vc)*this.ppf;
     if(L.a!=null&&Math.abs(x-X(L.a-0.5))<9) return 'a'; if(L.b!=null&&Math.abs(x-X(L.b+0.5))<9) return 'b'; return null; }
   time(){ return this.frame/this.fps; }
   setClip(c){
@@ -2590,8 +2605,10 @@ class Deck{
     this.changed();
   }
   changed(){ this.dirty=true; this.osd(); if(this.onChange) this.onChange(this); }
-  fitDefault(){ const W=this.cv.clientWidth||800; this.ppf=clamp(W/(3*this.fps),this.minPpf(),60); }
-  minPpf(){ const W=this.cv.clientWidth||800; return Math.min(1,(W*0.9)/this.nF); }
+  fitDefault(){ this.ppf=this.minPpf(); this.fit=true; } // Start: ganzes Video in der Leiste
+  minPpf(){ const W=this.cv.clientWidth||800; return Math.min(1,(W-16)/Math.max(1,this.nF)); }
+  vc(){ if(this.vcLock!=null) return this.vcLock; const W=this.cv.clientWidth||800, half=(W/2-8)/this.ppf; return this.nF<=2*half?(this.nF-1)/2:clamp(this.fpos,half-0.5,this.nF-0.5-half); }
+  fAt(clientX){ const r=this.cv.getBoundingClientRect(); return clamp(this.vc()+(clientX-r.left-r.width/2)/this.ppf,0,this.nF-1); }
   seekFrame(n,user){
     if(!this.ready) return;
     n=clamp(Math.round(n),0,this.nF-1); this.frame=n; this.fpos=n; this.mf=null;
@@ -2704,11 +2721,13 @@ class Deck{
     st.addEventListener('dblclick',()=>{ if(DRAW.tool==='none') this.resetZoom(); });
     // Zeitleiste
     const cv=this.cv; let drag=null;
-    cv.addEventListener('pointerdown',e=>{ if(!this.ready) return; cv.setPointerCapture(e.pointerId); this.pause(); const hit=this.cutHit?this.cutHit(e):null; drag={x:e.clientX,f:this.frame,moved:false,cut:hit,cf:hit?this.clip.loop[hit]:0}; cv.focus({preventScroll:true}); });
-    cv.addEventListener('pointermove',e=>{ if(!drag){ if(this.cutHit) cv.style.cursor=this.cutHit(e)?'ew-resize':''; return; } const dx=e.clientX-drag.x; if(Math.abs(dx)>3) drag.moved=true;
+    cv.addEventListener('pointerdown',e=>{ if(!this.ready) return; cv.setPointerCapture(e.pointerId); this.pause(); const hit=this.cutHit?this.cutHit(e):null; drag={x:e.clientX,f:this.frame,moved:false,cut:hit,cf:hit?this.clip.loop[hit]:0}; cv.focus({preventScroll:true}); this.vcLock=this.vc(); if(!hit) this.seekFrame(this.fAt(e.clientX),true); $('#hov').classList.remove('on'); });
+    cv.addEventListener('pointermove',e=>{ if(!drag){ if(this.cutHit) cv.style.cursor=this.cutHit(e)?'ew-resize':''; if(this.ready&&e.pointerType!=='touch') showHov(this,this.fAt(e.clientX),e.clientX,cv.getBoundingClientRect().top); return; }
+      { const r=cv.getBoundingClientRect(), ex=e.clientX-r.left, half=(r.width/2-8)/this.ppf; if(this.nF>2*half&&(ex<24||ex>r.width-24)){ this.vcLock=clamp(this.vcLock+(ex<24?-1:1)*Math.max(1,6/this.ppf),half-0.5,this.nF-0.5-half); } } const dx=e.clientX-drag.x; if(Math.abs(dx)>3) drag.moved=true;
       if(drag.cut&&drag.moved){ const L=this.clip.loop, nf=clamp(Math.round(drag.cf+dx/this.ppf),0,this.nF-1); if(drag.cut==='a'&&(L.b==null||nf<L.b)) L.a=nf; if(drag.cut==='b'&&(L.a==null||nf>L.a)) L.b=nf; this.seekFrame(nf,true); saveClip(this.clip); this.dirty=true; return; }
-      if(drag.moved) this.seekFrame(drag.f-dx/this.ppf,true); });
-    const cup=e=>{ if(!drag) return; if(!drag.moved&&e.type==='pointerup'){ const r=cv.getBoundingClientRect(); this.seekFrame(this.frame+(e.clientX-r.left-r.width/2)/this.ppf,true); } drag=null; };
+      if(drag.moved) this.seekFrame(this.fAt(e.clientX),true); });
+    cv.addEventListener('pointerleave',()=>{ if(!drag) $('#hov').classList.remove('on'); });
+    const cup=e=>{ if(!drag) return; drag=null; this.vcLock=null; this.dirty=true; };
     cv.addEventListener('pointerup',cup); cv.addEventListener('pointercancel',cup);
     cv.addEventListener('wheel',e=>{ if(!this.ready) return; e.preventDefault();
       if(e.ctrlKey){ this.setPpf(this.ppf*Math.exp(-e.deltaY*0.01)); return; }
@@ -2723,9 +2742,9 @@ class Deck{
     ov.addEventListener('pointerleave',()=>$('#hov').classList.remove('on'));
     ov.addEventListener('pointerup',()=>od=false); ov.addEventListener('pointercancel',()=>od=false);
     new ResizeObserver(()=>{ this.dirty=true; this.annDirty=true; }).observe(this.stage);
-    new ResizeObserver(()=>{ this.dirty=true; }).observe(this.cv);
+    new ResizeObserver(()=>{ if(this.ready&&(this.fit||this.ppf<this.minPpf())) { this.ppf=this.minPpf(); this.fit=true; } this.dirty=true; }).observe(this.cv);
   }
-  setPpf(p){ this.ppf=clamp(p,this.minPpf(),60); this.dirty=true; }
+  setPpf(p){ const m=this.minPpf(); this.ppf=clamp(p,m,60); this.fit=this.ppf<=m*1.001; this.dirty=true; }
 
   /* --- Zeichnen der Zeitleisten --- */
   draw(){ this.drawStrip(); this.drawOv(); }
@@ -2734,7 +2753,7 @@ class Deck{
     const [ctx,W,H]=this.sizeCanvas(this.cv); if(!W) return;
     ctx.fillStyle='#11151b'; ctx.fillRect(0,0,W,H);
     if(!this.ready){ ctx.fillStyle='#6b7785'; ctx.font='600 12px '+getComputedStyle(document.body).fontFamily; ctx.textAlign='center'; ctx.fillText(this.clip?'Video wird vorbereitet …':'Noch kein Video',W/2,H/2+4); return; }
-    const ppf=this.ppf, cx=W/2, f0=this.fpos, nF=this.nF, RH=22, TH=H-RH, c=this.clip, g=c.gen;
+    const ppf=this.ppf, cx=W/2, f0=this.vc(), nF=this.nF, RH=22, TH=H-RH, c=this.clip, g=c.gen;
     const X=f=>cx+(f-f0)*ppf;
     const xs=Math.max(0,X(-0.5)), xe=Math.min(W,X(nF-0.5));
     if(!Deck.hatch){ const p=document.createElement('canvas'); p.width=p.height=8; const px=p.getContext('2d'); px.fillStyle='#0f1216'; px.fillRect(0,0,8,8); px.strokeStyle='rgba(255,255,255,.05)'; px.lineWidth=1.5; px.beginPath(); px.moveTo(-2,10); px.lineTo(10,-2); px.stroke(); Deck.hatch=ctx.createPattern(p,'repeat'); }
@@ -2783,7 +2802,7 @@ class Deck{
     const t0s=Math.ceil(fa/fps/ss)*ss;
     for(let t=t0s; t*fps<=fb; t+=ss){ const x=Math.round(X(t*fps))+0.5; ctx.moveTo(x,TH); ctx.lineTo(x,TH+8); }
     ctx.stroke(); ctx.fillStyle='rgba(230,235,242,.75)';
-    for(let t=t0s; t*fps<=fb; t+=ss){ const x=X(t*fps); if(Math.abs(x-cx)<40) continue; ctx.fillText(t.toFixed(dec)+' s',x,TH+18); }
+    for(let t=t0s; t*fps<=fb; t+=ss){ const x=X(t*fps); if(Math.abs(x-X(this.fpos))<40) continue; ctx.fillText(t.toFixed(dec)+' s',x,TH+18); }
     // Loop-Klammern
     if(L&&L.a!=null){ const x=X(L.a-0.5); ctx.fillStyle='#ffd24a'; ctx.fillRect(x-1.5,0,4,TH); ctx.fillRect(x-1.5,0,10,4); ctx.fillRect(x-1.5,TH-4,10,4); }
     if(L&&L.b!=null){ const x=X(L.b+0.5); ctx.fillStyle='#ffd24a'; ctx.fillRect(x-2.5,0,4,TH); ctx.fillRect(x-8.5,0,10,4); ctx.fillRect(x-8.5,TH-4,10,4); }
@@ -2793,11 +2812,15 @@ class Deck{
       ctx.beginPath(); ctx.moveTo(x,TH-1); ctx.lineTo(x-5,TH-8); ctx.lineTo(x,TH-15); ctx.lineTo(x+5,TH-8); ctx.closePath(); ctx.fill();
       const nt=markerNote(c,m); if(nt){ ctx.font='600 10px Geist,-apple-system,Segoe UI,sans-serif'; const tx=nt.length>22?nt.slice(0,21)+'…':nt, tw=ctx.measureText(tx).width+10; ctx.fillStyle='rgba(218,41,28,.92)'; ctx.beginPath(); if(ctx.roundRect) ctx.roundRect(x+3,3,tw,16,4); else ctx.rect(x+3,3,tw,16); ctx.fill(); ctx.fillStyle='#fff'; ctx.textAlign='left'; ctx.textBaseline='middle'; ctx.fillText(tx,x+8,11.5); ctx.textAlign='center'; ctx.textBaseline='alphabetic'; } }
     if(ppf>=6){ const x=X(this.frame); ctx.strokeStyle='rgba(255,255,255,.95)'; ctx.lineWidth=2; ctx.strokeRect(x-ppf/2+1,ty-1,ppf-2,th+2); }
-    ctx.fillStyle='#DA291C'; ctx.fillRect(Math.round(cx)-1,0,2,TH);
-    ctx.beginPath(); ctx.moveTo(cx-6,0); ctx.lineTo(cx+6,0); ctx.lineTo(cx,7); ctx.closePath(); ctx.fill();
+    { const vis=(W-16)/ppf; if(nF>vis*1.02){ // hineingezoomt: Mini-Übersicht über das ganze Video oben in der Leiste
+      const ux=f=>8+f/Math.max(1,nF-1)*(W-16), a0=ux(f0-vis/2), a1=ux(f0+vis/2); ctx.fillStyle='rgba(255,255,255,.10)'; ctx.fillRect(8,1,W-16,3); ctx.fillStyle='rgba(255,255,255,.55)'; ctx.fillRect(a0,1,Math.max(3,a1-a0),3);
+      if(L&&L.a!=null&&L.b!=null){ ctx.fillStyle='#ffd24a'; ctx.fillRect(ux(L.a),4,Math.max(2,ux(L.b)-ux(L.a)),1.5); }
+      ctx.fillStyle='#ff5a4e'; for(const m of c.markers) ctx.fillRect(ux(m)-0.5,1,1.5,3); ctx.fillStyle='#DA291C'; ctx.fillRect(ux(this.fpos)-1,0,2,5); } }
+    const px=X(this.fpos); ctx.fillStyle='#DA291C'; ctx.fillRect(Math.round(px)-1,0,2,TH);
+    ctx.beginPath(); ctx.moveTo(px-6,0); ctx.lineTo(px+6,0); ctx.lineTo(px,7); ctx.closePath(); ctx.fill();
     const lab=(this.frame/this.fps).toFixed(2)+' s'; ctx.font='800 10.5px ui-monospace,Menlo,Consolas,monospace';
-    const lw=ctx.measureText(lab).width+12; ctx.beginPath(); if(ctx.roundRect) ctx.roundRect(cx-lw/2,TH+3,lw,16,4); else ctx.rect(cx-lw/2,TH+3,lw,16); ctx.fill();
-    ctx.fillStyle='#fff'; ctx.fillText(lab,cx,TH+15);
+    const lw=ctx.measureText(lab).width+12, lx=clamp(px,lw/2+2,W-lw/2-2); ctx.beginPath(); if(ctx.roundRect) ctx.roundRect(lx-lw/2,TH+3,lw,16,4); else ctx.rect(lx-lw/2,TH+3,lw,16); ctx.fill();
+    ctx.fillStyle='#fff'; ctx.fillText(lab,lx,TH+15);
   }
   drawOv(){
     const [ctx,W,H]=this.sizeCanvas(this.ov); if(!W) return;
@@ -3239,7 +3262,7 @@ async function ghostCompute(opt){ // opt.resume: ab Bild opt.j mit fester Lage o
     const Wl=lv.width, Hl=lv.height, k=Wl/W0, x=lv.getContext('2d'); x.setTransform(1,0,0,1,0,0); x.globalAlpha=1; x.drawImage(lbA,0,0,Wl,Hl);
     let Mi=affInv(M); if(OV.fix) Mi=affMul(ovDMat(OV.fix,W0),Mi);
     x.globalAlpha=+$('#opRange').value||0.5; x.setTransform(k*Mi[0],k*Mi[3],k*Mi[1],k*Mi[4],k*Mi[2],k*Mi[5]); x.drawImage(lbB,0,0,W0,hB); x.setTransform(1,0,0,1,0,0); x.globalAlpha=1; };
-  let i=0, mvHist=[]; const old=GH.S, resume=!!(opt&&opt.resume&&old&&old.length);
+  const cuts={a:0,b:0}; GH.cuts=cuts; let cutWarn=false; let i=0, mvHist=[]; const old=GH.S, resume=!!(opt&&opt.resume&&old&&old.length);
   if(resume){ const j=clamp(opt.j,0,Math.min(old.length,n)-1); for(let k=0;k<j;k++) S.push(old[k]);
     await seekV(va,GH.t0+j*step+0.5/A.fps); await seekV(vb,GH.t0+GH.off+j*step+0.5/B.fps);
     xa.drawImage(va,0,0,W0,hA); xb.drawImage(vb,0,0,W0,hB);
@@ -3267,8 +3290,10 @@ async function ghostCompute(opt){ // opt.resume: ab Bild opt.j mit fester Lage o
     let q=[1,0,0,0,1,0], qb=[1,0,0,0,1,0];
     const sane=r=>r.ok&&r.inl>0.35&&Math.abs(r.p[0])<0.06&&Math.abs(r.p[1])<0.04&&Math.hypot(r.p[2],r.p[3])<W0*0.35;
     const dbg={e:+(i*step).toFixed(2)};
-    if(prevPA){ const rq=align(prevPA,PA,lastQa,false,1); dbg.qa=sane(rq)?1:0; dbg.qainl=+rq.inl.toFixed(2); dbg.qat=[+rq.p[2].toFixed(1),+rq.p[3].toFixed(1)]; if(sane(rq)){ q=simToAff(rq.p,W0,hA,W0,hA); lastQa=rq.p.slice(); lastQa[4]=0; }
-      const rb=align(prevPB,PB,lastQb,false,1); dbg.qb=sane(rb)?1:0; dbg.qbinl=+rb.inl.toFixed(2); dbg.qbt=[+rb.p[2].toFixed(1),+rb.p[3].toFixed(1)]; if(sane(rb)){ qb=simToAff(rb.p,W0,hB,W0,hB); lastQb=rb.p.slice(); lastQb[4]=0; } }
+    if(prevPA){ const hd=(P,Q)=>{ const g1=P[3].g,g2=Q[3].g,h1=new Float32Array(16),h2=new Float32Array(16); for(let k=0;k<g1.length;k++){ h1[Math.min(15,g1[k]>>4)]++; h2[Math.min(15,g2[k]>>4)]++; } let d=0; for(let k=0;k<16;k++) d+=Math.abs(h1[k]-h2[k]); return d/g1.length; };
+      const rq=align(prevPA,PA,lastQa,false,1); dbg.qa=sane(rq)?1:0; dbg.qainl=+rq.inl.toFixed(2); dbg.qat=[+rq.p[2].toFixed(1),+rq.p[3].toFixed(1)]; if(sane(rq)){ q=simToAff(rq.p,W0,hA,W0,hA); lastQa=rq.p.slice(); lastQa[4]=0; }
+      if(!sane(rq)&&hd(prevPA,PA)>0.45){ cuts.a++; dbg.cutA=1; }
+      const rb=align(prevPB,PB,lastQb,false,1); if(!sane(rb)&&hd(prevPB,PB)>0.45){ cuts.b++; dbg.cutB=1; } dbg.qb=sane(rb)?1:0; dbg.qbinl=+rb.inl.toFixed(2); dbg.qbt=[+rb.p[2].toFixed(1),+rb.p[3].toFixed(1)]; if(sane(rb)){ qb=simToAff(rb.p,W0,hB,W0,hB); lastQb=rb.p.slice(); lastQb[4]=0; } }
     // B → A: aus den Ketten vorhersagen, dann fein nachführen (nur übernehmen, wenn plausibel)
     let p, ok;
     if(!prev){ let r=refP?align(PA,PB,refP,false):null; if(!r||!(r.ok&&r.inl>0.35)) r=align(PA,PB,refP||pInit,true); if(refP&&!(r.ok&&r.inl>0.35)){ r={ok:true,inl:0.4,p:refP.slice()}; } ok=r.ok&&r.inl>0.35; p=r.p.slice(); }
@@ -3311,6 +3336,7 @@ async function ghostCompute(opt){ // opt.resume: ab Bild opt.j mit fester Lage o
     S.push({e,p,ok,q,pa,pb,ca:cA,cb:cB,ma,mb});
     prev={p,M}; prevPA=PA; prevPB=PB;
     GH.curLen=S.length; drawLive(M);
+    if(!cutWarn&&cuts.a+cuts.b>=2){ cutWarn=true; toast('Achtung: '+(cuts.a&&cuts.b?'A und B haben':cuts.a?'Video A hat':'Video B hat')+' Kameraschnitte (TV-Bild) – Overlay braucht eine durchgehende Kamera vom gleichen Standort.',6000); }
     { const el=(performance.now()-t0)/1000, rest=el/(i+1)*(n-i-1); ghostProgress((i+1)/n,'Bild '+(i+1)+' / '+n+' · bei '+fmtS(GH.t0+e)+' · noch ca. '+Math.ceil(rest)+' s'); await new Promise(r=>setTimeout(r,0)); }
     while(GH.paused&&!GH.abort&&GH.rewind==null){ // angehalten: Vorschau zeigen, Korrektur übernehmen
       await new Promise(r=>setTimeout(r,60));
@@ -3331,7 +3357,7 @@ async function ghostCompute(opt){ // opt.resume: ab Bild opt.j mit fester Lage o
   GH.timing={seek:Math.round(GH.tSeek||0),total:Math.round(performance.now()-t0)}; GH.tSeek=0;
   GH.S=S; ghostGap(); tracksBuild(); GH.state='ready'; GH.dirty=true; ghostUI(); resSave();
   const bad=S.filter(s=>!s.ok).length/S.length;
-  const nm=ovActive()?'Overlay':'Ghost'; toast(bad>0.3?nm+' erstellt – an '+Math.round(bad*100)+' % der Stellen unsicher (Kamerastandort gleich?)':nm+' erstellt',3500); if(ovActive()) ovUI();
+  const nm=ovActive()?'Overlay':'Ghost'; const nc=cuts.a+cuts.b; toast(nc>=2?nm+' erstellt – aber '+(cuts.a&&cuts.b?'beide Videos haben':cuts.a?'Video A hat':'Video B hat')+' Kameraschnitte. Overlay klappt nur mit einer durchgehenden Kamera vom gleichen Standort.':bad>0.3?nm+' erstellt – an '+Math.round(bad*100)+' % der Stellen unsicher (Kamerastandort gleich?)':nm+' erstellt',nc>=2?6500:3500); if(ovActive()) ovUI();
 }
 
 /* ---------- Bahnen der Fahrer:innen: Bewegungsflecken je Bild → plausibelste durchgehende Bahn (Viterbi) ---------- */
@@ -3468,7 +3494,7 @@ function ovFollowOK(){ return OV.follow&&GH.state==='ready'&&ghostKey()===GH.key
 
 const OVI={tag:`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12V5a2 2 0 0 1 2-2h7l9 9-9 9-9-9z"/><circle cx="8" cy="8" r="1.6"/></svg>`,plus:`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>`,reset:`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 1 0 2.3-5.6"/><path d="M4 4v4h4"/></svg>`,pause:`<svg class="ic" viewBox="0 0 24 24" fill="currentColor"><rect x="6.5" y="5" width="4" height="14" rx="1"/><rect x="13.5" y="5" width="4" height="14" rx="1"/></svg>`,play:`<svg class="ic" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>`,fix:`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M3 12h18"/><path d="M9 6l3-3 3 3M9 18l3 3 3-3M6 9l-3 3 3 3M18 9l3 3-3 3"/></svg>`,trash:`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg>`,side:`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="5" width="8.5" height="14" rx="2"/><rect x="13" y="5" width="8.5" height="14" rx="2"/></svg>`,cs:`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M8 4H5v16h3"/><path d="M11 12h8M16 9l3 3-3 3"/></svg>`,ce:`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h3v16h-3"/><path d="M13 12H5M8 9l-3 3 3 3"/></svg>`,ok:`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>`,pin:`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="10" r="3"/><path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0C18.5 15.4 12 21 12 21z"/></svg>`,go:`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/><path d="M19 16l.7 2 2 .7-2 .7-.7 2-.7-2-2-.7 2-.7z"/></svg>`,back:`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>`,x:`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"/></svg>`};
 function ovT0(){ return OV.cut.a!=null?Math.max(OV.cut.a,-G.off,0):G.syncA; }
-function ovStep(){ if(!G.linked||OV.edit) return 1; if(OV.pick||!OV.T) return 2; return 3; }
+function ovStep(){ if(!G.linked||OV.edit) return 1; if(OV.pick) return 2; if(!OV.T&&!(OV.follow&&(GH.state==='busy'||ovFollowOK()))) return 2; return 3; }
 function ovApplyCut(){ // Ausschnitt als Loop in beiden Zeitleisten anzeigen
   const on=ovActive()&&(OV.cut.a!=null||OV.cut.b!=null)&&A.ready;
   const mk=(d,sh)=>{ if(!on||!d.ready){ d.loopOv=null; d.dirty=true; return; } const a=OV.cut.a!=null?OV.cut.a:0, b=OV.cut.b!=null?OV.cut.b:A.dur;
@@ -3478,7 +3504,7 @@ function ovBtn(id,label,icon,cls,title){ return `<button class="ov-b ${cls||''}"
 function ovUI(){
   const v=$('#viewCmp'), k=A.clip&&B.clip?A.clip.id+'|'+B.clip.id:''; if(k!==OV.key){ OV.key=k; OV.T=null; OV.follow=false; OV.pick=null; OV.cut={a:null,b:null}; OV.edit=false; }
   v.classList.toggle('ov-pick-a',OV.pick==='a'); v.classList.toggle('ov-pick-b',OV.pick==='b');
-  const split=ovActive()&&!OV.pick&&!OV.T; // bis B ausgerichtet ist: nebeneinander // Schritt 1: nebeneinander, damit A und B einzeln eingestellt werden können
+  const split=ovActive()&&!OV.pick&&!OV.T&&!(OV.follow&&(GH.state==='busy'||ovFollowOK())); // bis B ausgerichtet ist: nebeneinander // Schritt 1: nebeneinander, damit A und B einzeln eingestellt werden können
   if(v.classList.contains('ov-split')!==split){ v.classList.toggle('ov-split',split); decks.forEach(d=>{ d.dirty=true; d.annDirty=true; }); requestAnimationFrame(()=>{ decks.forEach(d=>{ d.dirty=true; }); if(typeof ovMarks==='function') ovMarks(); }); }
   if(!ovActive()){ ovApplyCut(); return; }
   const st=ovStep(), busy=OV.follow&&GH.state==='busy', done=ovFollowOK();
@@ -3503,9 +3529,9 @@ function ovUI(){
     t=`<b>Korrigieren</b> · B auf die Tore ziehen – ab hier wird neu gerechnet. <span class="ov-hint">Rechtsklick ziehen: drehen · Mausrad: Grösse · Pfeiltasten: fein <b class="ov-fixinfo" id="ovFixInfo"></b></span>`;
     acts=(near?ovBtn('fixdel','Korrektur löschen',OVI.trash,'ghost'):'')+ovBtn('fixreset','Auf 0',OVI.reset,'ghost','Handkorrektur zurücksetzen')+ovBtn('fixno','Abbrechen','','ghost')+ovBtn('fixok','Übernehmen & ab hier neu rechnen',OVI.ok,'pri','Ab diesem Bild wird mit deiner Lage neu berechnet – davor bleibt alles'); }
   else if(st===1){ t=`<b>Gleicher Moment</b> · A und B einzeln zum ersten gemeinsamen Tor ziehen. ${cut}`;
-    acts=cutBtns+ovBtn('hand','Von Hand',OVI.fix,'','A und B hier verbinden und B von Hand über A schieben')+ovBtn('sync','Gemeinsamer Punkt',OVI.pin,'pri','A und B an diesem Moment verbinden'); }
-  else if(st===2){ t=`<b>Synchron</b> <span class="ov-dim">B ${G.off>=0?'+':'−'}${Math.abs(G.off).toFixed(2)} s</span> · in A und B je zwei gleiche Tore antippen. ${cut}`;
-    acts=ovBtn('edit','Punkt ändern',OVI.back,'ghost')+ovBtn('pick','Referenzpunkte setzen',OVI.pin,'pri','2 feste Punkte in A und B antippen'); }
+    acts=cutBtns+ovBtn('auto',AS.busy?'Sucht …':'Automatisch finden',OVI.go,'ghost','Gleiche Stelle der Strecke in A und B automatisch suchen (gleicher Kamerastandort)')+ovBtn('hand','Von Hand',OVI.fix,'','A und B hier verbinden und B von Hand über A schieben')+ovBtn('sync','Gemeinsamer Punkt',OVI.pin,'pri','A und B an diesem Moment verbinden'); }
+  else if(st===2){ t=`<b>Synchron</b> <span class="ov-dim">B ${G.off>=0?'+':'−'}${Math.abs(G.off).toFixed(2)} s</span> · «Overlay erstellen» richtet B selbst aus. Liegt es daneben: zwei gleiche Tore als Referenz antippen. ${cut}`;
+    acts=ovBtn('edit','Punkt ändern',OVI.back,'ghost')+ovBtn('pick','Referenzpunkte',OVI.pin,'ghost','2 feste Punkte in A und B antippen – hilft bei stark unterschiedlichem Zoom')+ovBtn('make','Overlay erstellen',OVI.go,'pri','B automatisch über A legen und der Kamera folgen'); }
   else if(!done){ t=`<b>B liegt über A</b> · vorklicken zeigt den Vorsprung – bei Kameraschwenk «Overlay erstellen». ${cut}`;
     acts=ovBtn('edit','Punkt ändern',OVI.back,'ghost')+ovBtn('pick','Punkte setzen',OVI.pin,'ghost','2 gleiche Tore in A und B antippen')+ovBtn('hand','Von Hand',OVI.fix,'','B von Hand nachschieben')+ovBtn('make','Overlay erstellen',OVI.go,'pri'); }
   else { const kc=OV.K.length?`<span class="ov-chip">${OVI.fix}${OV.K.length} Korrektur${OV.K.length>1?'en':''}<button data-ov="fixall" title="Alle Korrekturen entfernen">${OVI.x}</button></span>`:'';
@@ -3762,6 +3788,11 @@ function renderOv(){
     else if(a==='cutx'){ OV.cut={a:null,b:null}; OV.T=null; OV.follow=false; }
     else if(a==='sync'){ doSync(); OV.edit=false; OV.T=null; OV.follow=false; return ovStart(); }
     else if(a==='edit'){ ovKill(); tagsReset(); OV.edit=true; OV.T=null; OV.follow=false; OV.pick=null; unlink(); toast('A und B einzeln verschieben, dann «Gemeinsamer Punkt».',2600); }
+    else if(a==='auto'){ if(AS.busy||!A.ready||!B.ready) return; A.pause(); B.pause(); AS.busy=true; AS.abort=false; ovUI(); const ca=A.clip, cb=B.clip;
+      (async()=>{ let r=null; try{ r=await autoSyncFind(ca,cb,f=>{ const b=$('[data-ov="auto"] span')||$('[data-ov="auto"]'); if(b) b.lastChild.textContent='Sucht … '+Math.round(f*100)+' %'; }); }catch(e){} AS.busy=false;
+        if(A.clip!==ca||B.clip!==cb){ ovUI(); return; }
+        if(!r||r.conf<0.4){ toast('Keine eindeutige gemeinsame Stelle gefunden – A und B von Hand zum gleichen Tor ziehen.',4200); ovUI(); return; }
+        unlink(); A.seekTime(r.tA); B.seekTime(Math.max(0,r.tA+r.off)); setTimeout(()=>{ if(A.clip===ca&&B.clip===cb){ doSync(); OV.edit=false; toast('Gemeinsame Stelle gefunden (B '+(r.off>=0?'+':'−')+Math.abs(r.off).toFixed(2)+' s) – kurz prüfen, sonst «Punkt ändern».',4500); } ovUI(); },400); })(); return; }
     else if(a==='pick') return ovStart();
     else if(a==='cancel') return ovStop();
     else if(a==='make'){ OV.follow=true; OV.fix=null; if(!(GH.state==='ready'&&ghostKey()===GH.key)){ OV.K=[]; ovUI(); ghostCompute(); return; } ovUI(); return; }
@@ -3955,23 +3986,32 @@ document.addEventListener('click',e=>{ const b=e.target.closest('[data-act="sbs"
 
 /* ---------- Auto-Sync beim Einfügen von B: gleicher Kamerastandort → gleiche Kameralage = gleicher Ort der Fahrer:in ---------- */
 const AS={key:'',busy:false}; var TRK_CW=3;
-async function autoSyncFind(ca,cb){
+async function autoSyncFind(ca,cb,prog){ // gleicher Kamerastandort → gleiche Kameralage = gleiche Stelle der Strecke. Ganze Videos vergleichen, beide Richtungen.
   const W=64, H=36, cv=document.createElement('canvas'); cv.width=W; cv.height=H; const x=cv.getContext('2d',{willReadFrequently:true});
-  const grab=v=>{ x.drawImage(v,0,0,W,H); const d=x.getImageData(0,0,W,H).data, g=new Float32Array(W*H); let m=0; for(let i=0,j=0;i<g.length;i++,j+=4){ g[i]=0.299*d[j]+0.587*d[j+1]+0.114*d[j+2]; m+=g[i]; } m/=g.length; for(let i=0;i<g.length;i++) g[i]-=m; return g; }; // Helligkeit ausgleichen
-  const va=await loadV(ca.url), vb=await loadV(cb.url); const st=0.2;
+  const grab=v=>{ x.drawImage(v,0,0,W,H); const d=x.getImageData(0,0,W,H).data, g=new Float32Array(W*H); let m=0; for(let i=0,j=0;i<g.length;i++,j+=4){ g[i]=0.299*d[j]+0.587*d[j+1]+0.114*d[j+2]; m+=g[i]; } m/=g.length; let sd=0; for(let i=0;i<g.length;i++){ g[i]-=m; sd+=g[i]*g[i]; } sd=Math.sqrt(sd/g.length)||1; for(let i=0;i<g.length;i++) g[i]*=40/sd; return g; }; // Helligkeit + Kontrast ausgleichen
+  const va=await loadV(ca.url), vb=await loadV(cb.url); const st=0.25;
   try{
-    // A: ersten Moment finden, an dem die Kamera sich bewegt (Fahrer:in ist losgefahren / im Bild)
-    const A0=[]; let mvAt=-1; for(let t=0;t<Math.min(va.duration-0.5,25);t+=st){ if(AS.abort) return null; await seekV(va,t); A0.push({t,g:grab(va)}); const L=A0.length; if(mvAt<0&&L>1){ const p=A0[L-2].g, q=A0[L-1].g; let s=0; for(let i=0;i<p.length;i+=2){ const d=p[i]-q[i]; s+=d*d; } if(s/(p.length/2)>60) mvAt=L-2; } if(mvAt>=0&&L>=mvAt+21) break; }
+    // Schnell: Video stumm im Zeitraffer abspielen und Bilder mitnehmen (viel schneller als hunderte Sprünge); Lücken danach per Sprung füllen
+    const scan=async(v,from)=>{ const T=Math.min(v.duration-0.3,90), N=Math.floor(T/st)+1, out=new Array(N).fill(null);
+      if(HTMLVideoElement.prototype.requestVideoFrameCallback){ await seekV(v,0); await new Promise(res=>{ let done=false, last=performance.now(); const fin=()=>{ if(done) return; done=true; clearInterval(wd); try{ v.pause(); }catch(e){} res(); };
+          const cb=(now,md)=>{ if(done) return; last=performance.now(); const k=Math.round(md.mediaTime/st); if(k<N&&!out[k]&&Math.abs(md.mediaTime-k*st)<0.06) out[k]=grab(v); if(prog) prog(from+Math.min(1,md.mediaTime/T)*0.5); if(md.mediaTime>=T||AS.abort) fin(); else v.requestVideoFrameCallback(cb); };
+          const tS=performance.now(); const wd=setInterval(()=>{ const el=(performance.now()-tS)/1000; if(performance.now()-last>1500||v.ended||(el>3&&v.currentTime/el<1.5)) fin(); },300); // zu langsames Gerät → auf Sprünge ausweichen
+          v.requestVideoFrameCallback(cb); v.playbackRate=6; v.play().catch(fin); }); }
+      for(let k=0;k<N;k++){ if(AS.abort) return null; if(!out[k]){ await seekV(v,k*st); out[k]=grab(v); } }
+      return out; };
+    const SA=await scan(va,0); if(!SA) return null; const SB=await scan(vb,0.5); if(!SB) return null;
     const diff=(p,q)=>{ let s=0; for(let i=0;i<p.length;i+=2){ const d=p[i]-q[i]; s+=d*d; } return s/(p.length/2); };
-    let i0=0; for(let i=1;i<A0.length;i++){ if(diff(A0[i].g,A0[i-1].g)>60){ i0=Math.max(0,i-1); break; } }
-    const ref=A0.slice(i0,i0+20); if(ref.length<6) return null; // ~4 s ab Bewegungsbeginn
-    const tA=ref[0].t, Bmax=Math.min(vb.duration-0.3,tA+16), B0=[]; const bStep=0.1;
-    for(let t=Math.max(0,tA-8);t<Bmax;t+=bStep){ if(AS.abort) return null; await seekV(vb,t); B0.push({t,g:grab(vb)}); }
-    if(B0.length<10) return null; const bAt=t=>{ const k=Math.round((t-B0[0].t)/bStep); return B0[k]; };
-    let best=null, bs=1e18, sc=[];
-    for(let off=B0[0].t-tA; off<=B0[B0.length-1].t-ref[ref.length-1].t; off+=bStep){ let s=0,n=0; for(const r of ref){ const b=bAt(r.t+off); if(!b) { n=0; break; } s+=diff(r.g,b.g); n++; } if(!n) continue; s/=n; sc.push(s); if(s<bs){ bs=s; best=off; } }
-    if(best==null) return null; sc.sort((a,b)=>a-b); const med=sc[sc.length>>1]||bs; // Eindeutigkeit prüfen
-    return {tA, off:best, conf:med>0?1-bs/med:0}; }
+    // Bewegung je Bild (Kamera schwenkt = Fahrer:in unterwegs) – ruhige Startbilder zählen kaum
+    const mv=S=>S.map((g,i)=>i?Math.min(1,diff(g,S[i-1])/60):0); const mA=mv(SA), mB=mv(SB);
+    const minOv=Math.round(4/st); let best=null; const sc=[];
+    for(let k=-(SA.length-minOv); k<=SB.length-minOv; k++){ // B-Index = A-Index + k
+      let s=0,w=0; const i0=Math.max(0,-k), i1=Math.min(SA.length,SB.length-k);
+      if(i1-i0<minOv) continue; for(let i=i0;i<i1;i+=1){ const ww=0.15+Math.max(mA[i],mB[i+k]); s+=ww*diff(SA[i],SB[i+k]); w+=ww; }
+      const v=s/w; let mvw=0; for(let i=i0;i<i1;i++) mvw+=mA[i]; if(mvw<3) continue; sc.push(v); if(!best||v<best.v) best={v,k,i0,i1}; }
+    if(!best) return null; sc.sort((a,b)=>a-b); const med=sc[sc.length>>1]||best.v;
+    // Startpunkt: erstes Bild im gemeinsamen Bereich, an dem A sich bewegt
+    let iS=best.i0; for(let i=best.i0;i<best.i1;i++){ if(mA[i]>0.5){ iS=Math.max(best.i0,i-1); break; } }
+    return {tA:iS*st, off:best.k*st, conf:med>0?1-best.v/med:0}; }
   finally{ [va,vb].forEach(v=>{ try{ v.removeAttribute('src'); v.load(); v.remove(); }catch(e){} }); } }
 async function autoSyncRun(){ const ca=A.clip, cb=B.clip; AS.busy=true; AS.abort=false; toast('Suche den gemeinsamen Startpunkt …',2500);
   let r=null; try{ r=await autoSyncFind(ca,cb); }catch(e){ r=null; } AS.busy=false;
@@ -4139,6 +4179,7 @@ function gateDrawTo(x,d,ox,oy,w,h){ const g=gateAt(d); if(!g) return; const k=h/
 
 function tlSlim(on,save){ document.body.classList.toggle('tl-slim',on); if(save){ LS.set('tlslim',on?1:0); toast(on?'Zeitleiste schlank – Vorschaubilder aus':'Vorschaubilder in der Zeitleiste ein',1500); } decks.forEach(d=>{ d.dirty=true; }); requestAnimationFrame(()=>window.dispatchEvent(new Event('resize'))); }
 tlSlim(!!LS.get('tlslim',1),false);
+
 function cmpReset(){
   A.pause(); B.pause(); G.playing=false;
   A.setClip(null); B.setClip(null); unlink(); G.off=0; G.syncA=0;
@@ -5004,7 +5045,7 @@ function ftRender(){
       $('.ft-nm',r).textContent=n.name;
     } else {
       const isV=VID_RE.test(n.name), m=isV?n.meta:null, ttl=m&&m.ok?m.athlete+(m.place?' · '+m.place:''):n.name.replace(/\.[^.]+$/,''), sub=m&&m.ok?[m.date,m.disc?(m.disc+(m.sex?' '+m.sex:'')):null,m.run].filter(Boolean).join(' · '):(n.size?fmtMB(n.size):'');
-      r.draggable=!n.ro;
+      r.draggable=true;
       const th=FT.thumbs.get(n.id);
       r.innerHTML=(isV?`<span class="ft-th${th?' has':''}" data-tid="${n.id}" style="${th?`background-image:url(${th})`:''}"><i>${n.dur?fmtDur(n.dur):''}</i></span>`:`<span class="ft-ic gps">${ICN.gps}</span>`)
         +`<span class="ft-tx"><span class="ft-nm"></span><span class="ft-sub"></span></span>`
@@ -5026,7 +5067,7 @@ function renderDemoList(){
   if(el._sig===sig) return; el.classList.toggle('first',!el._sig); el._sig=sig;
   el.innerHTML=''; let grp=null;
   ds.forEach(c=>{ const r=document.createElement('div'); const isOn=mode==='single'?S.clip===c:mode==='gps'?GD.clip===c:(A.clip===c||B.clip===c);
-    r.className='ft-row file demo-row'+(isOn?' on':''); r.dataset.ci=clips.indexOf(c); const m=c.meta||{};
+    r.className='ft-row file demo-row'+(isOn?' on':''); r.dataset.ci=clips.indexOf(c); r.draggable=true; const m=c.meta||{};
     r.innerHTML=`<span class="ft-th${c.poster?' has':''}" style="${c.poster?`background-image:url(${c.poster})`:''}"><i>${c.dur?fmtDur(c.dur):''}</i></span>`
       +`<span class="ft-tx"><span class="ft-nm"></span><span class="ft-sub"></span></span>`
       +(mode==='cmp'?`<span class="ab-tags">${A.clip===c?'<em class="ta">A</em>':''}${B.clip===c?'<em class="tb">B</em>':''}</span><span class="ft-acts"><button data-a="a" class="ab-a" title="Als Video A">A</button><button data-a="b" class="ab-b" title="Als Video B">B</button></span>`:'');
@@ -5092,6 +5133,7 @@ function ftWire(){
   $('#ftOk').addEventListener('click',async()=>{ if(!FT.dlg) return; const b=$('#ftOk'); b.disabled=true; try{ const ok=await FT.dlg(); if(ok!==false) ftClose(); }finally{ b.disabled=false; } });
   $('#ftModal').addEventListener('keydown',e=>{ e.stopPropagation(); if(e.key==='Enter'&&e.target.tagName==='INPUT') $('#ftOk').click(); if(e.key==='Escape') ftClose(); });
   const tree=$('#ftree');
+  $('#ftDemo').addEventListener('dragstart',e=>{ const r=e.target.closest('.demo-row'); if(!r) return; vdStart(e,{clip:clips[+r.dataset.ci]},r); });
   tree.addEventListener('click',async e=>{ const r=e.target.closest('.ft-row'); if(!r) return; const n=nodeById(r.dataset.id); if(!n) return; const a=e.target.closest('[data-a]'); const act=a&&a.dataset.a;
     if(act==='unlock') return ftUnlock(n); if(act==='unroot') return ftRemoveRoot(n); if(act==='newdir') return newDirDialog(n);
     if(act==='refresh'){ await ftLoad(n); n.open=true; ftRender(); return; }
@@ -5099,7 +5141,7 @@ function ftWire(){
     if(act==='a'||act==='b') return ftOpen(n,act);
     if(n.kind==='directory'){ if(n.root&&!n.ok) return ftUnlock(n); n.open=!n.open; if(n.open&&!n.children){ try{ await ftLoad(n); }catch(err){ toast('Ordner nicht lesbar.'); } } ftRender(); return; }
     ftOpen(n); });
-  tree.addEventListener('dragstart',e=>{ const r=e.target.closest('.ft-row.file'); if(!r) return; FT.drag=nodeById(r.dataset.id); e.dataTransfer.effectAllowed='move'; e.dataTransfer.setData('text/plain','vlab-node'); r.classList.add('dragging'); });
+  tree.addEventListener('dragstart',e=>{ const r=e.target.closest('.ft-row.file'); if(!r) return; const nd=nodeById(r.dataset.id); if(r.classList.contains('demo-row')){ vdStart(e,{clip:clips[+r.dataset.ci]},r); return; } if(nd&&VID_RE.test(nd.name)) vdStart(e,{node:nd},r,true); FT.drag=nd&&!nd.ro?nd:null; if(!FT.drag) return; e.dataTransfer.effectAllowed=VDRAG?'copyMove':'move'; e.dataTransfer.setData('text/plain','vlab-node'); r.classList.add('dragging'); });
   tree.addEventListener('dragend',()=>{ FT.drag=null; $$('.ft-row.drop,.ft-row.dragging').forEach(x=>x.classList.remove('drop','dragging')); });
   tree.addEventListener('dragover',e=>{ const r=e.target.closest('.ft-row.dir'); if(!FT.drag||!r) return; e.preventDefault(); e.stopPropagation(); $$('.ft-row.drop').forEach(x=>{ if(x!==r) x.classList.remove('drop'); }); r.classList.add('drop'); });
   tree.addEventListener('dragleave',e=>{ const r=e.target.closest('.ft-row.dir'); if(r&&!r.contains(e.relatedTarget)) r.classList.remove('drop'); });
@@ -5126,6 +5168,26 @@ try{ const demoG=addTracks(DEMO_GPS.map(o=>({...o,samples:normSamples(o.samples)
   if(c1&&demoG[0]){ c1.gpsId=demoG[0].id; c1.gpsOff=1.0; demoG[0].ref=demoG[1]?demoG[1].id:null; compareTracks(demoG[0],demoG[1]); GD.setClip(c1); }
   if(c2&&demoG[1]){ c2.gpsId=demoG[1].id; c2.gpsOff=1.0; demoG[1].ref=demoG[0].id; compareTracks(demoG[1],demoG[0]); }
 }catch(e){ console.error(e); }
+/* ---------- Video aus der Liste direkt in Basic, A oder B ziehen ---------- */
+let VDRAG=null;
+function vdStart(e,item,el,keepMove){ VDRAG=item; document.body.classList.add('vd-on'); try{ e.dataTransfer.effectAllowed=keepMove?'copyMove':'copy'; e.dataTransfer.setData('text/plain','vlab-video'); }catch(_){}
+  const c=item.clip, nm=c?metaTitle(c):(item.node.meta&&item.node.meta.ok?item.node.meta.athlete+(item.node.meta.place?' · '+item.node.meta.place:''):item.node.name);
+  const g=document.createElement('div'); g.className='vd-ghost'; g.textContent=nm; document.body.appendChild(g); try{ e.dataTransfer.setDragImage(g,16,14); }catch(_){} setTimeout(()=>g.remove(),0);
+  vdTargets().forEach(([d,l])=>{ d.stage.classList.add('vd-target'); d.stage.dataset.vd=l; }); }
+function vdTargets(){ return mode==='cmp'?[[A,'Als A öffnen'],[B,'Als B öffnen']]:mode==='gps'?[[GD,'Hier öffnen']]:[[S,'Hier öffnen']]; }
+function vdEnd(){ VDRAG=null; document.body.classList.remove('vd-on'); [S,A,B,GD].forEach(d=>d.stage&&d.stage.classList.remove('vd-target','vd-over')); }
+document.addEventListener('dragend',vdEnd);
+[S,A,B,GD].forEach(d=>{ const st=d.stage; if(!st) return;
+  st.addEventListener('dragover',e=>{ if(!VDRAG) return; e.preventDefault(); e.stopPropagation(); try{ e.dataTransfer.dropEffect='copy'; }catch(_){} st.classList.add('vd-over'); });
+  st.addEventListener('dragleave',e=>{ if(!st.contains(e.relatedTarget)) st.classList.remove('vd-over'); });
+  st.addEventListener('drop',async e=>{ if(!VDRAG) return; e.preventDefault(); e.stopPropagation(); const it=VDRAG; vdEnd();
+    if(it.node){ await ftOpen(it.node,d===B?'b':d===A?'a':null); return; }
+    const c=it.clip; if(!c) return;
+    if(d===A||d===B){ const o=d===A?B:A; d.setClip(c); if(o.clip===c) o.setClip(null); unlink(); syncSelects(); toast((d===A?'A':'B')+': '+metaTitle(c),1400); }
+    else if(d===GD){ GD.setClip(c); if(typeof gpsSelects==='function') gpsSelects(); }
+    else { S.setClip(c); refreshSingleHead(); }
+    renderLib(); if(typeof renderDemoList==='function') renderDemoList(); ftRender(); });
+});
 setColor(LS.get('color',COLORS[0])); setTool('none');
 restoreSession();
 /* Beispiel-Rennvideos (Sölden 2025, RS Herren) – liegen neben der App im Ordner demo/ */
@@ -5191,7 +5253,7 @@ if(!LS.get('hint1',0)){ setTimeout(()=>{ toast(matchMedia('(pointer:coarse)').ma
 
 /* Update-Hinweis: prüft version.json auf GitHub Pages; «Aktualisieren» lädt die Seite ohne Cache neu */
 (()=>{
-  const BUILD='20261028140909'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
+  const BUILD='20261028160037'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
   // nach einem Update die ?v=… aus der Adresse entfernen
   try{ const u=new URL(location.href); if(u.searchParams.has('v')){ u.searchParams.delete('v'); history.replaceState(null,'',u.pathname+(u.search||'')+u.hash); } }catch(e){}
   const el=$('#upd'); let latest=null, snoozed=null, busy=false;
