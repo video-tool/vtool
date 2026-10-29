@@ -1929,6 +1929,16 @@ canvas.strip:focus-visible{outline:2px solid rgba(255,255,255,.35)!important;out
 .ft-row.on{box-shadow:inset 2px 0 0 var(--red)!important}
 #sideTree.names .ft-nm{font-size:11.5px!important}
 .ft-nm[data-ren]{cursor:text}
+.ov-b.prev{background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.18)}
+.ov-b.prev.on{background:#f3f5f8!important;color:#14181f!important;border-color:#fff!important}
+.ov-b.prev.on svg.ic{color:#14181f}
+/* Start/Ende: gelb wie die Markierung in der Zeitleiste */
+.ov-cutg{background:rgba(255,210,74,.14)!important;border:1px solid rgba(255,210,74,.55)!important}
+.ov-cutg .ov-b{color:#ffd24a!important;font-weight:700!important}
+.ov-cutg .ov-b svg.ic{color:#ffd24a}
+.ov-cutg .ov-b:hover{background:rgba(255,210,74,.24)!important;color:#ffe38a!important}
+.ov-cutg .ov-b+.ov-b{border-left:1px solid rgba(255,210,74,.4)!important}
+.ov-chip:has([data-ov="cutx"]){background:rgba(255,210,74,.16)!important;border-color:rgba(255,210,74,.5)!important;color:#ffe38a!important}
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
   .aurora{display:none}
@@ -3587,6 +3597,13 @@ function ovApplyCut(){ // Ausschnitt als Loop in beiden Zeitleisten anzeigen
   mk(A,0); if(G.linked) mk(B,G.off); else { B.loopOv=null; B.dirty=true; } }
 function ovMore(items){ items=items.filter(Boolean); if(!items.length) return '';
   return `<span class="ov-morew">${ovBtn('more','',OVI.dots,'ico ghost'+(OV.more?' on':''),'Weitere Möglichkeiten')}${OV.more?`<span class="ov-menu">${items.map(([id,l,ic])=>`<button data-ov="${id}">${ic||''}<span>${l}</span></button>`).join('')}</span>`:''}</span>`; }
+function ovPrevBtn(){ const pl=!A.v.paused||!B.v.paused; return ovBtn('prev',pl?'Pause':'Vorschau',pl?OVI.pause:OVI.play,'prev'+(pl?' on':''),pl?'Vorschau anhalten':'Overlay von Anfang an abspielen'); }
+function ovPrevStart(){ // Overlay vom Start des Ausschnitts (bzw. der Berechnung) abspielen
+  if(!A.v.paused||!B.v.paused){ cmpToggle(); cmpPlayIcon(); ovUI(); return; }
+  const t0=OV.cut.a!=null?OV.cut.a:(GH.state==='ready'?GH.t0:ovT0()), t1=OV.cut.b!=null?OV.cut.b:(GH.state==='ready'?GH.t0+GH.eEnd:A.dur);
+  const now=A.time(), t=(now>=t0-0.02&&now<t1-0.3&&OV.prevAt===now)?now:t0; // nach Pause dort weiter, sonst von vorne
+  A.seekTime(Math.max(0,t)); A.onUserSeek&&A.onUserSeek(A);
+  setTimeout(()=>{ cmpToggle(); cmpPlayIcon(); ovUI(); OV.prevEnd=t1; },160); }
 function ovBtn(id,label,icon,cls,title){ return `<button class="ov-b ${cls||''}" data-ov="${id}" ${title?`title="${title}"`:''}>${icon||''}<span>${label}</span></button>`; }
 function ovUI(){
   const v=$('#viewCmp'), k=A.clip&&B.clip?A.clip.id+'|'+B.clip.id:''; if(k!==OV.key){ OV.key=k; OV.T=null; OV.follow=false; OV.pick=null; OV.cut={a:null,b:null}; OV.edit=false; }
@@ -3624,7 +3641,7 @@ function ovUI(){
   else { const kc=OV.K.length?`<span class="ov-chip">${OVI.fix}${OV.K.length} Korrektur${OV.K.length>1?'en':''}<button data-ov="fixall" title="Alle Korrekturen entfernen">${OVI.x}</button></span>`:'';
     t=`<b>Fertig</b> · B daneben? Dort anhalten, «Korrigieren». ${cut} ${kc}`;
     acts=cutBtns+ovBtn('fix','Korrigieren',OVI.fix,'ghost','B an dieser Stelle von Hand nachschieben')+ovBtn('nameset','Namen',OVI.tag,'ghost','Fahrer:innen antippen – die Namens-Pillen folgen dann genau ihnen')
-      +ovMore([LAY.length<3?['addrun','Weiteren Lauf dazunehmen',OVI.plus]:null,['make','Neu berechnen',OVI.go],['edit','Neu beginnen',OVI.back]])+ovBtn('save','Speichern',OVI.dl,'pri','Overlay als Video speichern'); }
+      +ovMore([LAY.length<3?['addrun','Weiteren Lauf dazunehmen',OVI.plus]:null,['make','Neu berechnen',OVI.go],['edit','Neu beginnen',OVI.back]])+ovPrevBtn()+ovBtn('save','Speichern',OVI.dl,'pri','Overlay als Video speichern'); }
   // nur neu zeichnen, wenn sich etwas ändert – sonst gehen Klicks verloren
   if(LAY.length) t+=' <span class="ov-lays">'+LAY.map((L,i)=>`<span class="ov-lay"><i style="background:${L.col}"></i>${L.let} · ${L.name}<button data-ov="laydel" data-i="${i}" title="Lauf ${L.let} entfernen">${OVI.x}</button></span>`).join('')+'</span>';
   const tx=$('#ovTxt'), ac=$('#ovActs'); if(tx._h!==t){ tx.innerHTML=t; tx._h=t; tx.title=tx.textContent.replace(/\s+/g,' ').trim(); } if(ac._h!==acts){ ac.innerHTML=acts; ac._h=acts; }
@@ -3879,6 +3896,7 @@ function renderOv(){
   ['pointerup','pointermove','click','dblclick'].forEach(t=>st.addEventListener(t,e=>{ block(e); },true));
   $('#ovPanel').addEventListener('click',e=>{ const b=e.target.closest('[data-ov]'); if(!b) return; const a=b.dataset.ov;
     if(a==='more'){ OV.more=!OV.more; ovUI(); return; } OV.more=false;
+    if(a==='prev') return ovPrevStart();
     if(a==='save'){ ovUI(); A.pause(); B.pause(); G.playing=false; cmpPlayIcon(); return openExport(); } if(/^(fixok|fixdel|fixall)$/.test(a)) setTimeout(resSave,50);
     if(a==='cuta'||a==='cutb'){ if(!A.ready) return; const t=A.time(), dn=ovFollowOK(); if(a==='cuta'){ OV.cut.a=t; if(OV.cut.b!=null&&OV.cut.b<=t) OV.cut.b=null; } else { OV.cut.b=t; if(OV.cut.a!=null&&OV.cut.a>=t) OV.cut.a=null; }
       const inside=dn&&t>=GH.t0-0.05&&t<=GH.t0+GH.eEnd+0.05; // fertiges Overlay: Start/Ende nur zum Abspielen und Exportieren – keine Neuberechnung nötig
@@ -3926,6 +3944,8 @@ function renderOv(){
   document.addEventListener('pointerdown',e=>{ if(OV.more&&!e.target.closest('.ov-morew')){ OV.more=false; ovUI(); } });
   addEventListener('resize',ovMarks);
   setInterval(()=>{ if(ovActive()&&(OV.follow||!G.linked)) ovUI(); },400);
+  setInterval(()=>{ if(OV.prevEnd==null) return; const pl=!A.v.paused||!B.v.paused; if(!pl){ OV.prevAt=A.time(); return; }
+    if(OV.cut.b==null&&A.time()>=OV.prevEnd-0.02){ cmpToggle(); cmpPlayIcon(); OV.prevEnd=null; OV.prevAt=null; ovUI(); } },80);
   const _sync=window.doSync;
 })();
 
@@ -5370,7 +5390,7 @@ if(!LS.get('hint1',0)){ setTimeout(()=>{ toast(matchMedia('(pointer:coarse)').ma
 
 /* Update-Hinweis: prüft version.json auf GitHub Pages; «Aktualisieren» lädt die Seite ohne Cache neu */
 (()=>{
-  const BUILD='20261029074619'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
+  const BUILD='20261029081041'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
   // nach einem Update die ?v=… aus der Adresse entfernen
   try{ const u=new URL(location.href); if(u.searchParams.has('v')){ u.searchParams.delete('v'); history.replaceState(null,'',u.pathname+(u.search||'')+u.hash); } }catch(e){}
   const el=$('#upd'); let latest=null, snoozed=null, busy=false;
