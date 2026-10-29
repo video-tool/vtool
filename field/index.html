@@ -334,7 +334,7 @@ svg{display:block}
 <section class="scr" id="sbs">
   <div class="ptop">
     <button class="ib" id="sBack" aria-label="Zurück"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button>
-    <div class="ttl"><b>Side by Side</b><span id="sSub">Beide zum gleichen Tor, dann «Sync»</span></div>
+    <div class="ttl"><b>Side by Side</b><span id="sSub">Beide zum gleichen Tor, dann «Gleicher Moment»</span></div>
     <button class="ib" id="sSwap" aria-label="A und B tauschen"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4v16M4 7l3-3 3 3M17 20V4M14 17l3 3 3-3"/></svg></button>
   </div>
   <div class="pair unl" id="pair"><button class="zchip" id="sZoom" hidden aria-label="Zoom zurücksetzen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.2-4.2"/></svg><b>1×</b><i>Zurück</i></button>
@@ -342,7 +342,7 @@ svg{display:block}
     <div class="pane pb" data-k="b"><video playsinline muted preload="auto"></video><div class="tag"><i>B</i><span></span></div><span class="pt">0.00</span><div class="flash"></div></div>
   </div>
   <div class="dock">
-    <div class="syncrow"><button class="syncbtn" id="sSync"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/></svg><span>Sync</span></button><span class="offc" id="sOff">B ±0.00 s</span></div>
+    <div class="syncrow"><button class="syncbtn" id="sSync"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/></svg><span>Gleicher Moment</span></button><span class="offc" id="sOff">B ±0.00 s</span></div>
     <div class="bar" id="sBar"><div class="tr"></div><div class="fi"></div><div class="kn"></div></div>
     <div class="ctr">
       <button class="cb rate" id="sRate">1×</button>
@@ -654,19 +654,19 @@ $$('[data-ss]').forEach(b=>holdBtn(b,()=>sStep(+b.dataset.ss)));
 const ZS=Zm(); const zsApply=()=>zApply(ZS,[SB.va,SB.vb],$('#sZoom'));
 $('#sZoom').addEventListener('click',e=>{ e.stopPropagation(); ZS.s=1; ZS.x=ZS.y=0; zsApply(); });
 $$('.pane').forEach(p=>gesture(p,{zoom:()=>ZS,apply:zsApply,zel:()=>p,step:k=>{ if(!SB.linked){ SB.act=p.dataset.k; } sStep(k); },tap:()=>{ if(!SB.linked&&SB.act!==p.dataset.k){ SB.act=p.dataset.k; sUI(); return; } sToggle(); flash($('.flash',p),sPlaying()); }}));
-$('#sSync').addEventListener('click',()=>{ SB.va.pause(); SB.vb.pause(); if(SB.linked){ SB.linked=false; toast('Getrennt – A und B einzeln einstellen.'); } else { SB.off=SB.vb.currentTime-SB.va.currentTime; SB.linked=true; toast('Synchron – beide laufen jetzt zusammen.'); } sUI(); });
+$('#sSync').addEventListener('click',()=>{ SB.va.pause(); SB.vb.pause(); if(SB.linked){ SB.linked=false; toast('Getrennt – A und B einzeln einstellen.'); } else { SB.off=SB.vb.currentTime-SB.va.currentTime; SB.linked=true; toast('Gleicher Moment gesetzt – beide laufen jetzt zusammen.'); } sUI(); });
 $('#sSwap').addEventListener('click',()=>{ if(SB.a&&SB.b) openSbs(SB.b,SB.a); });
 $('#sBack').addEventListener('click',()=>show('home'));
 barDrag($('#sBar'),()=>sAct(),f=>{ if(SB.linked){ const lo=Math.max(0,-SB.off), hi=Math.min(dur(SB.va),dur(SB.vb)-SB.off); const t=lo+f*(hi-lo); SB.vb.pause(); SB.va.currentTime=t; SB.vb.currentTime=t+SB.off; } else { const v=sAct(); v.currentTime=f*dur(v); } });
 $('#sSave').addEventListener('click',()=>sbsExport());
-function sUI(){ const L=SB.linked; $('#pair').classList.toggle('unl',!L); $$('.pane').forEach(p=>p.classList.toggle('act',p.dataset.k===SB.act)); $('#sSync').classList.toggle('on',L); $('#sSync span').textContent=L?'Synchron':'Sync';
-  $('#sSub').textContent=L?'A und B laufen zusammen':'Beide zum gleichen Tor, dann «Sync»'; const o=$('#sOff'); o.classList.toggle('on',L); o.textContent=L?'B '+(SB.off>=0?'+':'−')+Math.abs(SB.off).toFixed(2)+' s':'Wischen: '+(SB.act==='a'?'A':'B');
+function sUI(){ const L=SB.linked; $('#pair').classList.toggle('unl',!L); $$('.pane').forEach(p=>p.classList.toggle('act',p.dataset.k===SB.act)); $('#sSync').classList.toggle('on',L); $('#sSync span').textContent='Gleicher Moment';
+  $('#sSub').textContent=L?'A und B laufen zusammen':'Beide zum gleichen Tor, dann «Gleicher Moment»'; const o=$('#sOff'); o.classList.toggle('on',L); o.textContent=L?'B '+(SB.off>=0?'+':'−')+Math.abs(SB.off).toFixed(2)+' s':'Wischen: '+(SB.act==='a'?'A':'B');
   const ta=SB.va.currentTime||0, tb=SB.vb.currentTime||0; $('.pane.pa .pt').textContent=ta.toFixed(2); $('.pane.pb .pt').textContent=tb.toFixed(2);
   let f; if(L){ const lo=Math.max(0,-SB.off), hi=Math.min(dur(SB.va),dur(SB.vb)-SB.off); f=hi>lo?(ta-lo)/(hi-lo):0; } else { const v=sAct(), d=dur(v); f=d?v.currentTime/d:0; }
   f=clamp(f,0,1); $('#sBar .fi').style.width=(f*100)+'%'; $('#sBar .kn').style.left=(f*100)+'%'; $('#sBar .fi').style.background=L?'var(--red)':SB.act==='a'?'var(--a)':'var(--b)';
   const pl=sPlaying(); if($('#sPlay')._pl!==pl){ $('#sPlay')._pl=pl; $('#sPlay').innerHTML=pl?IC.pause:IC.play; } }
 // Side by Side als ein Video sichern (nebeneinander/übereinander, wie auf dem Bildschirm)
-async function sbsExport(){ if(!SB.a||!SB.b) return; if(!SB.linked){ toast('Zuerst «Sync» drücken – dann wird der Vergleich als Video gesichert.',3000); return; }
+async function sbsExport(){ if(!SB.a||!SB.b) return; if(!SB.linked){ toast('Zuerst «Gleicher Moment» drücken – dann wird der Vergleich als Video gesichert.',3000); return; }
   const mime=recMime(); const cv=document.createElement('canvas'); if(!cv.captureStream||!window.MediaRecorder){ toast('Speichern als Video geht in diesem Browser nicht.'); return; }
   const va=SB.va, vb=SB.vb, land=matchMedia('(orientation:landscape)').matches; const W1=1280, hA=Math.round(W1*(va.videoHeight||9)/(va.videoWidth||16)), hB=Math.round(W1*(vb.videoHeight||9)/(vb.videoWidth||16));
   if(land){ const H=Math.min(720,Math.max(hA,hB)); cv.width=1280*2+8&~1; cv.height=H&~1; } else { cv.width=W1; cv.height=(hA+hB+8)&~1; }
