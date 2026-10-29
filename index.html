@@ -3791,23 +3791,40 @@ function ovDrawB(x,ox,oy,w,h){ // B ausgerichtet über ein A-Bild der Grösse w�
     x.setTransform(sc*M[0],sc*M[3],sc*M[1],sc*M[4],sc*M[2]+ox,sc*M[5]+oy); x.drawImage(B.v,0,0,GH.W0,GH.hB); }
   else { const k=w/A.v.videoWidth, M=OV.T; x.setTransform(k*M[0],k*M[3],k*M[1],k*M[4],k*M[2]+ox,k*M[5]+oy); x.drawImage(B.v,0,0,B.v.videoWidth,B.v.videoHeight); }
   x.restore(); x.save(); x.beginPath(); x.rect(ox,oy,w,h); x.clip(); layerDraw(x,ox,oy,w); x.restore(); tagsDrawTo(x,ox,oy,w,h); }
+/* Namen: gleiche Regeln für Live-Bild und Export – nur wenn die Fahrer:innen klar auseinander sind, immer weich ein- und ausblenden */
+function tagItems(){ const its=[{k:'a',col:'#3e8bff',n:lastName(A.clip),T:GH.trk&&GH.trk.a,AL:GH.trkAl&&GH.trkAl.a,st:GH.step,t0:GH.t0,W0:GH.W0,h0:GH.hA,e1:GH.eEnd}];
+  if(B.clip&&ovFollowOK()) its.push({k:'b',col:'#f08a3c',n:lastName(B.clip),T:GH.trk&&GH.trk.b,AL:GH.trkAl&&GH.trkAl.b,st:GH.step,t0:GH.t0,W0:GH.W0,h0:GH.hA,e1:GH.eEnd});
+  LAY.forEach((L,i)=>its.push({k:'l'+i,col:L.col,n:L.name,T:L.trkB,AL:L.alB,st:L.step,t0:L.t0,W0:L.W0,h0:L.hA,e1:L.eEnd,L}));
+  return its; }
+function tagRaw(it,tA){ const e=tA-it.t0; if(!it.T||e<0||e>it.e1) return null; const q=trackAt(it.T,it.st,e); if(!q) return null; return {x:q[0]/it.W0,y:q[1]/it.h0,a:it.AL?alphaAt(it.AL,it.st,e):1}; }
+var TAG_SEP0=0.05, TAG_SEP1=0.085; // Abstand in Bildbreiten: darunter keine Pillen (verwirrt), darüber voll sichtbar
+function tagTarget(its,i,tA){ const p=tagRaw(its[i],tA); if(!p) return 0; let a=clamp((p.a-0.2)/0.5,0,1); if(!a) return 0;
+  for(let j=0;j<its.length;j++){ if(j===i) continue; const q=tagRaw(its[j],tA); if(!q||q.a<0.2) continue; const d=Math.hypot(p.x-q.x,(p.y-q.y)*its[i].h0/its[i].W0); a=Math.min(a,clamp((d-TAG_SEP0)/(TAG_SEP1-TAG_SEP0),0,1)); } return a; }
+function tagAlpha(its,i,tA){ let s=0,w=0; for(let k=-6;k<=6;k++){ const ww=7-Math.abs(k); s+=tagTarget(its,i,tA+k*0.08)*ww; w+=ww; } const a=s/w; return a*a*(3-2*a); } // über ±0,5 s gemittelt → nie hart an/aus
+function segDist(px,py,x1,y1,x2,y2){ const vx=x2-x1, vy=y2-y1, L=vx*vx+vy*vy; const u=L?clamp(((px-x1)*vx+(py-y1)*vy)/L,0,1):0; return Math.hypot(x1+u*vx-px,y1+u*vy-py); }
+// Pillen nebeneinander, ohne dass Linien schräg über andere laufen: linke Pille endet über ihrer Person, rechte beginnt über ihrer
+function tagLayout(list,minX,maxX){ list.sort((a,b)=>a.px-b.px);
+  for(const p of list){ p.bx=clamp(p.sx-p.w/2,minX,maxX-p.w); }
+  for(let i=1;i<list.length;i++){ const L=list[i-1], P=list[i]; if(P.bx<L.bx+L.w+6&&Math.abs(P.by-L.by)<P.h+3){ const mid=(L.px+P.px)/2;
+      L.bx=clamp(Math.min(L.bx,mid-3-L.w),minX,maxX-L.w); P.bx=clamp(Math.max(P.bx,mid+3),minX,maxX-P.w);
+      if(P.bx<L.bx+L.w+4){ P.by=L.by-P.h-4; } } }
+  for(const p of list){ p.lx=clamp(p.px,p.bx+6,p.bx+p.w-6); p.line=true;
+    for(const q of list){ if(q===p) continue; if(segDist(q.px,q.py,p.lx,p.by+p.h,p.px,p.py)<Math.max(9,p.h*0.7)) p.line=false; } } // Linie würde eine andere Person kreuzen → weglassen
+  return list; }
 function tagsDrawTo(x,ox,oy,w,h){ // Namens-Pillen ins exportierte Bild zeichnen
   if(EXP.live&&EXP.opt&&EXP.opt.names===false) return;
   if(!$('#viewCmp').classList.contains('ov-names')) return;
-  const its=[{col:'#3e8bff',n:lastName(A.clip),T:GH.trk&&GH.trk.a,AL:GH.trkAl&&GH.trkAl.a,st:GH.step,t0:GH.t0,W0:GH.W0,h0:GH.hA,e1:GH.eEnd}];
-  if(B.clip&&ovFollowOK()) its.push({col:'#f08a3c',n:lastName(B.clip),T:GH.trk&&GH.trk.b,AL:GH.trkAl&&GH.trkAl.b,st:GH.step,t0:GH.t0,W0:GH.W0,h0:GH.hA,e1:GH.eEnd});
-  LAY.forEach(L=>its.push({col:L.col,n:L.name,T:L.trkB,AL:L.alB,st:L.step,t0:L.t0,W0:L.W0,h0:L.hA,e1:L.eEnd}));
-  const k=w/1100, fs=Math.max(11,Math.round(13*k)), ph=Math.round(fs*1.75), rr=Math.max(5,w*0.016), placed=[];
+  const its=tagItems(), tA=A.v.currentTime, k=w/1100, fs=Math.max(11,Math.round(13*k)), ph=Math.round(fs*1.75), rr=Math.max(5,w*0.016), list=[];
   x.save(); x.font=`650 ${fs}px Geist,-apple-system,Segoe UI,Roboto,Arial,sans-serif`; x.textBaseline='middle';
-  for(const it of its){ const e=A.v.currentTime-it.t0; if(!it.T||e<0||e>it.e1) continue; const q=trackAt(it.T,it.st,e); if(!q) continue; let ga=it.AL?alphaAt(it.AL,it.st,e):1; if(ga<0.15) continue; ga=Math.min(1,(ga-0.15)/0.85*1.15);
-    const px=ox+q[0]/it.W0*w, py=oy+q[1]/it.h0*h, tw=x.measureText(it.n).width+fs*2.1, qs=trackSmoothAt(it.T,it.st,e,0.35)||q, sx=ox+qs[0]/it.W0*w, sy=oy+qs[1]/it.h0*h;
-    let bx=clamp(sx-tw/2,ox+4,ox+w-tw-4), by=Math.max(oy+4,Math.min(sy,py)-rr-12*k-ph);
-    for(const p of placed) if(bx<p.x+p.w+4&&bx+tw+4>p.x&&by<p.y+p.h+3&&by+ph+3>p.y){ const right=tagSide(p.n+'|'+it.n,px-p.px,w*0.035), xr=p.x+p.w+6, xl=p.x-tw-6; if((right||xl<ox+4)&&xr+tw<=ox+w-4) bx=xr; else if(xl>=ox+4) bx=xl; else { by=p.y-ph-4; continue; } by=p.y-Math.round(ph*0.35); }
-    placed.push({x:bx,y:by,w:tw,h:ph,px,n:it.n});
-    x.strokeStyle=it.col; x.globalAlpha=0.85*ga; x.lineWidth=Math.max(1.2,1.4*k); x.beginPath(); x.moveTo(clamp(px,bx+6,bx+tw-6),by+ph); x.lineTo(px,py-rr*0.55); x.stroke();
-    x.globalAlpha=ga; x.fillStyle='rgba(12,15,20,.55)'; x.beginPath(); (x.roundRect?x.roundRect(bx,by,tw,ph,ph/2):x.rect(bx,by,tw,ph)); x.fill();
-    x.fillStyle=it.col; x.beginPath(); x.arc(bx+fs*0.8,by+ph/2,fs*0.27,0,7); x.fill();
-    x.fillStyle='#fff'; x.textAlign='left'; x.fillText(it.n,bx+fs*1.3,by+ph/2+0.5); }
+  its.forEach((it,i)=>{ const ga=tagAlpha(its,i,tA); if(ga<0.03) return; const e=tA-it.t0, q=trackAt(it.T,it.st,e); if(!q) return;
+    const qs=trackSmoothAt(it.T,it.st,e,0.5)||q, px=ox+q[0]/it.W0*w, py=oy+q[1]/it.h0*h, sx=ox+qs[0]/it.W0*w, sy=oy+qs[1]/it.h0*h, tw=x.measureText(it.n).width+fs*2.1;
+    list.push({it,ga,px,py,sx,w:tw,h:ph,by:Math.max(oy+4,Math.min(sy,py)-rr-12*k-ph)}); });
+  tagLayout(list,ox+4,ox+w-4);
+  for(const p of list){ const it=p.it, ga=p.ga;
+    if(p.line){ x.strokeStyle=it.col; x.globalAlpha=0.85*ga; x.lineWidth=Math.max(1.2,1.4*k); x.beginPath(); x.moveTo(p.lx,p.by+p.h); x.lineTo(p.px,p.py-rr*0.55); x.stroke(); }
+    x.globalAlpha=ga; x.fillStyle='rgba(12,15,20,.55)'; x.beginPath(); (x.roundRect?x.roundRect(p.bx,p.by,p.w,p.h,p.h/2):x.rect(p.bx,p.by,p.w,p.h)); x.fill();
+    x.fillStyle=it.col; x.beginPath(); x.arc(p.bx+fs*0.8,p.by+p.h/2,fs*0.27,0,7); x.fill();
+    x.fillStyle='#fff'; x.textAlign='left'; x.fillText(it.n,p.bx+fs*1.3,p.by+p.h/2+0.5); }
   x.restore(); }
 function ovLiveCanvas(){ let c=$('canvas.ovlive',A.stage); if(!c){ c=document.createElement('canvas'); c.className='ovlive'; $('canvas.ovb',A.stage).after(c); }
   const R=A.rect(), W=Math.max(2,Math.round(Math.min(1280,R.w*DPR()))); c.width=W; c.height=Math.round(W*A.v.videoHeight/A.v.videoWidth); c.hidden=false; return c; }
@@ -3837,12 +3854,12 @@ function ovTags(on){
   const st=A.stage, R=A.rect(), z=A.z, SX=st.offsetLeft, SY=st.offsetTop, SW=st.offsetWidth, SH=st.offsetHeight;
   const toS=uv=>[SX+z.x+(R.x+uv[0]*R.w)*z.s, SY+z.y+(R.y+uv[1]*R.h)*z.s];
   TAGS.geo={SX,SY,R,z};
-  const now=performance.now(), playing=!A.v.paused, rr=Math.max(5,R.w*z.s*0.016), gapL=12, out=[];
+  const now=performance.now(), playing=!A.v.paused, rr=Math.max(5,R.w*z.s*0.016), gapL=12, out=[], TI=tagItems(), tAn=ovTA();
   for(const it of items){ const S0=TAGS.st[it.k]||(TAGS.st[it.k]={vis:false}), el=els[it.k];
     let uv=null; { const L=it.L, e=L?ovTA()-L.t0:ovE(), T=L?L.trkB:(GH.trk&&GH.trk[it.k]), st=L?L.step:GH.step, W0=L?L.W0:GH.W0, h0=L?L.hA:GH.hA;
       if(T&&e>=0&&e<=(L?L.eEnd:GH.eEnd)){ const q=trackAt(T,st,e); if(q) uv=[q[0]/W0,q[1]/h0]; } }
-    let alv=1; if(!it.L&&GH.trkAl&&GH.trkAl[it.k]) alv=alphaAt(GH.trkAl[it.k],GH.step,ovE()); else if(it.L&&it.L.alB) alv=alphaAt(it.L.alB,it.L.step,ovTA()-it.L.t0);
-    if(uv&&alv<0.15){ uv=null; }
+    const ti=TI.findIndex(x=>x.k===it.k); const alv=ti>=0?tagAlpha(TI,ti,tAn):0;
+    if(uv&&alv<0.03){ uv=null; }
     if(!uv){ S0.vis=false; el.classList.remove('on'); el.style.opacity=''; if(lines[it.k]) lines[it.k].style.opacity=0; continue; }
     S0.al=alv;
     if(el.classList.contains('drag')){ out.push({it,el,S0,w:el.offsetWidth,h:el.offsetHeight,x:S0.px,y:S0.py,fixed:1}); continue; }
@@ -3855,17 +3872,14 @@ function ovTags(on){
     const dtp=Math.min(0.1,(now-(S0.tl||now))/1000); S0.tl=now; const al=1-Math.exp(-dtp/(playing?0.6:0.15));
     if(S0.lx==null||!S0.vis){ S0.lx=S0.ax; S0.ly=S0.ay; } else { S0.lx+=(S0.ax-S0.lx)*al; S0.ly+=(S0.ay-S0.ly)*al; }
     const w=el.offsetWidth||60, h=el.offsetHeight||18; out.push({it,el,S0,w,h,x:clamp(S0.lx-w/2,SX+4,SX+SW-w-4),y:Math.max(SY+4,Math.min(S0.ly,S0.ay)-rr-gapL-h-6)}); }
-  // überlappende Pillen nach oben staffeln (immer oberhalb der Athlet:innen)
-  out.sort((p,q)=>p.it.k<q.it.k?-1:1); // feste Reihenfolge – Pillen tauschen beim Kreuzen nicht die Plätze
-  for(let i=0;i<out.length;i++){ const p=out[i]; for(let j=0;j<i;j++){ const q=out[j]; if(p.x<q.x+q.w+4&&p.x+p.w+4>q.x&&p.y<q.y+q.h+3&&p.y+p.h+3>q.y){ // nah beieinander: leicht seitlich versetzt statt übereinander
-      const right=tagSide(q.it.k+'|'+p.it.k,(p.S0.ax||0)-(q.S0.ax||0),SW*0.035), xr=q.x+q.w+6, xl=q.x-p.w-6, okR=xr+p.w<=SX+SW-4, okL=xl>=SX+4;
-      if(right?okR:!okL&&okR){ p.x=xr; } else if(okL){ p.x=xl; } else { const up=q.y-p.h-4; if(up>=SY+4) p.y=up; continue; } p.y=q.y-Math.round(p.h*0.35); } } }
+  // nebeneinander wie im Export: linke Pille endet über ihrer Person, rechte beginnt über ihrer – Linien kreuzen niemanden
+  { const L=out.filter(p=>!p.fixed).map(p=>({p,px:p.S0.ax,py:p.S0.ay,sx:p.x+p.w/2,w:p.w,h:p.h,by:p.y})); tagLayout(L,SX+4,SX+SW-4); L.forEach(o=>{ o.p.x=o.bx; o.p.y=o.by; o.p.noLine=!o.line; }); }
   for(const p of out){ const S0=p.S0;
     if(p.fixed){ continue; }
     if(!S0.vis||S0.px==null){ S0.px=p.x; S0.py=p.y; } else { const dx=p.x-S0.px, dy=p.y-S0.py; S0.px+=dx*0.25; S0.py+=dy*0.25; }
     S0.vis=true; p.el.style.transform=`translate(${S0.px.toFixed(1)}px,${S0.py.toFixed(1)}px)`; p.el.classList.add('on'); p.el.style.opacity=(0.9*(S0.al==null?1:S0.al)).toFixed(2);
     const ln=lines[p.it.k]; if(ln){ const x1=clamp(S0.ax,S0.px+6,S0.px+p.w-6), y1=S0.py+p.h, y2=S0.ay-rr*0.55;
-      ln.setAttribute('x1',x1.toFixed(1)); ln.setAttribute('y1',y1.toFixed(1)); ln.setAttribute('x2',S0.ax.toFixed(1)); ln.setAttribute('y2',Math.max(y1,y2).toFixed(1)); ln.style.opacity=y2-y1>2?(0.75*(S0.al==null?1:S0.al)).toFixed(2):0; ln.style.stroke=p.it.col; } } }
+      ln.setAttribute('x1',x1.toFixed(1)); ln.setAttribute('y1',y1.toFixed(1)); ln.setAttribute('x2',S0.ax.toFixed(1)); ln.setAttribute('y2',Math.max(y1,y2).toFixed(1)); ln.style.opacity=y2-y1>2&&!p.noLine?(0.75*(S0.al==null?1:S0.al)).toFixed(2):0; ln.style.stroke=p.it.col; } } }
 /* Verfolgung: Vorhersage aus Tempo/Richtung, nur Treffer im engen Fenster um die Vorhersage (Rutscher & Zuschauer fallen weg) */
 const TGD={a:document.createElement('canvas'),b:document.createElement('canvas'),t:0,f:-1};
 const TRK={}; TAGS.live={}; TAGS.path={}; TAGS.seed=null;
@@ -5599,7 +5613,7 @@ if(false&&!LS.get('hint1',0)){ setTimeout(()=>{ toast(matchMedia('(pointer:coars
 
 /* Update-Hinweis: prüft version.json auf GitHub Pages; «Aktualisieren» lädt die Seite ohne Cache neu */
 (()=>{
-  const BUILD='20261029112844'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
+  const BUILD='20261029121035'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
   // nach einem Update die ?v=… aus der Adresse entfernen
   try{ const u=new URL(location.href); if(u.searchParams.has('v')){ u.searchParams.delete('v'); history.replaceState(null,'',u.pathname+(u.search||'')+u.hash); } }catch(e){}
   const el=$('#upd'); let latest=null, snoozed=null, busy=false;
