@@ -1950,6 +1950,85 @@ body .player .dock .ctl.io-btn:not(.on){color:#ffe08a!important;background:rgba(
 .lib.list .clip.row:hover .rn{opacity:1}.lib.list .clip.row .rn:hover{background:color-mix(in srgb,var(--ink) 9%,transparent);color:var(--ink)}
 .lib:not(.list) .clip .rn{display:none}
 @media (hover:none){ .lib.list .clip.row .rn{opacity:.6} }
+/* Vergleich: Werkzeug-Leiste */
+#viewCmp .dock .dz-more{grid-column:1/-1;display:none;align-items:center;justify-content:center;gap:10px 22px;flex-wrap:wrap;padding:8px 0 2px;margin-top:2px;border-top:1px solid rgba(255,255,255,.07)}
+#viewCmp .dock.tools-open .dz-more{display:flex}
+#viewCmp .dm-grp{display:flex;align-items:center;gap:6px}
+#viewCmp .dm-lab{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.42);margin-right:2px}
+#viewCmp .dz-more #cTools{display:flex}
+#viewCmp .dz-more .rail .rail-tg,#viewCmp .dz-more .rail .rail-sep0{display:none!important}
+#viewCmp .dz-more .rail.h{background:rgba(255,255,255,.05)!important;border-radius:11px}
+#viewCmp .dz-more .rail.h button{width:30px;height:30px}
+.tools-btn{position:relative;gap:7px;padding:0 12px!important}
+.tools-btn svg{width:17px;height:17px}
+.tools-btn .tb-car{width:13px!important;height:13px!important;opacity:.6;transition:transform .25s var(--ease-out)}
+.tools-btn.on .tb-car{transform:rotate(180deg)}
+.tools-btn .tb-dot{display:none;position:absolute;top:5px;right:5px;width:7px;height:7px;border-radius:50%;background:#ffd24a;box-shadow:0 0 0 2px #14181f}
+.tools-btn.act:not(.on) .tb-dot{display:block}
+/* Speichern-Menü */
+.save-hid{display:none!important}
+body.recording .rec-btn.save-hid{display:inline-flex!important}
+.save-w{position:relative;display:inline-flex;flex:none}
+.ctl.save-btn{gap:7px;padding:0 10px 0 12px!important;width:auto!important;min-width:0!important;font-weight:700;white-space:nowrap}
+.ctl.save-btn svg{width:16px;height:16px}
+.ctl.save-btn .sv-car{width:12px!important;height:12px!important;opacity:.6;transition:transform .2s}
+.save-w.open .sv-car{transform:rotate(180deg)}
+.save-menu{position:absolute;top:calc(100% + 8px);right:0;z-index:80;width:290px;padding:6px;border-radius:14px;background:#1b2027;border:1px solid rgba(255,255,255,.12);box-shadow:0 20px 44px -14px rgba(0,0,0,.75);display:flex;flex-direction:column;gap:2px}
+.save-menu[hidden]{display:none}
+.save-w.up .save-menu{top:auto;bottom:calc(100% + 8px)}
+.save-menu button{display:flex;align-items:center;gap:12px;padding:9px 10px;border:none;border-radius:10px;background:none;color:#eef2f6;font:inherit;text-align:left;cursor:pointer}
+.save-menu button:hover{background:rgba(255,255,255,.08)}
+.save-menu button>svg{width:20px;height:20px;flex:none;color:#aab2bc}
+.save-menu button:hover>svg{color:#fff}
+.save-menu button:last-child>svg circle:last-child{color:#ff4b3e}
+.save-menu span{display:flex;flex-direction:column;gap:1px;flex:1;min-width:0}
+.save-menu b{font-size:13px;font-weight:700}
+.save-menu small{font-size:11px;color:rgba(255,255,255,.55);line-height:1.3}
+.save-menu kbd{font:600 10px var(--mono);color:rgba(255,255,255,.5);border:1px solid rgba(255,255,255,.16);border-radius:5px;padding:1px 5px}
+body.no-hdr .cmp-tools>.save-w .ctl{height:34px!important}
+@media (max-width:1100px){ .ctl.save-btn span{display:none} .ctl.save-btn .sv-car{display:none} .ctl.save-btn{width:36px!important;padding:0!important;justify-content:center} }
+/* Ansichten: Ein Video · Nebeneinander · Übereinander */
+#layoutSeg{display:none!important}
+.tab[hidden]{display:none!important}
+/* Export: Voreinstellung, Optionen unter «Anpassen» */
+.exp-adv{margin:4px 0 6px;padding:12px 12px 4px;border-radius:12px;background:color-mix(in srgb,var(--ink) 4%,transparent)}
+.exp-foot .exp-hint{flex:1;text-align:right}
+.exp-advbtn{display:inline-flex;align-items:center;gap:7px;height:38px;padding:0 13px;border-radius:11px;border:1px solid var(--line);background:none;color:var(--ink);font:inherit;font-size:13px;font-weight:650;cursor:pointer}
+.exp-advbtn svg{width:16px;height:16px}
+.exp-advbtn:hover,.exp-advbtn.on{background:color-mix(in srgb,var(--ink) 7%,transparent)}
+.btn-pri.exp-go{min-width:150px;height:44px;font-size:15px}
+.exp-sum .es-in b{font-size:12px;white-space:normal}
+/* Seitenleiste: eine Liste */
+#sideTabs{display:none!important}
+#sideTree .side-hint{display:none}
+#sideOpen .lib-top{display:none!important}
+#sideOpen{flex:none!important;max-height:44%;overflow:auto;margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid var(--line)}
+#sideOpen[hidden]{display:none!important}
+.side-sec{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:700;color:var(--ink);margin:2px 4px 6px}
+.side-sec span{font:600 10.5px var(--mono);color:var(--muted);background:color-mix(in srgb,var(--ink) 6%,transparent);border-radius:6px;padding:0 6px}
+.libcard .side-top{display:flex!important;align-items:center;justify-content:space-between;gap:10px}
+.side-ttl{font-size:15px;font-weight:750;letter-spacing:-.01em;color:var(--ink);padding-left:4px}
+.libcard>#ftTools{display:flex;align-items:center;gap:6px;margin:10px 0 10px}
+.libcard>#ftTools .lib-search{flex:1;min-width:0;margin:0}
+.libcard>#ftTools #ftView{flex:none;margin:0}
+#sideTree .side-hrow[hidden]{display:none!important}
+#sideOpen .lib.list .clip.row{grid-template-columns:50px minmax(0,1fr)!important;grid-auto-flow:column;grid-auto-columns:auto;gap:8px!important;padding:3px 6px!important;border-radius:8px!important;transform:none!important}
+#sideOpen .lib.list .clip.row .thumb{width:50px!important;height:28px!important;border-radius:5px!important}
+#sideOpen .lib.list .clip.row .nm{font-size:12px!important;font-weight:500}
+#sideOpen .lib.list .clip.row .mt{font-size:10px!important}
+#sideOpen .lib.list .clip.row .dur{font-size:8px!important}
+#sideOpen .lib .lib-grp{margin:4px 4px 2px!important;font-size:10.5px}
+#sideOpen .lib>.add,#sideOpen .lib .add-tile{display:none!important}
+.libcard>#ftTools.noroot #ftAdd{display:none}
+/* Hinweis beim Knopf */
+.coach{position:fixed;z-index:300;max-width:280px;display:flex;align-items:center;gap:10px;padding:9px 9px 9px 13px;border-radius:12px;background:#ffd24a;color:#14181f;font-size:12.5px;font-weight:600;line-height:1.35;box-shadow:0 14px 34px -12px rgba(0,0,0,.55);opacity:0;transform:translateY(4px);transition:opacity .2s,transform .2s;pointer-events:none}
+.coach button{pointer-events:auto}
+.coach.up{transform:translateY(-4px)}
+.coach.on{opacity:1;transform:none}
+.coach button{flex:none;border:none;background:rgba(20,24,31,.12);color:#14181f;font:inherit;font-size:11.5px;font-weight:800;padding:5px 9px;border-radius:8px;cursor:pointer}
+.coach button:hover{background:rgba(20,24,31,.22)}
+.coach-ar{position:absolute;top:-6px;width:12px;height:12px;background:#ffd24a;transform:translateX(-50%) rotate(45deg);border-radius:2px}
+.coach.up .coach-ar{top:auto;bottom:-6px}
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
   .aurora{display:none}
@@ -1967,8 +2046,9 @@ body .player .dock .ctl.io-btn:not(.on){color:#ffe08a!important;background:rgba(
       </div>
     </div>
     <nav class="tabs" role="tablist">
-      <button class="tab on" data-mode="single" role="tab" id="tabSingle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="5" width="19" height="14" rx="2.5"/><path d="M10 9.5v5l4.5-2.5z"/></svg>Basic</button>
-      <button class="tab" data-mode="cmp" role="tab" id="tabCmp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="9" height="12" rx="2"/><rect x="13" y="6" width="9" height="12" rx="2"/></svg>Analyse</button>
+      <button class="tab on" data-mode="single" role="tab" id="tabSingle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="5" width="19" height="14" rx="2.5"/><path d="M10 9.5v5l4.5-2.5z"/></svg>Ein Video</button>
+      <button class="tab" data-mode="cmp" data-lay="side" role="tab" id="tabCmp" title="Zwei Läufe nebeneinander vergleichen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="9" height="12" rx="2"/><rect x="13" y="6" width="9" height="12" rx="2"/></svg>Nebeneinander</button>
+      <button class="tab" data-mode="cmp" data-lay="overlay" role="tab" id="tabOv" title="Zwei Läufe übereinandergelegt in einem Bild"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="13" height="11" rx="2"/><rect x="8" y="9" width="13" height="11" rx="2" fill="currentColor" fill-opacity=".18"/></svg>Übereinander</button>
       <button class="tab" data-mode="gps" role="tab" id="tabGps"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.2 7-11.5A7 7 0 0 0 5 9.5C5 14.8 12 21 12 21z"/><path d="M8.5 10.5l2.2-2 1.8 2.6 3-3.6"/></svg>GPS<span class="dev-tag" title="Ist in Entwicklung">Beta</span></button>
     </nav>
     <div class="head-spacer"></div>
@@ -1999,11 +2079,11 @@ body .player .dock .ctl.io-btn:not(.on){color:#ffe08a!important;background:rgba(
       </div>
       <div class="ft-demo" id="ftDemo" hidden></div>
       <div class="ft-note ft-ro" id="ftRo" hidden></div>
-      <div class="ft-note" id="ftNote" hidden>Ordnerzugriff gibt es am Computer in <b>Chrome</b>, <b>Edge</b> und <b>Brave</b>. Auf iPhone und iPad öffnet <b>«+»</b> Videos aus <b>Fotos</b> oder <b>Dateien</b> – sie erscheinen unter «In Arbeit». Fertige Clips lassen sich danach direkt teilen oder in Fotos sichern.</div>
+      <div class="ft-note" id="ftNote" hidden>Ordnerzugriff gibt es am Computer in <b>Chrome</b>, <b>Edge</b> und <b>Brave</b>. Auf iPhone und iPad öffnet <b>«+»</b> Videos aus <b>Fotos</b> oder <b>Dateien</b> – sie erscheinen oben unter «Geöffnet». Fertige Clips lassen sich danach direkt teilen oder in Fotos sichern.</div>
       <div class="ft-busy" id="ftBusy" hidden><span></span></div>
     </div>
     <div id="sideOpen" class="side-pane" hidden>
-    <p class="side-hint">Gerade in der App geladen – nur diese stehen für A, B und GPS zur Wahl. «–» entfernt nur aus der Liste.</p>
+    <div class="side-sec" title="Gerade in der App geöffnete Videos – «–» nimmt sie nur aus der Liste, die Datei bleibt.">Geöffnet <span id="openN"></span></div>
     <div class="lib-top"><div class="lib-search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><input id="libQ" type="search" placeholder="Suchen: Athlet, Ort, Datum …" autocomplete="off"></div><div class="lib-view" id="libView" role="group" aria-label="Ansicht"><button data-lv="thumbs" title="Mit Vorschaubild"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="7" height="5" rx="1.2"/><rect x="3" y="14" width="7" height="5" rx="1.2"/><path d="M13 7h8M13 16h8"/></svg></button><button data-lv="names" title="Nur Dateinamen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button></div></div>
     <div class="lib-restore" id="libRestore" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg><span></span><button id="btnRestore">Öffnen</button></div>
     <div class="lib" id="lib"></div>
@@ -2015,7 +2095,7 @@ body .player .dock .ctl.io-btn:not(.on){color:#ffe08a!important;background:rgba(
   <section class="card player" id="viewSingle">
     <div class="pbar">
       <div class="ttl-wrap"><div class="mode-slot"></div>
-        <div class="eyebrow">Basic</div>
+        <div class="eyebrow">Ein Video</div>
         <div class="ttl" id="sTitle">Kein Video geöffnet</div>
       </div>
       <div class="chips" id="sChips"></div>
@@ -2088,9 +2168,9 @@ body .player .dock .ctl.io-btn:not(.on){color:#ffe08a!important;background:rgba(
   <!-- Modus 2: Vergleich -->
   <section class="card player" id="viewCmp" hidden>
     <div class="c-head">
-      <div><div class="mode-slot"></div><div class="eyebrow">Analyse</div><h2>Lauf A <span class="vs">vs</span> Lauf B</h2></div>
+      <div><div class="mode-slot"></div><div class="eyebrow" id="cmpEyebrow">Vergleich</div><h2>Lauf A <span class="vs">vs</span> Lauf B</h2></div>
       <div class="cmp-tools">
-        <button class="tut-open" id="cmpReset" title="Vergleich leeren: A und B entfernen, Sync und Overlay zurücksetzen (Videos bleiben unter «In Arbeit»)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/></svg><span>Zurücksetzen</span></button><button class="tut-open" id="tutBtn" title="Anleitung direkt im Tool – zeigt Schritt für Schritt mit den Beispiel-Läufen, wie es geht"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M10 8.5l5.5 3.5-5.5 3.5z" fill="currentColor"/></svg><span>Anleitung</span></button><div class="seg" id="layoutSeg"><button data-layout="side" class="on"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="5" width="8.5" height="14" rx="2"/><rect x="13" y="5" width="8.5" height="14" rx="2"/></svg>Side by Side</button><button data-layout="overlay"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="13" height="11" rx="2"/><rect x="8" y="9" width="13" height="11" rx="2" fill="currentColor" fill-opacity=".25"/></svg>Overlay</button><button data-layout="ghost"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M5 20V10a7 7 0 0 1 14 0v10l-2.4-1.8L14.3 20 12 18.2 9.7 20l-2.3-1.8z"/><circle cx="9.5" cy="10.5" r=".9" fill="currentColor"/><circle cx="14.5" cy="10.5" r=".9" fill="currentColor"/></svg>Ghost</button></div>
+        <button class="tut-open" id="cmpReset" title="Vergleich leeren: A und B entfernen, Sync und Overlay zurücksetzen (Videos bleiben unter «Geöffnet»)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/></svg><span>Zurücksetzen</span></button><button class="tut-open" id="tutBtn" title="Anleitung direkt im Tool – zeigt Schritt für Schritt mit den Beispiel-Läufen, wie es geht"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M10 8.5l5.5 3.5-5.5 3.5z" fill="currentColor"/></svg><span>Anleitung</span></button><div class="seg" id="layoutSeg"><button data-layout="side" class="on"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="5" width="8.5" height="14" rx="2"/><rect x="13" y="5" width="8.5" height="14" rx="2"/></svg>Side by Side</button><button data-layout="overlay"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="13" height="11" rx="2"/><rect x="8" y="9" width="13" height="11" rx="2" fill="currentColor" fill-opacity=".25"/></svg>Overlay</button><button data-layout="ghost"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M5 20V10a7 7 0 0 1 14 0v10l-2.4-1.8L14.3 20 12 18.2 9.7 20l-2.3-1.8z"/><circle cx="9.5" cy="10.5" r=".9" fill="currentColor"/><circle cx="14.5" cy="10.5" r=".9" fill="currentColor"/></svg>Ghost</button></div>
         <button class="ctl ov-namebtn" id="ovNames" title="Namen im Bild ein / aus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12V5a2 2 0 0 1 2-2h7l9 9-9 9-9-9z"/><circle cx="8" cy="8" r="1.6"/></svg><span>Namen</span></button><label class="ctl-lab op-wrap">Deckkraft <input type="range" class="op" id="opRange" min="0.1" max="0.9" step="0.05" value="0.5"></label>
         <button class="ctl" data-act="shot" title="Standbild A | B als PNG speichern (p)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.6"/></svg></button>
         <button class="ctl strobo-btn" data-act="strobe" title="Strobo: mehrere Positionen von A in einem Bild (±0.7 s um das aktuelle Bild)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><circle cx="5" cy="15" r="2.2" opacity=".45"/><circle cx="10.5" cy="11" r="2.2" opacity=".7"/><circle cx="17" cy="8" r="2.6"/><path d="M3 20c5-1 10-5 15-12" opacity=".5"/></svg></button><button class="ctl rec-btn" data-act="rec" title="Aufnahme: alles, was du jetzt zeigst, zeichnest und sagst, als Video aufnehmen (r)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4" fill="currentColor" stroke="none"/></svg></button><button class="ctl" data-act="export" title="Vergleich als Video exportieren (e)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg></button>
@@ -2173,8 +2253,8 @@ body .player .dock .ctl.io-btn:not(.on){color:#ffe08a!important;background:rgba(
 </div>
 <div class="modal" id="expModal">
   <div class="help exp" role="dialog" aria-label="Clip exportieren">
-    <h3>Clip exportieren <button class="hdr-ico" id="expX" title="Schliessen">✕</button></h3>
-    <div class="exp-grid">
+    <h3>Video speichern <button class="hdr-ico" id="expX" title="Schliessen">✕</button></h3>
+    <div class="exp-adv" id="expAdv" hidden><div class="exp-grid">
       <span class="exp-l">Ausschnitt</span><div class="seg" id="expRange"></div>
       <span class="exp-l" id="expDurL">Dauer</span><div id="expDurRow"><input class="exp-num" id="expDur" type="number" min="0.5" max="120" step="0.5" value="3"> s</div>
       <span class="exp-l">Tempo</span><div class="seg" id="expRate"><button data-r="1">1×</button><button data-r="0.5">½×</button><button data-r="0.25">¼×</button><button data-r="0.1">0.1×</button></div>
@@ -2185,10 +2265,10 @@ body .player .dock .ctl.io-btn:not(.on){color:#ffe08a!important;background:rgba(
         <label id="expNotesRow"><input type="checkbox" id="expNotes" checked> Marker-Notizen einblenden</label>
         <label id="expGps"><input type="checkbox" id="expGpsOv" checked> GPS-Anzeigen</label>
       </div>
-    </div>
+    </div></div>
     <div class="exp-sum" id="expSum"></div>
     <div class="gprog exp-prog" id="expProg" hidden><div class="gprog-bar"><i></i></div><span></span></div>
-    <div class="exp-foot"><span class="exp-hint" id="expHint">Läuft im Browser · Fenster offen lassen</span><button class="btn-pri" id="expGo">Exportieren</button></div>
+    <div class="exp-foot"><button class="exp-advbtn" id="expAdvBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg><span>Anpassen</span></button><span class="exp-hint" id="expHint">Läuft im Browser · Fenster offen lassen</span><button class="btn-pri exp-go" id="expGo">Speichern</button></div>
   </div>
 </div>
 <div class="modal" id="catModal">
@@ -2230,18 +2310,18 @@ body .player .dock .ctl.io-btn:not(.on){color:#ffe08a!important;background:rgba(
       <dt>Zeitleiste</dt><dd>Eine Leiste für das ganze Video – antippen oder ziehen springt dorthin · + / − (oder Ctrl + Mausrad) zoomt bis auf einzelne Bilder, oben zeigt dann ein feiner Balken, wo du bist · Film-Knopf: Vorschaubilder ein/aus</dd>
       <dt>Marker</dt><dd>Raute-Knopf oder <kbd>m</kbd> setzt einen Marker mit Notiz · <kbd>,</kbd> <kbd>.</kbd> springt zum vorherigen / nächsten</dd>
       <dt>Lupe</dt><dd><kbd>z</kbd>, Pinch oder Ctrl + Mausrad · ziehen = schwenken · Doppelklick = zurück</dd>
-      <dt>Side by Side</dt><dd>Knopf «Side by Side» übernimmt das Video als A in die Analyse – dann B wählen</dd>
+      <dt>Vergleichen</dt><dd>Knopf «Side by Side» übernimmt das Video als A in «Nebeneinander» – dann B wählen</dd>
     </dl></section>
     <section class="hp" data-hp="analyse" hidden><dl>
-      <dt>Side by Side</dt><dd>A und B wählen, beide zum gleichen Tor ziehen und «Sync» drücken</dd>
+      <dt>Nebeneinander</dt><dd>A und B wählen, beide zum gleichen Tor ziehen und unter «Werkzeuge» «Sync» drücken (<kbd>t</kbd> öffnet die Werkzeuge)</dd>
       <dt>Zeitmessung</dt><dd>Stoppuhr-Knopf: Start = Sync-Punkt · Fahne A / B setzt das Ziel · Zeit und Differenz stehen im Bild</dd>
       <dt>Tore</dt><dd><kbd>m</kbd> Tor in A · <kbd>n</kbd> Tor in B → Abschnittszeiten · <kbd>Alt</kbd> + ← → bewegt nur B</dd>
-      <dt>Overlay</dt><dd>1 «Automatisch finden» sucht die gleiche Stelle der Strecke (oder A und B von Hand zum gleichen Tor) · 2 «Overlay erstellen» – B folgt dem Kameraschwenk; nur bei stark unterschiedlichem Zoom vorher zwei gleiche Tore als Referenz antippen · Braucht eine durchgehende Kamera vom gleichen Standort (kein TV-Schnitt)</dd>
-      <dt>Hineinziehen</dt><dd>Ein Video aus der Liste links direkt auf Basic, A oder B ziehen</dd>
-      <dt>Korrigieren</dt><dd>Während der Berechnung: Pause · 1 s zurück · Korrigieren. Im fertigen Overlay: anhalten → «Hier korrigieren» – ab dort wird neu gerechnet</dd>
+      <dt>Übereinander</dt><dd>1 «Automatisch suchen» sucht die gleiche Stelle der Strecke (oder A und B von Hand zum gleichen Tor), dann «Weiter» · 2 «Overlay erstellen» – B folgt dem Kameraschwenk; nur bei stark unterschiedlichem Zoom unter «…» zwei gleiche Tore als Referenz antippen · 3 «Vorschau» und «Speichern» · Braucht eine durchgehende Kamera vom gleichen Standort (kein TV-Schnitt)</dd>
+      <dt>Hineinziehen</dt><dd>Ein Video aus der Liste links direkt ins Bild, auf A oder B ziehen</dd>
+      <dt>Korrigieren</dt><dd>Während der Berechnung: Pause · 1 s zurück · Korrigieren. Im fertigen Overlay: anhalten → «Korrigieren» – ab dort wird neu gerechnet</dd>
       <dt>Von Hand</dt><dd>B ziehen · Rechtsklick ziehen (oder Ctrl / Alt) = drehen · Mausrad = Grösse · Pfeiltasten = fein · Enter = übernehmen</dd>
-      <dt>Namen</dt><dd>«Namen setzen»: Fahrer:innen einmal antippen. Sitzt eine Pille falsch, auf die Person ziehen – jede Korrektur wird zum Anker</dd>
-      <dt>Mehrere Läufe</dt><dd>Im fertigen Overlay «Lauf hinzufügen» – bis zu 4 Läufe im gleichen Bild</dd>
+      <dt>Namen</dt><dd>«Namen»: Fahrer:innen einmal antippen. Sitzt eine Pille falsch, auf die Person ziehen – jede Korrektur wird zum Anker</dd>
+      <dt>Mehrere Läufe</dt><dd>Im fertigen Overlay unter «…» «Weiteren Lauf dazunehmen» – bis zu 4 Läufe im gleichen Bild</dd>
       <dt>Strobo</dt><dd>Mehrere Positionen von A in einem Bild (±0.7 s um das aktuelle Bild)</dd>
       <dt>Gemerkt</dt><dd>Fertige Overlays, Namen und Korrekturen sind beim nächsten Öffnen der gleichen Videos sofort da</dd>
     </dl></section>
@@ -2274,7 +2354,7 @@ body .player .dock .ctl.io-btn:not(.on){color:#ffe08a!important;background:rgba(
     </dl></div></section>
     <section class="hp" data-hp="mobile" hidden><dl>
       <dt>Am Hang</dt><dd>Für den Einsatz draussen gibt es die schlanke Handy-App <a href="field/" target="_blank" rel="noopener" style="color:var(--red);font-weight:700">Video-Lab Field</a>: filmen, sofort in Zeitlupe ansehen, Side by Side, aufs Handy sichern</dd>
-      <dt>Videos</dt><dd>«+» öffnet Videos aus Fotos oder Dateien – sie erscheinen unter «In Arbeit»</dd>
+      <dt>Videos</dt><dd>«+» öffnet Videos aus Fotos oder Dateien – sie erscheinen oben unter «Geöffnet»</dd>
       <dt>Bedienen</dt><dd>Tippen = Abspielen · Zeitleiste wischen = Bild für Bild · zwei Finger = Lupe</dd>
       <dt>Sichern</dt><dd>Nach Export oder Standbild: «Teilen · In Fotos sichern»</dd>
       <dt>Als App</dt><dd>Safari → Teilen → «Zum Home-Bildschirm» – startet wie eine App, auch offline</dd>
@@ -2391,7 +2471,7 @@ function ftViewUI(){ const n=LS.get('ftview','thumbs')==='names'; $('#sideTree')
 document.addEventListener('click',e=>{ const b=e.target.closest('#ftView [data-fv]'); if(!b) return; LS.set('ftview',b.dataset.fv); ftViewUI(); });
 ftViewUI();
 function renderLib(){
-  const el=$('#lib'); el.innerHTML=''; $('#libCount').textContent=clips.length; if(typeof renderDemoList==='function') setTimeout(renderDemoList,0);
+  const el=$('#lib'); el.innerHTML=''; $('#libCount').textContent=clips.length; if(typeof sideOpenUI==='function') sideOpenUI(); if(typeof renderDemoList==='function') setTimeout(renderDemoList,0);
   el.classList.add('list'); const NAMES=LS.get('libview','thumbs')==='names'; el.classList.toggle('names',NAMES); $$('#libView button').forEach(b=>b.classList.toggle('on',b.dataset.lv===(NAMES?'names':'thumbs')));
   // nach Rennen/Training gruppieren (Ort · Disziplin · Datum), Reihenfolge wie geöffnet
   const gk=c=>{ const m=c.meta; return m&&m.ok&&(m.place||m.date)?[m.place||'',m.disc||'',m.date||''].join('|'):'~'; };
@@ -2399,7 +2479,7 @@ function renderLib(){
   const list=order.flatMap(k=>clips.filter(c=>gk(c)===k)); let lastG=null;
   const XI='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/></svg>';
   list.forEach(c=>{
-    if(!libMatch(c)) return;
+    if(!libMatch(c)||c.demo) return; // Beispiele stehen unten bei den Beispiel-Läufen
     const g=gk(c); if(!NAMES&&g!==lastG&&order.length>1){ lastG=g; const m=c.meta||{}, h=document.createElement('div'); h.className='lib-grp';
       h.textContent=g==='~'?'Weitere Videos':[[m.place,m.date?m.date.slice(-4):''].filter(Boolean).join(' '),DISC_LONG[m.disc]||m.disc,m.cam].filter(Boolean).join(' · '); el.appendChild(h); }
     const on=mode==='single'?S.clip===c:mode==='gps'?GD.clip===c:(A.clip===c||B.clip===c);
@@ -2411,7 +2491,7 @@ function renderLib(){
       +'<span class="abtag">'+(A.clip===c?'<span class="ta">A</span>':'')+(B.clip===c?'<span class="tb">B</span>':'')+'</span>'
       +'<div class="ab"><button class="ba'+(A.clip===c?' on':'')+'" title="Als Video A">A</button><button class="bb'+(B.clip===c?' on':'')+'" title="Als Video B">B</button></div>'
       +'<button class="rn" title="Umbenennen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></svg></button>'
-      +'<button class="x" title="Aus «In Arbeit» nehmen – die Datei im Ordner bleibt unverändert">'+XI+'</button>';
+      +'<button class="x" title="Aus «Geöffnet» nehmen – die Datei im Ordner bleibt unverändert">'+XI+'</button>';
     const mm=c.meta, grouped=!NAMES&&order.length>1&&g!=='~'&&mm&&mm.ok;
     $('.nm',card).textContent=NAMES?dispName(c):grouped?mm.athlete:metaTitle(c); card.title=dispName(c)+(c.alias?' (Datei: '+c.name+')':'');
     $('.mt',card).textContent=grouped?[mm.run,mm.date].filter(Boolean).join(' · '):(c.demo?'Beispiel · ':'')+(metaLine(c)||[c.dur?fmtDur(c.dur):null,c.size?fmtMB(c.size):null].filter(Boolean).join(' · ')||'—');
@@ -3027,7 +3107,7 @@ function linkedTick(){
   else if(tight) B.v.playbackRate=clamp(A.rate*(1-G.errS*4),A.rate*0.75,A.rate*1.25);
   else B.v.playbackRate=clamp(A.rate*(1-err*1.5),A.rate*0.85,A.rate*1.15);
 }
-function setLayout(l){ if(l==='ghost') l='side'; if(l!=='overlay'&&typeof OV!=='undefined'&&OV.pick) OV.pick=null; setTimeout(()=>typeof ovUI==='function'&&ovUI(),0);  $$('#layoutSeg button').forEach(x=>x.classList.toggle('on',x.dataset.layout===l)); const v=$('#viewCmp'); v.classList.toggle('overlay',l==='overlay'); v.classList.toggle('ghost',l==='ghost'); if(typeof ghostUI==='function') ghostUI();  LS.set('layout',l); decks.forEach(d=>{ d.dirty=true; d.annDirty=true; }); if(typeof splitsUI==='function') splitsUI(); }
+function setLayout(l){ if(l==='ghost') l='side'; if(l!=='overlay'&&typeof OV!=='undefined'&&OV.pick) OV.pick=null; setTimeout(()=>typeof ovUI==='function'&&ovUI(),0);  $$('#layoutSeg button').forEach(x=>x.classList.toggle('on',x.dataset.layout===l)); const v=$('#viewCmp'); v.classList.toggle('overlay',l==='overlay'); v.classList.toggle('ghost',l==='ghost'); if(typeof ghostUI==='function') ghostUI();  LS.set('layout',l); decks.forEach(d=>{ d.dirty=true; d.annDirty=true; }); if(typeof splitsUI==='function') splitsUI(); if(typeof tabsUI==='function') tabsUI(); }
 $('#layoutSeg').addEventListener('click',e=>{ const b=e.target.closest('[data-layout]'); if(b) setLayout(b.dataset.layout); });
 $('#opRange').addEventListener('input',e=>$('#viewCmp').style.setProperty('--ovop',e.target.value));
 
@@ -3075,7 +3155,7 @@ $$('.dock [data-act], .cmp-tools [data-act]').forEach(b=>b.addEventListener('cli
 /* Modus */
 function setMode(m){
   mode=m; document.body.classList.toggle('m-cmp',m==='cmp'); document.body.classList.toggle('m-single',m==='single');
-  $$('.tab').forEach(t=>t.classList.toggle('on',t.dataset.mode===m));
+  tabsUI();
   $('#viewSingle').hidden=m!=='single'; $('#viewCmp').hidden=m!=='cmp'; $('#viewGps').hidden=m!=='gps';
   [S,A,B,GD].forEach(d=>{ if(!(m==='single'&&d===S)&&!(m==='cmp'&&(d===A||d===B))&&!(m==='gps'&&d===GD)) d.pause(); });
   if(m==='gps') gpsSelects(); GPS.dirty=true;
@@ -3091,7 +3171,10 @@ function switchMode(m){ if(m===mode) return;
     const t=document.startViewTransition(()=>setMode(m)); t.finished.finally(()=>html.classList.remove('vt-mode','vt-fwd','vt-back')); return; }
   setMode(m); if(calm) return; const v=$(m==='cmp'?'#viewCmp':m==='gps'?'#viewGps':'#viewSingle'); v.classList.remove('view-in'); void v.offsetWidth; v.classList.add('view-in');
   v.addEventListener('animationend',()=>v.classList.remove('view-in'),{once:true}); }
-$$('.tab').forEach(t=>t.addEventListener('click',()=>{ switchMode(t.dataset.mode); }));
+function curLayout(){ return $('#viewCmp').classList.contains('overlay')?'overlay':'side'; }
+function tabsUI(){ const ly=curLayout(); $$('.tab').forEach(t=>t.classList.toggle('on',t.dataset.mode===mode&&(!t.dataset.lay||t.dataset.lay===ly))); gpsTabUI(); }
+function gpsTabUI(){ const t=$('#tabGps'); if(!t) return; const has=mode==='gps'||(typeof GPS!=='undefined'&&(GPS.tracks.some(x=>!x._demo)||clips.some(c=>c.gpsId&&GPS.tracks.some(x=>x.id===c.gpsId)))); t.hidden=!has; }
+$$('.tab').forEach(t=>t.addEventListener('click',()=>{ if(t.dataset.lay){ if(curLayout()!==t.dataset.lay) setLayout(t.dataset.lay); } switchMode(t.dataset.mode); tabsUI(); }));
 
 /* Dateien */
 $('#fileIn').addEventListener('change',e=>{ const fs=e.target.files; if(fs&&fs.length){
@@ -3105,7 +3188,8 @@ window.addEventListener('dragover',e=>e.preventDefault());
 window.addEventListener('drop',async e=>{ e.preventDefault(); dragN=0; $('#dropOv').classList.remove('on'); const dt=e.dataTransfer; if(!dt||!dt.files||!dt.files.length) return;
   const files=[...dt.files]; const hp=[...(dt.items||[])].filter(i=>i.kind==='file').map(i=>i.getAsFileSystemHandle?i.getAsFileSystemHandle().catch(()=>null):null);
   if(FSA&&hp.some(Boolean)){ const hs=await Promise.all(hp); files.forEach((f,i)=>{ if(hs[i]&&hs[i].kind==='file') f._h=hs[i]; }); }
-  addFiles(files); });
+  const GPSX=/\.(gpx|csv|json|fit|tcx)$/i, gf=files.filter(f=>GPSX.test(f.name)); if(gf.length) importGpsFiles(gf);
+  const vf=files.filter(f=>!GPSX.test(f.name)); if(vf.length) addFiles(vf); });
 
 /* Tastatur */
 document.addEventListener('keydown',e=>{
@@ -4321,7 +4405,7 @@ function cmpReset(){
   if(typeof OV!=='undefined'){ OV.T=null; OV.follow=false; OV.pick=null; OV.edit=false; OV.cut={a:null,b:null}; OV.pa=[]; OV.pb=[]; OV.key=''; ovKill(); }
   if(GH.state==='busy') GH.abort=true; GH.state='idle'; GH.key='';
   RES.tried=''; layersClear(); tagsReset(); A.loopOv=null; B.loopOv=null; syncSelects(); renderLib(); if(typeof ovUI==='function') ovUI(); ghostUI(); cmpPlayIcon(); updSync();
-  toast('Vergleich zurückgesetzt – die Videos bleiben unter «In Arbeit».',2600); }
+  toast('Vergleich zurückgesetzt – die Videos bleiben unter «Geöffnet».',2600); }
 $('#cmpReset').addEventListener('click',cmpReset);
 function renderGhost(){
   const gc=$('canvas.ghost',A.stage), gp=$('.gap',A.stage);
@@ -4368,7 +4452,7 @@ function ghostUI(){
   btn.textContent=GH.state==='busy'?'Abbrechen':GH.state==='ready'?'Neu berechnen':'Ghost berechnen';
   btn.disabled=!key&&GH.state!=='busy';
   if(!A.ready||!B.ready) st.innerHTML='<b>Lauf A</b> und <b>Lauf B</b> oben wählen – gleicher Kamerastandort, Zoom darf variieren.';
-  else if(!G.linked) st.innerHTML='<b>1 · Gleicher Moment</b> · in «Side by Side» A und B zum gleichen Tor ziehen, dann «Sync».';
+  else if(!G.linked) st.innerHTML='<b>1 · Gleicher Moment</b> · in «Nebeneinander» A und B zum gleichen Tor ziehen, dann «Sync».';
   else if(GH.state==='idle') st.innerHTML='<b>2 · Ghost berechnen</b> · dauert ca. '+Math.max(5,Math.round((Math.min(A.dur,B.dur))*0.5))+' s.';
   else if(GH.state==='busy') st.innerHTML='Berechnet lokal auf deinem Gerät …';
   else st.innerHTML='<b>Ghost fertig</b> · Zeitabstand oben rechts (<span style="color:var(--good);font-weight:800">−</span> = A schneller)';
@@ -4602,7 +4686,7 @@ $('#gpsView').addEventListener('click',e=>{ const b=e.target.closest('[data-v]')
 $('#gpsColor').addEventListener('click',e=>{ const b=e.target.closest('[data-c]'); if(!b) return; GPS.color=b.dataset.c; $$('#gpsColor button').forEach(x=>x.classList.toggle('on',x===b)); GPS.dirty=true; });
 $('#gpsChart').addEventListener('click',e=>{ const N=gpsNow(); if(!N) return; const r=e.currentTarget.getBoundingClientRect(); const {tr,c}=N, P=tr.P, s0=P[tr.iS].s, s1=P[tr.iE].s;
   const s=s0+clamp((e.clientX-r.left-64)/(r.width-74),0,1)*(s1-s0); let i=tr.iS; while(i<tr.iE&&P[i].s<s) i++; GD.pause(); GD.seekTime(P[i].t-c.gpsOff); GPS.dirty=true; });
-function importGpsFiles(files){ [...files].forEach(f=>{ const rd=new FileReader(); rd.onload=()=>{ try{ const made=addTracks(parseGps(String(rd.result),f.name)); if(made.length){ toast('GPS geladen: '+made.map(t=>t.name).join(', ')); if(mode!=='gps') setMode('gps'); } }catch(err){ toast('GPS-Datei nicht lesbar: '+err.message,4500); } }; rd.readAsText(f); }); }
+function importGpsFiles(files){ [...files].forEach(f=>{ const rd=new FileReader(); rd.onload=()=>{ try{ const made=addTracks(parseGps(String(rd.result),f.name)); if(made.length){ toast('GPS geladen: '+made.map(t=>t.name).join(', ')); if(mode!=='gps') setMode('gps'); gpsTabUI(); } }catch(err){ toast('GPS-Datei nicht lesbar: '+err.message,4500); } }; rd.readAsText(f); }); }
 $('#gpsIn').addEventListener('change',e=>{ if(e.target.files&&e.target.files.length) importGpsFiles(e.target.files); e.target.value=''; });
 // Schnittstelle für den späteren externen Datenfluss
 window.VideoLab={
@@ -4727,11 +4811,13 @@ function openExport(){
   $$('#expRate button').forEach(b=>b.classList.toggle('on',+b.dataset.r===EXP.rate));
   $('#expNotesRow').hidden=!(mode==='single');
   $('#expAnnRow').hidden=!ds.some(d=>d.clip&&d.clip.anns&&d.clip.anns.length); // nur zeigen, wenn es Zeichnungen gibt
-  const ovN=mode==='cmp'&&$('#viewCmp').classList.contains('overlay')&&$('#viewCmp').classList.contains('ov-names'); $('#expNamesRow').hidden=!ovN; if(ovN) $('#expNames').checked=LS.get('expNames',true);
+  const ovN=mode==='cmp'&&$('#viewCmp').classList.contains('overlay')&&$('#viewCmp').classList.contains('ov-names'); $('#expNamesRow').hidden=!ovN; if(ovN) $('#expNames').checked=true;
   $('#expGps').hidden=mode!=='gps';
-  $('#expProg').hidden=true; $('#expGo').disabled=false; $('#expGo').textContent='Exportieren';
+  $('#expProg').hidden=true; $('#expGo').disabled=false; $('#expGo').textContent='Speichern'; $('#expAdv').hidden=true; $('#expAdvBtn').classList.remove('on'); $('#expAnn').checked=true; $('#expInfo').checked=true;
   expSummary(); $('#expModal').classList.add('on');
 }
+document.addEventListener('click',e=>{ const b=e.target.closest('#expAdvBtn'); if(!b) return; const a=$('#expAdv'); a.hidden=!a.hidden; b.classList.toggle('on',!a.hidden); });
+document.addEventListener('change',e=>{ if(e.target.closest('#expModal .exp-checks')&&typeof expSummary==='function') expSummary(); });
 function expRangeFrames(){
   const ds=expDecks(), D=ds[0], fps=D.fps;
   let a=D.frame, b;
@@ -4747,12 +4833,13 @@ function expRangeFrames(){
   }
   return {a,b};
 }
+function expInhalt(){ const it=[]; const on=(row,cb)=>!$(row).hidden&&$(cb).checked; if(on('#expNamesRow','#expNames')) it.push('Namen'); if(on('#expAnnRow','#expAnn')) it.push('Zeichnungen'); if($('#expInfo').checked) it.push('Info-Leiste'); if(on('#expNotesRow','#expNotes')) it.push('Notizen'); if(on('#expGps','#expGpsOv')) it.push('GPS'); return it.join(' · ')||'nur Video'; }
 function expSummary(){
   const r=expRangeFrames(), D=expDecks()[0], len=(r.b-r.a)/D.fps;
   $('#expDurRow').hidden=$('#expDurL').hidden=EXP.range==='loop'||EXP.range==='all'||EXP.range==='ovcut';
   $('#expDur').value=EXP.dur;
   const vid=len/EXP.rate, fmt=t=>t>=60?Math.floor(t/60)+':'+String(Math.floor(t%60)).padStart(2,'0')+' min':t.toFixed(1)+' s', fast=typeof VideoEncoder!=='undefined';
-  $('#expSum').innerHTML=`<span class="es-r"><span>Ausschnitt</span><b>${(r.a/D.fps).toFixed(2)} – ${(r.b/D.fps).toFixed(2)} s</b></span><span class="es-arrow">→</span><span class="es-r"><span>Video${EXP.rate<1?' · Zeitlupe':''}</span><b>${fmt(vid)}</b></span><span class="es-r"><span>Format</span><b>MP4</b></span><span class="es-r"><span>Dauer Export</span><b>ca. ${fmt(fast?len*1.1:vid)}</b></span>`;
+  $('#expSum').innerHTML=`<span class="es-r"><span>Ausschnitt</span><b>${(r.a/D.fps).toFixed(2)} – ${(r.b/D.fps).toFixed(2)} s</b></span><span class="es-arrow">→</span><span class="es-r"><span>Video${EXP.rate<1?' · Zeitlupe':''}</span><b>${fmt(vid)}</b></span><span class="es-r es-in"><span>Mit</span><b>${expInhalt()}</b></span><span class="es-r"><span>Dauer Export</span><b>ca. ${fmt(fast?len*1.1:vid)}</b></span>`;
 }
 async function startExport(){
   if(EXP.live) return;
@@ -4840,12 +4927,12 @@ async function wcConfig(w,h,fps){ if(typeof VideoEncoder==='undefined'||typeof V
 function finishExport(){
   const E=EXP; if(!E.live) return; E.live=false; E.started=false; clearInterval(E.wd);
   expDecks().forEach(d=>d.pause()); G.playing=false; S.useLoop=E.prevLoop; if(E.prevLov){ A.loopOv=E.prevLov[0]; B.loopOv=E.prevLov[1]; E.prevLov=null; } setRate(E.prevRate);
-  if(E.wc){ (async()=>{ $('#expGo').textContent='Exportieren'; $('#expProg').hidden=true;
+  if(E.wc){ (async()=>{ $('#expGo').textContent='Speichern'; $('#expProg').hidden=true;
       if(E.cancel){ try{ E.enc.close(); }catch(e){} toast('Export abgebrochen.'); return; }
       try{ await E.enc.flush(); E.enc.close(); E.muxer.finalize(); if(E.wcErr) throw E.wcErr;
         const bl=new Blob([E.muxer.target.buffer],{type:'video/mp4'}); $('#expModal').classList.remove('on'); saveOut(bl,E.name+'.mp4',(expDecks()[0]||{}).clip,'Clip'); }
       catch(err){ console.error(err); toast('Export fehlgeschlagen – bitte nochmals versuchen.',4000); } })(); return; }
-  const r=E.rec; r.onstop=()=>{ $('#expGo').textContent='Exportieren'; $('#expProg').hidden=true;
+  const r=E.rec; r.onstop=()=>{ $('#expGo').textContent='Speichern'; $('#expProg').hidden=true;
     if(E.cancel){ toast('Export abgebrochen.'); return; }
     const type=r.mimeType||E.mime||'video/webm', ext=type.includes('mp4')?'mp4':'webm', bl=new Blob(E.chunks,{type});
     $('#expModal').classList.remove('on'); saveOut(bl,E.name+'.'+ext,(expDecks()[0]||{}).clip,'Clip'); };
@@ -5180,7 +5267,7 @@ function ftMatch(n){ if(!FT.q) return true; if(n.kind==='directory') return ftHa
 function ftHasMatch(n){ if(!n.children) return false; return n.children.some(k=>k.kind==='directory'?ftHasMatch(k):ftMatch(k)); }
 function ftRender(){
   const el=$('#ftree'); if(!el) return; el.innerHTML='';
-  $('#ftEmpty').hidden=!!FT.roots.length||!(DIR_OK||DIR_RO); $('#ftNote').hidden=DIR_OK||DIR_RO; $('#ftRo').hidden=!FT.roots.some(r=>r.ro); $('#ftTools').hidden=false; $('#sideTree').classList.toggle('has-roots',!!FT.roots.length);
+  $('#ftEmpty').hidden=!!FT.roots.length||!(DIR_OK||DIR_RO); $('#ftNote').hidden=DIR_OK||DIR_RO; $('#ftRo').hidden=!FT.roots.some(r=>r.ro); $('#ftTools').hidden=false; $('#ftTools').classList.toggle('noroot',!FT.roots.length); $('#sideTree').classList.toggle('has-roots',!!FT.roots.length);
   const openIds=new Set([S,A,B,GD].map(d=>d.clip&&d.clip._node&&d.clip._node.id).filter(Boolean));
   const row=(n,depth)=>{
     const r=document.createElement('div'); r.className='ft-row '+(n.kind==='directory'?'dir':'file')+(n.root?' root':'')+(openIds.has(n.id)?' on':''); r.dataset.id=n.id; r.style.setProperty('--d',depth);
@@ -5275,7 +5362,8 @@ function renDialog(node){ if(node.ro){ toast('Dieser Ordner ist nur zum Ansehen 
 function newDirDialog(parent){ ftDialog('Neuer Ordner',`<p class="ft-hint">In «${esc(parent.name)}»</p><input class="ft-in" id="ndName" placeholder="z. B. 270110_Adelboden_GS">`,async()=>{ const n=$('#ndName').value.trim().replace(/[\\/:*?"<>|]+/g,'-'); if(!n) return false; await ftNewFolder(parent,n); return true; },'Erstellen'); }
 
 /* ---------- Bedienung ---------- */
-function setSideTab(t){ FT.tab=t; LS.set('side',t); $$('#sideTabs button').forEach(b=>b.classList.toggle('on',b.dataset.st===t)); $('#sideTree').hidden=t!=='tree'; $('#sideOpen').hidden=t!=='open'; if(t==='tree') ftRender(); }
+function setSideTab(t){ FT.tab='tree'; $('#sideTree').hidden=false; sideOpenUI(); ftRender(); } // eine Liste: Geöffnet oben, Ordner und Beispiele darunter
+function sideOpenUI(){ const n=clips.filter(c=>!c.demo).length, el=$('#sideOpen'); if(!el) return; const rs=$('#libRestore'); el.hidden=!n&&(!rs||rs.hidden); const k=$('#openN'); if(k) k.textContent=n; }
 function ftWire(){
   $('#ftDemo').addEventListener('click',e=>{ const r=e.target.closest('.demo-row'); if(!r) return; const c=clips[+r.dataset.ci]; if(!c) return; const a=e.target.closest('[data-a]');
     if(mode==='single'){ S.setClip(c); refreshSingleHead(); }
@@ -5286,7 +5374,8 @@ function ftWire(){
     renderLib(); });
   $('#sideTabs').addEventListener('click',e=>{ const b=e.target.closest('[data-st]'); if(b) setSideTab(b.dataset.st); });
   $('#ftAdd').addEventListener('click',ftConnect); $('#ftAdd2').addEventListener('click',ftConnect);
-  $('#ftQ').addEventListener('input',e=>{ FT.q=e.target.value.trim().toLowerCase(); ftRender(); renderDemoList(); });
+  $('#ftQ').addEventListener('input',e=>{ FT.q=e.target.value.trim().toLowerCase(); LIB.q=FT.q; ftRender(); renderDemoList(); renderLib(); });
+  $('#ftView').addEventListener('click',e=>{ const b=e.target.closest('[data-fv]'); if(!b) return; LS.set('libview',b.dataset.fv==='names'?'names':'thumbs'); setTimeout(renderLib,0); });
   $('#ftX').addEventListener('click',ftClose); $('#ftCancel').addEventListener('click',ftClose);
   $('#ftModal').addEventListener('click',e=>{ if(e.target.id==='ftModal') ftClose(); });
   $('#ftOk').addEventListener('click',async()=>{ if(!FT.dlg) return; const b=$('#ftOk'); b.disabled=true; try{ const ok=await FT.dlg(); if(ok!==false) ftClose(); }finally{ b.disabled=false; } });
@@ -5323,7 +5412,7 @@ if(clips[0]){ S.setClip(clips[0]); A.setClip(clips[0]); }
 const ghostDemo=clips.filter(c=>c.demo&&/Soelden/.test(c.name));
 if(false){ A.setClip(ghostDemo[0]); B.setClip(ghostDemo[1]); Promise.all([A,B].map(d=>new Promise(r=>{ const t=setInterval(()=>{ if(d.ready){ clearInterval(t); r(); } },100); }))).then(()=>{ if(A.clip===ghostDemo[0]&&B.clip===ghostDemo[1]&&!G.linked){ G.off=0; G.syncA=0; G.linked=true; linkBtn(); updSync(); ghostUI(); } }); }
 else if(clips[1]) B.setClip(clips[1]);
-try{ const demoG=addTracks(DEMO_GPS.map(o=>({...o,samples:normSamples(o.samples)})),{link:false});
+try{ const demoG=addTracks(DEMO_GPS.map(o=>({...o,samples:normSamples(o.samples)})),{link:false}); demoG.forEach(t=>t._demo=true);
   const c1=clips.find(c=>c.demo&&/Adelboden.*_L1/.test(c.name)), c2=clips.find(c=>c.demo&&/Adelboden.*_L2/.test(c.name));
   if(c1&&demoG[0]){ c1.gpsId=demoG[0].id; c1.gpsOff=1.0; demoG[0].ref=demoG[1]?demoG[1].id:null; compareTracks(demoG[0],demoG[1]); GD.setClip(c1); }
   if(c2&&demoG[1]){ c2.gpsId=demoG[1].id; c2.gpsOff=1.0; demoG[1].ref=demoG[0].id; compareTracks(demoG[1],demoG[0]); }
@@ -5348,6 +5437,82 @@ document.addEventListener('dragend',vdEnd);
     else { S.setClip(c); refreshSingleHead(); }
     renderLib(); if(typeof renderDemoList==='function') renderDemoList(); ftRender(); });
 });
+
+/* ---------- Vergleich: Werkzeuge hinter einem Knopf ---------- */
+(function(){ const dock=$('#viewCmp .dock3'); if(!dock) return; const L=$('.dz-l',dock), Rz=$('.dz-r',dock);
+  const more=document.createElement('div'); more.className='dz-more'; more.id='cmpMore';
+  const grp=(lab,nodes)=>{ const g=document.createElement('div'); g.className='dm-grp'; g.innerHTML=`<span class="dm-lab">${lab}</span>`; nodes.filter(Boolean).forEach(n=>g.appendChild(n)); more.appendChild(g); };
+  grp('Sync',[$('#btnLink'),$('#btnSync'),$('#syncChip')]);
+  grp('Messen',[$('#btnTime'),$('#timActs'),$('#btnSplits')]);
+  const rail=$('#cTools .rail'); if(rail) rail.classList.remove('collapsed');
+  grp('Zeichnen',[$('#cTools')]);
+  L.innerHTML=''; Rz.innerHTML='';
+  const tb=document.createElement('button'); tb.className='ctl tools-btn'; tb.id='btnTools'; tb.title='Werkzeuge: Sync, Zeitmessung, Tore, Zeichnen (t)';
+  tb.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.2L3.5 17.3a1.8 1.8 0 0 0 2.5 2.5l5.8-5.8a4 4 0 0 0 5.2-5.4l-2.6 2.6-2.4-.6-.6-2.4z"/></svg><span>Werkzeuge</span><i class="tb-dot"></i><svg class="tb-car" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 15l6-6 6 6"/></svg>';
+  L.appendChild(tb); dock.appendChild(more);
+  const set=on=>{ dock.classList.toggle('tools-open',on); tb.classList.toggle('on',on); LS.set('cmpTools',on); requestAnimationFrame(()=>{ dispatchEvent(new Event('resize')); decks.forEach(d=>{ d.dirty=true; d.annDirty=true; }); }); };
+  tb.addEventListener('click',()=>set(!dock.classList.contains('tools-open')));
+  set(!!LS.get('cmpTools',false));
+  document.addEventListener('keydown',e=>{ if((e.key==='t'||e.key==='T')&&!e.metaKey&&!e.ctrlKey&&!e.altKey&&mode==='cmp'&&!/INPUT|SELECT|TEXTAREA/.test((e.target.tagName||''))&&!e.target.isContentEditable){ e.preventDefault(); set(!dock.classList.contains('tools-open')); } });
+  // Punkt am Knopf, wenn ein Werkzeug aktiv ist (bei geschlossener Leiste)
+  setInterval(()=>{ if(mode!=='cmp') return; const act=(typeof TIM!=='undefined'&&TIM.on)||(DRAW.tool&&DRAW.tool!=='none')||!!(($('#splitsN')||{}).textContent||'').trim();
+    tb.classList.toggle('act',act); },500);
+})();
+
+/* ---------- Ein Knopf «Speichern»: Video · Standbild · Aufnahme ---------- */
+(function(){ const IC={dl:'<path d="M12 4v11M7 10l5 5 5-5M5 20h14"/>',vid:'<rect x="3" y="6" width="13" height="12" rx="2"/><path d="M16 10l5-3v10l-5-3z"/>',img:'<path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.6"/>',rec:'<circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4" fill="currentColor" stroke="none"/>'};
+  const sv=p=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">${p}</svg>`;
+  const all=[];
+  ['#viewSingle','#viewGps','#viewCmp'].forEach(id=>{ const v=$(id); if(!v) return; const ex=$('[data-act="export"]',v); if(!ex) return; const sh=$('[data-act="shot"]',v), rc=$('[data-act="rec"]',v);
+    const items=[[ex,'Video','Clip als MP4 – Ausschnitt, Zeitlupe, Anzeigen','e',IC.vid],[sh,'Standbild','Aktuelles Bild als PNG','p',IC.img],[rc,'Aufnahme mit Ton','Bildschirm, Zeichnungen und Stimme aufnehmen','r',IC.rec]].filter(x=>x[0]);
+    const w=document.createElement('span'); w.className='save-w'+(ex.closest('.dock')?' up':'');
+    w.innerHTML=`<button class="ctl save-btn" title="Speichern: Video, Standbild oder Aufnahme">${sv(IC.dl)}<span>Speichern</span><svg class="sv-car" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button><div class="save-menu" hidden>${items.map((it,i)=>`<button data-i="${i}">${sv(it[4])}<span><b>${it[1]}</b><small>${it[2]}</small></span><kbd>${it[3].toUpperCase()}</kbd></button>`).join('')}</div>`;
+    ex.parentNode.insertBefore(w,ex); items.forEach(it=>it[0].classList.add('save-hid'));
+    const m=$('.save-menu',w), b=$('.save-btn',w); all.push(w);
+    b.addEventListener('click',e=>{ e.stopPropagation(); const op=m.hidden; all.forEach(x=>{ $('.save-menu',x).hidden=true; x.classList.remove('open'); }); m.hidden=!op; w.classList.toggle('open',op); });
+    m.addEventListener('click',e=>{ const it=e.target.closest('[data-i]'); if(!it) return; e.stopPropagation(); m.hidden=true; w.classList.remove('open'); items[+it.dataset.i][0].click(); });
+  });
+  document.addEventListener('pointerdown',e=>{ if(e.target.closest('.save-w')) return; all.forEach(x=>{ $('.save-menu',x).hidden=true; x.classList.remove('open'); }); });
+  document.addEventListener('keydown',e=>{ if(e.key==='Escape') all.forEach(x=>{ $('.save-menu',x).hidden=true; x.classList.remove('open'); }); });
+})();
+try{ tabsUI(); }catch(e){}
+setInterval(()=>{ try{ sideOpenUI(); }catch(e){} },1500);
+try{ const so=$('#sideOpen'), st=$('#sideTree'); if(so&&st) st.parentNode.insertBefore(so,st);
+  const top=$('.libcard .side-top'), tools=$('#ftTools'), fv=$('#ftView'); if(top){ top.insertAdjacentHTML('afterbegin','<span class="side-ttl">Videos</span>'); if(tools){ if(fv) tools.appendChild(fv); top.after(tools); } } const hr=$('#sideTree .side-hrow'); if(hr) hr.hidden=true; }catch(e){}
+
+/* ---------- Hilfe direkt beim Knopf: einmal zeigen, dann nie wieder ---------- */
+const COACH={el:null,cur:null,last:0};
+const TOUCH=matchMedia('(pointer:coarse)').matches;
+const COACHES=[
+  {id:'play',sel:'#viewSingle [data-act="play"]',when:()=>mode==='single'&&S.ready,t:TOUCH?'Tippen aufs Video = Abspielen · Zeitleiste wischen = Bild für Bild':'Leertaste = Abspielen · ← / → = Bild für Bild'},
+  {id:'rate',sel:'#viewSingle [data-act="rate"]',when:()=>mode==='single'&&S.ready,t:'Hier auf Zeitlupe stellen: ½×, ¼× oder 0.1×.'},
+  {id:'inout',sel:'#viewSingle [data-act="in"]',when:()=>mode==='single'&&S.ready,t:'«In» und «Out» setzen den Ausschnitt – er wird so abgespielt und gespeichert.'},
+  {id:'save',sel:'.player:not([hidden]) .save-btn',when:()=>mode!=='single'||(S.ready&&!!LS.get('coach:inout',0)),t:'Video, Standbild oder Aufnahme mit Ton – alles unter «Speichern».'},
+  {id:'ovtab',sel:'#tabOv',when:()=>mode==='cmp'&&!$('#viewCmp').classList.contains('overlay'),t:'«Übereinander» legt beide Läufe in ein Bild.'},
+  {id:'tools',sel:'#btnTools',when:()=>mode==='cmp'&&!$('#viewCmp').classList.contains('overlay'),t:'Sync, Zeitmessung, Tore und Zeichnen findest du hier.'},
+  {id:'ovnext',sel:'[data-ov="sync"]',when:()=>mode==='cmp',t:'A und B einzeln zum selben Tor ziehen, dann «Weiter».'},
+  {id:'ovmake',sel:'[data-ov="make"]',when:()=>mode==='cmp'&&!(OV.follow&&GH.state==='busy'),t:'Ein Klick – B wird über A gelegt und folgt der Kamera.'},
+  {id:'ovprev',sel:'[data-ov="prev"]',when:()=>mode==='cmp',t:'Overlay abspielen. Liegt B daneben: anhalten und «Korrigieren».'}
+];
+function coachVis(el){ if(!el||!el.isConnected) return false; const r=el.getBoundingClientRect(); return r.width>4&&r.height>4&&r.bottom>0&&r.top<innerHeight&&getComputedStyle(el).visibility!=='hidden'&&el.offsetParent!==null; }
+function coachHide(mark){ if(!COACH.el) return; if(mark&&COACH.cur) LS.set('coach:'+COACH.cur.id,1); COACH.el.classList.remove('on'); const e=COACH.el; setTimeout(()=>e.remove(),220); COACH.el=null; COACH.cur=null; COACH.last=Date.now(); }
+function coachShow(c,el){
+  COACH.cur=c; COACH.t0=Date.now(); const b=document.createElement('div'); b.className='coach'; b.setAttribute('role','status');
+  b.innerHTML=`<span>${c.t}</span><button aria-label="Verstanden">OK</button><i class="coach-ar"></i>`; document.body.appendChild(b); COACH.el=b; COACH.tgt=el;
+  coachPlace(); requestAnimationFrame(()=>b.classList.add('on'));
+  b.querySelector('button').addEventListener('click',e=>{ e.stopPropagation(); coachHide(true); });
+  clearTimeout(COACH.tm); COACH.tm=setTimeout(()=>{ if(COACH.cur===c) coachHide(true); },8000); }
+function coachPlace(){ const b=COACH.el; let el=COACH.tgt; if(!b) return; if(!coachVis(el)){ const n=COACH.cur&&$(COACH.cur.sel); if(coachVis(n)){ el=COACH.tgt=n; } else { coachHide(Date.now()-COACH.t0>1500); return; } }
+  const r=el.getBoundingClientRect(), w=b.offsetWidth, h=b.offsetHeight, up=r.top>innerHeight*0.5;
+  const cx=r.left+r.width/2, x=Math.max(10,Math.min(innerWidth-w-10,cx-w/2)), y=up?r.top-h-12:r.bottom+12;
+  b.style.left=x+'px'; b.style.top=y+'px'; b.classList.toggle('up',up); b.querySelector('.coach-ar').style.left=Math.max(14,Math.min(w-14,cx-x))+'px'; }
+setInterval(()=>{ try{
+  if(COACH.el){ coachPlace(); return; }
+  if(Date.now()-COACH.last<2500||document.hidden||document.body.classList.contains('touring')||$('.modal.on')||(typeof EXP!=='undefined'&&EXP.live)) return;
+  for(const c of COACHES){ if(LS.get('coach:'+c.id,0)) continue; let ok=false; try{ ok=c.when(); }catch(e){} if(!ok) continue; const el=$(c.sel); if(coachVis(el)){ coachShow(c,el); break; } }
+}catch(e){} },900);
+addEventListener('resize',()=>{ if(COACH.el) coachPlace(); });
+document.addEventListener('pointerdown',e=>{ if(COACH.el&&!e.target.closest('.coach')) coachHide(Date.now()-COACH.t0>800); },true);
 setColor(LS.get('color',COLORS[0])); setTool('none');
 restoreSession();
 /* Beispiel-Rennvideos (Sölden 2025, RS Herren) – liegen neben der App im Ordner demo/ */
@@ -5373,7 +5538,7 @@ $$('.ctl.play').forEach(b=>b.innerHTML=ICON.play);
 setMode(location.hash==='#vergleich'?'cmp':location.hash==='#gps'?'gps':location.hash==='#einzel'?'single':LS.get('mode','single'));
 refreshSingleHead(); linkBtn(); updSync();
 requestAnimationFrame(tick);
-if(!LS.get('hint1',0)){ setTimeout(()=>{ toast(matchMedia('(pointer:coarse)').matches?'Tipp: Tippen aufs Video = Abspielen · Zeitleiste wischen = Bild für Bild · «1×» = Zeitlupe':'Tipp: Leertaste = Abspielen · ← / → = Bild für Bild · Klick auf «1×» = Zeitlupe',7000); LS.set('hint1',1); },2500); }
+if(false&&!LS.get('hint1',0)){ setTimeout(()=>{ toast(matchMedia('(pointer:coarse)').matches?'Tipp: Tippen aufs Video = Abspielen · Zeitleiste wischen = Bild für Bild · «1×» = Zeitlupe':'Tipp: Leertaste = Abspielen · ← / → = Bild für Bild · Klick auf «1×» = Zeitlupe',7000); LS.set('hint1',1); },2500); }
 /* v3 – Bewegung: gleitende Segment-Indikatoren, Play-Zustand, Tempo-Animation */
 (()=>{
   // Lichter im Hintergrund
@@ -5413,7 +5578,7 @@ if(!LS.get('hint1',0)){ setTimeout(()=>{ toast(matchMedia('(pointer:coarse)').ma
 
 /* Update-Hinweis: prüft version.json auf GitHub Pages; «Aktualisieren» lädt die Seite ohne Cache neu */
 (()=>{
-  const BUILD='20261029090458'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
+  const BUILD='20261029095816'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
   // nach einem Update die ?v=… aus der Adresse entfernen
   try{ const u=new URL(location.href); if(u.searchParams.has('v')){ u.searchParams.delete('v'); history.replaceState(null,'',u.pathname+(u.search||'')+u.hash); } }catch(e){}
   const el=$('#upd'); let latest=null, snoozed=null, busy=false;
@@ -5550,7 +5715,7 @@ const PRE_GH={"t0":0,"off":0,"step":0.1406,"eEnd":42.18,"W0":400,"hA":224,"hB":2
   function saveState(){ return {a:A.clip,b:B.clip,lay:$('#viewCmp').classList.contains('overlay')?'overlay':$('#viewCmp').classList.contains('ghost')?'ghost':'side',G:{...G},ta:A.time(),tb:B.time()}; }
   window.startTour=async kind=>{
     if(!demo(M)||!demo(BO)){ toast('Die Anleitung braucht die Beispiel-Läufe (nur online verfügbar).'); return; }
-    TR.kind=kind; TR.steps=STEPS[kind]; TR.saved=saveState(); TR.on=true; el.hidden=false; document.body.classList.add('touring');
+    TR.kind=kind; TR.steps=STEPS[kind]; TR.saved=saveState(); TR.on=true; if(kind!=='overlay'){ const dk=$('#viewCmp .dock3'); if(dk&&!dk.classList.contains('tools-open')) $('#btnTools').click(); } el.hidden=false; document.body.classList.add('touring');
     requestAnimationFrame(()=>el.classList.add('on')); cur.style.opacity='0'; show(0);
   };
   async function end(){ TR.on=false; TR.abort=true; clearTimeout(TR.timer); el.classList.remove('on'); document.body.classList.remove('touring'); setTimeout(()=>{ el.hidden=true; },300);
