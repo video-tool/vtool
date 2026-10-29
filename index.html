@@ -1939,6 +1939,17 @@ canvas.strip:focus-visible{outline:2px solid rgba(255,255,255,.35)!important;out
 .ov-cutg .ov-b:hover{background:rgba(255,210,74,.24)!important;color:#ffe38a!important}
 .ov-cutg .ov-b+.ov-b{border-left:1px solid rgba(255,210,74,.4)!important}
 .ov-chip:has([data-ov="cutx"]){background:rgba(255,210,74,.16)!important;border-color:rgba(255,210,74,.5)!important;color:#ffe38a!important}
+/* In/Out: immer leicht gelb, gesetzt kräftiger */
+body .player .dock .ctl.io-btn:not(.on){color:#ffe08a!important;background:rgba(255,210,74,.16)!important;border:1px solid rgba(255,210,74,.45)!important;box-shadow:none!important}
+.player .dock .ctl.io-btn svg{color:#ffd24a}
+.player .dock .ctl.io-btn:hover{background:rgba(255,210,74,.18)!important;border-color:rgba(255,210,74,.5)!important;color:#fff0bf!important}
+.player .dock .ctl.io-btn.on{color:#14181f!important;background:#ffd24a!important;border-color:#ffd24a!important}
+.player .dock .ctl.io-btn.on svg{color:#14181f}
+.lib.list .clip.row .rn{width:26px;height:26px;border-radius:8px;background:none;color:var(--muted);opacity:0;display:grid;place-items:center;border:none;padding:0;cursor:pointer;flex:none}
+.lib.list .clip.row .rn svg{width:14px;height:14px}
+.lib.list .clip.row:hover .rn{opacity:1}.lib.list .clip.row .rn:hover{background:color-mix(in srgb,var(--ink) 9%,transparent);color:var(--ink)}
+.lib:not(.list) .clip .rn{display:none}
+@media (hover:none){ .lib.list .clip.row .rn{opacity:.6} }
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
   .aurora{display:none}
@@ -2337,10 +2348,11 @@ function computeFps(ts){
 const clips=[]; let uid=0;
 const listeners=new Set(); function emit(ev,c){ listeners.forEach(fn=>fn(ev,c)); }
 function clipKey(c){ return 'clip:'+c.name+'|'+c.size; }
+function dispName(c){ return c?(c.alias||c.name):''; }
 function saveClip(c){ if(c.demo&&!c.keep) return; clearTimeout(c._st); c._st=setTimeout(()=>LS.set(clipKey(c),{markers:c.markers,notes:c.notes,anns:c.anns,loop:c.loop,fps:c.fpsAuto?null:c.fps}),300); }
 
 function addClip(o){
-  const c={id:++uid,name:o.name,size:o.size||0,url:o.url,demo:!!o.demo,dur:0,w:0,h:0,fps:null,fpsAuto:false,markers:[],notes:{},anns:[],loop:{a:null,b:null,on:false},poster:null,err:false}; c.meta=parseName(c.name);
+  const c={id:++uid,name:o.name,size:o.size||0,url:o.url,demo:!!o.demo,dur:0,w:0,h:0,fps:null,fpsAuto:false,markers:[],notes:{},anns:[],loop:{a:null,b:null,on:false},poster:null,err:false}; c.meta=parseName(c.name); { const al=LS.get('alias:'+clipKey(c),null); if(al){ c.alias=al; c.meta=parseName(al); } }
   const st=LS.get(clipKey(c),null);
   if(st){ c.markers=st.markers||[]; c.notes=st.notes||{}; c.anns=st.anns||[]; c.loop=Object.assign(c.loop,st.loop||{}); c.loop.on=false; if(st.fps) c.manualFps=st.fps; }
   let res; c.whenFps=new Promise(r=>res=r); c._fpsRes=res;
@@ -2398,15 +2410,18 @@ function renderLib(){
       +'<div class="info"><div class="nm"></div><div class="mt"></div></div>'+'<span class="ndur">'+(c.dur?fmtDur(c.dur):'')+'</span>'
       +'<span class="abtag">'+(A.clip===c?'<span class="ta">A</span>':'')+(B.clip===c?'<span class="tb">B</span>':'')+'</span>'
       +'<div class="ab"><button class="ba'+(A.clip===c?' on':'')+'" title="Als Video A">A</button><button class="bb'+(B.clip===c?' on':'')+'" title="Als Video B">B</button></div>'
+      +'<button class="rn" title="Umbenennen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></svg></button>'
       +'<button class="x" title="Aus «In Arbeit» nehmen – die Datei im Ordner bleibt unverändert">'+XI+'</button>';
     const mm=c.meta, grouped=!NAMES&&order.length>1&&g!=='~'&&mm&&mm.ok;
-    $('.nm',card).textContent=NAMES?c.name:grouped?mm.athlete:metaTitle(c); card.title=c.name;
+    $('.nm',card).textContent=NAMES?dispName(c):grouped?mm.athlete:metaTitle(c); card.title=dispName(c)+(c.alias?' (Datei: '+c.name+')':'');
     $('.mt',card).textContent=grouped?[mm.run,mm.date].filter(Boolean).join(' · '):(c.demo?'Beispiel · ':'')+(metaLine(c)||[c.dur?fmtDur(c.dur):null,c.size?fmtMB(c.size):null].filter(Boolean).join(' · ')||'—');
     if(c.markers.length){ const mk=document.createElement('span'); mk.className='mk-count'; mk.innerHTML='<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 9-7 9-7-9z"/></svg>'+c.markers.length; $('.thumb',card).appendChild(mk); }
     const open=()=>{ if(mode==='single'){ S.setClip(c); refreshSingleHead(); } else if(mode==='gps'){ GD.setClip(c); if(typeof gpsSelects==='function') gpsSelects(); } else if(A.clip!==c&&B.clip!==c){ B.setClip(c); unlink(); syncSelects(); } renderLib(); };
     card.addEventListener('click',e=>{ if(e.target.closest('.x,.ab')) return; open(); });
     card.addEventListener('keydown',e=>{ if(e.key==='Enter') open(); });
     $('.x',card).addEventListener('click',()=>removeClip(c));
+    $('.rn',card).addEventListener('click',e=>{ e.stopPropagation(); clipRename(c); });
+    $('.nm',card).addEventListener('dblclick',e=>{ e.stopPropagation(); e.preventDefault(); clipRename(c); });
     $('.ba',card).addEventListener('click',()=>{ A.setClip(c); unlink(); syncSelects(); renderLib(); });
     $('.bb',card).addEventListener('click',()=>{ B.setClip(c); unlink(); syncSelects(); renderLib(); });
     // Hover-Scrub über dem Vorschaubild
@@ -2922,7 +2937,7 @@ document.addEventListener('click',e=>{ const b=e.target.closest('[data-rate]'); 
 /* Einzelvideo */
 function refreshSingleHead(){
   const c=S.clip;
-  $('#sTitle').textContent=c?metaTitle(c):'Kein Video geöffnet'; $('#sTitle').title=c?c.name:'';
+  $('#sTitle').textContent=c?metaTitle(c):'Kein Video geöffnet'; $('#sTitle').title=c?dispName(c):'';
   const ch=$('#sChips');
   const mt=c&&c.meta&&c.meta.ok?[c.meta.date,c.meta.disc?c.meta.disc+(c.meta.sex?' '+c.meta.sex:''):null,c.meta.run].filter(Boolean).map(t=>`<span class="chip meta">${esc(t)}</span>`).join(''):'';
   ch.innerHTML=mt+(c?'<span class="tech">'+[c.w?c.w+'×'+c.h:'',c.dur?fmtDur(c.dur):'',c.size?fmtMB(c.size):''].filter(Boolean).join('<i>·</i>')+'</span>':'');
@@ -2960,7 +2975,7 @@ $('#sFps').addEventListener('change',e=>{ const c=S.clip; const f=parseFloat(Str
 /* Vergleich */
 const G={linked:false,off:0,syncA:0,playing:false};
 function syncSelects(){
-  [['#selA',A],['#selB',B]].forEach(([sel,d])=>{ const s=$(sel); s.innerHTML='<option value="">– Video wählen –</option>'+clips.map(c=>{ const m=c.meta; const t=m&&m.ok?metaTitle(c)+(m.run?' · '+m.run:''):c.name; return `<option value="${c.id}" title="${esc(c.name)}">${esc(t)}</option>`; }).join(''); s.value=d.clip?d.clip.id:''; });
+  [['#selA',A],['#selB',B]].forEach(([sel,d])=>{ const s=$(sel); s.innerHTML='<option value="">– Video wählen –</option>'+clips.map(c=>{ const m=c.meta; const t=m&&m.ok?metaTitle(c)+(m.run?' · '+m.run:''):dispName(c); return `<option value="${c.id}" title="${esc(dispName(c))}">${esc(t)}</option>`; }).join(''); s.value=d.clip?d.clip.id:''; });
   cmpMeta();
 }
 function cmpMeta(){ [[A,'#metaA'],[B,'#metaB']].forEach(([d,m])=>{ const c=d.clip; $(m).textContent=c&&c.dur?fmtDur(c.dur):''; }); }
@@ -4558,7 +4573,7 @@ function drawGpsChart(N){
 /* ---------- Bedienung ---------- */
 function gpsSelects(){
   const sv=$('#gpsVideo'), st=$('#gpsTrack'), sr=$('#gpsRef'); const c=GD.clip, tr=trackOf(c);
-  sv.innerHTML='<option value="">– Video wählen –</option>'+clips.map(c=>{ const m=c.meta; const t=m&&m.ok?metaTitle(c)+(m.run?' · '+m.run:''):c.name; return `<option value="${c.id}" title="${esc(c.name)}">${esc(t)}</option>`; }).join(''); sv.value=c?c.id:'';
+  sv.innerHTML='<option value="">– Video wählen –</option>'+clips.map(c=>{ const m=c.meta; const t=m&&m.ok?metaTitle(c)+(m.run?' · '+m.run:''):dispName(c); return `<option value="${c.id}" title="${esc(dispName(c))}">${esc(t)}</option>`; }).join(''); sv.value=c?c.id:'';
   const opts=GPS.tracks.map(t=>`<option value="${t.id}">${esc(t.name)}</option>`).join('');
   st.innerHTML='<option value="">– keine GPS-Daten –</option>'+opts; st.value=tr?tr.id:'';
   sr.innerHTML='<option value="">– keine Referenz –</option>'+opts; sr.value=tr&&tr.ref?tr.ref:'';
@@ -4627,7 +4642,7 @@ function parseName(n){
   return m;
 }
 function metaLine(c){ const m=c.meta; if(!m||!m.ok) return null; return [m.date,m.disc?(m.disc+(m.sex?' '+m.sex:'')):null,m.run,m.cam].filter(Boolean).join(' · '); }
-function metaTitle(c){ const m=c.meta; return m&&m.ok?m.athlete+(m.place?' · '+m.place:''):c.name; }
+function metaTitle(c){ const m=c.meta; return m&&m.ok?m.athlete+(m.place?' · '+m.place:''):dispName(c); }
 
 /* ---------- Videos merken (Datei-Zugriff des Browsers) ---------- */
 const FSA=typeof window.showOpenFilePicker==='function';
@@ -5203,7 +5218,7 @@ function renderDemoList(){
     r.innerHTML=`<span class="ft-th${c.poster?' has':''}" style="${c.poster?`background-image:url(${c.poster})`:''}"><i>${c.dur?fmtDur(c.dur):''}</i></span>`
       +`<span class="ft-tx"><span class="ft-nm"></span><span class="ft-sub"></span></span>`
       +(mode==='cmp'?`<span class="ab-tags">${A.clip===c?'<em class="ta">A</em>':''}${B.clip===c?'<em class="tb">B</em>':''}</span><span class="ft-acts"><button data-a="a" class="ab-a" title="Als Video A">A</button><button data-a="b" class="ab-b" title="Als Video B">B</button></span>`:'');
-    $('.ft-nm',r).textContent=m.athlete||c.name; subCols($('.ft-sub',r),[m.run||DISC_LONG[m.disc]||m.cam,m.date]);
+    $('.ft-nm',r).textContent=m.athlete||dispName(c); subCols($('.ft-sub',r),[m.run||DISC_LONG[m.disc]||m.cam,m.date]);
     const g=(m.place||'')+'|'+(m.disc||'')+'|'+(m.date||''); if(g!==grp){ grp=g; const h=document.createElement('div'); h.className='ft-demo-h'; const yr=m.date?m.date.slice(-4):'';
       h.innerHTML='<b>'+(grp===((ds[0].meta.place||'')+'|'+(ds[0].meta.disc||'')+'|'+(ds[0].meta.date||''))?'Beispiel-Läufe':'')+'</b><span></span>'; $('span',h).textContent=[[m.place,yr].filter(Boolean).join(' '),DISC_LONG[m.disc]||m.disc,m.cam].filter(Boolean).join(' · '); if(!$('b',h).textContent) $('b',h).remove(); el.appendChild(h); }
     el.appendChild(r); });
@@ -5245,6 +5260,14 @@ function moveDialog(node){
     async()=>{ const sel=$('#ftBody .mv-dir.sel'); if(!sel){ toast('Zielordner wählen.'); return false; } const dest=nodeById(sel.dataset.id); if(!dest.children) await ftLoad(dest); const ok=await ftTransfer(node,dest); if(ok){ dest.open=true; ftRender(); toast('Verschoben nach «'+dest.name+'»'); } return ok; },'Verschieben');
   $('#ftBody').addEventListener('click',e=>{ const b=e.target.closest('.mv-dir'); if(!b||b.classList.contains('cur')) return; $$('#ftBody .mv-dir').forEach(x=>x.classList.toggle('sel',x===b)); });
 }
+function clipRename(c){ // echte Datei im verbundenen Ordner umbenennen, sonst Anzeigename in der App
+  if(c._node&&!c._node.ro&&c._node.parent) return renDialog(c._node);
+  const cur=dispName(c), ext=(cur.match(/\.[^.]+$/)||[''])[0], stem=ext?cur.slice(0,-ext.length):cur;
+  ftDialog('Umbenennen',`<input class="ft-in" id="rnName" value="${esc(stem)}" spellcheck="false"><p class="ft-hint small">Gilt hier in der App (Liste, Titel, Namen im Overlay). ${c.demo?'Beispiel-Videos':'Die Originaldatei'} bleib${c.demo?'en':'t'} unverändert${c.alias?' · leer lassen = ursprünglicher Name':''}. Echte Dateien benennst du im verbundenen Ordner unter «Dateien» um.</p>`,
+    async()=>{ const v=$('#rnName').value.trim(); const k='alias:'+clipKey(c);
+      if(!v){ c.alias=null; LS.set(k,null); } else { const nm=v+(ext||''); c.alias=nm===c.name?null:nm; LS.set(k,c.alias); }
+      c.meta=parseName(dispName(c)); renderLib(); syncSelects(); refreshSingleHead(); if(typeof gpsSelects==='function') gpsSelects(); if(typeof renderDemoList==='function') renderDemoList(); if(typeof ovUI==='function') ovUI(); return true; },'Umbenennen');
+  setTimeout(()=>{ const f=$('#rnName'); if(f){ f.focus(); f.select(); } },40); }
 function renDialog(node){ if(node.ro){ toast('Dieser Ordner ist nur zum Ansehen geöffnet.'); return; } const ext=(node.name.match(/\.[^.]+$/)||[''])[0], stem=ext?node.name.slice(0,-ext.length):node.name;
   ftDialog('Umbenennen',`<input class="ft-in" id="rnName" value="${esc(stem)}" spellcheck="false"><p class="ft-hint small">${ext?'Die Endung '+esc(ext)+' bleibt. ':''}Die Datei wird im Ordner auf dem Gerät umbenannt.</p>`,
     async()=>{ const v=$('#rnName').value.trim().replace(/[\\/:*?"<>|]+/g,'-'); if(!v){ toast('Bitte einen Namen eingeben.'); return false; } if(v+ext===node.name) return true; return await ftTransfer(node,node.parent,v+ext); },'Umbenennen');
@@ -5390,7 +5413,7 @@ if(!LS.get('hint1',0)){ setTimeout(()=>{ toast(matchMedia('(pointer:coarse)').ma
 
 /* Update-Hinweis: prüft version.json auf GitHub Pages; «Aktualisieren» lädt die Seite ohne Cache neu */
 (()=>{
-  const BUILD='20261029081041'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
+  const BUILD='20261029090458'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
   // nach einem Update die ?v=… aus der Adresse entfernen
   try{ const u=new URL(location.href); if(u.searchParams.has('v')){ u.searchParams.delete('v'); history.replaceState(null,'',u.pathname+(u.search||'')+u.hash); } }catch(e){}
   const el=$('#upd'); let latest=null, snoozed=null, busy=false;
