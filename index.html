@@ -3547,10 +3547,13 @@ function trackViterbi(S,key,W,seeds){ // seeds: [{i,x,y}] – angetippte Ankerpu
     const st=[]; const P=i?layers[i-1]:null;
     let bestPrev=null; if(P) for(const p of P) if(!bestPrev||p.sc>bestPrev.sc) bestPrev=p;
     for(const c of blobsI){ let sc=i?NEG:c.em-4, from=null;
-      if(P) for(const p of P){ const pp=affApply(q,p.x,p.y), d=Math.hypot(c.x-pp[0],c.y-pp[1]), lim=W*(0.07+0.02*Math.min(p.coast,6)); if(d>lim) continue; const v=p.sc+c.em-(d/sig)*(d/sig); if(v>sc){ sc=v; from=p; } }
+      if(P) for(const p of P){ const pp=affApply(q,p.x,p.y), d=Math.hypot(c.x-pp[0],c.y-pp[1]), lim=W*(0.07+0.02*Math.min(p.coast,6)); if(d>lim) continue;
+        let cost=(d/sig)*(d/sig); if(TRK_VEL&&p.vn>=2&&d>1){ const pv=affApply(q,p.x+p.vx,p.y+p.vy), dv=Math.hypot(c.x-pv[0],c.y-pv[1]); if(dv<d){ const r=dv/d; cost*=0.45+0.55*r*r; } } // gleichmässige Bewegung bevorzugen (Sessel, Zuschauer ziehen anders)
+        const v=p.sc+c.em-cost; if(v>sc){ sc=v; from=p; } }
       if(P&&bestPrev){ const v=bestPrev.sc+c.em-14; if(v>sc){ sc=v; from=bestPrev; } } // neu fassen (teuer)
-      st.push({x:c.x,y:c.y,sc,from,coast:0,real:true}); }
-    if(P){ const top=[...P].sort((u,v)=>v.sc-u.sc).slice(0,K); for(const p of top){ if(p.coast>=10) continue; const pp=affApply(q,p.x,p.y); st.push({x:pp[0],y:pp[1],sc:p.sc-0.9-(p.coast*0.15),from:p,coast:p.coast+1,real:false}); } }
+      let vx=0,vy=0,vn=0; if(from&&from.coast<99){ const pp=affApply(q,from.x,from.y), mx=c.x-pp[0], my=c.y-pp[1]; if(from.vn){ vx=from.vx*0.55+mx*0.45; vy=from.vy*0.55+my*0.45; } else { vx=mx; vy=my; } vn=Math.min(9,(from.vn||0)+1); }
+      st.push({x:c.x,y:c.y,sc,from,coast:0,real:true,vx,vy,vn}); }
+    if(P){ const top=[...P].sort((u,v)=>v.sc-u.sc).slice(0,K); for(const p of top){ if(p.coast>=10) continue; const pp=TRK_VEL&&p.vn>=2?affApply(q,p.x+p.vx*0.8,p.y+p.vy*0.8):affApply(q,p.x,p.y); st.push({x:pp[0],y:pp[1],sc:p.sc-0.9-(p.coast*0.15),from:p,coast:p.coast+1,real:false,vx:(p.vx||0)*0.8,vy:(p.vy||0)*0.8,vn:p.vn||0}); } }
     if(seed) for(const x of st) if(!x.real) x.sc=NEG;
     layers.push(st.length?st:[{x:W/2,y:W*0.28,sc:i?(bestPrev?bestPrev.sc-2:0):0,from:bestPrev,coast:99,real:false}]); }
   let cur=null; for(const x of layers[N-1]) if(!cur||x.sc>cur.sc) cur=x;
@@ -3566,10 +3569,15 @@ function trackViterbi(S,key,W,seeds){ // seeds: [{i,x,y}] – angetippte Ankerpu
     if(a!=null) segs.push([a,N-1]);
     const G=[[1,0,0,0,1,0]]; for(let i=1;i<N;i++) G.push(affMul(G[i-1],affInv(S[i].q||[1,0,0,0,1,0])));
     const map=(p,i,j)=>affApply(affMul(affInv(G[j]),G[i]),p[0],p[1]); // Punkt aus Bild i in Bild j
-    const info=segs.map(([i0,i1])=>{ let dc=0; for(let i=i0;i<=i1;i++){ const c0=(key==='mb'?S[i].cb:S[i].ca)||[W/2,W*0.28]; dc+=Math.hypot(out[i][0]-c0[0],out[i][1]-c0[1])/(W*0.22); } const n=i1-i0+1; let anch=false; for(const q of SM.values()) if(q.i>=i0&&q.i<=i1) anch=true; return {t:n*step,dc:dc/n,anch}; });
+    const info=segs.map(([i0,i1])=>{ let dc=0; for(let i=i0;i<=i1;i++){ const c0=(key==='mb'?S[i].cb:S[i].ca)||[W/2,W*0.28]; dc+=Math.hypot(out[i][0]-c0[0],out[i][1]-c0[1])/(W*0.22); } const n=i1-i0+1; let anch=false; for(const q of SM.values()) if(q.i>=i0&&q.i<=i1) anch=true;
+      // Tempo in der Welt (Kamera herausgerechnet, auf Bildpixel normiert): Sessel/Gondeln und Zuschauer sind viel langsamer als die Fahrer:in
+      let ws=0, nn=0; const hs=Math.max(1,Math.round(0.6/step)); for(let i=i0;i+hs<=i1;i++){ const a=affApply(G[i],out[i][0],out[i][1]), b=affApply(G[i+hs],out[i+hs][0],out[i+hs][1]), sc=Math.sqrt(Math.abs(G[i][0]*G[i][4]-G[i][1]*G[i][3]))||1; ws+=Math.hypot(b[0]-a[0],b[1]-a[1])/sc; nn++; } // Weg über 0,6 s (Zittern hebt sich auf)
+      return {t:n*step,dc:dc/n,anch,sp:nn?ws/nn/(hs*step):null}; });
+    { let tw=0; const sps=[]; info.forEach(x=>{ if(x.t>=1&&x.sp!=null) sps.push([x.sp,x.t]); }); sps.sort((a,b)=>a[0]-b[0]); const tot=sps.reduce((a,b)=>a+b[1],0); let acc=0, msp=0; for(const [v,t] of sps){ acc+=t; if(acc>=tot/2){ msp=v; break; } } info.msp=msp; }
     const hide=new Set();
     segs.forEach(([i0,i1],k)=>{ const x=info[k]; if(x.anch) return;
       if(x.t<0.35||x.dc>1.6){ hide.add(k); return; }
+      if(TRK_SLOW&&info.msp>0&&x.sp!=null&&x.t<5&&x.sp<info.msp*0.42){ hide.add(k); return; } // langsames Ding (Gondel, Sessel, Zuschauer)
       // Ausreisser: kurzes Stück, davor und danach eine Bahn, die zueinander passt (Fahrer:in war die ganze Zeit dort)
       if(x.t<1.5&&k>0&&k<segs.length-1){ const [p0,p1]=segs[k-1], [n0]=segs[k+1], gap=(n0-p1)*step; if(gap<2.5){ const pr=map(out[p1],p1,n0), d=Math.hypot(pr[0]-out[n0][0],pr[1]-out[n0][1]); if(d<W*0.07+med*(n0-p1)) hide.add(k); } } });
     segs.forEach(([i0,i1],k)=>{ if(hide.has(k)) for(let i=i0;i<=i1;i++) out[i]=null; });
@@ -3587,20 +3595,28 @@ function trackViterbi(S,key,W,seeds){ // seeds: [{i,x,y}] – angetippte Ankerpu
   for(const a of SM.values()) if(a.i<N) sm[a.i]=[a.x,a.y]; // Anker exakt
   // Sicherheit je Bild: genug echte Treffer in ±0,5 s und nahe der Bildmitte (wer filmt, hält die Fahrer:in mittig); Anker = sicher
   const step=N>1?Math.max(0.02,S[1].e-S[0].e):0.1, hw=Math.max(2,Math.round(0.5/step)), conf=new Float32Array(N), anc=[...SM.keys()].sort((a,b)=>a-b);
+  let spd=null; if(TRK_SLOW&&N>10){ const G=[[1,0,0,0,1,0]]; for(let i=1;i<N;i++) G.push(affMul(G[i-1],affInv(S[i].q||[1,0,0,0,1,0])));
+    const h=Math.max(1,Math.round(0.6/step)), v=new Array(N).fill(null), all=[];
+    for(let i=0;i<N;i++){ const i0=i-h, i1=i+h; if(i0<0||i1>=N||!sm[i0]||!sm[i1]) continue; const a=affApply(G[i0],sm[i0][0],sm[i0][1]), b=affApply(G[i1],sm[i1][0],sm[i1][1]), sc=Math.sqrt(Math.abs(G[i][0]*G[i][4]-G[i][1]*G[i][3]))||1; v[i]=Math.hypot(b[0]-a[0],b[1]-a[1])/sc/(2*h*step); all.push(v[i]); }
+    all.sort((x,y)=>x-y); spd={v,med:all.length>20?all[Math.floor(all.length*0.6)]:0}; }
   for(let i=0;i<N;i++){ if(!sm[i]){ conf[i]=0; continue; } let r=0,n=0,dc=0; for(let j=Math.max(0,i-hw);j<=Math.min(N-1,i+hw);j++){ n++; if(real[j]) r++; if(sm[j]){ const c0=(key==='mb'?S[j].cb:S[j].ca)||[W/2,W*0.28]; dc+=Math.hypot(sm[j][0]-c0[0],sm[j][1]-c0[1])/(W*0.22); } }
-    const rf=r/n, dca=dc/n; let c=clamp((rf-0.45)/0.3,0,1)*clamp((1.35-dca)/0.5,0,1);
+    const rf=r/n, dca=dc/n; let c=clamp((rf-0.45)/0.3,0,1)*clamp((TRK_CEN-dca)/0.6,0,1);
+    if(TRK_SLOW&&spd&&spd.med>0&&spd.v[i]!=null) c*=clamp((spd.v[i]/spd.med-0.3)/0.25,0,1); // steht fast still in der Welt → Gondel, Sessel, Zuschauer
     for(const a of anc){ const dd=Math.abs(a-i)*step; if(dd<4) c=Math.max(c,1-dd/4*0.4); } // in der Nähe eines Ankers vertrauen
     conf[i]=c; }
   sm.conf=conf; return sm; }
-let TRK_REL=true, TRK_STATIC=true; // Bahn-Stücke ohne verlässlichen Bezug ausblenden
+let TRK_REL=true, TRK_STATIC=true, TRK_VEL=true, TRK_CEN=1.7, TRK_SLOW=true; // Bahn-Stücke ohne verlässlichen Bezug ausblenden
+function trkAlFull(T,S,W){ const al=trkAlpha(T,S,W), C=T&&T.conf; if(C) for(let i=0;i<C.length;i++){ const c=C[i]; al[i]=Math.min(al[i],c<0.35?0:Math.min(1,(c-0.35)/0.35)); } return al; }
 function tracksBuild(){ if(!GH.S||!GH.S.length||!GH.S.some(s=>s.ma)) { GH.trk=null; return; } const seeds=GH.seeds||{};
-  GH.trk={a:trackViterbi(GH.S,'ma',GH.W0,seeds.a),b:trackViterbi(GH.S,'mb',GH.W0,seeds.b)}; GH.trkAl={a:trkAlpha(GH.trk.a,GH.S,GH.W0),b:trkAlpha(GH.trk.b,GH.S,GH.W0)}; for(const k of ['a','b']){ const C=GH.trk[k].conf; if(C) for(let i=0;i<C.length;i++){ const c=C[i]; GH.trkAl[k][i]=Math.min(GH.trkAl[k][i],c<0.35?0:Math.min(1,(c-0.35)/0.35)); } } TGD.f=-1; }
+  GH.trk={a:trackViterbi(GH.S,'ma',GH.W0,seeds.a),b:trackViterbi(GH.S,'mb',GH.W0,seeds.b)}; GH.trkAl={a:trkAlFull(GH.trk.a,GH.S,GH.W0),b:trkAlFull(GH.trk.b,GH.S,GH.W0)}; TGD.f=-1; }
 // Deckkraft je Bild: bei Sprüngen und am Rand von Lücken sanft aus- und wieder einblenden, statt quer übers Bild zu gleiten
 function trkAlpha(T,S,W){ const N=T?T.length:0, al=new Float32Array(N); if(!N) return al; const bad=new Uint8Array(N);
   for(let i=0;i<N;i++){ if(!T[i]){ bad[i]=1; continue; } if(i&&T[i-1]){ const q=S[i].q||[1,0,0,0,1,0], pp=affApply(q,T[i-1][0],T[i-1][1]); if(Math.hypot(T[i][0]-pp[0],T[i][1]-pp[1])>W*0.08){ bad[i]=1; bad[i-1]=Math.max(bad[i-1],2); } } }
   const R=3; for(let i=0;i<N;i++){ if(!T[i]){ al[i]=0; continue; } let d=R; for(let k=0;k<R&&d===R;k++){ if((i-k>=0&&bad[i-k]===1&&!T[i-k])||(i+k<N&&bad[i+k]===1&&!T[i+k])) d=k; if((i-k>=0&&bad[i-k]&&T[i-k]&&k>0)||(i+k<N&&bad[i+k]&&T[i+k]&&k>0)) d=Math.min(d,k); } if(bad[i]&&T[i]) d=0; al[i]=Math.min(1,d/R); }
   return al; }
 function alphaAt(A,step,e){ if(!A||!A.length) return 1; const x=e/step, i=clamp(Math.floor(x),0,A.length-1), j=Math.min(A.length-1,i+1), f=clamp(x-i,0,1); return A[i]+(A[j]-A[i])*f; }
+function trackSmoothAt(T,step,e,h){ // ruhige Lage für die Pille (±h s, dreieckig gewichtet)
+  let sx=0,sy=0,sw=0; for(let k=-4;k<=4;k++){ const q=trackAt(T,step,e+k*h/4); if(!q) continue; const w=5-Math.abs(k); sx+=q[0]*w; sy+=q[1]*w; sw+=w; } return sw?[sx/sw,sy/sw]:null; }
 function trackAt(T,step,e){ if(!T) return null; const x=e/step, i=Math.floor(x), f=x-i, a=T[i], b=T[i+1]; if(a&&b) return [a[0]+(b[0]-a[0])*f,a[1]+(b[1]-a[1])*f]; if(a&&f<0.5) return a; if(b&&f>=0.5) return b; return null; }
 function ghostGap(){
   const S=GH.S; let Gm=[1,0,0,0,1,0]; const PA=[],PB=[];
@@ -3742,7 +3758,7 @@ function ovUI(){
     acts=cutBtns+ovBtn('fix','Korrigieren',OVI.fix,'ghost','B an dieser Stelle von Hand nachschieben')+ovBtn('nameset','Namen',OVI.tag,'ghost','Fahrer:innen antippen – die Namens-Pillen folgen dann genau ihnen')
       +ovMore([LAY.length<3?['addrun','Weiteren Lauf dazunehmen',OVI.plus]:null,['make','Neu berechnen',OVI.go],['edit','Neu beginnen',OVI.back]])+ovPrevBtn()+ovBtn('save','Speichern',OVI.dl,'pri','Overlay als Video speichern'); }
   // nur neu zeichnen, wenn sich etwas ändert – sonst gehen Klicks verloren
-  if(LAY.length) t+=' <span class="ov-lays">'+LAY.map((L,i)=>`<span class="ov-lay"><i style="background:${L.col}"></i>${L.let} · ${L.name}<button data-ov="laydel" data-i="${i}" title="Lauf ${L.let} entfernen">${OVI.x}</button></span>`).join('')+'</span>';
+  if(LAY.length){ const ch='<span class="ov-lays">'+LAY.map((L,i)=>`<span class="ov-lay"><i style="background:${L.col}"></i>${L.let} · ${L.name}<button data-ov="laydel" data-i="${i}" title="Lauf ${L.let} entfernen">${OVI.x}</button></span>`).join('')+'</span>'; const p=t.indexOf('</b>'); t=p>=0?t.slice(0,p+4)+' '+ch+t.slice(p+4):ch+' '+t; } // Läufe vorne zeigen, damit sie nicht abgeschnitten werden
   const tx=$('#ovTxt'), ac=$('#ovActs'); if(tx._h!==t){ tx.innerHTML=t; tx._h=t; tx.title=tx.textContent.replace(/\s+/g,' ').trim(); } if(ac._h!==acts){ ac.innerHTML=acts; ac._h=acts; }
   const pr=$('#ovProg'); pr.hidden=!busy; if(busy){ const w=($('#ghostBar .gprog i')||{style:{}}).style.width||'0%'; $('i',pr).style.width=w; }
   ovApplyCut(); ovMarks();
@@ -3780,14 +3796,14 @@ function tagsDrawTo(x,ox,oy,w,h){ // Namens-Pillen ins exportierte Bild zeichnen
   if(!$('#viewCmp').classList.contains('ov-names')) return;
   const its=[{col:'#3e8bff',n:lastName(A.clip),T:GH.trk&&GH.trk.a,AL:GH.trkAl&&GH.trkAl.a,st:GH.step,t0:GH.t0,W0:GH.W0,h0:GH.hA,e1:GH.eEnd}];
   if(B.clip&&ovFollowOK()) its.push({col:'#f08a3c',n:lastName(B.clip),T:GH.trk&&GH.trk.b,AL:GH.trkAl&&GH.trkAl.b,st:GH.step,t0:GH.t0,W0:GH.W0,h0:GH.hA,e1:GH.eEnd});
-  LAY.forEach(L=>its.push({col:L.col,n:L.name,T:L.trkB,st:L.step,t0:L.t0,W0:L.W0,h0:L.hA,e1:L.eEnd}));
+  LAY.forEach(L=>its.push({col:L.col,n:L.name,T:L.trkB,AL:L.alB,st:L.step,t0:L.t0,W0:L.W0,h0:L.hA,e1:L.eEnd}));
   const k=w/1100, fs=Math.max(11,Math.round(13*k)), ph=Math.round(fs*1.75), rr=Math.max(5,w*0.016), placed=[];
   x.save(); x.font=`650 ${fs}px Geist,-apple-system,Segoe UI,Roboto,Arial,sans-serif`; x.textBaseline='middle';
-  for(const it of its){ const e=A.v.currentTime-it.t0; if(!it.T||e<0||e>it.e1) continue; const q=trackAt(it.T,it.st,e); if(!q) continue; const ga=it.AL?alphaAt(it.AL,it.st,e):1; if(ga<0.05) continue;
-    const px=ox+q[0]/it.W0*w, py=oy+q[1]/it.h0*h, tw=x.measureText(it.n).width+fs*2.1;
-    let bx=clamp(px-tw/2,ox+4,ox+w-tw-4), by=Math.max(oy+4,py-rr-12*k-ph);
-    for(const p of placed) if(bx<p.x+p.w+4&&bx+tw+4>p.x&&by<p.y+p.h+3&&by+ph+3>p.y){ const right=px>=p.px, xr=p.x+p.w+6, xl=p.x-tw-6; if((right||xl<ox+4)&&xr+tw<=ox+w-4) bx=xr; else if(xl>=ox+4) bx=xl; else { by=p.y-ph-4; continue; } by=p.y-Math.round(ph*0.35); }
-    placed.push({x:bx,y:by,w:tw,h:ph,px});
+  for(const it of its){ const e=A.v.currentTime-it.t0; if(!it.T||e<0||e>it.e1) continue; const q=trackAt(it.T,it.st,e); if(!q) continue; let ga=it.AL?alphaAt(it.AL,it.st,e):1; if(ga<0.15) continue; ga=Math.min(1,(ga-0.15)/0.85*1.15);
+    const px=ox+q[0]/it.W0*w, py=oy+q[1]/it.h0*h, tw=x.measureText(it.n).width+fs*2.1, qs=trackSmoothAt(it.T,it.st,e,0.35)||q, sx=ox+qs[0]/it.W0*w, sy=oy+qs[1]/it.h0*h;
+    let bx=clamp(sx-tw/2,ox+4,ox+w-tw-4), by=Math.max(oy+4,Math.min(sy,py)-rr-12*k-ph);
+    for(const p of placed) if(bx<p.x+p.w+4&&bx+tw+4>p.x&&by<p.y+p.h+3&&by+ph+3>p.y){ const right=tagSide(p.n+'|'+it.n,px-p.px,w*0.035), xr=p.x+p.w+6, xl=p.x-tw-6; if((right||xl<ox+4)&&xr+tw<=ox+w-4) bx=xr; else if(xl>=ox+4) bx=xl; else { by=p.y-ph-4; continue; } by=p.y-Math.round(ph*0.35); }
+    placed.push({x:bx,y:by,w:tw,h:ph,px,n:it.n});
     x.strokeStyle=it.col; x.globalAlpha=0.85*ga; x.lineWidth=Math.max(1.2,1.4*k); x.beginPath(); x.moveTo(clamp(px,bx+6,bx+tw-6),by+ph); x.lineTo(px,py-rr*0.55); x.stroke();
     x.globalAlpha=ga; x.fillStyle='rgba(12,15,20,.55)'; x.beginPath(); (x.roundRect?x.roundRect(bx,by,tw,ph,ph/2):x.rect(bx,by,tw,ph)); x.fill();
     x.fillStyle=it.col; x.beginPath(); x.arc(bx+fs*0.8,by+ph/2,fs*0.27,0,7); x.fill();
@@ -3798,6 +3814,8 @@ function ovLiveCanvas(){ let c=$('canvas.ovlive',A.stage); if(!c){ c=document.cr
 
 /* ---------- Namens-Pillen: folgen den Fahrer:innen im Overlay, ohne Fahrer oder die andere Pille zu überdecken ---------- */
 const TAGS={el:null,st:{a:{x:0,y:0,o:0,c:0},b:{x:0,y:0,o:0,c:0}}};
+const TSIDE={}; // Seite je Pillen-Paar merken: erst wechseln, wenn die Fahrer:innen deutlich die Seite tauschen (kein Hin und Her)
+function tagSide(k,dx,m){ const pv=TSIDE[k]; const r=pv==null?dx>=0:pv?dx>-m:dx>m; TSIDE[k]=r; return r; }
 function lastName(c){ if(!c) return ''; const n=c.meta&&c.meta.ok&&c.meta.athlete?c.meta.athlete:base(c.name).split(/[_\s\-·]+/)[0]; const w=n.trim().split(/\s+/); const l=w[w.length-1]||n; return l.charAt(0).toUpperCase()+l.slice(1); }
 function posAt(e,k,fb,L){ const S=L?L.S:GH.S, step=L?L.step:GH.step; if(!S||!S.length||!(step>0)||!isFinite(e)) return null; const x=clamp(e/step,0,S.length-1), i=Math.floor(x);
   let a=i; while(a>=0&&!S[a][k]) a--; let b=i+1; while(b<S.length&&!S[b][k]) b++;
@@ -3823,7 +3841,7 @@ function ovTags(on){
   for(const it of items){ const S0=TAGS.st[it.k]||(TAGS.st[it.k]={vis:false}), el=els[it.k];
     let uv=null; { const L=it.L, e=L?ovTA()-L.t0:ovE(), T=L?L.trkB:(GH.trk&&GH.trk[it.k]), st=L?L.step:GH.step, W0=L?L.W0:GH.W0, h0=L?L.hA:GH.hA;
       if(T&&e>=0&&e<=(L?L.eEnd:GH.eEnd)){ const q=trackAt(T,st,e); if(q) uv=[q[0]/W0,q[1]/h0]; } }
-    let alv=1; if(!it.L&&GH.trkAl&&GH.trkAl[it.k]) alv=alphaAt(GH.trkAl[it.k],GH.step,ovE());
+    let alv=1; if(!it.L&&GH.trkAl&&GH.trkAl[it.k]) alv=alphaAt(GH.trkAl[it.k],GH.step,ovE()); else if(it.L&&it.L.alB) alv=alphaAt(it.L.alB,it.L.step,ovTA()-it.L.t0);
     if(uv&&alv<0.15){ uv=null; }
     if(!uv){ S0.vis=false; el.classList.remove('on'); el.style.opacity=''; if(lines[it.k]) lines[it.k].style.opacity=0; continue; }
     S0.al=alv;
@@ -3840,7 +3858,7 @@ function ovTags(on){
   // überlappende Pillen nach oben staffeln (immer oberhalb der Athlet:innen)
   out.sort((p,q)=>p.it.k<q.it.k?-1:1); // feste Reihenfolge – Pillen tauschen beim Kreuzen nicht die Plätze
   for(let i=0;i<out.length;i++){ const p=out[i]; for(let j=0;j<i;j++){ const q=out[j]; if(p.x<q.x+q.w+4&&p.x+p.w+4>q.x&&p.y<q.y+q.h+3&&p.y+p.h+3>q.y){ // nah beieinander: leicht seitlich versetzt statt übereinander
-      const right=(p.S0.ax||0)>=(q.S0.ax||0), xr=q.x+q.w+6, xl=q.x-p.w-6, okR=xr+p.w<=SX+SW-4, okL=xl>=SX+4;
+      const right=tagSide(q.it.k+'|'+p.it.k,(p.S0.ax||0)-(q.S0.ax||0),SW*0.035), xr=q.x+q.w+6, xl=q.x-p.w-6, okR=xr+p.w<=SX+SW-4, okL=xl>=SX+4;
       if(right?okR:!okL&&okR){ p.x=xr; } else if(okL){ p.x=xl; } else { const up=q.y-p.h-4; if(up>=SY+4) p.y=up; continue; } p.y=q.y-Math.round(p.h*0.35); } } }
   for(const p of out){ const S0=p.S0;
     if(p.fixed){ continue; }
@@ -3915,7 +3933,7 @@ function layerAdd(){
   if(!ovFollowOK()){ toast('Zuerst «Overlay erstellen» – dann weiteren Lauf hinzufügen.'); return; }
   const v=document.createElement('video'); v.muted=true; v.playsInline=true; v.preload='auto'; v.src=B.clip.url; v.className='gen-vid'; document.body.appendChild(v);
   const L={aClip:A.clip,clip:B.clip,v,off:G.off,syncA:G.syncA,t0:GH.t0,step:GH.step,eEnd:GH.eEnd,W0:GH.W0,hA:GH.hA,hB:GH.hB,S:GH.S.map(s=>({e:s.e,p:ovKeep(s),pb:s.pb,cb:s.cb})),col:LCOL[LAY.length],let:LLET[LAY.length],name:lastName(B.clip)};
-  L.trkB=GH.trk?GH.trk.b:null; L.S.forEach((x,i)=>{ x.mb=GH.S[i].mb; x.q=GH.S[i].q; }); LAY.push(L);
+  L.trkB=GH.trk?GH.trk.b:null; L.alB=GH.trkAl&&GH.trkAl.b?Float32Array.from(GH.trkAl.b):null; { const sb=GH.seeds&&GH.seeds.b; L.seeds=Array.isArray(sb)?sb.map(q=>({...q})):sb?[{...sb}]:[]; } L.S.forEach((x,i)=>{ x.mb=GH.S[i].mb; x.q=GH.S[i].q; }); LAY.push(L);
   // B frei machen für den nächsten Lauf – gleicher Ausschnitt, neue Synchronisierung
   A.pause(); B.pause(); G.playing=false; OV.T=null; OV.follow=false; OV.K=[]; OV.fix=null; OV.pick=null; OV.edit=false; OV.pa=[]; OV.pb=[]; GH.state='idle'; GH.key='';
   B.setClip(null); unlink(); syncSelects(); renderLib(); ovUI(); ghostUI();
@@ -4006,7 +4024,7 @@ function renderOv(){
     else if(a==='auto'){ if(AS.busy||!A.ready||!B.ready) return; A.pause(); B.pause(); AS.busy=true; AS.abort=false; ovUI(); const ca=A.clip, cb=B.clip;
       (async()=>{ let r=null; try{ r=await autoSyncFind(ca,cb,f=>{ const b=$('[data-ov="auto"] span')||$('[data-ov="auto"]'); if(b) b.lastChild.textContent='Sucht … '+Math.round(f*100)+' %'; }); }catch(e){} AS.busy=false;
         if(A.clip!==ca||B.clip!==cb){ ovUI(); return; }
-        if(!r||r.conf<0.4){ toast('Keine eindeutige gemeinsame Stelle gefunden – A und B von Hand zum gleichen Tor ziehen.',4200); ovUI(); return; }
+        if(!r||!(r.conf>=0.4||(r.conf>=0.25&&r.sep>=0.45))){ toast('Keine eindeutige gemeinsame Stelle gefunden – A und B von Hand zum gleichen Tor ziehen.',4200); ovUI(); return; }
         unlink(); A.seekTime(r.tA); B.seekTime(Math.max(0,r.tA+r.off)); setTimeout(()=>{ if(A.clip===ca&&B.clip===cb){ doSync(); OV.edit=false; toast('Gleiche Stelle gefunden (B '+(r.off>=0?'+':'−')+Math.abs(r.off).toFixed(2)+' s) – jetzt «Overlay erstellen». Passt es nicht: «Zurück».',4500); } ovUI(); },400); })(); return; }
     else if(a==='pick') return ovStart();
     else if(a==='cancel') return ovStop();
@@ -4105,7 +4123,7 @@ if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)) window.add
 
 /* Namen setzen: Fahrer:in einmal antippen – ab dort wird genau diese Person verfolgt */
 function tagSeed(k,u,v){ const e=ovE(); if(!GH.S||!GH.S.length) return;
-  if(k[0]==='l'){ const L=LAY[+k.slice(1)]; if(!L||!L.S[0]||!L.S.some(s=>s.mb)) return; const i=clamp(Math.round((ovTA()-L.t0)/L.step),0,L.S.length-1); L.trkB=trackViterbi(L.S,'mb',L.W0,{i,x:u*L.W0,y:v*L.hA}); return; }
+  if(k[0]==='l'){ const L=LAY[+k.slice(1)]; if(!L||!L.S[0]||!L.S.some(s=>s.mb)) return; const i=clamp(Math.round((ovTA()-L.t0)/L.step),0,L.S.length-1); L.seeds=(L.seeds||[]).filter(q=>Math.abs(q.i-i)>2); L.seeds.push({i,x:u*L.W0,y:v*L.hA}); L.trkB=trackViterbi(L.S,'mb',L.W0,L.seeds); L.alB=trkAlFull(L.trkB,L.S,L.W0); return; }
   const i=clamp(Math.round(e/GH.step),0,GH.S.length-1); GH.seeds=GH.seeds||{}; let L=GH.seeds[k]; if(!Array.isArray(L)) L=GH.seeds[k]=L?[L]:[]; const near=L.findIndex(q=>Math.abs(q.i-i)<=2); if(near>=0) L.splice(near,1); L.push({i,x:u*GH.W0,y:v*GH.hA}); tracksBuild(); if(typeof resSave==='function') resSave(); }
 function tagKeys(){ const L=[{k:'a',n:lastName(A.clip)}]; if(B.clip) L.push({k:'b',n:lastName(B.clip)}); LAY.forEach((l,i)=>L.push({k:'l'+i,n:l.name})); return L; }
 function tagsReset(){ TAGS.path={}; TAGS.seedPts={}; TAGS.cand={}; MOV.prev=null; for(const k in TRK) delete TRK[k]; GH.seeds={}; if(GH.S&&GH.S.length) tracksBuild(); }
@@ -4203,7 +4221,7 @@ document.addEventListener('click',e=>{ const b=e.target.closest('[data-act="sbs"
   setTimeout(()=>{ if(!B.clip){ const sel=$('#selB'); sel&&sel.focus(); toast('Jetzt Video B wählen – oben bei B oder in der Liste «B» drücken.',3600); } else toast('Side by Side: '+lastName(A.clip)+' vs '+lastName(B.clip)+'. Gleichen Moment einstellen, dann «Sync».',3200); },450); });
 
 /* ---------- Auto-Sync beim Einfügen von B: gleicher Kamerastandort → gleiche Kameralage = gleicher Ort der Fahrer:in ---------- */
-const AS={key:'',busy:false}; var TRK_CW=3;
+const AS={key:'',busy:false}; var TRK_CW=3; // Gewicht «Fahrer:in nahe Bildmitte» (getestet: 1.5 / 2.2 / 3 – 3 insgesamt am wenigsten Fehltreffer)
 async function autoSyncFind(ca,cb,prog){ // gleicher Kamerastandort → gleiche Kameralage = gleiche Stelle der Strecke. Ganze Videos vergleichen, beide Richtungen.
   const W=64, H=36, cv=document.createElement('canvas'); cv.width=W; cv.height=H; const x=cv.getContext('2d',{willReadFrequently:true});
   const grab=v=>{ x.drawImage(v,0,0,W,H); const d=x.getImageData(0,0,W,H).data, g=new Float32Array(W*H); let m=0; for(let i=0,j=0;i<g.length;i++,j+=4){ g[i]=0.299*d[j]+0.587*d[j+1]+0.114*d[j+2]; m+=g[i]; } m/=g.length; let sd=0; for(let i=0;i<g.length;i++){ g[i]-=m; sd+=g[i]*g[i]; } sd=Math.sqrt(sd/g.length)||1; for(let i=0;i<g.length;i++) g[i]*=40/sd; return g; }; // Helligkeit + Kontrast ausgleichen
@@ -4221,15 +4239,18 @@ async function autoSyncFind(ca,cb,prog){ // gleicher Kamerastandort → gleiche 
     const diff=(p,q)=>{ let s=0; for(let i=0;i<p.length;i+=2){ const d=p[i]-q[i]; s+=d*d; } return s/(p.length/2); };
     // Bewegung je Bild (Kamera schwenkt = Fahrer:in unterwegs) – ruhige Startbilder zählen kaum
     const mv=S=>S.map((g,i)=>i?Math.min(1,diff(g,S[i-1])/60):0); const mA=mv(SA), mB=mv(SB);
-    const minOv=Math.round(4/st); let best=null; const sc=[];
+    const minOv=Math.round(4/st); let best=null; const sc=[], kv=[];
     for(let k=-(SA.length-minOv); k<=SB.length-minOv; k++){ // B-Index = A-Index + k
       let s=0,w=0; const i0=Math.max(0,-k), i1=Math.min(SA.length,SB.length-k);
       if(i1-i0<minOv) continue; for(let i=i0;i<i1;i+=1){ const ww=0.15+Math.max(mA[i],mB[i+k]); s+=ww*diff(SA[i],SB[i+k]); w+=ww; }
-      const v=s/w; let mvw=0; for(let i=i0;i<i1;i++) mvw+=mA[i]; if(mvw<3) continue; sc.push(v); if(!best||v<best.v) best={v,k,i0,i1}; }
+      const v=s/w; let mvw=0; for(let i=i0;i<i1;i++) mvw+=mA[i]; if(mvw<3) continue; sc.push(v); kv.push([k,v]); if(!best||v<best.v) best={v,k,i0,i1}; }
     if(!best) return null; sc.sort((a,b)=>a-b); const med=sc[sc.length>>1]||best.v;
     // Startpunkt: erstes Bild im gemeinsamen Bereich, an dem A sich bewegt
     let iS=best.i0; for(let i=best.i0;i<best.i1;i++){ if(mA[i]>0.5){ iS=Math.max(best.i0,i-1); break; } }
-    return {tA:iS*st, off:best.k*st, conf:med>0?1-best.v/med:0}; }
+    // Eindeutigkeit: wie weit liegt die beste andere Stelle (mehr als 3 s daneben) über dem Bestwert?
+    let alt=null; for(const [k,v] of kv) if(Math.abs(k-best.k)*st>3&&(alt==null||v<alt)) alt=v;
+    const sep=alt==null||med<=best.v?1:clamp((alt-best.v)/(med-best.v),0,1);
+    return {tA:iS*st, off:best.k*st, conf:med>0?1-best.v/med:0, sep}; }
   finally{ [va,vb].forEach(v=>{ try{ v.removeAttribute('src'); v.load(); v.remove(); }catch(e){} }); } }
 async function autoSyncRun(){ const ca=A.clip, cb=B.clip; AS.busy=true; AS.abort=false; toast('Suche den gemeinsamen Startpunkt …',2500);
   let r=null; try{ r=await autoSyncFind(ca,cb); }catch(e){ r=null; } AS.busy=false;
@@ -5578,7 +5599,7 @@ if(false&&!LS.get('hint1',0)){ setTimeout(()=>{ toast(matchMedia('(pointer:coars
 
 /* Update-Hinweis: prüft version.json auf GitHub Pages; «Aktualisieren» lädt die Seite ohne Cache neu */
 (()=>{
-  const BUILD='20261029095816'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
+  const BUILD='20261029112844'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
   // nach einem Update die ?v=… aus der Adresse entfernen
   try{ const u=new URL(location.href); if(u.searchParams.has('v')){ u.searchParams.delete('v'); history.replaceState(null,'',u.pathname+(u.search||'')+u.hash); } }catch(e){}
   const el=$('#upd'); let latest=null, snoozed=null, busy=false;
