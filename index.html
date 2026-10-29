@@ -1897,6 +1897,38 @@ canvas.strip:focus-visible{outline:2px solid rgba(255,255,255,.35)!important;out
 #expRange.rgrid button small{font:600 11px var(--mono);color:var(--muted);opacity:.9}
 #expRange.rgrid button.on small{color:var(--ink2)}
 #expRange.rgrid .seg-ind{display:none!important}
+/* Overlay: einfacher Ablauf */
+.ov-cutg{display:inline-flex;gap:0;border-radius:11px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);padding:0}
+.ov-cutg .ov-b{background:transparent!important;border-color:transparent!important;color:#c9d1db}
+.ov-cutg .ov-b:hover{color:#fff;background:rgba(255,255,255,.1)!important}
+.ov-cutg .ov-b+.ov-b{border-left:1px solid rgba(255,255,255,.1)!important;border-radius:0 11px 11px 0}
+.ov-cutg .ov-b:first-child{border-radius:11px 0 0 11px}
+.ov-b svg.ic{width:15px;height:15px;margin-right:6px;flex:none}
+.ov-b.ico svg.ic,.ov-b:empty svg.ic{margin:0}
+.ov-b span:empty{display:none}
+.ov-morew{position:relative;display:inline-flex}
+.ov-b.ico.on{background:rgba(255,255,255,.14)!important;color:#fff}
+.ov-menu{position:absolute;top:calc(100% + 6px);right:0;z-index:60;min-width:230px;display:flex;flex-direction:column;padding:5px;border-radius:12px;background:#1b2027;border:1px solid rgba(255,255,255,.12);box-shadow:0 18px 40px -12px rgba(0,0,0,.7)}
+.ov-menu button{display:flex;align-items:center;gap:9px;height:34px;padding:0 10px;border:none;border-radius:8px;background:none;color:#e6ebf0;font:inherit;font-size:12.5px;font-weight:600;cursor:pointer;text-align:left;white-space:nowrap}
+.ov-menu button:hover{background:rgba(255,255,255,.08)}
+.ov-menu button svg.ic{width:15px;height:15px;color:#aab2bc}
+.ov-dim{color:rgba(255,255,255,.55);font-weight:500}
+#viewCmp .ov-acts{align-items:center}
+@media (min-width:1000px){ #viewCmp .ov-acts [data-ov="cuta"] span,#viewCmp .ov-acts [data-ov="cutb"] span{display:inline!important} #viewCmp .ov-acts [data-ov="cuta"],#viewCmp .ov-acts [data-ov="cutb"]{width:auto!important;padding:0 10px!important} }
+/* Videoliste: ruhig und kompakt */
+.ft-row,.ft-row:hover{transform:none!important}
+.ftree .ft-row,.ft-demo .ft-row,.ft-demo.first .ft-row{animation:none!important}
+.ft-row .ft-th,.ft-row:hover .ft-th{transform:none!important;box-shadow:0 0 0 1px rgba(0,0,0,.06)!important;transition:none!important}
+.clip:hover .thumb{transform:none!important}
+.ft-row{transition:background .15s!important;border-radius:8px!important}
+.ft-row.file{min-height:38px!important}
+.ft-nm{font-size:12px!important}
+.ft-sub,.ft-sub i{font-size:10px!important}
+.ft-th{width:50px!important;height:28px!important;border-radius:5px!important}
+.ft-th i{font-size:8px!important}
+.ft-row.on{box-shadow:inset 2px 0 0 var(--red)!important}
+#sideTree.names .ft-nm{font-size:11.5px!important}
+.ft-nm[data-ren]{cursor:text}
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
   .aurora{display:none}
@@ -2050,9 +2082,9 @@ canvas.strip:focus-visible{outline:2px solid rgba(255,255,255,.35)!important;out
     </div>
     <div class="ov-panel" id="ovPanel">
       <ol class="ov-steps" id="ovSteps">
-        <li data-st="1"><i>1</i><span>Gemeinsamer Punkt</span></li>
-        <li data-st="2"><i>2</i><span>Referenzpunkte</span></li>
-        <li data-st="3"><i>3</i><span>Overlay erstellen</span></li>
+        <li data-st="1"><i>1</i><span>Gleicher Moment</span></li>
+        <li data-st="2"><i>2</i><span>Erstellen</span></li>
+        <li data-st="3"><i>3</i><span>Fertig</span></li>
       </ol>
       <div class="ov-row">
         <div class="ov-txt" id="ovTxt"></div>
@@ -2328,7 +2360,7 @@ function addFiles(files){
 // Lange Dateinamen: beim Darüberfahren seitlich durchlaufen lassen
 (()=>{ const glide=(el,to)=>{ cancelAnimationFrame(el._ga); const from=el.scrollLeft, d=to-from, t0=performance.now(), T=Math.min(2600,Math.max(500,Math.abs(d)*9));
     const st=now=>{ const f=Math.min(1,(now-t0)/T), e=f<.5?2*f*f:1-Math.pow(-2*f+2,2)/2; el.scrollLeft=from+d*e; if(f<1) el._ga=requestAnimationFrame(st); }; el._ga=requestAnimationFrame(st); };
-  document.addEventListener('pointerover',e=>{ const r=e.target.closest('.lib.names .clip.row, #sideTree.names .ft-row.file'); if(!r||r._gl) return; r._gl=1; const n=$('.nm, .ft-nm',r); if(n&&n.scrollWidth>n.clientWidth+2) glide(n,n.scrollWidth-n.clientWidth); });
+  document.addEventListener('pointerover',e=>{ return; const r=e.target.closest('.lib.names .clip.row, #sideTree.names .ft-row.file'); if(!r||r._gl) return; r._gl=1; const n=$('.nm, .ft-nm',r); if(n&&n.scrollWidth>n.clientWidth+2) glide(n,n.scrollWidth-n.clientWidth); });
   document.addEventListener('pointerout',e=>{ const r=e.target.closest('.lib.names .clip.row, #sideTree.names .ft-row.file'); if(!r||r.contains(e.relatedTarget)) return; r._gl=0; const n=$('.nm, .ft-nm',r); if(n) glide(n,0); });
 })();
 document.addEventListener('click',e=>{ const b=e.target.closest('#libView [data-lv]'); if(!b) return; LS.set('libview',b.dataset.lv); renderLib(); });
@@ -3545,7 +3577,7 @@ function ovSim(pa,pb){ // Ähnlichkeits-Transformation B-Videopixel → A-Videop
   return [re,-im,a1[0]-(re*b1[0]-im*b1[1]),im,re,a1[1]-(im*b1[0]+re*b1[1])]; }
 function ovFollowOK(){ return OV.follow&&GH.state==='ready'&&ghostKey()===GH.key; }
 
-const OVI={tag:`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12V5a2 2 0 0 1 2-2h7l9 9-9 9-9-9z"/><circle cx="8" cy="8" r="1.6"/></svg>`,plus:`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>`,reset:`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 1 0 2.3-5.6"/><path d="M4 4v4h4"/></svg>`,pause:`<svg class="ic" viewBox="0 0 24 24" fill="currentColor"><rect x="6.5" y="5" width="4" height="14" rx="1"/><rect x="13.5" y="5" width="4" height="14" rx="1"/></svg>`,play:`<svg class="ic" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>`,fix:`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M3 12h18"/><path d="M9 6l3-3 3 3M9 18l3 3 3-3M6 9l-3 3 3 3M18 9l3 3-3 3"/></svg>`,trash:`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg>`,side:`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="5" width="8.5" height="14" rx="2"/><rect x="13" y="5" width="8.5" height="14" rx="2"/></svg>`,cs:`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M8 4H5v16h3"/><path d="M11 12h8M16 9l3 3-3 3"/></svg>`,ce:`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h3v16h-3"/><path d="M13 12H5M8 9l-3 3 3 3"/></svg>`,ok:`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>`,pin:`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="10" r="3"/><path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0C18.5 15.4 12 21 12 21z"/></svg>`,go:`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/><path d="M19 16l.7 2 2 .7-2 .7-.7 2-.7-2-2-.7 2-.7z"/></svg>`,back:`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>`,x:`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"/></svg>`};
+const OVI={dots:`<svg class="ic" viewBox="0 0 24 24" fill="currentColor"><circle cx="5.5" cy="12" r="1.9"/><circle cx="12" cy="12" r="1.9"/><circle cx="18.5" cy="12" r="1.9"/></svg>`,dl:`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg>`,tag:`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12V5a2 2 0 0 1 2-2h7l9 9-9 9-9-9z"/><circle cx="8" cy="8" r="1.6"/></svg>`,plus:`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>`,reset:`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 1 0 2.3-5.6"/><path d="M4 4v4h4"/></svg>`,pause:`<svg class="ic" viewBox="0 0 24 24" fill="currentColor"><rect x="6.5" y="5" width="4" height="14" rx="1"/><rect x="13.5" y="5" width="4" height="14" rx="1"/></svg>`,play:`<svg class="ic" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>`,fix:`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M3 12h18"/><path d="M9 6l3-3 3 3M9 18l3 3 3-3M6 9l-3 3 3 3M18 9l3 3-3 3"/></svg>`,trash:`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg>`,side:`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="5" width="8.5" height="14" rx="2"/><rect x="13" y="5" width="8.5" height="14" rx="2"/></svg>`,cs:`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M8 4H5v16h3"/><path d="M11 12h8M16 9l3 3-3 3"/></svg>`,ce:`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h3v16h-3"/><path d="M13 12H5M8 9l-3 3 3 3"/></svg>`,ok:`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>`,pin:`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="10" r="3"/><path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0C18.5 15.4 12 21 12 21z"/></svg>`,go:`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/><path d="M19 16l.7 2 2 .7-2 .7-.7 2-.7-2-2-.7 2-.7z"/></svg>`,back:`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>`,x:`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"/></svg>`};
 function ovT0(){ return OV.cut.a!=null?Math.max(OV.cut.a,-G.off,0):G.syncA; }
 function ovStep(){ if(!G.linked||OV.edit) return 1; if(OV.pick) return 2; if(!OV.T&&!(OV.follow&&(GH.state==='busy'||ovFollowOK()))) return 2; return 3; }
 function ovApplyCut(){ // Ausschnitt als Loop in beiden Zeitleisten anzeigen
@@ -3553,6 +3585,8 @@ function ovApplyCut(){ // Ausschnitt als Loop in beiden Zeitleisten anzeigen
   const mk=(d,sh)=>{ if(!on||!d.ready){ d.loopOv=null; d.dirty=true; return; } const a=OV.cut.a!=null?OV.cut.a:0, b=OV.cut.b!=null?OV.cut.b:A.dur;
     d.loopOv={a:clamp(Math.round((a+sh)*d.fps),0,d.nF-1),b:clamp(Math.round((b+sh)*d.fps),0,d.nF-1),on:true}; d.dirty=true; };
   mk(A,0); if(G.linked) mk(B,G.off); else { B.loopOv=null; B.dirty=true; } }
+function ovMore(items){ items=items.filter(Boolean); if(!items.length) return '';
+  return `<span class="ov-morew">${ovBtn('more','',OVI.dots,'ico ghost'+(OV.more?' on':''),'Weitere Möglichkeiten')}${OV.more?`<span class="ov-menu">${items.map(([id,l,ic])=>`<button data-ov="${id}">${ic||''}<span>${l}</span></button>`).join('')}</span>`:''}</span>`; }
 function ovBtn(id,label,icon,cls,title){ return `<button class="ov-b ${cls||''}" data-ov="${id}" ${title?`title="${title}"`:''}>${icon||''}<span>${label}</span></button>`; }
 function ovUI(){
   const v=$('#viewCmp'), k=A.clip&&B.clip?A.clip.id+'|'+B.clip.id:''; if(k!==OV.key){ OV.key=k; OV.T=null; OV.follow=false; OV.pick=null; OV.cut={a:null,b:null}; OV.edit=false; }
@@ -3563,7 +3597,7 @@ function ovUI(){
   const st=ovStep(), busy=OV.follow&&GH.state==='busy', done=ovFollowOK();
   $$('#ovSteps li').forEach(li=>{ const n=+li.dataset.st; li.classList.toggle('on',n===st&&!done); li.classList.toggle('done',n<st||done); $('i',li).innerHTML=(n<st||done)?OVI.ok:n; });
   const cut=(OV.cut.a!=null||OV.cut.b!=null)?`<span class="ov-chip">${OVI.cs}${OV.cut.a!=null?fmtS(OV.cut.a):'Anfang'} – ${OV.cut.b!=null?fmtS(OV.cut.b):'Ende'}<button data-ov="cutx" title="Ausschnitt entfernen">${OVI.x}</button></span>`:'';
-  const cutBtns=ovBtn('cuta','Start',OVI.cs,'','Start des Ausschnitts = aktuelles Bild von A')+ovBtn('cutb','Ende',OVI.ce,'','Ende des Ausschnitts = aktuelles Bild von A');
+  const cutBtns=`<span class="ov-cutg">${ovBtn('cuta','Start',OVI.cs,'','Start des Overlays = aktuelles Bild')}${ovBtn('cutb','Ende',OVI.ce,'','Ende des Overlays = aktuelles Bild')}</span>`;
   let t='', acts='';
   if(!A.ready||!B.ready){ t='Oben <b>Lauf A</b> und <b>Lauf B</b> wählen – beide vom gleichen Kamerastandort gefilmt.'; }
   else if(busy&&OV.fix){ t=`<b>Korrigieren</b> · B auf die Tore ziehen – danach wird ab hier weitergerechnet. <span class="ov-hint">Rechtsklick ziehen: drehen · Mausrad: Grösse · Pfeiltasten: fein <b class="ov-fixinfo" id="ovFixInfo"></b></span>`;
@@ -3581,15 +3615,16 @@ function ovUI(){
   else if(OV.fix){ const near=OV.K.some(k=>Math.abs(k.e-ovE())<0.15);
     t=`<b>Korrigieren</b> · B auf die Tore ziehen – ab hier wird neu gerechnet. <span class="ov-hint">Rechtsklick ziehen: drehen · Mausrad: Grösse · Pfeiltasten: fein <b class="ov-fixinfo" id="ovFixInfo"></b></span>`;
     acts=(near?ovBtn('fixdel','Korrektur löschen',OVI.trash,'ghost'):'')+ovBtn('fixreset','Auf 0',OVI.reset,'ghost','Handkorrektur zurücksetzen')+ovBtn('fixno','Abbrechen','','ghost')+ovBtn('fixok','Übernehmen & ab hier neu rechnen',OVI.ok,'pri','Ab diesem Bild wird mit deiner Lage neu berechnet – davor bleibt alles'); }
-  else if(st===1){ t=`<b>Gleicher Moment</b> · A und B einzeln zum ersten gemeinsamen Tor ziehen. ${cut}`;
-    acts=cutBtns+ovBtn('auto',AS.busy?'Sucht …':'Automatisch finden',OVI.go,'ghost','Gleiche Stelle der Strecke in A und B automatisch suchen (gleicher Kamerastandort)')+ovBtn('hand','Von Hand',OVI.fix,'','A und B hier verbinden und B von Hand über A schieben')+ovBtn('sync','Gemeinsamer Punkt',OVI.pin,'pri','A und B an diesem Moment verbinden'); }
-  else if(st===2){ t=`<b>Synchron</b> <span class="ov-dim">B ${G.off>=0?'+':'−'}${Math.abs(G.off).toFixed(2)} s</span> · «Overlay erstellen» richtet B selbst aus. Liegt es daneben: zwei gleiche Tore als Referenz antippen. ${cut}`;
-    acts=cutBtns+ovBtn('edit','Punkt ändern',OVI.back,'ghost')+ovBtn('pick','Referenzpunkte',OVI.pin,'ghost','2 feste Punkte in A und B antippen – hilft bei stark unterschiedlichem Zoom')+ovBtn('make','Overlay erstellen',OVI.go,'pri','B automatisch über A legen und der Kamera folgen'); }
-  else if(!done){ t=`<b>B liegt über A</b> · vorklicken zeigt den Vorsprung – bei Kameraschwenk «Overlay erstellen». ${cut}`;
-    acts=cutBtns+ovBtn('edit','Punkt ändern',OVI.back,'ghost')+ovBtn('pick','Punkte setzen',OVI.pin,'ghost','2 gleiche Tore in A und B antippen')+ovBtn('hand','Von Hand',OVI.fix,'','B von Hand nachschieben')+ovBtn('make','Overlay erstellen',OVI.go,'pri'); }
+  else if(st===1){ t=`<b>Gleicher Moment</b> · A und B einzeln zum selben Tor ziehen – oder suchen lassen.`;
+    acts=ovBtn('auto',AS.busy?'Sucht …':'Automatisch suchen',OVI.go,'ghost','Gleiche Stelle der Strecke in A und B automatisch suchen (gleicher Kamerastandort)')+ovBtn('sync','Weiter',OVI.ok,'pri','A und B an diesem Moment verbinden'); }
+  else if(st===2){ t=`<b>Bereit</b> · jetzt «Overlay erstellen» – B wird über A gelegt und folgt der Kamera. ${cut}`;
+    acts=ovBtn('edit','Zurück',OVI.back,'ghost','Gleichen Moment neu wählen')+cutBtns+ovMore([['pick','Referenzpunkte antippen',OVI.pin],['hand','Von Hand übereinanderlegen',OVI.fix]])+ovBtn('make','Overlay erstellen',OVI.go,'pri','B automatisch über A legen und der Kamera folgen'); }
+  else if(!done){ t=`<b>B liegt über A</b> · nur für dieses Bild – «Overlay erstellen» folgt auch der Kamera. ${cut}`;
+    acts=ovBtn('edit','Zurück',OVI.back,'ghost','Gleichen Moment neu wählen')+cutBtns+ovMore([['pick','Referenzpunkte neu',OVI.pin],['hand','Von Hand nachschieben',OVI.fix]])+ovBtn('make','Overlay erstellen',OVI.go,'pri'); }
   else { const kc=OV.K.length?`<span class="ov-chip">${OVI.fix}${OV.K.length} Korrektur${OV.K.length>1?'en':''}<button data-ov="fixall" title="Alle Korrekturen entfernen">${OVI.x}</button></span>`:'';
-    t=`<b>Overlay fertig</b> ${cut} ${kc}`;
-    acts=cutBtns+ovBtn('edit','Neu beginnen',OVI.back,'ghost')+ovBtn('make','Neu berechnen',OVI.go,'ghost')+ovBtn('nameset','Namen setzen',OVI.tag,'ghost','Fahrer:innen antippen – die Namens-Pillen folgen dann genau ihnen')+(LAY.length<3?ovBtn('addrun','Lauf hinzufügen',OVI.plus,'ghost','Diesen Lauf im Bild behalten und einen weiteren dazunehmen'):'')+ovBtn('fix','Hier korrigieren',OVI.fix,'pri','B an dieser Stelle von Hand nachschieben'); }
+    t=`<b>Fertig</b> · B daneben? Dort anhalten, «Korrigieren». ${cut} ${kc}`;
+    acts=cutBtns+ovBtn('fix','Korrigieren',OVI.fix,'ghost','B an dieser Stelle von Hand nachschieben')+ovBtn('nameset','Namen',OVI.tag,'ghost','Fahrer:innen antippen – die Namens-Pillen folgen dann genau ihnen')
+      +ovMore([LAY.length<3?['addrun','Weiteren Lauf dazunehmen',OVI.plus]:null,['make','Neu berechnen',OVI.go],['edit','Neu beginnen',OVI.back]])+ovBtn('save','Speichern',OVI.dl,'pri','Overlay als Video speichern'); }
   // nur neu zeichnen, wenn sich etwas ändert – sonst gehen Klicks verloren
   if(LAY.length) t+=' <span class="ov-lays">'+LAY.map((L,i)=>`<span class="ov-lay"><i style="background:${L.col}"></i>${L.let} · ${L.name}<button data-ov="laydel" data-i="${i}" title="Lauf ${L.let} entfernen">${OVI.x}</button></span>`).join('')+'</span>';
   const tx=$('#ovTxt'), ac=$('#ovActs'); if(tx._h!==t){ tx.innerHTML=t; tx._h=t; tx.title=tx.textContent.replace(/\s+/g,' ').trim(); } if(ac._h!==acts){ ac.innerHTML=acts; ac._h=acts; }
@@ -3842,18 +3877,20 @@ function renderOv(){
     else if(e.key==='Enter'){ e.stopPropagation(); e.preventDefault(); $('[data-ov="fixok"]').click(); }
     else if(e.key==='Escape'){ e.stopPropagation(); e.preventDefault(); $('[data-ov="fixno"]').click(); } },true);
   ['pointerup','pointermove','click','dblclick'].forEach(t=>st.addEventListener(t,e=>{ block(e); },true));
-  $('#ovPanel').addEventListener('click',e=>{ const b=e.target.closest('[data-ov]'); if(!b) return; const a=b.dataset.ov; if(/^(fixok|fixdel|fixall)$/.test(a)) setTimeout(resSave,50);
+  $('#ovPanel').addEventListener('click',e=>{ const b=e.target.closest('[data-ov]'); if(!b) return; const a=b.dataset.ov;
+    if(a==='more'){ OV.more=!OV.more; ovUI(); return; } OV.more=false;
+    if(a==='save'){ ovUI(); A.pause(); B.pause(); G.playing=false; cmpPlayIcon(); return openExport(); } if(/^(fixok|fixdel|fixall)$/.test(a)) setTimeout(resSave,50);
     if(a==='cuta'||a==='cutb'){ if(!A.ready) return; const t=A.time(), dn=ovFollowOK(); if(a==='cuta'){ OV.cut.a=t; if(OV.cut.b!=null&&OV.cut.b<=t) OV.cut.b=null; } else { OV.cut.b=t; if(OV.cut.a!=null&&OV.cut.a>=t) OV.cut.a=null; }
       const inside=dn&&t>=GH.t0-0.05&&t<=GH.t0+GH.eEnd+0.05; // fertiges Overlay: Start/Ende nur zum Abspielen und Exportieren – keine Neuberechnung nötig
       if(dn){ GH.key=ghostKey(); } else { OV.T=null; OV.follow=false; } toast((a==='cuta'?'Start':'Ende')+' des Overlays: '+fmtS(t)+(dn&&!inside?' – ausserhalb der Berechnung, «Neu berechnen»':''),dn&&!inside?3200:1400); ovApplyCut(); }
     else if(a==='cutx'){ const dn=ovFollowOK(); OV.cut={a:null,b:null}; if(dn) GH.key=ghostKey(); else { OV.T=null; OV.follow=false; } ovApplyCut(); }
-    else if(a==='sync'){ doSync(); OV.edit=false; OV.T=null; OV.follow=false; return ovStart(); }
-    else if(a==='edit'){ ovKill(); tagsReset(); OV.edit=true; OV.T=null; OV.follow=false; OV.pick=null; unlink(); toast('A und B einzeln verschieben, dann «Gemeinsamer Punkt».',2600); }
+    else if(a==='sync'){ doSync(); OV.edit=false; OV.T=null; OV.follow=false; OV.pick=null; }
+    else if(a==='edit'){ ovKill(); tagsReset(); OV.edit=true; OV.T=null; OV.follow=false; OV.pick=null; unlink(); toast('A und B einzeln zum selben Tor ziehen, dann «Weiter».',2600); }
     else if(a==='auto'){ if(AS.busy||!A.ready||!B.ready) return; A.pause(); B.pause(); AS.busy=true; AS.abort=false; ovUI(); const ca=A.clip, cb=B.clip;
       (async()=>{ let r=null; try{ r=await autoSyncFind(ca,cb,f=>{ const b=$('[data-ov="auto"] span')||$('[data-ov="auto"]'); if(b) b.lastChild.textContent='Sucht … '+Math.round(f*100)+' %'; }); }catch(e){} AS.busy=false;
         if(A.clip!==ca||B.clip!==cb){ ovUI(); return; }
         if(!r||r.conf<0.4){ toast('Keine eindeutige gemeinsame Stelle gefunden – A und B von Hand zum gleichen Tor ziehen.',4200); ovUI(); return; }
-        unlink(); A.seekTime(r.tA); B.seekTime(Math.max(0,r.tA+r.off)); setTimeout(()=>{ if(A.clip===ca&&B.clip===cb){ doSync(); OV.edit=false; toast('Gemeinsame Stelle gefunden (B '+(r.off>=0?'+':'−')+Math.abs(r.off).toFixed(2)+' s) – kurz prüfen, sonst «Punkt ändern».',4500); } ovUI(); },400); })(); return; }
+        unlink(); A.seekTime(r.tA); B.seekTime(Math.max(0,r.tA+r.off)); setTimeout(()=>{ if(A.clip===ca&&B.clip===cb){ doSync(); OV.edit=false; toast('Gleiche Stelle gefunden (B '+(r.off>=0?'+':'−')+Math.abs(r.off).toFixed(2)+' s) – jetzt «Overlay erstellen». Passt es nicht: «Zurück».',4500); } ovUI(); },400); })(); return; }
     else if(a==='pick') return ovStart();
     else if(a==='cancel') return ovStop();
     else if(a==='make'){ OV.follow=true; OV.fix=null; if(!(GH.state==='ready'&&ghostKey()===GH.key)){ OV.K=[]; ovUI(); ghostCompute(); return; } ovUI(); return; }
@@ -3884,8 +3921,9 @@ function renderOv(){
     else if(a==='fixall'){ ovKill(); toast('Alle Korrekturen entfernt.',1400); }
     ovUI(); });
   $('#ovSteps').addEventListener('click',e=>{ const li=e.target.closest('li'); if(!li||OV.pick||GH.state==='busy') return; const n=+li.dataset.st;
-    OV.fix=null; if(n===1&&G.linked){ OV.edit=true; OV.T=null; OV.follow=false; unlink(); } else if(n===2&&G.linked){ OV.edit=false; ovStart(); return; } ovUI(); });
-  document.addEventListener('keydown',e=>{ if(e.key==='Escape'&&OV.pick){ e.stopPropagation(); ovStop(); } },true);
+    OV.fix=null; if(n===1&&G.linked){ OV.edit=true; OV.T=null; OV.follow=false; unlink(); } else if(n===2&&G.linked){ OV.edit=false; OV.pick=null; } ovUI(); });
+  document.addEventListener('keydown',e=>{ if(e.key==='Escape'&&OV.more){ OV.more=false; ovUI(); return; } if(e.key==='Escape'&&OV.pick){ e.stopPropagation(); ovStop(); } },true);
+  document.addEventListener('pointerdown',e=>{ if(OV.more&&!e.target.closest('.ov-morew')){ OV.more=false; ovUI(); } });
   addEventListener('resize',ovMarks);
   setInterval(()=>{ if(ovActive()&&(OV.follow||!G.linked)) ovUI(); },400);
   const _sync=window.doSync;
@@ -4982,7 +5020,7 @@ function ftPickRO(){ const i=document.createElement('input'); i.type='file'; i.w
     await ftAddRoot(root,false); setSideTab('tree'); });
   i.click(); }
 let ftId=0;
-const ICN={
+const ICN={pen:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></svg>',
   folder:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 6.5A2.5 2.5 0 0 1 5.5 4h3.6c.6 0 1.2.25 1.6.7L12 6h6.5A2.5 2.5 0 0 1 21 8.5v9a2.5 2.5 0 0 1-2.5 2.5h-13A2.5 2.5 0 0 1 3 17.5z"/></svg>',
   open:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 6.5A2.5 2.5 0 0 1 5.5 4h3.6c.6 0 1.2.25 1.6.7L12 6h6.5A2.5 2.5 0 0 1 21 8.5V10H8.2a2.5 2.5 0 0 0-2.4 1.8L3.4 19.6A2.5 2.5 0 0 1 3 18z"/><path d="M6.8 12.3A1.5 1.5 0 0 1 8.2 11.2H21.7a1 1 0 0 1 1 1.3l-2 6.3A1.8 1.8 0 0 1 19 20H4.8a.9.9 0 0 1-.86-1.16z"/></svg>',
   gps:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.2 7-11.5A7 7 0 0 0 5 9.5C5 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.3"/></svg>',
@@ -5123,7 +5161,7 @@ function ftRender(){
       const th=FT.thumbs.get(n.id);
       r.innerHTML=(isV?`<span class="ft-th${th?' has':''}" data-tid="${n.id}" style="${th?`background-image:url(${th})`:''}"><i>${n.dur?fmtDur(n.dur):''}</i></span>`:`<span class="ft-ic gps">${ICN.gps}</span>`)
         +`<span class="ft-tx"><span class="ft-nm"></span><span class="ft-sub"></span></span>`
-        +`<span class="ft-acts">${mode==='cmp'&&isV?'<button data-a="a" class="ab-a" title="Als Video A">A</button><button data-a="b" class="ab-b" title="Als Video B">B</button>':''}${n.ro?'':`<button data-a="label" title="Beschriften / umbenennen">${ICN.tag}</button><button data-a="move" title="Verschieben">${ICN.move}</button>`}</span>`;
+        +`<span class="ft-acts">${mode==='cmp'&&isV?'<button data-a="a" class="ab-a" title="Als Video A">A</button><button data-a="b" class="ab-b" title="Als Video B">B</button>':''}${n.ro?'':`<button data-a="ren" title="Umbenennen">${ICN.pen}</button><button data-a="label" title="Beschriften nach Schema (Athlet, Ort, Datum …)">${ICN.tag}</button><button data-a="move" title="Verschieben">${ICN.move}</button>`}</span>`;
       $('.ft-nm',r).textContent=ttl; if(m&&m.ok) subCols($('.ft-sub',r),[m.run,m.date]); else $('.ft-sub',r).textContent=sub; r.title=n.name+(n.size?' · '+fmtMB(n.size):'');
       if(isV&&!th) ftThumb(n);
     }
@@ -5187,6 +5225,10 @@ function moveDialog(node){
     async()=>{ const sel=$('#ftBody .mv-dir.sel'); if(!sel){ toast('Zielordner wählen.'); return false; } const dest=nodeById(sel.dataset.id); if(!dest.children) await ftLoad(dest); const ok=await ftTransfer(node,dest); if(ok){ dest.open=true; ftRender(); toast('Verschoben nach «'+dest.name+'»'); } return ok; },'Verschieben');
   $('#ftBody').addEventListener('click',e=>{ const b=e.target.closest('.mv-dir'); if(!b||b.classList.contains('cur')) return; $$('#ftBody .mv-dir').forEach(x=>x.classList.toggle('sel',x===b)); });
 }
+function renDialog(node){ if(node.ro){ toast('Dieser Ordner ist nur zum Ansehen geöffnet.'); return; } const ext=(node.name.match(/\.[^.]+$/)||[''])[0], stem=ext?node.name.slice(0,-ext.length):node.name;
+  ftDialog('Umbenennen',`<input class="ft-in" id="rnName" value="${esc(stem)}" spellcheck="false"><p class="ft-hint small">${ext?'Die Endung '+esc(ext)+' bleibt. ':''}Die Datei wird im Ordner auf dem Gerät umbenannt.</p>`,
+    async()=>{ const v=$('#rnName').value.trim().replace(/[\\/:*?"<>|]+/g,'-'); if(!v){ toast('Bitte einen Namen eingeben.'); return false; } if(v+ext===node.name) return true; return await ftTransfer(node,node.parent,v+ext); },'Umbenennen');
+  setTimeout(()=>{ const f=$('#rnName'); if(f){ f.focus(); f.select(); } },40); }
 function newDirDialog(parent){ ftDialog('Neuer Ordner',`<p class="ft-hint">In «${esc(parent.name)}»</p><input class="ft-in" id="ndName" placeholder="z. B. 270110_Adelboden_GS">`,async()=>{ const n=$('#ndName').value.trim().replace(/[\\/:*?"<>|]+/g,'-'); if(!n) return false; await ftNewFolder(parent,n); return true; },'Erstellen'); }
 
 /* ---------- Bedienung ---------- */
@@ -5208,10 +5250,11 @@ function ftWire(){
   $('#ftModal').addEventListener('keydown',e=>{ e.stopPropagation(); if(e.key==='Enter'&&e.target.tagName==='INPUT') $('#ftOk').click(); if(e.key==='Escape') ftClose(); });
   const tree=$('#ftree');
   $('#ftDemo').addEventListener('dragstart',e=>{ const r=e.target.closest('.demo-row'); if(!r) return; vdStart(e,{clip:clips[+r.dataset.ci]},r); });
+  tree.addEventListener('dblclick',e=>{ const r=e.target.closest('.ft-row.file'); if(!r||r.classList.contains('demo-row')||!e.target.closest('.ft-nm')) return; const n=nodeById(r.dataset.id); if(n&&!n.ro){ e.preventDefault(); renDialog(n); } });
   tree.addEventListener('click',async e=>{ const r=e.target.closest('.ft-row'); if(!r) return; const n=nodeById(r.dataset.id); if(!n) return; const a=e.target.closest('[data-a]'); const act=a&&a.dataset.a;
     if(act==='unlock') return ftUnlock(n); if(act==='unroot') return ftRemoveRoot(n); if(act==='newdir') return newDirDialog(n);
     if(act==='refresh'){ await ftLoad(n); n.open=true; ftRender(); return; }
-    if(act==='label') return labelDialog(n); if(act==='move') return moveDialog(n);
+    if(act==='label') return labelDialog(n); if(act==='ren') return renDialog(n); if(act==='move') return moveDialog(n);
     if(act==='a'||act==='b') return ftOpen(n,act);
     if(n.kind==='directory'){ if(n.root&&!n.ok) return ftUnlock(n); n.open=!n.open; if(n.open&&!n.children){ try{ await ftLoad(n); }catch(err){ toast('Ordner nicht lesbar.'); } } ftRender(); return; }
     ftOpen(n); });
@@ -5327,7 +5370,7 @@ if(!LS.get('hint1',0)){ setTimeout(()=>{ toast(matchMedia('(pointer:coarse)').ma
 
 /* Update-Hinweis: prüft version.json auf GitHub Pages; «Aktualisieren» lädt die Seite ohne Cache neu */
 (()=>{
-  const BUILD='20261028213212'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
+  const BUILD='20261029074619'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
   // nach einem Update die ?v=… aus der Adresse entfernen
   try{ const u=new URL(location.href); if(u.searchParams.has('v')){ u.searchParams.delete('v'); history.replaceState(null,'',u.pathname+(u.search||'')+u.hash); } }catch(e){}
   const el=$('#upd'); let latest=null, snoozed=null, busy=false;
@@ -5429,15 +5472,11 @@ const PRE_GH={"t0":0,"off":0,"step":0.1406,"eEnd":42.18,"W0":400,"hA":224,"hB":2
     overlay:[
       {t:'1 · Beide zum gleichen Moment',p:'Beispiel: Abfahrtstraining Courchevel vom Gegenhang, Boisset (A) gegen Kriechmayr (B). A und B einzeln in ihren Zeitleisten verschieben, bis beide am gleichen Punkt sind – z. B. beim ersten Tor, das in beiden zu sehen ist.',f:rectOf(tlA,tlB),
        run:async()=>{ setLayout('overlay'); A.setClip(demo(BO)); B.setClip(demo(KR)); unlink(); syncSelects(); renderLib(); await waitReady(); A.seekTime(0.5); B.seekTime(1.5); OV.cut={a:null,b:null}; OV.T=null; OV.follow=false; OV.edit=false; OV.pick=null; ovUI(); await sleep(500); await scrub(A,PRE_OV.cut.a,1400); await scrub(B,PRE_OV.cut.a+PRE_OV.off,1400); }},
-      {t:'Start des Ausschnitts',p:'Optional: «Start» setzt den Anfang des Overlays auf das aktuelle Bild.',f:'[data-ov="cuta"]',run:async()=>{ await clickEl('[data-ov="cuta"]'); }},
-      {t:'Gemeinsamer Punkt',p:'«Gemeinsamer Punkt» verbindet A und B an diesem Moment – danach geht es direkt mit den Referenzpunkten weiter.',f:'[data-ov="sync"]',run:async()=>{ await clickEl('[data-ov="sync"]'); }},
-      {t:'2 · Referenzpunkte in A',p:'In A zwei Tore antippen – Torflaggen sind ideale Fixpunkte. Am besten zwei, die weit auseinander liegen.',f:stage,
-       run:async()=>{ if(!OV.pick) ovStart(); await sleep(900); for(const q of PRE_OV.pa){ if(stopped()) return; await tapVideo(A,q[0],q[1]); } }},
-      {t:'Gleiche Punkte in B',p:'Dann dieselben zwei Tore in B, in der gleichen Reihenfolge. Die gestrichelten Kreise zeigen, wo sie in A lagen. B wird sofort darauf ausgerichtet.',f:stage,
-       run:async()=>{ for(const q of PRE_OV.pb){ if(stopped()) return; await tapVideo(B,q[0],q[1]); } await sleep(500); }},
-      {t:'3 · Overlay erstellen',p:'«Overlay erstellen» – die App führt B über den ganzen Ausschnitt mit, auch wenn die Kamera schwenkt und zoomt. Das dauert etwa 2–3 Minuten (hier vorbereitet).',f:'[data-ov="make"]',
+      {t:'Weiter',p:'«Weiter» verbindet A und B an diesem Moment. «Automatisch suchen» findet die Stelle auch selbst, wenn beide vom gleichen Standort gefilmt sind.',f:'[data-ov="sync"]',run:async()=>{ await clickEl('[data-ov="sync"]'); }},
+      {t:'Start und Ende (optional)',p:'Mit «Start» und «Ende» wählst du den Teil der Strecke, der übereinandergelegt wird. Ohne Angabe gilt das ganze Video.',f:'.ov-cutg',run:async()=>{ await clickEl('[data-ov="cuta"]'); }},
+      {t:'2 · Overlay erstellen',p:'«Overlay erstellen» – die App legt B selbst über A und führt es über den ganzen Ausschnitt mit, auch wenn die Kamera schwenkt und zoomt. Das dauert etwa 2–3 Minuten (hier vorbereitet).',f:'[data-ov="make"]',
        run:async()=>{ OV.cut.b=PRE_OV.cut.b; ovUI(); preloadOv(); await clickEl('[data-ov="make"]'); }},
-      {t:'Fertig: beide in einem Bild',p:'Abspielen oder scrubben: Boisset und Kriechmayr fahren im selben Bild. Mit «Deckkraft» oben das Mischverhältnis wählen.',f:stage,
+      {t:'3 · Fertig',p:'Abspielen oder scrubben: Boisset und Kriechmayr fahren im selben Bild. Liegt B irgendwo daneben: anhalten und «Korrigieren». «Speichern» exportiert das Overlay als Video.',f:stage,
        run:async()=>{ A.seekTime(26); A.onUserSeek(A); await sleep(700); cmpToggle(); await sleep(4200); if(!A.v.paused) cmpToggle(); }}
     ]
   };
