@@ -2245,6 +2245,38 @@ button.lg-it:hover{background:rgba(12,15,20,.8);border-color:rgba(255,255,255,.3
   #viewGps .ctl-lab .sel,#viewGps .sel{height:38px!important;padding-top:13px!important;font-size:13px!important}
   #viewGps .ctl-lab::before{top:4px!important;font-size:9px!important}
   #gpsChart{height:92px!important}
+  #viewSingle .pbar{margin-bottom:4px!important;min-height:0!important}
+  #viewSingle .ttl{font-size:12.5px!important;line-height:16px!important}
+  #viewSingle .ttl *{font-size:inherit!important}
+  #viewGps .ctl-lab .sel,#viewGps .sel{height:32px!important;padding-top:11px!important;font-size:12px!important;border-radius:9px!important}
+  #viewGps .ctl-lab::before{top:3px!important;font-size:7.5px!important;left:11px!important}
+  #viewGps .gps-sel{gap:5px!important}
+  #viewSingle .dock.dock3 .dz-l .ctl,#viewSingle .dock.dock3 .dz-r .ctl{width:32px!important;min-width:32px!important;height:32px!important;border-radius:9px!important}
+  #viewSingle .dock.dock3 .dz-l .ctl svg,#viewSingle .dock.dock3 .dz-r .ctl svg{width:15px!important;height:15px!important}
+  #viewSingle .dz-l .grp,#viewSingle .dz-r .grp{gap:3px!important}
+  /* Side-by-Side: alles in einer Zeile, Werkzeuge/Speichern/Mehr nur als Symbol */
+  #viewCmp:not(.overlay) .dock.dock3{display:flex!important;flex-wrap:wrap!important;justify-content:center!important;align-items:center!important;gap:4px!important;overflow:visible!important}
+  #viewCmp:not(.overlay) .dock.dock3>.dz-c{order:1;flex:0 0 auto!important;width:auto!important;margin:0!important}
+  #viewCmp:not(.overlay) .dock.dock3>.dz-l,#viewCmp:not(.overlay) .dock.dock3>.dz-r{flex:0 0 auto!important;width:auto!important}
+  #viewCmp:not(.overlay) .dock.dock3>.dz-r:empty{display:none!important}
+  #viewCmp:not(.overlay) .dock.dock3>.dz-l{order:2;gap:3px!important;margin:0!important}
+  #viewCmp:not(.overlay) .dock.dock3>.dz-r{order:3}
+  #viewCmp:not(.overlay) .dock.dock3>.dz-more{order:4;flex-basis:100%}
+  #viewCmp .dz-c .grp{gap:3px!important}
+  #viewCmp .dz-c .ctl:not(.play){width:32px!important;min-width:32px!important;height:32px!important;padding:0!important}
+  #viewCmp .dz-c .rate-btn{width:auto!important;min-width:32px!important;padding:0 6px!important;font-size:12px!important}
+  #viewCmp .dock .ctl.play{width:40px!important;height:40px!important;min-width:40px!important}
+  #viewCmp #btnTools{width:32px!important;min-width:32px!important;height:32px!important;padding:0!important;justify-content:center;gap:0!important}
+  #viewCmp #btnTools>span,#viewCmp #btnTools .tb-car{display:none!important}
+  #viewCmp #btnTools .tb-dot{position:absolute;top:3px;right:3px}
+  #viewCmp .dz-l .save-w>.ctl,#viewCmp .dz-l .save-w>button,#viewCmp .dz-l .m-more{width:32px!important;min-width:32px!important;height:32px!important;padding:0!important}
+  #viewCmp .dz-l svg{width:15px!important;height:15px!important}
+  .vchip{height:26px!important;min-width:0!important;border-radius:8px!important}
+  .vc-pick{gap:5px!important;padding:0 7px 0 3px!important}
+  .vchip .badge{width:18px!important;height:18px!important;font-size:10px!important;border-radius:5px!important}
+  .vc-lab{font-size:11.5px!important} .vc-lab small{font-size:10.5px!important}
+  .vc-car{width:10px!important;height:10px!important}
+  .vchip .slot-flip{width:26px!important;height:24px!important}
 }
 </style>
 </head>
@@ -4787,7 +4819,7 @@ function ghostUI(){ // Ghost-Ansicht gibt es nicht mehr – die Leiste dient nur
    Datenformat (CSV, GPX oder JSON): Zeit + lat + lon (+ alt, + speed). Siehe Hilfe.
    Externe Anbindung später: window.VideoLab.loadGps({...}) oder postMessage {type:'vlab:gps', payload}.
    ========================================================= */
-const GPS={tracks:[],origin:null,view:{band:true,snake:true,time:true},color:'speed',dirty:true};
+const GPS={tracks:[],origin:null,view:{band:true,snake:false,time:true},snakeUser:false,color:'speed',dirty:true};
 let gpsUid=0;
 const KMH=v=>v*3.6;
 function gpsKey(o,names){ const ks=Object.keys(o); for(const n of names){ const k=ks.find(k=>k.toLowerCase().replace(/[^a-z]/g,'')===n); if(k!=null) return k; } for(const n of names){ const k=ks.find(k=>k.toLowerCase().includes(n)); if(k!=null) return k; } return null; }
@@ -4917,7 +4949,7 @@ function drawGpsOverlay(T){ /* T={x,R}: direkt in den Export zeichnen (volle Auf
   const rr=(X,Y,w,h,r)=>{ x.beginPath(); if(x.roundRect) x.roundRect(X,Y,w,h,r); else x.rect(X,Y,w,h); };
   const inRun=N.tg>=tr.tStart-0.3&&N.tg<=tr.tEnd+0.3;
   /* 1) Tacho unten rechts: Bogen füllt sich mit dem Tempo, Spitze und Referenz als Marken */
-  const TD=T?R.h*0.36:small?clamp(Math.min(R.w*0.24,R.h*0.36),76,104):clamp(Math.min(R.w*0.26,R.h*0.42),112,230), TX=R.x+R.w-TD/2-(small?6:12)*k, TY=R.y+R.h-TD/2-(small?6:10)*k;
+  const TD=T?R.h*0.36:small?clamp(Math.min(R.w*0.2,R.h*0.3),64,88):clamp(Math.min(R.w*0.26,R.h*0.42),112,230), TX=R.x+R.w-TD/2-(small?6:12)*k, TY=R.y+R.h-TD/2-(small?6:10)*k;
   if(GPS.view.band){
     const have=N.tg>=P[0].t-0.3&&N.tg<=P[P.length-1].t+0.3, rad=TD/2, f=TD/200;
     const vhiK=Math.max(40,Math.ceil(KMH(Math.max(tr.vmax,ref?ref.vmax:0))*1.04/10)*10), A0=Math.PI*0.75, A1=Math.PI*2.25, AV=v=>A0+(A1-A0)*clamp(KMH(v)/vhiK,0,1), AK=kmh=>A0+(A1-A0)*clamp(kmh/vhiK,0,1);
@@ -5002,7 +5034,8 @@ function drawGpsChart(N){
 }
 /* ---------- Bedienung ---------- */
 function gpsSyncBtnUI(){ if(typeof invBtnUI==='function') invBtnUI(); const b=$('#gpsSync'); if(!b) return; const tr=trackOf(GD.clip); if($('#viewGps').classList.contains('no-trk')!==!tr){ $('#viewGps').classList.toggle('no-trk',!tr); GPS.dirty=true; } /* Profil erst nach dem Einblenden zeichnen */ b.hidden=!!(tr&&tr.source==='innove'); $$('#viewGps [data-gn]').forEach(x=>x.hidden=!!(tr&&tr.source==='innove')); $('#viewGps').classList.toggle('inv-trk',!!(tr&&tr.source==='innove')); } // innove: Zeit genügt, kein Startabgleich von Hand
-function gpsSelects(){ setTimeout(()=>{ gpsSyncBtnUI(); if(typeof demoGpsFor==='function'&&mode==='gps') demoGpsFor(GD.clip); if(typeof invAuto==='function') invAuto(); },0);
+function gpsSnakeAuto(){ if(GPS.snakeUser) return; const tr=trackOf(GD.clip), on=!!(tr&&tr.ref); if(GPS.view.snake!==on){ GPS.view.snake=on; GPS.dirty=true; } const b=$('#gpsView [data-v="snake"]'); if(b) b.classList.toggle('on',on); } /* Fahrlinie: Standard nur im Vergleich */
+function gpsSelects(){ gpsSnakeAuto(); setTimeout(()=>{ gpsSyncBtnUI(); if(typeof demoGpsFor==='function'&&mode==='gps') demoGpsFor(GD.clip); if(typeof invAuto==='function') invAuto(); },0);
   const sv=$('#gpsVideo'), st=$('#gpsTrack'), sr=$('#gpsRef'); const c=GD.clip, tr=trackOf(c);
   sv.innerHTML='<option value="">– Video wählen –</option>'+clips.map(c=>{ const m=c.meta; const t=m&&m.ok?metaTitle(c)+(m.run?' · '+m.run:''):dispName(c); return `<option value="${c.id}" title="${esc(dispName(c))}">${esc(t)}</option>`; }).join(''); sv.value=c?c.id:'';
   const opts=GPS.tracks.map(t=>`<option value="${t.id}">${esc(t.name)}</option>`).join('');
@@ -5029,7 +5062,7 @@ $('#gpsTrack').addEventListener('change',e=>{ linkGps(GD.clip,GPS.tracks.find(t=
 $('#gpsRef').addEventListener('change',e=>{ const tr=trackOf(GD.clip); if(!tr) return; tr.ref=+e.target.value||null; compareTracks(tr,GPS.tracks.find(t=>t.id===tr.ref)); gpsSelects(); });
 $('#gpsSync').addEventListener('click',gpsSyncHere);
 $$('[data-gn]').forEach(b=>b.addEventListener('click',()=>{ const v=b.dataset.gn; gpsNudge(v.endsWith('f')?parseFloat(v)/GD.fps:parseFloat(v)); }));
-$('#gpsView').addEventListener('click',e=>{ const b=e.target.closest('[data-v]'); if(!b) return; GPS.view[b.dataset.v]=!GPS.view[b.dataset.v]; b.classList.toggle('on',GPS.view[b.dataset.v]); GPS.dirty=true; });
+$('#gpsView').addEventListener('click',e=>{ const b=e.target.closest('[data-v]'); if(!b) return; if(b.dataset.v==='snake') GPS.snakeUser=true; GPS.view[b.dataset.v]=!GPS.view[b.dataset.v]; b.classList.toggle('on',GPS.view[b.dataset.v]); GPS.dirty=true; });
 false&&$('#gpsColor').addEventListener('click',e=>{ const b=e.target.closest('[data-c]'); if(!b) return; GPS.color=b.dataset.c; $$('#gpsColor button').forEach(x=>x.classList.toggle('on',x===b)); GPS.dirty=true; });
 
 /* Handy: Anzeigen (Tacho/Linie/Zeit) als Auswahlmenü in der Knopfleiste */
@@ -6161,7 +6194,7 @@ if(false&&!LS.get('hint1',0)){ setTimeout(()=>{ toast(matchMedia('(pointer:coars
 
 /* Update-Hinweis: prüft version.json auf GitHub Pages; «Aktualisieren» lädt die Seite ohne Cache neu */
 (()=>{
-  const BUILD='20261030171848'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
+  const BUILD='20261030172914'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
   // nach einem Update die ?v=… aus der Adresse entfernen
   try{ const u=new URL(location.href); if(u.searchParams.has('v')){ u.searchParams.delete('v'); history.replaceState(null,'',u.pathname+(u.search||'')+u.hash); } }catch(e){}
   const el=$('#upd'); let latest=null, snoozed=null, busy=false;
