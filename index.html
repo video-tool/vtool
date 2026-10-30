@@ -2224,6 +2224,28 @@ button.lg-it:hover{background:rgba(12,15,20,.8);border-color:rgba(255,255,255,.3
   #viewGps .gv-btn svg{width:15px!important;height:15px!important;margin:0!important;flex:none}
   #viewGps .gv-btn svg.dd{width:10px!important;height:10px!important;margin:0 0 0 1px!important}
 }
+
+/* Handy schlank (alle Ansichten): weniger Höhe, kleinere Knöpfe */
+@media (max-width:600px){
+  header .head-in{min-height:44px!important;height:44px!important;padding-top:0!important;padding-bottom:0!important}
+  .btn-cam{height:32px!important;padding:0 11px!important;font-size:13.5px!important;gap:5px!important}
+  .btn-cam svg{width:16px!important;height:16px!important}
+  header .btn-add,header .hdr-ico,header .ham-btn{width:32px!important;height:32px!important;min-width:32px!important}
+  .tabs{padding:3px 8px!important}
+  .tabs .tab{min-height:0!important;padding-top:3px!important;padding-bottom:3px!important;font-size:11.5px!important;gap:1px!important}
+  .tabs .tab svg{width:18px!important;height:18px!important}
+  .card.player:not([hidden]),#viewGps,#viewCmp:not(.overlay){padding:8px 7px 7px!important}
+  .player .tl,#viewGps .tl{margin-top:6px!important}
+  .player .dock,#viewGps .dock{margin-top:6px!important;padding:4px!important}
+  .player .dock .ctl:not(.play):not(.rate-btn):not(.gv-btn):not(.ctl-lab):not(:has(span)){width:36px!important;min-width:36px!important;height:36px!important;padding:0!important}
+  .player .dock .rate-btn,.player .dock .gv-btn{height:36px!important}
+  .player .dock .ctl.play,#viewGps .ctl.play,#viewGps.inv-trk .ctl.play{width:44px!important;height:44px!important;min-width:44px!important}
+  .player .dock .grp{gap:3px!important}
+  .player .dock.dock3{gap:5px 5px!important}
+  #viewGps .ctl-lab .sel,#viewGps .sel{height:38px!important;padding-top:13px!important;font-size:13px!important}
+  #viewGps .ctl-lab::before{top:4px!important;font-size:9px!important}
+  #gpsChart{height:92px!important}
+}
 </style>
 </head>
 <body class="m-single">
@@ -5960,6 +5982,7 @@ function coachPlace(){ const b=COACH.el; let el=COACH.tgt; if(!b) return; if(!co
 setInterval(()=>{ try{
   if(COACH.el){ if($('.modal.on')||(typeof SER!=='undefined'&&SER.on)) coachHide(false); else coachPlace(); return; }
   if(Date.now()-COACH.last<(COACH.n?30000:2500)||(COACH.n&&COACH.act<COACH.last)||document.hidden||document.body.classList.contains('touring')||$('.modal.on')||(typeof SER!=='undefined'&&SER.on)||(typeof EXP!=='undefined'&&EXP.live)) return;
+  if(innerWidth<=600) return; /* Handy: keine Hilfe-Blasen, Bild bleibt frei */
   for(const c of COACHES){ if(LS.get('coach:'+c.id,0)) continue; let ok=false; try{ ok=c.when(); }catch(e){} if(!ok) continue; const el=$(c.sel); if(coachVis(el)){ coachShow(c,el); break; } }
 }catch(e){} },900);
 addEventListener('resize',()=>{ if(COACH.el) coachPlace(); });
@@ -6138,7 +6161,7 @@ if(false&&!LS.get('hint1',0)){ setTimeout(()=>{ toast(matchMedia('(pointer:coars
 
 /* Update-Hinweis: prüft version.json auf GitHub Pages; «Aktualisieren» lädt die Seite ohne Cache neu */
 (()=>{
-  const BUILD='20261030171333'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
+  const BUILD='20261030171848'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
   // nach einem Update die ?v=… aus der Adresse entfernen
   try{ const u=new URL(location.href); if(u.searchParams.has('v')){ u.searchParams.delete('v'); history.replaceState(null,'',u.pathname+(u.search||'')+u.hash); } }catch(e){}
   const el=$('#upd'); let latest=null, snoozed=null, busy=false;
