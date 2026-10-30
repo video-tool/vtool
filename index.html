@@ -1977,6 +1977,26 @@ button.lg-it:hover{background:rgba(12,15,20,.8);border-color:rgba(255,255,255,.3
   body.side-col .libcard .side-top>:not(.side-col-btn):not(.btn-add){display:none!important}
   body.side-col .side-col-btn .sc-ar{transform:translateX(-1px) scaleX(-1);transform-origin:14px 12px}
 }
+/* ---- Serie gegen Referenz ---- */
+.help.ser{max-width:520px}
+.ser-sub{font-size:13px;line-height:1.5;color:var(--ink2);margin:4px 0 12px}
+.ser-list{display:flex;flex-direction:column;gap:6px;max-height:46vh;overflow:auto;margin:0 -2px;padding:2px}
+.ser-row{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:12px;border:1px solid var(--line);cursor:pointer}
+.ser-row input{width:18px;height:18px;accent-color:var(--red);flex:none;margin:0}
+.ser-row.done{opacity:.7}
+.ser-n{display:flex;flex-direction:column;gap:1px;flex:1;min-width:0}
+.ser-n b{font-size:13.5px;font-weight:650}
+.ser-n small{font-size:11.5px;color:var(--muted)}
+.ser-tag{font-size:11px;font-weight:650;padding:2px 8px;border-radius:999px;background:rgba(31,157,107,.14);color:#1f9d6b;white-space:nowrap}
+.ser-tag.dim{background:rgba(127,127,127,.14);color:var(--muted)}
+.ser-row>i{flex:none;width:22px;height:22px;border-radius:50%;display:grid;place-items:center;color:#fff}
+.ser-row>i svg{width:13px;height:13px;margin:0}
+.ser-row.ok>i{background:#1f9d6b}.ser-row.bad>i{background:#8a929c}
+.ser-row.ok,.ser-row.bad{cursor:default}
+.ser-note{font-size:11.5px;color:var(--muted);margin:10px 0 0;line-height:1.45}
+.ser-est{font-size:12px;color:var(--muted)}
+.ser-btns{display:flex;gap:8px;margin-left:auto}
+.ser .hdr-ico svg{width:16px;height:16px}
 /* Eine Zeitleiste, sobald A und B gemeinsam laufen */
 #viewCmp.overlay.ov-one .strips>.tl:nth-child(2){display:none}
 @media (prefers-reduced-motion:reduce){
@@ -1997,8 +2017,8 @@ button.lg-it:hover{background:rgba(12,15,20,.8);border-color:rgba(255,255,255,.3
     </div>
     <nav class="tabs" role="tablist">
       <button class="tab on" data-mode="single" role="tab" id="tabSingle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="5" width="19" height="14" rx="2.5"/><path d="M10 9.5v5l4.5-2.5z"/></svg>Ein Video</button>
-      <button class="tab" data-mode="cmp" data-lay="side" role="tab" id="tabCmp" title="Zwei Läufe nebeneinander vergleichen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="9" height="12" rx="2"/><rect x="13" y="6" width="9" height="12" rx="2"/></svg>Nebeneinander</button>
-      <button class="tab" data-mode="cmp" data-lay="overlay" role="tab" id="tabOv" title="Zwei Läufe übereinandergelegt in einem Bild"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="13" height="11" rx="2"/><rect x="8" y="9" width="13" height="11" rx="2" fill="currentColor" fill-opacity=".18"/></svg>Übereinander</button>
+      <button class="tab" data-mode="cmp" data-lay="side" role="tab" id="tabCmp" title="Zwei Läufe nebeneinander vergleichen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="9" height="12" rx="2"/><rect x="13" y="6" width="9" height="12" rx="2"/></svg>Side-by-Side</button>
+      <button class="tab" data-mode="cmp" data-lay="overlay" role="tab" id="tabOv" title="Zwei Läufe übereinandergelegt in einem Bild"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="13" height="11" rx="2"/><rect x="8" y="9" width="13" height="11" rx="2" fill="currentColor" fill-opacity=".18"/></svg>Overlay</button>
       <button class="tab" data-mode="gps" role="tab" id="tabGps"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.2 7-11.5A7 7 0 0 0 5 9.5C5 14.8 12 21 12 21z"/><path d="M8.5 10.5l2.2-2 1.8 2.6 3-3.6"/></svg>GPS<span class="dev-tag" title="Ist in Entwicklung">Beta</span></button>
     </nav>
     <div class="head-spacer"></div>
@@ -2069,7 +2089,7 @@ button.lg-it:hover{background:rgba(12,15,20,.8);border-color:rgba(255,255,255,.3
         <label class="ctl-lab fps-edit" title="Bilder pro Sekunde – wird beim Laden gemessen">fps <input class="num" id="sFps" type="number" min="1" max="1000" step="0.01"></label>
         <button class="ctl" data-act="sound" title="Ton ein / aus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5L6 9H2v6h4l5 4z"/><path class="snd-on" d="M15.5 8.5a5 5 0 0 1 0 7" hidden/><path class="snd-off" d="M16 9l5 6M21 9l-5 6"/></svg></button>
         <button class="ctl" data-act="shot" title="Standbild mit Zeichnungen als PNG speichern (p)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.6"/></svg></button>
-        <button class="ctl sbs-btn" data-act="sbs" title="Side by Side: dieses Video als A in die Analyse übernehmen und ein zweites danebenstellen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="5" width="8.5" height="14" rx="2"/><rect x="13" y="5" width="8.5" height="14" rx="2"/></svg><span>Side by Side</span></button><button class="ctl cat-btn" data-act="concat" title="Mehrere Videos aneinanderhängen und als ein Video speichern"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="6" height="10" rx="1.6"/><rect x="9" y="7" width="6" height="10" rx="1.6"/><rect x="16" y="7" width="6" height="10" rx="1.6"/></svg></button><button class="ctl rec-btn" data-act="rec" title="Aufnahme: alles, was du jetzt zeigst, zeichnest und sagst, als Video aufnehmen (r)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4" fill="currentColor" stroke="none"/></svg></button><button class="ctl" data-act="export" title="Clip exportieren – z. B. Schwung in Zeitlupe (e)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg></button>
+        <button class="ctl sbs-btn" data-act="sbs" title="Side-by-Side: dieses Video als A in die Analyse übernehmen und ein zweites danebenstellen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="5" width="8.5" height="14" rx="2"/><rect x="13" y="5" width="8.5" height="14" rx="2"/></svg><span>Side-by-Side</span></button><button class="ctl cat-btn" data-act="concat" title="Mehrere Videos aneinanderhängen und als ein Video speichern"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="6" height="10" rx="1.6"/><rect x="9" y="7" width="6" height="10" rx="1.6"/><rect x="16" y="7" width="6" height="10" rx="1.6"/></svg></button><button class="ctl rec-btn" data-act="rec" title="Aufnahme: alles, was du jetzt zeigst, zeichnest und sagst, als Video aufnehmen (r)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4" fill="currentColor" stroke="none"/></svg></button><button class="ctl" data-act="export" title="Clip exportieren – z. B. Schwung in Zeitlupe (e)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg></button>
         <button class="ctl" data-act="fs" title="Vollbild (f)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3M21 8V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3M16 21h3a2 2 0 0 0 2-2v-3"/></svg></button>
       </div></div>
     </div>
@@ -2121,7 +2141,7 @@ button.lg-it:hover{background:rgba(12,15,20,.8);border-color:rgba(255,255,255,.3
       <div><div class="mode-slot"></div><div class="eyebrow" id="cmpEyebrow">Vergleich</div><h2>Lauf A <span class="vs">vs</span> Lauf B</h2></div>
       <div class="cmp-head"><div class="slot-head vchip" data-k="a"><label class="vc-pick" id="vcpA" title="Video A wählen"><span class="badge" style="background:var(--a)">A</span><span class="vc-lab" id="vcA"><b>Video wählen</b><small></small></span><svg class="vc-car" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg><select class="sel" id="selA" aria-label="Video A"></select></label><button class="slot-flip" id="flipA" title="A spiegeln (Links- mit Rechtsschwung vergleichen)"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18" stroke-dasharray="2 2.5"/><path d="M9 7L4 12l5 5z"/><path d="M15 7l5 5-5 5z"/></svg></button><span class="meta" id="metaA"></span></div><div class="slot-head vchip" data-k="b"><label class="vc-pick" id="vcpB" title="Video B wählen"><span class="badge" style="background:var(--b)">B</span><span class="vc-lab" id="vcB"><b>Video wählen</b><small></small></span><svg class="vc-car" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg><select class="sel" id="selB" aria-label="Video B"></select></label><button class="slot-flip" id="flipB" title="B spiegeln (Links- mit Rechtsschwung vergleichen)"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18" stroke-dasharray="2 2.5"/><path d="M9 7L4 12l5 5z"/><path d="M15 7l5 5-5 5z"/></svg></button><span class="meta" id="metaB"></span></div></div>
       <div class="cmp-tools">
-        <button class="tut-open" id="cmpReset" title="Vergleich leeren: A und B entfernen, gleichen Moment und Overlay zurücksetzen (Videos bleiben unter «Geöffnet»)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/></svg><span>Zurücksetzen</span></button><button class="tut-open" id="tutBtn" title="Anleitung direkt im Tool – zeigt Schritt für Schritt mit den Beispiel-Läufen, wie es geht"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M10 8.5l5.5 3.5-5.5 3.5z" fill="currentColor"/></svg><span>Anleitung</span></button><div class="seg" id="layoutSeg"><button data-layout="side" class="on"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="5" width="8.5" height="14" rx="2"/><rect x="13" y="5" width="8.5" height="14" rx="2"/></svg>Side by Side</button><button data-layout="overlay"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="13" height="11" rx="2"/><rect x="8" y="9" width="13" height="11" rx="2" fill="currentColor" fill-opacity=".25"/></svg>Overlay</button><button data-layout="ghost"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M5 20V10a7 7 0 0 1 14 0v10l-2.4-1.8L14.3 20 12 18.2 9.7 20l-2.3-1.8z"/><circle cx="9.5" cy="10.5" r=".9" fill="currentColor"/><circle cx="14.5" cy="10.5" r=".9" fill="currentColor"/></svg>Ghost</button></div>
+        <button class="tut-open" id="cmpReset" title="Vergleich leeren: A und B entfernen, gleichen Moment und Overlay zurücksetzen (Videos bleiben unter «Geöffnet»)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/></svg><span>Zurücksetzen</span></button><button class="tut-open" id="tutBtn" title="Anleitung direkt im Tool – zeigt Schritt für Schritt mit den Beispiel-Läufen, wie es geht"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M10 8.5l5.5 3.5-5.5 3.5z" fill="currentColor"/></svg><span>Anleitung</span></button><div class="seg" id="layoutSeg"><button data-layout="side" class="on"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="5" width="8.5" height="14" rx="2"/><rect x="13" y="5" width="8.5" height="14" rx="2"/></svg>Side-by-Side</button><button data-layout="overlay"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="13" height="11" rx="2"/><rect x="8" y="9" width="13" height="11" rx="2" fill="currentColor" fill-opacity=".25"/></svg>Overlay</button><button data-layout="ghost"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M5 20V10a7 7 0 0 1 14 0v10l-2.4-1.8L14.3 20 12 18.2 9.7 20l-2.3-1.8z"/><circle cx="9.5" cy="10.5" r=".9" fill="currentColor"/><circle cx="14.5" cy="10.5" r=".9" fill="currentColor"/></svg>Ghost</button></div>
         <button class="ctl ov-namebtn" id="ovNames" title="Namen im Bild ein / aus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12V5a2 2 0 0 1 2-2h7l9 9-9 9-9-9z"/><circle cx="8" cy="8" r="1.6"/></svg><span>Namen</span></button><label class="ctl-lab op-wrap">Deckkraft <input type="range" class="op" id="opRange" min="0.1" max="0.9" step="0.05" value="0.5"></label>
         <button class="ctl" data-act="shot" title="Standbild A | B als PNG speichern (p)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.6"/></svg></button>
         <button class="ctl strobo-btn" data-act="strobe" title="Strobo: mehrere Positionen von A in einem Bild (±0.7 s um das aktuelle Bild)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><circle cx="5" cy="15" r="2.2" opacity=".45"/><circle cx="10.5" cy="11" r="2.2" opacity=".7"/><circle cx="17" cy="8" r="2.6"/><path d="M3 20c5-1 10-5 15-12" opacity=".5"/></svg></button><button class="ctl rec-btn" data-act="rec" title="Aufnahme: alles, was du jetzt zeigst, zeichnest und sagst, als Video aufnehmen (r)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4" fill="currentColor" stroke="none"/></svg></button><button class="ctl" data-act="export" title="Vergleich als Video exportieren (e)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg></button>
@@ -2234,7 +2254,7 @@ button.lg-it:hover{background:rgba(12,15,20,.8);border-color:rgba(255,255,255,.3
       <div class="steps">
         <div><i>1</i><b>Video laden</b>Ordner verbinden oder Datei ins Fenster ziehen – alles bleibt auf deinem Gerät.</div>
         <div><i>2</i><b>Moment finden</b>Zeitleiste ziehen, dann mit ← → Bild für Bild. ↑ ↓ ändert das Tempo.</div>
-        <div><i>3</i><b>Analysieren</b>Zeichnen, messen, Side by Side oder Overlay mit einem zweiten Lauf.</div>
+        <div><i>3</i><b>Analysieren</b>Zeichnen, messen, Side-by-Side oder Overlay mit einem zweiten Lauf.</div>
         <div><i>4</i><b>Teilen</b>Standbild, Clip oder Aufnahme mit deiner Stimme – landet neben dem Video.</div>
       </div>
       <p class="hp-note">Im Analyse-Tab zeigt der Knopf <b>Anleitung</b> jede Funktion Schritt für Schritt mit den Beispiel-Läufen.</p>
@@ -2245,13 +2265,13 @@ button.lg-it:hover{background:rgba(12,15,20,.8);border-color:rgba(255,255,255,.3
       <dt>Zeitleiste</dt><dd>Eine Leiste für das ganze Video – antippen oder ziehen springt dorthin · + / − (oder Ctrl + Mausrad) zoomt bis auf einzelne Bilder, oben zeigt dann ein feiner Balken, wo du bist · Film-Knopf: Vorschaubilder ein/aus</dd>
       <dt>Marker</dt><dd>Raute-Knopf oder <kbd>m</kbd> setzt einen Marker mit Notiz · <kbd>,</kbd> <kbd>.</kbd> springt zum vorherigen / nächsten</dd>
       <dt>Lupe</dt><dd><kbd>z</kbd>, Pinch oder Ctrl + Mausrad · ziehen = schwenken · Doppelklick = zurück</dd>
-      <dt>Vergleichen</dt><dd>Knopf «Side by Side» übernimmt das Video als A in «Nebeneinander» – dann B wählen</dd>
+      <dt>Vergleichen</dt><dd>Knopf «Side-by-Side» übernimmt das Video als A in «Side-by-Side» – dann B wählen</dd>
     </dl></section>
     <section class="hp" data-hp="analyse" hidden><dl>
-      <dt>Nebeneinander</dt><dd>A und B wählen, beide zum gleichen Tor ziehen und unter «Werkzeuge» «Gleicher Moment» drücken (<kbd>t</kbd> öffnet die Werkzeuge)</dd>
+      <dt>Side-by-Side</dt><dd>A und B wählen, beide zum gleichen Tor ziehen und unter «Werkzeuge» «Gleicher Moment» drücken (<kbd>t</kbd> öffnet die Werkzeuge)</dd>
       <dt>Zeitmessung</dt><dd>Stoppuhr-Knopf: Start = gleicher Moment · Fahne A / B setzt das Ziel · Zeit und Differenz stehen im Bild</dd>
       <dt>Tore</dt><dd><kbd>m</kbd> Tor in A · <kbd>n</kbd> Tor in B → Abschnittszeiten · <kbd>Alt</kbd> + ← → bewegt nur B</dd>
-      <dt>Übereinander</dt><dd>1 «Automatisch suchen» sucht die gleiche Stelle der Strecke (oder A und B von Hand zum gleichen Tor), dann «Weiter» · 2 «Overlay erstellen» – B folgt dem Kameraschwenk; nur bei stark unterschiedlichem Zoom unter «…» zwei gleiche Tore als Referenz antippen · 3 «Vorschau» und «Speichern» · Braucht eine durchgehende Kamera vom gleichen Standort (kein TV-Schnitt)</dd>
+      <dt>Overlay</dt><dd>1 A und B zum gleichen Tor ziehen (oder «Automatisch suchen»), dann «Weiter» – das Overlay wird gleich erstellt, zuerst als Vorschau, dann fein · 2 Abspielen läuft von Start bis Ende; liegt B daneben: anhalten, «Korrigieren» · «…» › «Serie gegen A rechnen» rechnet alle Läufe derselben Serie</dd>
       <dt>Hineinziehen</dt><dd>Ein Video aus der Liste links direkt ins Bild, auf A oder B ziehen</dd>
       <dt>Korrigieren</dt><dd>Während der Berechnung: Pause · 1 s zurück · Korrigieren. Im fertigen Overlay: anhalten → «Korrigieren» – ab dort wird neu gerechnet</dd>
       <dt>Von Hand</dt><dd>B ziehen · Rechtsklick ziehen (oder Ctrl / Alt) = drehen · Mausrad = Grösse · Pfeiltasten = fein · Enter = übernehmen</dd>
@@ -2288,7 +2308,7 @@ button.lg-it:hover{background:rgba(12,15,20,.8);border-color:rgba(255,255,255,.3
       <dt><kbd>?</kbd></dt><dd>Diese Hilfe</dd>
     </dl></div></section>
     <section class="hp" data-hp="mobile" hidden><dl>
-      <dt>Am Hang</dt><dd>Für den Einsatz draussen gibt es die schlanke Handy-App <a href="field/" target="_blank" rel="noopener" style="color:var(--red);font-weight:700">Video-Lab Field</a>: filmen, sofort in Zeitlupe ansehen, Side by Side, aufs Handy sichern</dd>
+      <dt>Am Hang</dt><dd>Für den Einsatz draussen gibt es die schlanke Handy-App <a href="field/" target="_blank" rel="noopener" style="color:var(--red);font-weight:700">Video-Lab Field</a>: filmen, sofort in Zeitlupe ansehen, Side-by-Side, aufs Handy sichern</dd>
       <dt>Videos</dt><dd>«+» öffnet Videos aus Fotos oder Dateien – sie erscheinen oben unter «Geöffnet»</dd>
       <dt>Bedienen</dt><dd>Tippen = Abspielen · Zeitleiste wischen = Bild für Bild · zwei Finger = Lupe</dd>
       <dt>Sichern</dt><dd>Nach Export oder Standbild: «Teilen · In Fotos sichern»</dd>
@@ -3331,27 +3351,29 @@ function ghostKey(){ return (A.clip&&B.clip&&G.linked)?A.clip.id+'|'+B.clip.id+'
 function seekV(v,t){ return new Promise(res=>{ let done=false; const h=()=>{ if(done) return; done=true; v.removeEventListener('seeked',h); res(); }; v.addEventListener('seeked',h); setTimeout(h,4000); v.currentTime=Math.max(0,t); }); }
 function loadV(url){ return new Promise((res,rej)=>{ const v=document.createElement('video'); v.muted=true; v.playsInline=true; v.preload='auto'; v.className='gen-vid'; document.body.appendChild(v);
   v.addEventListener('loadeddata',()=>res(v),{once:true}); v.addEventListener('error',()=>rej(new Error('video')),{once:true}); v.src=url; }); }
-async function ghostCompute(opt){ // opt.resume: ab Bild opt.j mit fester Lage opt.p neu rechnen, davor bleibt
-  if(GH.state==='busy') return;
+async function ghostCompute(opt){ // opt.resume: ab Bild opt.j mit fester Lage opt.p neu rechnen, davor bleibt · opt.coarse: Schnellvorschau (jedes 4. Bild) · opt.bg: fein im Hintergrund
+  const coarse=!!(opt&&opt.coarse), bg=!!(opt&&opt.bg);
+  if(bg){ if(GH.state!=='ready'||GH.bg) return; } else { if(GH.state==='busy') return; GH.bgAbort=true; }
   if(!A.ready||!B.ready||!G.linked){ toast('Zuerst den gleichen Moment von A und B setzen.'); return; }
-  A.pause(); B.pause();
-  const key=ghostKey(); GH.state='busy'; GH.abort=false; GH.key=key; ghostUI();
+  if(!bg){ A.pause(); B.pause(); }
+  const key=ghostKey(); if(bg){ GH.bgAbort=false; GH.bg={p:0,k0:OV.K.length}; } else { GH.state='busy'; GH.abort=false; GH.key=key; GH.coarse=coarse; } ghostUI();
+  const stop=()=>bg?(GH.bgAbort||ghostKey()!==key||GH.key!==key||GH.state!=='ready'):(GH.abort||ghostKey()!==key);
   const W0=GH.W0, wA=A.v.videoWidth, hA0=A.v.videoHeight, wB=B.v.videoWidth, hB0=B.v.videoHeight;
   const hA=Math.round(W0*hA0/wA)&~1, hB=Math.round(W0*hB0/wB)&~1; GH.hA=hA; GH.hB=hB;
-  const useOv=ovActive(); GH.t0=useOv?ovT0():G.syncA; GH.off=G.off;
-  const eEnd=Math.min(A.dur-GH.t0, B.dur-(GH.t0+GH.off), useOv&&OV.cut.b!=null?OV.cut.b-GH.t0:1e9)-0.06; GH.eEnd=eEnd;
+  const useOv=ovActive(); if(!bg){ GH.t0=useOv?ovT0():G.syncA; GH.off=G.off; }
+  const eEnd=bg?GH.eEnd:Math.min(A.dur-GH.t0, B.dur-(GH.t0+GH.off), useOv&&OV.cut.b!=null?OV.cut.b-GH.t0:1e9)-0.06; GH.eEnd=eEnd;
   if(eEnd<0.3){ GH.state='idle'; ghostUI(); toast('Zu kurz – Start/Ende prüfen.'); return; }
   // Startwert aus den Referenzpunkten (B-Videopixel → A-Videopixel) in Analyse-Koordinaten A→B umrechnen
   let refP=null; if(useOv&&OV.T){ const sA=W0/wA, sB=W0/wB, Ti=affInv(OV.T); const Mab=affMul(affMul([sB,0,0,0,sB,0],Ti),[1/sA,0,0,0,1/sA,0]); refP=affToSim(Mab,W0,hA,W0,hB); }
-  const step=clamp(eEnd/300,0.08,0.25); GH.step=step;
+  const step=clamp(eEnd/300,0.08,0.25)*(coarse?4:1); if(!bg) GH.step=step;
   let va,vb;
-  try{ va=await loadV(A.clip.url); vb=await loadV(B.clip.url); }catch(e){ GH.state='idle'; ghostUI(); toast('Videos konnten nicht geladen werden.'); return; }
+  try{ va=await loadV(A.clip.url); vb=await loadV(B.clip.url); }catch(e){ if(bg){ GH.bg=null; return; } GH.state='idle'; ghostUI(); toast('Videos konnten nicht geladen werden.'); return; }
   const ca=document.createElement('canvas'); ca.width=W0; ca.height=hA; const xa=ca.getContext('2d',{willReadFrequently:true});
   const cb=document.createElement('canvas'); cb.width=W0; cb.height=hB; const xb=cb.getContext('2d',{willReadFrequently:true});
-  GH.dbg=[]; const hist=[]; let fail=0; const S=[]; let prev=null, prevPA=null, prevPB=null, pInit=[0,0,0,0,0], lastQa=[0,0,0,0,0], lastQb=[0,0,0,0,0]; const trk={a:null,b:null};
+  const DBG=[]; if(!bg) GH.dbg=DBG; const hist=[]; let fail=0; const S=[]; let prev=null, prevPA=null, prevPB=null, pInit=[0,0,0,0,0], lastQa=[0,0,0,0,0], lastQb=[0,0,0,0,0]; const trk={a:null,b:null};
   const n=Math.max(2,Math.floor(eEnd/step)+1), t0=performance.now();
   GH.paused=false; GH.rewind=null; GH.fixApply=null;
-  const lv=useOv&&!(opt&&opt.resume)?ovLiveCanvas():null; // beim Nachrechnen nach einer Korrektur bleibt das Bild an der korrigierten Stelle stehen
+  const lv=useOv&&!(opt&&opt.resume)&&!bg?ovLiveCanvas():null; // beim Nachrechnen nach einer Korrektur bleibt das Bild an der korrigierten Stelle stehen
   // Bildpaare für die Live-Vorschau zwischenspeichern (die Videos springen schon zum nächsten Bild)
   const lbA=document.createElement('canvas'), lbB=document.createElement('canvas');
   if(lv){ lbA.width=lv.width; lbA.height=lv.height; lbB.width=lv.width; lbB.height=Math.round(lv.width*hB/W0); }
@@ -3362,7 +3384,7 @@ async function ghostCompute(opt){ // opt.resume: ab Bild opt.j mit fester Lage o
     const Wl=lv.width, Hl=lv.height, k=Wl/W0, x=lv.getContext('2d'); x.setTransform(1,0,0,1,0,0); x.globalAlpha=1; x.drawImage(lbA,0,0,Wl,Hl);
     let Mi=affInv(M); if(OV.fix) Mi=affMul(ovDMat(OV.fix,W0),Mi);
     x.globalAlpha=+$('#opRange').value||0.5; x.setTransform(k*Mi[0],k*Mi[3],k*Mi[1],k*Mi[4],k*Mi[2],k*Mi[5]); x.drawImage(lbB,0,0,W0,hB); x.setTransform(1,0,0,1,0,0); x.globalAlpha=1; };
-  const cuts={a:0,b:0}; GH.cuts=cuts; let cutWarn=false; let i=0, mvHist=[]; const old=GH.S, resume=!!(opt&&opt.resume&&old&&old.length);
+  const cuts={a:0,b:0}; if(!bg) GH.cuts=cuts; let cutWarn=false; let i=0, mvHist=[]; const old=GH.S, resume=!!(opt&&opt.resume&&old&&old.length);
   if(resume){ const j=clamp(opt.j,0,Math.min(old.length,n)-1); for(let k=0;k<j;k++) S.push(old[k]);
     await seekV(va,GH.t0+j*step+0.5/A.fps); await seekV(vb,GH.t0+GH.off+j*step+0.5/B.fps);
     xa.drawImage(va,0,0,W0,hA); xb.drawImage(vb,0,0,W0,hB);
@@ -3371,7 +3393,7 @@ async function ghostCompute(opt){ // opt.resume: ab Bild opt.j mit fester Lage o
     S.push({e:j*step,p:opt.p,ok:true,q:o.q||[1,0,0,0,1,0],pa:o.pa||null,pb:o.pb||null,ca:o.ca||[W0/2,hA/2],cb:o.cb||affApply(affInv(M),W0/2,hB/2)});
     grab(); drawLive(M); i=j+1; }
   while(i<n){
-    if(GH.abort||ghostKey()!==key){ break; }
+    if(stop()){ break; }
     if(GH.rewind!=null){ // zurückspringen: ab Bild j neu rechnen, Kette ab j-1 wieder aufbauen
       if(pend){ await pend; pend=null; }
       const j=clamp(GH.rewind,1,S.length-1); GH.rewind=null; S.length=j; if(GH.dbg.length>j) GH.dbg.length=j; i=j;
@@ -3413,46 +3435,54 @@ async function ghostCompute(opt){ // opt.resume: ab Bild opt.j mit fester Lage o
       const ds=Math.abs((1+r.p[0])/(1+p0[0])-1), dt=Math.hypot(r.p[2]-p0[2],r.p[3]-p0[3]);
       dbg.rinl=+r.inl.toFixed(2); dbg.ds=+ds.toFixed(3); dbg.dt=+dt.toFixed(1); dbg.src=best.src; dbg.cp=+cp.toFixed(2); dbg.cb=+best.c.toFixed(2); }
     if(ok&&!fail){ hist.push([p[0],p[1]]); if(hist.length>40) hist.shift(); }
-    dbg.ok=ok?1:0; dbg.p=p.map(v=>+v.toFixed(3)); (GH.dbg=GH.dbg||[]).push(dbg);
+    dbg.ok=ok?1:0; dbg.p=p.map(v=>+v.toFixed(3)); DBG.push(dbg);
     // Positionen beider Fahrer:innen (in A(i)-Pixeln)
-    let M=simToAff(p,W0,hA,W0,hB); const dB=new Uint8ClampedArray(W0*hA*4), okB=new Uint8Array(W0*hA);
+    let M=simToAff(p,W0,hA,W0,hB); const Minv=affInv(M), cA=[W0/2,hA/2], cB=affApply(Minv,W0/2,hB/2); let pa=null, pb=null, ma=null, mb=null;
+    if(!coarse){ // Schnellvorschau: Fahrer:innen-Suche (Namen) erst in der Feinberechnung
+    const dB=new Uint8ClampedArray(W0*hA*4), okB=new Uint8Array(W0*hA);
     const gB=ib.data;
     for(let y=0;y<hA;y++) for(let x=0;x<W0;x++){ const X=M[0]*x+M[1]*y+M[2], Y=M[3]*x+M[4]*y+M[5]; if(X<0||Y<0||X>=W0-1||Y>=hB-1) continue;
       const k=(y*W0+x), j=((Y|0)*W0+(X|0))*4; okB[k]=1; dB[k*4]=gB[j]; dB[k*4+1]=gB[j+1]; dB[k*4+2]=gB[j+2]; }
     const mB=morph(morph(ghostMask(ia.data,dB,okB,W0*hA,p[4],GH.sens+6,'B'),W0,hA,false),W0,hA,true);
     const mA=morph(morph(ghostMask(ia.data,dB,okB,W0*hA,p[4],GH.sens+6,'A'),W0,hA,false),W0,hA,true);
     // Wer filmt, hält die Fahrer:in fast immer in der Bildmitte → Bildmitte als starke Vorgabe
-    const Minv=affInv(M), cA=[W0/2,hA/2], cB=affApply(Minv,W0/2,hB/2);
     const ba=pickBlob(blobs(mA,W0,hA,4),cA,W0*0.06), bb=pickBlob(blobs(mB,W0,hA,4),cB,W0*0.06);
-    const pa=ba&&Math.hypot(ba.x-cA[0],ba.y-cA[1])<W0*0.22?[ba.x,ba.y]:null;
-    const pb=bb&&Math.hypot(bb.x-cB[0],bb.y-cB[1])<W0*0.22?[bb.x,bb.y]:null;
+    pa=ba&&Math.hypot(ba.x-cA[0],ba.y-cA[1])<W0*0.22?[ba.x,ba.y]:null;
+    pb=bb&&Math.hypot(bb.x-cB[0],bb.y-cB[1])<W0*0.22?[bb.x,bb.y]:null;
     // Bewegung seit dem letzten Bild (Kamera herausgerechnet): wo ist es jetzt dunkler/farbiger als vorher → dort ist die Fahrer:in jetzt
     // Vergleich mit dem Bild von ~0,25 s vorher (Kamerabewegung über die Kette herausgerechnet)
     // A im eigenen Bild, B ebenfalls im eigenen Bild (eigene Kamerakette) – danach B-Lagen in A-Pixel umrechnen
-    let ma=null, mb=null; mvHist.forEach(h=>{ h.Q=affMul(q,h.Q); h.QB=affMul(qb,h.QB); }); const lag=clamp(Math.round(0.25/step),1,5);
+    mvHist.forEach(h=>{ h.Q=affMul(q,h.Q); h.QB=affMul(qb,h.QB); }); const lag=clamp(Math.round(0.25/step),1,5);
     if(mvHist.length>=lag){ const h=mvHist[mvHist.length-lag]; ma=motBlobs(ia.data,null,h.a,null,affInv(h.Q),W0,hA);
       const Mi=affInv(M); mb=motBlobs(ib.data,null,h.b,null,affInv(h.QB),W0,hB).map(([x,y,a])=>{ const u=affApply(Mi,x,y); return [Math.round(u[0]*10)/10,Math.round(u[1]*10)/10,a]; }).filter(b=>b[0]>=0&&b[1]>=0&&b[0]<W0&&b[1]<hA); }
     mvHist.push({a:ia.data,b:ib.data,Q:[1,0,0,0,1,0],QB:[1,0,0,0,1,0]}); if(mvHist.length>6) mvHist.shift();
+    }
     S.push({e,p,ok,q,pa,pb,ca:cA,cb:cB,ma,mb,cut:(dbg.cutA||dbg.cutB)?1:0});
     prev={p,M}; prevPA=PA; prevPB=PB;
-    GH.curLen=S.length; drawLive(M);
-    if(!cutWarn&&cuts.a+cuts.b>=2){ cutWarn=true; toast('Achtung: '+(cuts.a&&cuts.b?'A und B haben':cuts.a?'Video A hat':'Video B hat')+' Kameraschnitte (TV-Bild) – Overlay braucht eine durchgehende Kamera vom gleichen Standort.',6000); }
-    { const el=(performance.now()-t0)/1000, rest=el/(i+1)*(n-i-1); ghostProgress((i+1)/n,'Bild '+(i+1)+' / '+n+' · bei '+fmtS(GH.t0+e)+' · noch ca. '+Math.ceil(rest)+' s'); await new Promise(r=>setTimeout(r,0)); }
-    while(GH.paused&&!GH.abort&&GH.rewind==null){ // angehalten: Vorschau zeigen, Korrektur übernehmen
+    if(!bg){ GH.curLen=S.length; drawLive(M); }
+    if(!bg&&!cutWarn&&cuts.a+cuts.b>=2){ cutWarn=true; toast('Achtung: '+(cuts.a&&cuts.b?'A und B haben':cuts.a?'Video A hat':'Video B hat')+' Kameraschnitte (TV-Bild) – Overlay braucht eine durchgehende Kamera vom gleichen Standort.',6000); }
+    if(bg){ GH.bg.p=(i+1)/n; await new Promise(r=>setTimeout(r,0)); while(EXP.live&&!stop()) await new Promise(r=>setTimeout(r,300)); } // beim Speichern pausieren else { const el=(performance.now()-t0)/1000, rest=el/(i+1)*(n-i-1); ghostProgress((i+1)/n,'Bild '+(i+1)+' / '+n+' · bei '+fmtS(GH.t0+e)+' · noch ca. '+Math.ceil(rest)+' s'); await new Promise(r=>setTimeout(r,0)); }
+    while(!bg&&GH.paused&&!GH.abort&&GH.rewind==null){ // angehalten: Vorschau zeigen, Korrektur übernehmen
       await new Promise(r=>setTimeout(r,60));
       if(GH.fixApply){ const D=ovDMat(GH.fixApply,W0); GH.fixApply=null; M=affMul(M,affInv(D)); const p2=affToSim(M,W0,hA,W0,hB); p2[4]=p[4]; p=p2;
         const last=S[S.length-1]; last.p=p2; last.ok=true; prev={p:p2,M}; hist.length=0; fail=0; GH.paused=false; }
       drawLive(M); }
-    if(GH.rewind!=null) continue;
+    if(!bg&&GH.rewind!=null) continue;
     i++;
   }
   if(pend){ try{ await pend; }catch(e){} pend=null; }
-  GH.paused=false; if(lv) lv.hidden=true;
+  if(!bg) GH.paused=false; if(lv) lv.hidden=true;
   [va,vb].forEach(v=>{ try{ v.removeAttribute('src'); v.load(); v.remove(); }catch(e){} });
+  if(bg){ // feine Berechnung übernehmen – nur wenn sich inzwischen nichts geändert hat (keine Korrekturen, gleiche Paarung)
+    const k0=GH.bg.k0; GH.bg=null;
+    if(stop()||OV.K.length!==k0||S.length<2){ if(!stop()&&OV.K.length!==k0) toast('Feinberechnung verworfen – du hast inzwischen korrigiert. «Neu berechnen» rechnet fein.',3800); if(ovActive()) ovUI(); return; }
+    const r=GH.step/step; if(GH.seeds) for(const k in GH.seeds){ const L=GH.seeds[k]; (Array.isArray(L)?L:[L]).forEach(q=>{ if(q&&q.i!=null) q.i=Math.round(q.i*r); }); }
+    GH.step=step; GH.cuts=cuts; GH.dbg=DBG; GH.S=S; GH.coarse=false; ghostGap(); tracksBuild(); GH.dirty=true; ghostUI(); resSave(); toast('Overlay verfeinert – jetzt mit allen Bildern.',2200); if(ovActive()) ovUI(); return; }
   if(resume&&GH.abort&&ghostKey()===key){ GH.S=old; GH.state='ready'; GH.dirty=true; ghostUI(); if(ovActive()) ovUI(); toast('Neuberechnung abgebrochen – das bisherige Overlay bleibt.'); return; }
   if(GH.abort||ghostKey()!==key){ GH.state='idle'; ghostUI(); toast('Berechnung abgebrochen.'); return; }
   GH.timing={seek:Math.round(GH.tSeek||0),total:Math.round(performance.now()-t0)}; GH.tSeek=0;
-  GH.S=S; ghostGap(); tracksBuild(); GH.state='ready'; GH.dirty=true; ghostUI(); resSave();
+  GH.S=S; ghostGap(); tracksBuild(); GH.state='ready'; GH.dirty=true; ghostUI(); if(!coarse) resSave();
+  if(coarse){ toast('Vorschau fertig – wird im Hintergrund verfeinert.',3000); if(ovActive()) ovUI(); setTimeout(()=>{ if(GH.state==='ready'&&GH.key===key) ghostCompute({bg:true}); },400); return; }
   const bad=S.filter(s=>!s.ok).length/S.length;
   const nm=ovActive()?'Overlay':'Ghost'; const nc=cuts.a+cuts.b; toast(nc>=2?nm+' erstellt – aber '+(cuts.a&&cuts.b?'beide Videos haben':cuts.a?'Video A hat':'Video B hat')+' Kameraschnitte. Overlay klappt nur mit einer durchgehenden Kamera vom gleichen Standort.':bad>0.3?nm+' erstellt – an '+Math.round(bad*100)+' % der Stellen unsicher (Kamerastandort gleich?)':nm+' erstellt',nc>=2?6500:3500); if(ovActive()) ovUI();
 }
@@ -3681,16 +3711,18 @@ function ovUI(){ vchipPlace();
     acts=ovBtn('autohand','Von Hand','','ghost','A und B selbst zum selben Tor ziehen')+ovBtn('autoagain','Nochmals suchen',OVI.go,'','Nächstbeste Stelle suchen')+ovBtn('autook','Passt',OVI.ok,'pri','A und B an diesem Moment verbinden und Overlay erstellen'); }
   else if(st===1){ ttl='Gleicher Moment'; say='A und B zum selben Tor ziehen – oder suchen lassen.';
     tip='A und B einzeln in ihrer Zeitleiste zum selben Tor ziehen, dann «Weiter» – das Overlay wird gleich erstellt. «Automatisch suchen» findet den gleichen Moment selbst, wenn beide vom gleichen Standort gefilmt sind.';
-    acts=ovBtn('auto',AS.busy?'Sucht …':'Automatisch suchen',OVI.go,'ghost','Gleichen Moment in A und B automatisch suchen (gleicher Kamerastandort)')+ovBtn('sync','Weiter',OVI.ok,'pri','A und B an diesem Moment verbinden und Overlay erstellen'); }
+    acts=ovMore([['series','Serie gegen A rechnen …',OVI.go]])+ovBtn('auto',AS.busy?'Sucht …':'Automatisch suchen',OVI.go,'ghost','Gleichen Moment in A und B automatisch suchen (gleicher Kamerastandort)')+ovBtn('sync','Weiter',OVI.ok,'pri','A und B an diesem Moment verbinden und Overlay erstellen'); }
   else if(st===2){ ttl='Bereit'; say='Jetzt «Overlay erstellen».'; tip='B wird über A gelegt und folgt der Kamera. Mit «Start» und «Ende» nur einen Teil der Strecke übereinanderlegen.'; chips=cut;
     acts=ovBtn('edit','Zurück',OVI.back,'ghost','Gleichen Moment neu wählen')+cutBtns+ovMore([['pick','Referenzpunkte antippen',OVI.pin],['hand','Von Hand übereinanderlegen',OVI.fix]])+ovBtn('make','Overlay erstellen',OVI.go,'pri','B automatisch über A legen und der Kamera folgen'); }
   else if(!done){ ttl='B liegt über A'; say='Gilt nur für dieses Bild.'; tip='«Overlay erstellen» legt B über die ganze Strecke und folgt auch der Kamera.'; chips=cut;
     acts=ovBtn('edit','Zurück',OVI.back,'ghost','Gleichen Moment neu wählen')+cutBtns+ovMore([['pick','Referenzpunkte neu',OVI.pin],['hand','Von Hand nachschieben',OVI.fix]])+ovBtn('make','Overlay erstellen',OVI.go,'pri'); }
   else { const kc=OV.K.length?`<span class="ov-chip">${OVI.fix}${OV.K.length} Korrektur${OV.K.length>1?'en':''}<button data-ov="fixall" title="Alle Korrekturen entfernen">${OVI.x}</button></span>`:'';
-    ttl='Fertig'; dot=true; say='B daneben? «Korrigieren».'; chips=cut+kc;
+    ttl=GH.coarse?'Vorschau':'Fertig'; dot=true; say=GH.bg?'Wird verfeinert · '+Math.round((GH.bg.p||0)*100)+' %':GH.coarse?'Grob gerechnet – «…» › «Neu berechnen» rechnet fein.':'B daneben? «Korrigieren».'; chips=cut+kc;
     tip='Liegt B neben A: an der Stelle anhalten und «Korrigieren». Der Punkt links und das Band in der Zeitleiste zeigen den Zustand: grün ausgerichtet, gelb unsicher, rot Kameraschnitt. Das Auge bei den Läufen oben links blendet einen Lauf ein oder aus.';
     acts=cutBtns+ovBtn('fix','Korrigieren',OVI.fix,'ghost','B an dieser Stelle von Hand nachschieben')
-      +ovMore([['nameset','Namen setzen (Fahrer:innen antippen)',OVI.tag],LAY.length<3?['addrun','Weiteren Lauf dazunehmen',OVI.plus]:null,['make','Neu berechnen',OVI.go],['edit','Neu beginnen',OVI.back]])+ovSaveBtn(); }
+      +ovMore([['nameset','Namen setzen (Fahrer:innen antippen)',OVI.tag],LAY.length<3?['addrun','Weiteren Lauf dazunehmen',OVI.plus]:null,['series','Serie gegen A rechnen …',OVI.go],['make','Neu berechnen',OVI.go],['edit','Neu beginnen',OVI.back]])+ovSaveBtn(); }
+  if(SER.on){ ttl='Serie '+(SER.i+1)+' / '+SER.list.length; dot=false; chips=''; say='<b>'+esc(lastName(SER.cur)||'')+'</b> · '+(busy?((($('#ghostBar .gprog span')||{}).textContent)||'Overlay wird erstellt'):SER.msg);
+    tip='Alle gewählten Läufe werden nacheinander gegen A gerechnet und gespeichert. Tab offen lassen.'; acts=ovBtn('serstop','Serie abbrechen','','ghost','Nach dem laufenden Schritt aufhören'); }
   // drei Zonen: links Schritt (+ Zustand), Mitte kurzer Hinweis, rechts Knöpfe – nur neu zeichnen, wenn sich etwas ändert (sonst gehen Klicks verloren)
   const te=$('#ovTtl'); if(te.textContent!==ttl) te.textContent=ttl;
   $$('#ovSteps li').forEach(li=>{ const n=+li.dataset.st, sp=$('span',li), tx=li.classList.contains('on')?ttl:OVSTEPN[n-1]; if(sp.textContent!==tx) sp.textContent=tx; }); const pnl=$('#ovPanel'); if(pnl.classList.contains('ov-done')!==dot){ pnl.classList.toggle('ov-done',dot); v.classList.toggle('ov-fin',dot); ovFit(); } // Fertig: Schritte ausblenden, Platz für den Hinweis
@@ -3729,7 +3761,7 @@ const OVST={ok:['ausgerichtet','B liegt hier sicher über A'],unsure:['unsicher'
 function ovStUpd(){ const el=$('#ovSt'); if(!el||el.hidden) return; const k=ovStAt()||'out'; if(el._k===k) return; el._k=k; el.className='ov-st '+k; $('span',el).textContent=OVST[k][0]; el.title=OVST[k][1]; }
 function ovThumb(v){ const c=document.createElement('canvas'); c.width=144; c.height=Math.max(2,Math.round(144*(v.videoHeight||9)/(v.videoWidth||16))); try{ c.getContext('2d').drawImage(v,0,0,c.width,c.height); return c.toDataURL('image/jpeg',0.78); }catch(e){ return ''; } }
 function ovMakeNow(){ // nach «Weiter»/«Passt» gleich losrechnen (in der Anleitung nicht – dort sind die Ergebnisse vorbereitet)
-  if(document.body.classList.contains('touring')){ ovUI(); return; } OV.follow=true; OV.fix=null; OV.K=[]; ovUI(); ghostCompute(); }
+  if(document.body.classList.contains('touring')){ ovUI(); return; } OV.follow=true; OV.fix=null; OV.K=[]; ovUI(); ghostCompute({coarse:true}); }
 function ovAutoRun(ex){ if(AS.busy||!A.ready||!B.ready) return; A.pause(); B.pause(); G.playing=false; cmpPlayIcon(); const prev=OV.found; OV.found=null; AS.busy=true; AS.abort=false; ovUI(); const ca=A.clip, cb=B.clip;
   (async()=>{ let r=null; try{ r=await autoSyncFind(ca,cb,f=>{ const b=$('[data-ov="auto"] span')||$('[data-ov="auto"]'); if(b) b.lastChild.textContent='Sucht … '+Math.round(f*100)+' %'; },ex); }catch(e){} AS.busy=false;
     if(A.clip!==ca||B.clip!==cb){ ovUI(); return; }
@@ -4062,7 +4094,7 @@ function renderOv(){
     else if(a==='autohand'){ OV.found=null; OV.foundEx=null; toast('A und B einzeln zum selben Tor ziehen, dann «Weiter».',2600); }
     else if(a==='pick') return ovStart();
     else if(a==='cancel') return ovStop();
-    else if(a==='make'){ OV.follow=true; OV.fix=null; if(!(GH.state==='ready'&&ghostKey()===GH.key)){ OV.K=[]; ovUI(); ghostCompute(); return; } ovUI(); return; }
+    else if(a==='make'){ OV.follow=true; OV.fix=null; if(!(GH.state==='ready'&&ghostKey()===GH.key)){ OV.K=[]; ovUI(); ghostCompute({coarse:!document.body.classList.contains('touring')}); return; } if(GH.coarse&&!GH.bg){ ghostCompute({bg:true}); } ovUI(); return; }
     else if(a==='fix'){ A.pause(); B.pause(); G.playing=false; cmpPlayIcon(); const D=ovDAt(ovE()); OV.fix={...D}; OV.fix0={...D}; }
     else if(a==='hand'){ if(!A.ready||!B.ready) return; A.pause(); B.pause(); G.playing=false; cmpPlayIcon();
       if(!G.linked||OV.edit){ doSync(); OV.edit=false; } OV.follow=false; OV.pick=null;
@@ -4071,6 +4103,8 @@ function renderOv(){
     else if(a==='fixreset'){ if(OV.fix){ OV.fix.dx=0; OV.fix.dy=0; OV.fix.s=1; OV.fix.r=0; A.dirty=true; } return; }
     else if(a==='fixno'){ if(!ovFollowOK()&&OV.handNew){ OV.T=null; } OV.handNew=false; OV.fix=null; }
     else if(a==='addrun'){ return layerAdd(); }
+    else if(a==='series'){ return serOpen(); }
+    else if(a==='serstop'){ SER.abort=true; GH.abort=true; AS.abort=true; toast('Serie wird abgebrochen …',1800); return; }
     else if(a==='nameset'){ return nameSetStart(); }
     else if(a==='nameskip'){ OV.nameQ.shift(); if(!OV.nameQ.length) nameSetEnd(); else ovUI(); return; }
     else if(a==='namedone'){ return nameSetEnd(); }
@@ -4254,12 +4288,12 @@ document.addEventListener('keydown',e=>{ if(e.key!=='r'||e.metaKey||e.ctrlKey||e
 
 function subCols(el,parts){ el.textContent=''; parts.forEach((t,i)=>{ const x=document.createElement('i'); x.className='c'+i; x.textContent=t||''; el.appendChild(x); }); }
 
-/* Basic → Side by Side: aktuelles Video als A, zweites wählen */
+/* Basic → Side-by-Side: aktuelles Video als A, zweites wählen */
 document.addEventListener('click',e=>{ const b=e.target.closest('[data-act="sbs"]'); if(!b) return; e.preventDefault();
   if(!S.ready||!S.clip){ toast('Zuerst ein Video öffnen.'); return; } const c=S.clip, t=S.time(); S.pause();
   switchMode('cmp'); setLayout('side'); if(A.clip!==c){ A.setClip(c); if(B.clip===c) B.setClip(null); } unlink(); syncSelects(); renderLib();
   const go=()=>{ if(A.ready){ A.seekTime(t); } else setTimeout(go,120); }; go();
-  setTimeout(()=>{ if(!B.clip){ const sel=$('#selB'); sel&&sel.focus(); toast('Jetzt Video B wählen – oben bei B oder in der Liste «B» drücken.',3600); } else toast('Side by Side: '+lastName(A.clip)+' vs '+lastName(B.clip)+'. Gleichen Moment einstellen, dann «Gleicher Moment».',3200); },450); });
+  setTimeout(()=>{ if(!B.clip){ const sel=$('#selB'); sel&&sel.focus(); toast('Jetzt Video B wählen – oben bei B oder in der Liste «B» drücken.',3600); } else toast('Side-by-Side: '+lastName(A.clip)+' vs '+lastName(B.clip)+'. Gleichen Moment einstellen, dann «Gleicher Moment».',3200); },450); });
 
 /* ---------- Auto-Sync beim Einfügen von B: gleicher Kamerastandort → gleiche Kameralage = gleicher Ort der Fahrer:in ---------- */
 const AS={key:'',busy:false}; var TRK_CW=3; // Gewicht «Fahrer:in nahe Bildmitte» (getestet: 1.5 / 2.2 / 3 – 3 insgesamt am wenigsten Fehltreffer)
@@ -5481,7 +5515,7 @@ const COACHES=[
   {id:'rate',sel:'#viewSingle [data-act="rate"]',when:()=>mode==='single'&&S.ready&&COACH.played,t:'Hier auf Zeitlupe stellen: ½×, ¼× oder 0.1×.'},
   {id:'inout',sel:'#viewSingle [data-act="in"]',when:()=>mode==='single'&&S.ready&&COACH.played&&!!LS.get('coach:rate',0),t:'«Start» und «Ende» legen fest, welcher Teil abgespielt und gespeichert wird.'},
   {id:'save',sel:'.player:not([hidden]) .save-btn',when:()=>(mode==='single'&&S.ready&&!!S.clip.loop&&(S.clip.loop.a!=null||S.clip.loop.b!=null))||(mode==='cmp'&&!$('#viewCmp').classList.contains('overlay')&&G.linked),t:'Video, Standbild oder Aufnahme mit Ton – alles unter «Speichern».'},
-  {id:'ovtab',sel:'#tabOv',when:()=>mode==='cmp'&&!$('#viewCmp').classList.contains('overlay'),t:'«Übereinander» legt beide Läufe in ein Bild.'},
+  {id:'ovtab',sel:'#tabOv',when:()=>mode==='cmp'&&!$('#viewCmp').classList.contains('overlay'),t:'«Overlay» legt beide Läufe in ein Bild.'},
   {id:'tools',sel:'#btnTools',when:()=>mode==='cmp'&&!$('#viewCmp').classList.contains('overlay'),t:'Gleicher Moment, Zeitmessung, Tore und Zeichnen findest du hier.'},
   {id:'ovnext',sel:'[data-ov="sync"]',when:()=>mode==='cmp',t:'A und B einzeln zum selben Tor ziehen, dann «Weiter».'},
   {id:'ovmake',sel:'[data-ov="make"]',when:()=>mode==='cmp'&&!(OV.follow&&GH.state==='busy'),t:'Ein Klick – B wird über A gelegt und folgt der Kamera.'},
@@ -5502,12 +5536,69 @@ function coachPlace(){ const b=COACH.el; let el=COACH.tgt; if(!b) return; if(!co
   const cx=r.left+r.width/2, x=Math.max(10,Math.min(innerWidth-w-10,cx-w/2)), y=up?r.top-h-12:r.bottom+12;
   b.style.left=x+'px'; b.style.top=y+'px'; b.classList.toggle('up',up); b.querySelector('.coach-ar').style.left=Math.max(14,Math.min(w-14,cx-x))+'px'; }
 setInterval(()=>{ try{
-  if(COACH.el){ coachPlace(); return; }
-  if(Date.now()-COACH.last<(COACH.n?30000:2500)||(COACH.n&&COACH.act<COACH.last)||document.hidden||document.body.classList.contains('touring')||$('.modal.on')||(typeof EXP!=='undefined'&&EXP.live)) return;
+  if(COACH.el){ if($('.modal.on')||(typeof SER!=='undefined'&&SER.on)) coachHide(false); else coachPlace(); return; }
+  if(Date.now()-COACH.last<(COACH.n?30000:2500)||(COACH.n&&COACH.act<COACH.last)||document.hidden||document.body.classList.contains('touring')||$('.modal.on')||(typeof SER!=='undefined'&&SER.on)||(typeof EXP!=='undefined'&&EXP.live)) return;
   for(const c of COACHES){ if(LS.get('coach:'+c.id,0)) continue; let ok=false; try{ ok=c.when(); }catch(e){} if(!ok) continue; const el=$(c.sel); if(coachVis(el)){ coachShow(c,el); break; } }
 }catch(e){} },900);
 addEventListener('resize',()=>{ if(COACH.el) coachPlace(); });
 document.addEventListener('pointerdown',e=>{ if(COACH.el&&!e.target.closest('.coach')) coachHide(Date.now()-COACH.t0>800); },true);
+/* ---------- Serie gegen Referenz: alle Läufe derselben Serie nacheinander gegen A rechnen und speichern ---------- */
+var SER={on:false,abort:false,list:[],i:0,msg:'',res:[],cur:null,lock:null};
+const serSleep=ms=>new Promise(r=>setTimeout(r,ms));
+const serWait=(f,ms)=>new Promise(r=>{ const t0=Date.now(), t=setInterval(()=>{ let ok=false; try{ ok=f(); }catch(e){} if(ok||Date.now()-t0>ms){ clearInterval(t); r(ok); } },100); });
+function serKey(c){ const m=c&&c.meta; return m&&m.ok&&(m.place||m.date)?[m.place||'',m.disc||'',m.date||'',m.cam||''].join('|'):null; } // gleicher Ort, Disziplin, Tag, Kamera
+function serCands(){ const a=A.clip, k=serKey(a); if(!k) return []; return clips.filter(c=>c!==a&&!c.err&&serKey(c)===k); }
+function serPairKey(a,b){ const k=c=>c.name+'#'+(c.size||0); return 'res:ov:'+k(a)+'|'+k(b); }
+const SERX='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M7 7l10 10M17 7L7 17"/></svg>';
+function serModal(){ let m=$('#serModal'); if(m) return m; m=document.createElement('div'); m.className='modal'; m.id='serModal';
+  m.innerHTML='<div class="help ser" role="dialog" aria-label="Serie gegen Referenz"><h3><span class="ser-h">Serie gegen Referenz</span> <button class="hdr-ico" data-ser="x" title="Schliessen">'+SERX+'</button></h3><div class="ser-body"></div><div class="exp-foot ser-foot"></div></div>';
+  document.body.appendChild(m); m.addEventListener('click',e=>{ if(e.target===m||e.target.closest('[data-ser="x"],[data-ser="no"]')){ m.classList.remove('on'); return; }
+    if(e.target.closest('[data-ser="go"]')){ const L=[...m.querySelectorAll('.ser-row input:checked')].map(i=>clips.find(c=>c.id==i.value)).filter(Boolean); if(!L.length){ toast('Mindestens einen Lauf wählen.'); return; } m.classList.remove('on'); serRun(L); } });
+  m.addEventListener('change',()=>serEst(m)); return m; }
+function serEst(m){ const n=m.querySelectorAll('.ser-row input:checked').length, mins=Math.max(1,Math.round(n*3.5)), go=m.querySelector('[data-ser="go"]'); const e=m.querySelector('.ser-est');
+  if(e) e.textContent=n?n+' Lauf'+(n>1?'e':'')+' · ca. '+mins+' min (je nach Gerät)':'Kein Lauf gewählt'; if(go) go.disabled=!n; }
+async function serOpen(){ if(SER.on) return; if(!A.ready||!A.clip){ toast('Zuerst Video A wählen.'); return; }
+  const cs=serCands(); if(!cs.length){ toast('Keine weiteren Läufe derselben Serie gefunden – gleicher Ort, Tag, Disziplin und Kamera laut Dateiname.',4500); return; }
+  const done=await Promise.all(cs.map(c=>idbGet(serPairKey(A.clip,c)).then(d=>!!(d&&d.gh)).catch(()=>false))), run=A.clip.meta.run, m=serModal();
+  const cut=OV.cut.a!=null||OV.cut.b!=null?' · Start/Ende '+(OV.cut.a!=null?fmtS(OV.cut.a):'Anfang')+' – '+(OV.cut.b!=null?fmtS(OV.cut.b):'Ende'):'';
+  m.querySelector('.ser-body').innerHTML=`<p class="ser-sub">Referenz <b>A · ${esc(metaTitle(A.clip))}</b>${A.clip.meta.run?' · '+esc(A.clip.meta.run):''}${cut}.<br>Jeder gewählte Lauf wird nacheinander gegen A gerechnet: gleichen Moment suchen, Overlay erstellen, speichern. Danach ist jedes Overlay sofort da, sobald du den Lauf bei B wählst.</p>
+    <div class="ser-list">${cs.map((c,i)=>{ const same=!run||c.meta.run===run; return `<label class="ser-row${done[i]?' done':''}"><input type="checkbox" value="${c.id}" ${same&&!done[i]?'checked':''}><span class="ser-n"><b>${esc(lastName(c))}</b><small>${esc([c.meta.run,c.dur?fmtDur(c.dur):null].filter(Boolean).join(' · '))}</small></span>${done[i]?'<span class="ser-tag">schon gerechnet</span>':!same?'<span class="ser-tag dim">anderer Lauf</span>':''}</label>`; }).join('')}</div>
+    <p class="ser-note">Tipp: Tab offen und sichtbar lassen – der Bildschirm bleibt während der Serie an. Abbrechen jederzeit in der Overlay-Leiste.</p>`;
+  m.querySelector('.ser-foot').innerHTML='<span class="ser-est"></span><span class="ser-btns"><button class="btn-sec" data-ser="no">Abbrechen</button><button class="btn-pri" data-ser="go">Serie starten</button></span>';
+  serEst(m); m.classList.add('on'); }
+async function serRun(list){ if(SER.on) return; const a=A.clip, b0=B.clip, cut={...OV.cut};
+  Object.assign(SER,{on:true,abort:false,list,i:0,res:[],cur:null,msg:''}); A.pause(); B.pause(); G.playing=false; cmpPlayIcon();
+  try{ if(navigator.wakeLock) SER.lock=await navigator.wakeLock.request('screen'); }catch(e){ SER.lock=null; }
+  if(!ovActive()) setLayout('overlay');
+  try{
+    for(SER.i=0;SER.i<list.length&&!SER.abort;SER.i++){ const c=list[SER.i]; SER.cur=c; SER.msg='wird geladen …'; ovUI();
+      if(A.clip!==a){ SER.abort=true; break; } // A wurde gewechselt → Serie beenden
+      if(GH.state==='busy'){ GH.abort=true; await serWait(()=>GH.state!=='busy',60000); }
+      B.setClip(c); unlink(); syncSelects(); renderLib();
+      if(!await serWait(()=>B.clip===c&&B.ready,90000)){ SER.res.push([c,'Video liess sich nicht laden']); continue; }
+      ovUI(); OV.cut={...cut}; OV.found=null; ovApplyCut(); await serSleep(300);
+      SER.msg='gleichen Moment suchen …'; ovUI(); AS.busy=true; AS.abort=false; let r=null;
+      try{ r=await autoSyncFind(a,c,f=>{ SER.msg='gleichen Moment suchen · '+Math.round(f*100)+' %'; },[]); }catch(e){} AS.busy=false;
+      if(SER.abort) break;
+      if(!r||!(r.conf>=0.4||(r.conf>=0.25&&r.sep>=0.45))){ SER.res.push([c,'kein eindeutiger gleicher Moment – von Hand setzen']); continue; }
+      unlink(); A.seekTime(r.tA); B.seekTime(Math.max(0,r.tA+r.off)); await serSleep(400); await serWait(()=>!A.v.seeking&&!B.v.seeking,5000);
+      doSync(); OV.edit=false; OV.T=null; OV.pick=null; OV.fix=null; OV.K=[]; OV.follow=true; SER.msg='Overlay wird erstellt'; ovUI();
+      await ghostCompute();
+      if(GH.state==='ready'&&ghostKey()===GH.key&&!SER.abort){ resSave(); await serSleep(1300); SER.res.push([c,'ok']); }
+      else SER.res.push([c,SER.abort?'abgebrochen':'Berechnung nicht abgeschlossen']);
+    }
+  } finally {
+    const stopped=SER.abort; for(let k=SER.res.length;k<list.length;k++) SER.res.push([list[k],'nicht gerechnet']);
+    SER.on=false; SER.cur=null; AS.busy=false; try{ if(SER.lock) await SER.lock.release(); }catch(e){} SER.lock=null;
+    if(A.clip===a&&b0&&B.clip!==b0){ B.setClip(b0); unlink(); syncSelects(); renderLib(); RES.tried=''; } ovUI(); serSummary(stopped); }
+}
+function serSummary(stopped){ const m=serModal(), ok=SER.res.filter(r=>r[1]==='ok').length;
+  m.querySelector('.ser-h').textContent='Serie '+(stopped?'abgebrochen':'fertig');
+  m.querySelector('.ser-body').innerHTML=`<p class="ser-sub"><b>${ok} von ${SER.res.length}</b> Overlays erstellt und gespeichert. Lauf bei B wählen – das Overlay ist sofort da.</p>
+    <div class="ser-list">${SER.res.map(([c,s])=>`<div class="ser-row ${s==='ok'?'ok':'bad'}"><i>${s==='ok'?OVI.ok:SERX}</i><span class="ser-n"><b>${esc(lastName(c))}</b><small>${esc(s==='ok'?(c.meta.run||'gespeichert'):s)}</small></span></div>`).join('')}</div>`;
+  m.querySelector('.ser-foot').innerHTML='<span></span><span class="ser-btns"><button class="btn-pri" data-ser="x">Schliessen</button></span>'; m.classList.add('on');
+  toast('Serie '+(stopped?'abgebrochen':'fertig')+': '+ok+' von '+SER.res.length+' Overlays gespeichert.',4000); }
+document.addEventListener('visibilitychange',async()=>{ if(SER.on&&!document.hidden&&navigator.wakeLock&&!SER.lock) try{ SER.lock=await navigator.wakeLock.request('screen'); }catch(e){} });
 setColor(LS.get('color',COLORS[0])); setTool('none');
 restoreSession();
 /* Beispiel-Rennvideos (Sölden 2025, RS Herren) – liegen neben der App im Ordner demo/ */
@@ -5573,7 +5664,7 @@ if(false&&!LS.get('hint1',0)){ setTimeout(()=>{ toast(matchMedia('(pointer:coars
 
 /* Update-Hinweis: prüft version.json auf GitHub Pages; «Aktualisieren» lädt die Seite ohne Cache neu */
 (()=>{
-  const BUILD='20261030084612'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
+  const BUILD='20261030103233'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
   // nach einem Update die ?v=… aus der Adresse entfernen
   try{ const u=new URL(location.href); if(u.searchParams.has('v')){ u.searchParams.delete('v'); history.replaceState(null,'',u.pathname+(u.search||'')+u.hash); } }catch(e){}
   const el=$('#upd'); let latest=null, snoozed=null, busy=false;
