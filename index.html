@@ -2034,6 +2034,15 @@ button.lg-it:hover{background:rgba(12,15,20,.8);border-color:rgba(255,255,255,.3
   /* GPS: wie «Ein Video» – oben Abspielen, darunter Start-Abgleich, Feinschieben und Speichern in einer Zeile */
   #viewGps .dock.dock3{display:grid!important;grid-template-columns:auto auto;justify-content:center;align-items:center;gap:8px 8px!important;padding:8px 6px!important}
   #viewGps .dock.dock3 .dz-c{grid-column:1 / -1;justify-content:center}
+  /* innove-Spur (kein Feinschieben nötig): alles in einer Zeile */
+  #viewGps.inv-trk .dock.dock3{display:flex!important;flex-wrap:nowrap!important;justify-content:center;gap:4px!important}
+  #viewGps.inv-trk .dock.dock3 .dz-l{display:none!important}
+  #viewGps.inv-trk .dock.dock3 .dz-c,#viewGps.inv-trk .dock.dock3 .dz-r{flex:none}
+  #viewGps.inv-trk .dz-c .grp{gap:3px!important}
+  #viewGps.inv-trk .dz-c .ctl:not(.play){min-width:36px!important;width:36px!important;height:38px!important}
+  #viewGps.inv-trk .ctl.play{width:48px!important;height:48px!important;min-width:48px!important}
+  #viewGps.inv-trk .dz-c .rate-btn{width:auto!important;padding:0 7px!important;margin-left:3px!important}
+  #viewGps.inv-trk .dz-r .ctl{width:38px!important;min-width:38px!important;height:38px!important}
   #viewGps .dock.dock3 .dz-l,#viewGps .dock.dock3 .dz-r{margin:0!important;flex:none;flex-wrap:nowrap!important}
   #viewGps .dz-l .grp,#viewGps .dz-r .grp{gap:4px!important;flex-wrap:nowrap!important}
   #viewGps .dz-l .ctl,#viewGps .dz-r .ctl{height:40px!important;min-width:0!important;padding:0 8px!important;font-size:12.5px!important;justify-content:center}
@@ -2129,6 +2138,7 @@ button.lg-it:hover{background:rgba(12,15,20,.8);border-color:rgba(255,255,255,.3
   #viewCmp.overlay:not(.ov-fin) .dock .save-w{display:none!important}
   #viewCmp.overlay:not(.ov-fin) #ovActs .ov-cutg{display:none!important}
   #viewGps .dev-note{display:none!important}
+  .stage .osd-r .pill.rt{display:none!important} /* Tempo steht schon in der Knopfleiste */
   html,body{touch-action:manipulation} /* kein Zoomen der Seite per Doppeltipp */
   html,body{overflow-x:hidden;overscroll-behavior-x:none;max-width:100vw} /* Seite lässt sich nicht seitlich verschieben (Hintergrund-Leuchten ragt sonst hinaus) */
   .aurora{display:none!important}
@@ -4846,7 +4856,7 @@ function drawGpsOverlay(){
   const inRun=N.tg>=tr.tStart-0.3&&N.tg<=tr.tEnd+0.3;
   // 1) Band: Tempo mitlaufend über die Zeit – aktuelle Geschwindigkeit immer sichtbar (auch vor dem Start und nach dem Ziel)
   if(GPS.view.band){
-    const top=R.x<200?44:10, bx=R.x+10*k, by=R.y+top, bw=R.w-20*k, bh=clamp(R.h*0.2,58,120);
+    const top=(R.x<200&&!small)?44:10, bx=R.x+10*k, by=R.y+top, bw=R.w-20*k, bh=clamp(R.h*0.2,58,120);
     x.fillStyle='rgba(10,14,20,.58)'; rr(bx,by,bw,bh,10*k); x.fill();
     const WIN=small?7:10, t0=N.tg-WIN*0.65, t1=N.tg+WIN*0.35, have=N.tg>=P[0].t-0.3&&N.tg<=P[P.length-1].t+0.3;
     const vhi=Math.max(tr.vmax,ref?ref.vmax:0,1)*1.06, vlo=0, gx=bx+12*k, gw=bw-24*k, gy=by+32*k, gh=bh-40*k;
@@ -4918,7 +4928,7 @@ function drawGpsChart(N){
   x.fillStyle=st.getPropertyValue('--ink').trim(); x.fillRect(X(cur.s)-1,2,2,H-14);
 }
 /* ---------- Bedienung ---------- */
-function gpsSyncBtnUI(){ if(typeof invBtnUI==='function') invBtnUI(); const b=$('#gpsSync'); if(!b) return; const tr=trackOf(GD.clip); if($('#viewGps').classList.contains('no-trk')!==!tr){ $('#viewGps').classList.toggle('no-trk',!tr); GPS.dirty=true; } /* Profil erst nach dem Einblenden zeichnen */ b.hidden=!!(tr&&tr.source==='innove'); $$('#viewGps [data-gn]').forEach(x=>x.hidden=!!(tr&&tr.source==='innove')); } // innove: Zeit genügt, kein Startabgleich von Hand
+function gpsSyncBtnUI(){ if(typeof invBtnUI==='function') invBtnUI(); const b=$('#gpsSync'); if(!b) return; const tr=trackOf(GD.clip); if($('#viewGps').classList.contains('no-trk')!==!tr){ $('#viewGps').classList.toggle('no-trk',!tr); GPS.dirty=true; } /* Profil erst nach dem Einblenden zeichnen */ b.hidden=!!(tr&&tr.source==='innove'); $$('#viewGps [data-gn]').forEach(x=>x.hidden=!!(tr&&tr.source==='innove')); $('#viewGps').classList.toggle('inv-trk',!!(tr&&tr.source==='innove')); } // innove: Zeit genügt, kein Startabgleich von Hand
 function gpsSelects(){ setTimeout(()=>{ gpsSyncBtnUI(); if(typeof demoGpsFor==='function'&&mode==='gps') demoGpsFor(GD.clip); if(typeof invAuto==='function') invAuto(); },0);
   const sv=$('#gpsVideo'), st=$('#gpsTrack'), sr=$('#gpsRef'); const c=GD.clip, tr=trackOf(c);
   sv.innerHTML='<option value="">– Video wählen –</option>'+clips.map(c=>{ const m=c.meta; const t=m&&m.ok?metaTitle(c)+(m.run?' · '+m.run:''):dispName(c); return `<option value="${c.id}" title="${esc(dispName(c))}">${esc(t)}</option>`; }).join(''); sv.value=c?c.id:'';
@@ -4958,8 +4968,8 @@ $('#gpsIn').addEventListener('change',e=>{ if(e.target.files&&e.target.files.len
    Überlappung (sonst der nächste innert 2 min) → Rohspur des Sensors ±5 s. Jede:r meldet sich mit dem eigenen innove-Zugang an; gespeichert wird nur das Token. */
 const INV={B:'https://api.innove.swiss/swissski/v1',TOL:120000,PAD:5000};
 const invAuth=()=>LS.get('innove',null);
-async function invLogin(u,p){ let r; try{ r=await fetch(INV.B+'/auth/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:u,password:p})}); }catch(e){ throw new Error('innove ist nicht erreichbar – Internet prüfen.'); }
-  if(!r.ok) throw new Error(r.status===401?'Benutzername oder Passwort stimmt nicht.':'Anmeldung fehlgeschlagen ('+r.status+').');
+async function invLogin(u,p){ let r; try{ r=await fetch(INV.B+'/auth/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:u.trim(),password:p})}); }catch(e){ throw new Error('innove ist von diesem Gerät aus nicht erreichbar (Netz oder Sperre) – '+(e&&e.message||'kein Kontakt')+'.'); }
+  if(!r.ok){ let m=''; try{ m=((await r.json())||{}).message||''; }catch(e){} throw new Error((r.status===401?'innove kennt diese Kombination nicht – E-Mail und Passwort wie im GPS-Dashboard (dashboard.innove.ch) verwenden.':'Anmeldung fehlgeschlagen.')+' [innove: '+r.status+(m?' · '+m:'')+']'); }
   const j=await r.json(); LS.set('innove',{token:j.token,refresh:j.refreshToken,user:u}); gpsTabUI(); if(typeof invBtnUI==='function') invBtnUI(); return true; }
 async function invGet(path){ let a=invAuth(); if(!a) throw new Error('login'); const go=t=>fetch(INV.B+path,{headers:{Authorization:'Bearer '+t}});
   let r=await go(a.token);
@@ -6065,7 +6075,7 @@ if(false&&!LS.get('hint1',0)){ setTimeout(()=>{ toast(matchMedia('(pointer:coars
 
 /* Update-Hinweis: prüft version.json auf GitHub Pages; «Aktualisieren» lädt die Seite ohne Cache neu */
 (()=>{
-  const BUILD='20261030151815'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
+  const BUILD='20261030154841'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
   // nach einem Update die ?v=… aus der Adresse entfernen
   try{ const u=new URL(location.href); if(u.searchParams.has('v')){ u.searchParams.delete('v'); history.replaceState(null,'',u.pathname+(u.search||'')+u.hash); } }catch(e){}
   const el=$('#upd'); let latest=null, snoozed=null, busy=false;
