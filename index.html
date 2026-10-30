@@ -2009,7 +2009,7 @@ button.lg-it:hover{background:rgba(12,15,20,.8);border-color:rgba(255,255,255,.3
 @media (pointer:coarse){ .btn-cam{display:inline-flex} }
 /* ---- Handy: feste Leisten oben und unten, nichts scrollt dahinter · Bedienung in zwei Zeilen ---- */
 @media (max-width:600px){
-  header{position:sticky!important;top:0!important;z-index:110;margin:0 -0px 8px!important;padding:env(safe-area-inset-top,0px) 0 0!important;background:var(--bg)!important;border-bottom:1px solid var(--line)!important}
+  header{position:sticky!important;top:0!important;z-index:130;margin:0 -0px 8px!important;padding:env(safe-area-inset-top,0px) 0 0!important;background:var(--bg)!important;border-bottom:1px solid var(--line)!important}
   header .head-in{min-height:48px!important;padding:0 10px!important;background:transparent!important;border:none!important;border-radius:0!important;box-shadow:none!important;gap:8px!important}
   .tabs{left:0!important;right:0!important;bottom:0!important;height:auto!important;min-height:0!important;padding:5px 8px calc(5px + env(safe-area-inset-bottom,0px))!important;border-radius:0!important;border:none!important;border-top:1px solid var(--line)!important;background:var(--bg)!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important;box-shadow:none!important}
   .tabs .tab{height:44px!important;border-radius:11px!important;gap:2px!important;font-size:10.5px!important}
@@ -2025,6 +2025,10 @@ button.lg-it:hover{background:rgba(12,15,20,.8);border-color:rgba(255,255,255,.3
   #viewSingle .dz-r .grp{gap:4px!important;flex-wrap:nowrap}
   #viewSingle .dz-l .ctl,#viewSingle .dz-r .ctl{min-width:38px!important;width:38px;height:38px!important;padding:0!important;justify-content:center}
   #viewSingle .dz-r .ctl-lab{display:none!important}
+  /* Handy: nur das Nötige – Side-by-Side gibt es unten als Modus, Aneinanderhängen ist Desktop-Arbeit, Vollbild = Handy quer drehen */
+  .player .dock [data-act="sbs"],.player .dock [data-act="concat"],.player .dock [data-act="fs"],.player .dock .ctl-sep{display:none!important}
+  #viewSingle .dock.dock3 .dz-r .ctl,#viewSingle .dock.dock3 .dz-l .ctl{width:44px;min-width:44px!important;height:44px!important}
+  #viewSingle .dock.dock3{gap:10px 14px!important}
   #viewSingle .dz-c .ctl:not(.play){min-width:40px;width:40px;height:40px}
   #viewSingle .ctl.play{width:52px!important;height:52px!important;min-width:52px!important}
   /* Filmen: führt in die Field-App (gleiche Seite, bleibt in der installierten App) */
@@ -5769,7 +5773,7 @@ if(false&&!LS.get('hint1',0)){ setTimeout(()=>{ toast(matchMedia('(pointer:coars
 
 /* Update-Hinweis: prüft version.json auf GitHub Pages; «Aktualisieren» lädt die Seite ohne Cache neu */
 (()=>{
-  const BUILD='20261030121403'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
+  const BUILD='20261030122841'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
   // nach einem Update die ?v=… aus der Adresse entfernen
   try{ const u=new URL(location.href); if(u.searchParams.has('v')){ u.searchParams.delete('v'); history.replaceState(null,'',u.pathname+(u.search||'')+u.hash); } }catch(e){}
   const el=$('#upd'); let latest=null, snoozed=null, busy=false;
