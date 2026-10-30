@@ -275,6 +275,26 @@ svg{display:block}
 .chips.run .rl{font-size:12px;font-weight:700;color:var(--muted);margin-right:2px;letter-spacing:.04em;text-transform:uppercase}
 .chips.run{gap:6px;flex-wrap:nowrap;overflow-x:auto}
 .chips.run button{min-width:36px;padding:0 10px;flex:none}
+/* Kompakt (30.10.): Installationshinweis als schmale Zeile (antippen = ganze Anleitung), niedrigere Kacheln, Player ohne «Sichern»-Knopf */
+.inst{padding:7px 8px 7px 9px!important;gap:9px!important;border-radius:14px!important;margin-top:10px!important;cursor:pointer}
+.inst-ic{width:28px!important;height:28px!important;border-radius:9px!important}
+.inst-ic svg{width:16px!important;height:16px!important}
+.inst-tx{display:flex;align-items:baseline;gap:6px;min-width:0}
+.inst-tx b{font-size:13px!important;flex:none}
+.inst-tx span{font-size:12px!important;margin:0!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.inst.open .inst-tx{display:block}
+.inst.open .inst-tx span{white-space:normal;margin-top:3px!important}
+.inst-x{width:30px!important;height:30px!important}
+.big{min-height:0!important;padding:12px!important;flex-direction:row!important;align-items:center!important;justify-content:flex-start!important;gap:11px;border-radius:18px!important}
+.big .bi{width:38px!important;height:38px!important;border-radius:12px!important;flex:none}
+.big .bt b{font-size:16.5px!important}
+.big .bt small{font-size:11.5px!important;margin-top:1px!important}
+#pSave{display:none!important}
+.big{gap:9px;padding:11px!important}
+.big .bt{min-width:0}
+.big .bt b{font-size:15.5px!important}
+#play .ctr{grid-template-columns:64px 1fr 1fr 76px 1fr 1fr 64px}
+#play .ctr::after{content:""} /* «Sichern» ist im «…»-Menü – Platz rechts frei lassen, damit Abspielen in der Mitte bleibt */
 </style>
 </head>
 <body>
@@ -746,6 +766,7 @@ sessUI();
   window.addEventListener('beforeinstallprompt',e=>{ e.preventDefault(); deferred=e; t.textContent='Startet dann wie eine App – im Vollbild und ohne Internet.'; $('#instGo').hidden=false; el.hidden=false; });
   if(!ios&&matchMedia('(pointer:coarse)').matches) setTimeout(()=>{ if(el.hidden){ t.textContent='Im Browser-Menü (⋮) «Zum Startbildschirm hinzufügen» wählen.'; el.hidden=false; } },2500);
   $('#instGo').addEventListener('click',async()=>{ if(!deferred) return; deferred.prompt(); try{ const r=await deferred.userChoice; if(r&&r.outcome==='accepted') el.hidden=true; }catch(e){} deferred=null; });
+  $('#inst').addEventListener('click',e=>{ if(!e.target.closest('button')) $('#inst').classList.toggle('open'); });
   $('#instX').addEventListener('click',()=>{ el.hidden=true; LS.set('instNo',Date.now()+14*864e5); }); // 2 Wochen Ruhe
   window.addEventListener('appinstalled',()=>{ el.hidden=true; });
 })();
