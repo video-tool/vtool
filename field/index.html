@@ -104,7 +104,7 @@ svg{display:block}
 #camV{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background:#000}
 .camtop{position:absolute;left:0;right:0;top:0;padding:calc(var(--st) + 10px) calc(var(--sr) + 14px) 10px calc(var(--sl) + 14px);display:flex;align-items:center;gap:10px;background:linear-gradient(rgba(0,0,0,.55),transparent)}
 .rb{width:44px;height:44px;border-radius:50%;background:rgba(0,0,0,.42);display:flex;align-items:center;justify-content:center;-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
-.camtop .info{flex:1;display:flex;justify-content:center}
+.camtop .info{flex:1;display:flex;justify-content:center;gap:6px}
 .pill{font:700 12px var(--mono);padding:6px 11px;border-radius:999px;background:rgba(0,0,0,.45);color:#fff;-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
 .pill.live{background:var(--red)}
 .pill.live::before{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;background:#fff;margin-right:7px;vertical-align:1px;animation:blink 1s infinite}
@@ -295,6 +295,12 @@ svg{display:block}
 .big .bt b{font-size:15.5px!important}
 #play .ctr{grid-template-columns:64px 1fr 1fr 76px 1fr 1fr 64px}
 #play .ctr::after{content:""} /* «Sichern» ist im «…»-Menü – Platz rechts frei lassen, damit Abspielen in der Mitte bleibt */
+.gq{margin:-4px 4px 10px;color:var(--ink2);font-size:14px;line-height:1.4}
+.sh .gopt{border:1.5px solid var(--line);margin-bottom:8px}
+.sh .gopt.on{border-color:var(--red)}
+.sh .gopt span{display:flex;flex-direction:column;gap:2px}
+.sh .gopt small{font-size:12.5px;font-weight:500;color:var(--muted)}
+.pill.gps{background:rgba(31,157,107,.85)!important;color:#fff}
 </style>
 </head>
 <body>
@@ -330,7 +336,7 @@ svg{display:block}
   <div class="camerr" id="camErr"><b>Kamera nicht verfügbar</b><span id="camErrT">Bitte in den Einstellungen den Kamera-Zugriff für diese Seite erlauben.</span><button class="ghost" id="camRetry">Nochmals versuchen</button></div>
   <div class="camtop">
     <button class="rb" id="camX" aria-label="Schliessen"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
-    <div class="info"><span class="pill" id="camInfo">Kamera</span></div>
+    <div class="info"><span class="pill" id="camInfo">Kamera</span><span class="pill gps" id="camGps" hidden>GPS</span></div>
     <button class="rb" id="camFlip" aria-label="Kamera wechseln"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M20 7h-3l-2-3H9L7 7H4a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1V8a1 1 0 0 0-1-1z"/><path d="M9 13a3 3 0 0 1 5.2-2M15 13a3 3 0 0 1-5.2 2"/><path d="M14 9.5l.4 1.6-1.6.3M10 16.5l-.4-1.6 1.6-.3"/></svg></button>
   </div>
   <div class="cambot">
@@ -463,7 +469,7 @@ async function meta(blob){ const url=URL.createObjectURL(blob); try{ const v=awa
     return {dur, w:v.videoWidth, h:v.videoHeight, thumb:cv.toDataURL('image/jpeg',0.72)}; }
   catch(e){ return {dur:0,w:0,h:0,thumb:''}; } finally{ URL.revokeObjectURL(url); } }
 const nextName=()=>{ const n=CLIPS.filter(c=>/^Lauf \d+$/.test(c.name)).map(c=>+c.name.slice(5)); return 'Lauf '+((n.length?Math.max(...n):0)+1); };
-async function addClip(blob,o){ const m=await meta(blob); if(!o.fps){ try{ o.fps=await mp4Fps(URL.createObjectURL(blob))||null; }catch(e){} } const c={sess:o.sess||(typeof SESS!=='undefined'&&SESS.disc?{...SESS}:null),id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),name:o.name||nextName(),created:o.created||Date.now(),blob,mime:blob.type||'video/mp4',fps:o.fps||null,t0:o.t0||null,marks:o.marks&&o.marks.length?o.marks:undefined,...m};
+async function addClip(blob,o){ const m=await meta(blob); if(!o.fps){ try{ o.fps=await mp4Fps(URL.createObjectURL(blob))||null; }catch(e){} } const c={sess:o.sess||(typeof SESS!=='undefined'&&SESS.disc?{...SESS}:null),id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),name:o.name||nextName(),created:o.created||Date.now(),blob,mime:blob.type||'video/mp4',fps:o.fps||null,t0:o.t0||null,gps:o.gps||undefined,marks:o.marks&&o.marks.length?o.marks:undefined,...m};
   try{ await dbPut(c); }catch(e){ toast('Speicher voll – alte Läufe löschen.',3500); return null; } CLIPS.unshift(c); CLIPS.sort((a,b)=>b.created-a.created); render(); return c; }
 
 /* ---------- Startseite ---------- */
@@ -472,7 +478,7 @@ function dayLabel(ts){ const d=new Date(ts), n=new Date(); const k=x=>x.toDateSt
 const hhmm=ts=>new Date(ts).toLocaleTimeString('de-CH',{hour:'2-digit',minute:'2-digit'});
 const camName=k=>(CAMS.find(x=>x[0]===k)||[])[1]||'', kindName=k=>(KINDS.find(x=>x[0]===k)||[])[1]||'';
 function sessKey(c){ const S=c.sess; return S?[S.place||'',S.disc||''].join('|'):''; }
-function clipSub(c){ const S=c.sess||{}, a=[]; if(c.run) a.push('<i>'+(S.kind==='l'?'Rennen':'Lauf')+' '+esc(c.run)+'</i>'); if(S.cam) a.push(esc(camName(S.cam))); if(!a.length) a.push(hhmm(c.created)); return a.join(' · '); }
+function clipSub(c){ const S=c.sess||{}, a=[]; if(c.run) a.push('<i>'+(S.kind==='l'?'Rennen':'Lauf')+' '+esc(c.run)+'</i>'); if(S.cam) a.push(esc(camName(S.cam))); if(c.gps) a.push('GPS'); if(!a.length) a.push(hhmm(c.created)); return a.join(' · '); }
 function clipRow(c,opts={}){ const r=document.createElement('div'); r.className='clip'+(SEL.a===c.id?' pa':SEL.b===c.id?' pb':''); r.dataset.id=c.id;
   r.innerHTML=`<span class="th" style="${c.thumb?`background-image:url(${c.thumb})`:''}"><em>${fmtDur(c.dur)}</em>${c.saved?'<i class="sv" title="In Fotos gesichert">'+IC.ok+'</i>':''}</span><span class="tx"><b>${esc(c.ath||c.name)}</b><span>${clipSub(c)}</span></span>`+(opts.noMore?'':`<button class="more" aria-label="Optionen">${IC.more}</button>`)+`<span class="ck">${SEL.a===c.id?'A':SEL.b===c.id?'B':''}</span>`;
   return r; }
@@ -599,6 +605,7 @@ async function camStart(){ $('#camErr').classList.remove('on');
 function camErr(t){ $('#camErrT').textContent=t; $('#camErr').classList.add('on'); $('#camInfo').textContent='Kamera'; }
 function camStop(){ if(REC.on) recStop(false); if(CAM.stream){ CAM.stream.getTracks().forEach(t=>t.stop()); CAM.stream=null; } $('#camV').srcObject=null; try{ wake&&wake.release(); }catch(e){} wake=null; }
 function recMime(){ const L=['video/mp4;codecs=avc1.640028','video/mp4;codecs=avc1','video/mp4','video/webm;codecs=vp9','video/webm;codecs=vp8','video/webm']; return L.find(m=>window.MediaRecorder&&MediaRecorder.isTypeSupported&&MediaRecorder.isTypeSupported(m))||''; }
+function camGpsUI(){ const g=$('#camGps'); if(g) g.hidden=LS.get('gpsMode','gps')!=='gps'; }
 function recStart(){ if(!CAM.stream||REC.on) return; const mime=recMime(); let mr;
   try{ mr=new MediaRecorder(CAM.stream,mime?{mimeType:mime,videoBitsPerSecond:12e6}:{}); }catch(e){ try{ mr=new MediaRecorder(CAM.stream); }catch(e2){ toast('Aufnahme wird hier nicht unterstützt.'); return; } }
   REC.mr=mr; REC.chunks=[]; REC.on=true; REC.t0=performance.now(); REC.ts=Date.now(); REC.marks=[]; mr.onstart=()=>{ REC.ts=Date.now(); }; /* Startzeit (Handyuhr, ms) für die GPS-Verbindung im Video-Lab */ mr.ondataavailable=e=>{ if(e.data&&e.data.size) REC.chunks.push(e.data); };
@@ -606,10 +613,15 @@ function recStart(){ if(!CAM.stream||REC.on) return; const mime=recMime(); let m
   const pill=$('#camInfo'); pill.classList.add('live'); REC.tick=setInterval(()=>{ pill.textContent=((performance.now()-REC.t0)/1000).toFixed(1)+' s'; },100); }
 function recStop(keep=true){ if(!REC.on) return; REC.on=false; clearInterval(REC.tick); $('#cam').classList.remove('recording'); const pill=$('#camInfo'); pill.classList.remove('live');
   const mr=REC.mr, fps=CAM.fps, t0=REC.ts, marks=(REC.marks||[]).slice(); mr.onstop=async()=>{ if(!keep) return; const type=(mr.mimeType||'video/mp4').split(';')[0]; const blob=new Blob(REC.chunks,{type}); REC.chunks=[];
-    if(blob.size<2000){ toast('Aufnahme zu kurz.'); return; } busy(true,'Wird gespeichert …'); const c=await addClip(blob,{fps,t0,marks}); busy(false);
+    if(blob.size<2000){ toast('Aufnahme zu kurz.'); return; } busy(true,'Wird gespeichert …'); const c=await addClip(blob,{fps,t0,marks,gps:LS.get('gpsMode','gps')==='gps'}); busy(false);
     if(c){ $('#camLast').hidden=false; $('#camLast').style.backgroundImage=c.thumb?`url(${c.thumb})`:''; $('#camLast').dataset.id=c.id; openPlayer(c,{fresh:true}); askName(c); } };
   try{ mr.stop(); }catch(e){} if(navigator.vibrate) navigator.vibrate([20,40,20]); if(!keep) setTimeout(()=>{ $('#camInfo').textContent='Kamera'; },0); }
-$('#goCam').addEventListener('click',()=>{ const go=()=>{ show('cam'); camStart(); }; if(!SESS.disc&&!LS.get('sessAsk',0)){ LS.set('sessAsk',1); sessSheet(go); return; } go(); });
+/* Vor dem Filmen: mit oder ohne GPS (Sensor fährt mit) – mit GPS holt das Video-Lab später Tempo und Lauf von innove */
+function gpsAsk(go){ const last=LS.get('gpsMode','gps'), PIN='<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.2 7-11.5A7 7 0 0 0 5 9.5C5 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.4"/></svg>', NO='<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="13" height="12" rx="2"/><path d="M16 10l5-3v10l-5-3z"/></svg>';
+  sheet(`<h3>Filmen</h3><p class="gq">Fährt die Athletin / der Athlet mit GPS-Sensor (innove)?</p>
+    <button class="opt gopt${last==='gps'?' on':''}" data-o="gps">${PIN}<span><b>Mit GPS</b><small>Tempo und Lauf kommen im Video-Lab automatisch dazu</small></span></button>
+    <button class="opt gopt${last==='no'?' on':''}" data-o="no">${NO}<span><b>Ohne GPS</b><small>Nur Video</small></span></button>`,o=>{ LS.set('gpsMode',o); closeSheet(); go(); }); }
+$('#goCam').addEventListener('click',()=>{ const go0=()=>{ show('cam'); camStart(); camGpsUI(); }, go=()=>gpsAsk(go0); if(!SESS.disc&&!LS.get('sessAsk',0)){ LS.set('sessAsk',1); sessSheet(go); return; } go(); });
 $('#camX').addEventListener('click',()=>show('home'));
 $('#camRetry').addEventListener('click',camStart);
 $('#shut').addEventListener('click',()=>REC.on?recStop(true):recStart());

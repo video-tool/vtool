@@ -2103,14 +2103,14 @@ button.lg-it:hover{background:rgba(12,15,20,.8);border-color:rgba(255,255,255,.3
   #viewSingle #sTitle::before{content:"";order:2;flex:none;width:16px;height:16px;background:currentColor;opacity:.7;-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") center/contain no-repeat;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") center/contain no-repeat}
   /* Zeitleiste: Zoom mit zwei Fingern statt Knöpfen */
   .tl-zoom button[data-z="-1"],.tl-zoom button[data-z="1"]{display:none!important}
-  /* Videoliste als Blatt von unten */
-  .libcard{position:fixed!important;left:0!important;right:0!important;bottom:0!important;top:auto!important;z-index:150!important;max-height:78dvh;margin:0!important;border-radius:20px 20px 0 0!important;overflow:auto!important;-webkit-overflow-scrolling:touch;padding-bottom:calc(14px + env(safe-area-inset-bottom,0px))!important;transform:translateY(105%);transition:transform .28s var(--ease-out,ease);box-shadow:0 -20px 50px -20px rgba(0,0,0,.5);visibility:hidden}
-  body.lib-open .libcard{transform:none;visibility:visible}
-  .libcard{background:var(--card)!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
-  .libcard .side-ttl{display:none!important}
+  /* Videoliste: standardmässig unter dem Player; als Blatt von unten nur, wenn im Vergleich/GPS geöffnet (body.lib-open) */
+  .libcard{margin-top:10px!important}
+  body.lib-open .libcard{position:fixed!important;left:0!important;right:0!important;bottom:0!important;top:auto!important;z-index:150!important;max-height:78dvh;margin:0!important;border-radius:20px 20px 0 0!important;overflow:auto!important;-webkit-overflow-scrolling:touch;padding-bottom:calc(14px + env(safe-area-inset-bottom,0px))!important;transform:translateY(105%);transition:transform .28s var(--ease-out,ease);box-shadow:0 -20px 50px -20px rgba(0,0,0,.5);visibility:hidden}
+  body.lib-open .libcard{transform:none;visibility:visible;background:var(--card)!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
+  body.lib-open .libcard .side-ttl{display:none!important}
   .lib-back{position:fixed;inset:0;z-index:149;background:rgba(0,0,0,.45);opacity:0;pointer-events:none;transition:opacity .25s}
   body.lib-open .lib-back{opacity:1;pointer-events:auto}
-  .lib-sh{display:flex;align-items:center;gap:8px;position:sticky;top:-14px;z-index:3;margin:-14px -14px 8px;padding:10px 12px 8px 16px;background:inherit;border-radius:20px 20px 0 0}
+  body.lib-open .lib-sh{display:flex;align-items:center;gap:8px;position:sticky;top:-14px;z-index:3;margin:-14px -14px 8px;padding:10px 12px 8px 16px;background:inherit;border-radius:20px 20px 0 0}
   .lib-sh b{flex:1;font-size:16px;font-weight:750}
   .lib-sh::before{content:"";position:absolute;left:50%;top:5px;width:38px;height:4px;margin-left:-19px;border-radius:3px;background:rgba(127,127,127,.35)}
   .lib-sh button{width:36px;height:36px;border-radius:11px;border:none;background:rgba(127,127,127,.14);color:inherit;display:grid;place-items:center}
@@ -2119,6 +2119,32 @@ button.lg-it:hover{background:rgba(12,15,20,.8);border-color:rgba(255,255,255,.3
   #viewCmp>.c-head{display:none!important}
   .m-more{display:inline-flex!important;align-items:center;justify-content:center}
   #viewCmp .dock .save-w .save-menu{top:auto!important;bottom:calc(100% + 8px)!important}
+  /* Feinschliff Handy: im Overlay bis «Fertig» kein Speichern unten, Start/Ende erst im fertigen Overlay, GPS-Hinweis weg (Text im «i» der Hilfe) */
+  #viewCmp.overlay:not(.ov-fin) .dock .save-w{display:none!important}
+  #viewCmp.overlay:not(.ov-fin) #ovActs .ov-cutg{display:none!important}
+  #viewGps .dev-note{display:none!important}
+  /* GPS kompakt: Auswahl in zwei Spalten, Anzeige-Optionen in einer Zeile, ohne GPS keine leeren Felder */
+  #viewGps .gps-sel{display:grid!important;grid-template-columns:1fr 1fr;gap:6px!important;width:100%}
+  #viewGps .gps-sel>label[data-lab="Video"]{grid-column:1 / -1}
+  #viewGps .gps-sel select.sel{max-width:none!important;width:100%}
+  #viewGps .gps-sel>.ctl,#viewGps .gps-sel>label.ctl{height:40px!important;justify-content:center}
+  #viewGps .gps-sel>label[data-lab="Referenz"]{order:3}
+  #viewGps .gps-sel>#gpsInv{order:4}
+  #viewGps .gps-sel>label[for="gpsIn"]{order:5}
+  #viewGps.no-trk .gps-sel>label[data-lab="Referenz"]{display:none!important}
+  #viewGps.no-trk .gps-sel>label[data-lab="GPS-Daten"]{grid-column:1 / -1}
+  #viewGps.no-trk .gps-foot,#viewGps.no-trk canvas.gchart{display:none!important}
+  #viewGps #gpsInfo,#viewGps .gv-lab{display:none!important}
+  #viewGps .gps-foot{margin-top:6px}
+  #viewGps .gps-viewopts{display:flex!important;flex-wrap:nowrap!important;gap:6px;overflow-x:auto;scrollbar-width:none;width:100%}
+  #viewGps .gps-viewopts::-webkit-scrollbar{display:none}
+  #viewGps .gps-viewopts .chip,#viewGps .gps-viewopts .seg button{height:32px!important;padding:0 10px!important;font-size:12.5px!important;white-space:nowrap;flex:none}
+  #viewGps .gps-viewopts .chips,#viewGps .gps-viewopts .seg{flex:none;flex-wrap:nowrap!important}
+  #viewGps canvas.gchart{height:110px!important}
+  #viewGps .gleg{display:none!important}
+  #viewGps .gps-foot{display:block!important}
+  #viewGps .gps-sel{gap:6px!important}
+  .rail .tbtn,.rail button{min-width:34px}
   /* Overlay Schritt 1: eine Zeitleiste (A) – B wird im Bild gewischt */
   #viewCmp.overlay.ov-split .strips>.tl:nth-child(2){display:none!important}
   /* Gelbe Hinweise: schmale Zeile oben, verdecken keine Knöpfe */
@@ -2248,7 +2274,6 @@ button.lg-it:hover{background:rgba(12,15,20,.8);border-color:rgba(255,255,255,.3
       </div>
       <input type="file" id="gpsIn" accept=".csv,.gpx,.json,.txt" multiple hidden>
     </div>
-    <div class="dev-note" role="note"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.6 2.6-2.4-.6-.6-2.4z"/></svg><span><b>GPS von innove:</b> «innove» holt Lauf, Zwischenzeiten und Tempo zum Video – mit deinem innove-Zugang (wie in der alten Video-App). Die Tempo-Spur liegt automatisch nach der Aufnahmezeit auf dem Video. Oder eine GPS-Datei importieren.</span></div>
     <div class="stage-host" id="gHost"></div>
     <div id="gStrip"></div>
     <div class="dock dock3">
@@ -4841,7 +4866,7 @@ function drawGpsOverlay(){
   }
   // 3) Laufzeit & Differenz
   if(GPS.view.time){
-    const rt=N.tg-tr.tStart, bw=(ref?210:120)*k, bh=52*k, bx=R.x+R.w-bw-12*k, by=R.y+R.h-bh-12*k;
+    const rt=N.tg-tr.tStart, bw=(ref?210:120)*k, bh=52*k, bx=small?R.x+12*k:R.x+R.w-bw-12*k, by=R.y+R.h-bh-12*k; // schmal: links, damit der Stift rechts frei bleibt
     x.fillStyle='rgba(10,14,20,.62)'; rr(bx,by,bw,bh,10*k); x.fill();
     txt('Laufzeit',bx+12*k,by+14*k,10.5,'rgba(255,255,255,.7)','left',700);
     txt(rt<0?'—':Math.min(rt,tr.tEnd-tr.tStart).toFixed(2),bx+12*k,by+35*k,22,'#fff','left',800);
@@ -4854,7 +4879,7 @@ function drawGpsOverlay(){
 /* ---------- Profil unter dem Video ---------- */
 function drawGpsChart(N){
   const cv=$('#gpsChart'); if(!cv||cv.offsetParent===null) return; const W=cv.clientWidth,H=cv.clientHeight,d=DPR(); if(!W) return;
-  if(cv.width!==Math.round(W*d)){ cv.width=Math.round(W*d); cv.height=Math.round(H*d); } const x=cv.getContext('2d'); x.setTransform(d,0,0,d,0,0); x.clearRect(0,0,W,H);
+  if(cv.width!==Math.round(W*d)||cv.height!==Math.round(H*d)){ cv.width=Math.round(W*d); cv.height=Math.round(H*d); } const x=cv.getContext('2d'); x.setTransform(d,0,0,d,0,0); x.clearRect(0,0,W,H);
   if(!N) return; const {tr,cur}=N, ref=GPS.tracks.find(t=>t.id===tr.ref), P=tr.P, s0=P[tr.iS].s, s1=P[tr.iE].s;
   const st=getComputedStyle(cv), ink=st.getPropertyValue('--muted').trim(), line=st.getPropertyValue('--line').trim(), ff=getComputedStyle(document.body).fontFamily;
   const pl=64, pr=10, h1=H*0.56, X=s=>pl+(W-pl-pr)*clamp((s-s0)/Math.max(1,s1-s0),0,1);
@@ -4867,12 +4892,12 @@ function drawGpsChart(N){
   x.strokeStyle=line; x.lineWidth=1; x.beginPath(); x.moveTo(pl,Y2(0)); x.lineTo(W-pr,Y2(0)); x.stroke();
   x.fillStyle=ink; x.fillText(ref?'Δ +'+mx.toFixed(2)+' s':'Δ –',pl-6,Y2(mx*0.75)); if(ref) x.fillText('−'+mx.toFixed(2)+' s',pl-6,Y2(-mx*0.75));
   if(tr.dt){ x.lineWidth=2.4; for(let i=tr.iS+1;i<=tr.iE;i++){ const a=tr.dt[i-1], b=tr.dt[i]; if(a==null||b==null) continue; x.strokeStyle=b<=a?'#1f9d6b':'#DA291C'; x.beginPath(); x.moveTo(X(P[i-1].s),Y2(a)); x.lineTo(X(P[i].s),Y2(b)); x.stroke(); } }
-  x.textAlign='center'; x.fillStyle=ink; const step=s1-s0>600?100:s1-s0>200?50:s1-s0>60?10:5; for(let m=0;m<=s1-s0;m+=step) x.fillText(m+' m',X(s0+m),H-5);
+  x.textAlign='center'; x.fillStyle=ink; const L=s1-s0, nT=Math.max(3,Math.floor(W/70)), step=[5,10,20,50,100,200,250,500,1000].find(v=>L/v<=nT)||1000; for(let m=0;m<=L;m+=step) x.fillText(m+' m',X(s0+m),H-5);
   x.fillStyle=st.getPropertyValue('--ink').trim(); x.fillRect(X(cur.s)-1,2,2,H-14);
 }
 /* ---------- Bedienung ---------- */
-function gpsSyncBtnUI(){ const b=$('#gpsSync'); if(!b) return; const tr=trackOf(GD.clip); b.hidden=!!(tr&&tr.source==='innove'); } // innove: Zeit genügt, kein Startabgleich von Hand
-function gpsSelects(){ setTimeout(()=>{ gpsSyncBtnUI(); if(typeof invAuto==='function') invAuto(); },0);
+function gpsSyncBtnUI(){ const b=$('#gpsSync'); if(!b) return; const tr=trackOf(GD.clip); if($('#viewGps').classList.contains('no-trk')!==!tr){ $('#viewGps').classList.toggle('no-trk',!tr); GPS.dirty=true; } /* Profil erst nach dem Einblenden zeichnen */ b.hidden=!!(tr&&tr.source==='innove'); } // innove: Zeit genügt, kein Startabgleich von Hand
+function gpsSelects(){ setTimeout(()=>{ gpsSyncBtnUI(); if(typeof demoGpsFor==='function'&&mode==='gps') demoGpsFor(GD.clip); if(typeof invAuto==='function') invAuto(); },0);
   const sv=$('#gpsVideo'), st=$('#gpsTrack'), sr=$('#gpsRef'); const c=GD.clip, tr=trackOf(c);
   sv.innerHTML='<option value="">– Video wählen –</option>'+clips.map(c=>{ const m=c.meta; const t=m&&m.ok?metaTitle(c)+(m.run?' · '+m.run:''):dispName(c); return `<option value="${c.id}" title="${esc(dispName(c))}">${esc(t)}</option>`; }).join(''); sv.value=c?c.id:'';
   const opts=GPS.tracks.map(t=>`<option value="${t.id}">${esc(t.name)}</option>`).join('');
@@ -4880,7 +4905,7 @@ function gpsSelects(){ setTimeout(()=>{ gpsSyncBtnUI(); if(typeof invAuto==='fun
   sr.innerHTML='<option value="">– keine Referenz –</option>'+opts; sr.value=tr&&tr.ref?tr.ref:'';
   sr.disabled=!tr;
   const info=$('#gpsInfo');
-  if(!c) info.textContent='Video wählen.'; else if(!tr) info.innerHTML='GPS-Datei (CSV, GPX, JSON) importieren oder ins Fenster ziehen.';
+  if(!c) info.textContent='Video wählen.'; else if(!tr) info.innerHTML='';
   else info.innerHTML=`${tr.P.length} Punkte · ${(1/((tr.P[tr.P.length-1].t-tr.P[0].t)/(tr.P.length-1))).toFixed(0)} Hz · Start bei GPS ${tr.tStart.toFixed(2)} s · Versatz <b>${fmtD(c.gpsOff-tr.tStart,3)} s</b>`;
   GPS.dirty=true;
 }
@@ -4889,7 +4914,7 @@ function gpsNudge(dt){ const c=GD.clip; if(!trackOf(c)) return; c.gpsOff+=dt; gp
 
 const GD=new Deck('g',$('#gHost'),$('#gStrip'));
 $('#gHost').insertAdjacentHTML('beforeend',railHTML(false));
-GD.stage.insertAdjacentHTML('beforeend','<span class="pill gps-no" id="gpsNo" hidden>Keine GPS-Daten mit diesem Video verknüpft – oben «Import» oder Datei ins Fenster ziehen.</span>');
+GD.stage.insertAdjacentHTML('beforeend','<span class="pill gps-no" id="gpsNo" hidden>Keine GPS-Daten zu diesem Video – oben «innove» antippen oder eine GPS-Datei importieren.</span>');
 $$('#viewGps [data-rates]').forEach(seg=>{ seg.innerHTML=RATES.map(r=>`<button type="button" data-rate="${r}">${fmtRate(r)}</button>`).join(''); });
 $$('#viewGps .ctl.play').forEach(b=>b.innerHTML=ICON.play);
 GD.onChange=()=>{ $('#viewGps .ctl.play').innerHTML=GD.v.paused?ICON.play:ICON.pause; GPS.dirty=true; };
@@ -4946,6 +4971,20 @@ function invLoginUI(){ return new Promise(res=>{ const m=$('#invModal'), a=invAu
     try{ await invLogin(u,p); LS.set('innove:user',u); $('#invP').value=''; done(true); }catch(err){ $('#invErr').textContent=err.message; $('#invErr').hidden=false; } $('#invGo').disabled=false; };
   $('#invX').onclick=()=>done(false); $('#invOut').onclick=()=>{ LS.set('innove',null); toast('Von innove abgemeldet.'); done(false); };
   m.classList.add('on'); setTimeout(()=>($('#invU').value?$('#invP'):$('#invU')).focus(),60); }); }
+function invRunApply(tr,run){ // innove-Start = Nullpunkt der Laufzeit, innove-Ziel = Ende (Vergleich und Profil)
+  const at=t=>{ let k=0; while(k<tr.P.length-1&&tr.P[k].t<t) k++; return k; };
+  tr.iS=at(run.start_time/1000-tr.t0abs); tr.iE=Math.max(tr.iS+1,at(run.finish_time/1000-tr.t0abs)); tr.tStart=run.start_time/1000-tr.t0abs; tr.tEnd=run.finish_time/1000-tr.t0abs; // Start und Ziel von innove
+  tr.vmax=Math.max(...tr.P.slice(tr.iS,tr.iE+1).map(p=>p.v)); tr.vmin=Math.min(...tr.P.slice(tr.iS,tr.iE+1).map(p=>p.v)); }
+/* Beispiel Stelvio 29.10.2026: GPS von innove liegt als Datei bei (demo/stelvio_gps.json), der Bezug zum Video kommt wie im Einsatz aus dem Zeitcode im Ton */
+let DGPS=null;
+async function demoGpsFor(c){ if(!c||!/_stelvio_261029\.mp4$/.test(c.name)||c.gpsId||c._dg) return; c._dg=true;
+  const D=await (DGPS||(DGPS=fetch('demo/stelvio_gps.json').then(r=>r.ok?r.json():null).catch(()=>null))); const v=D&&D.videos[c.name]; if(!v) return;
+  if(!GPS.tracks.some(t=>t._stel)){ const made=D.tracks.map(o=>{ const nm=o.athlete.split(' ').slice(1).join(' ')+' · Lauf '+o.run.run_number;
+      const t=addTracks([{name:nm,athlete:o.athlete,run:'Lauf '+o.run.run_number,source:'innove',samples:normSamples(o.S.map(([t,lat,lon,alt,speed])=>({t,lat,lon,alt,speed})))}],{link:false})[0]; if(t){ t._stel=o.key; t._demo=true; invRunApply(t,o.run); t.innove={run:o.run}; } return t; }).filter(Boolean);
+    if(made.length===2){ made[0].ref=made[1].id; made[1].ref=made[0].id; compareTracks(made[0],made[1]); compareTracks(made[1],made[0]); } } // Monney und Rogentin gegeneinander
+  const tr=GPS.tracks.find(t=>t._stel===v.track); if(!tr) return;
+  let s0=null; try{ s0=await ltcRead(c); }catch(e){} if(s0==null) s0=v.ltc0; // Zeitcode aus dem Ton, sonst gespeicherter Wert
+  linkGps(c,tr,s0-tr.t0abs); c.gpsAuto=0; GPS.dirty=true; gpsSelects(); }
 async function invFetch(c){ c=c||GD.clip; if(!c){ toast('Zuerst ein Video wählen.'); return; }
   let s0=vidStart(c); if(s0==null&&c.ltc0===undefined){ toast('Zeitcode im Ton wird gelesen …',2500); s0=await ltcRead(c); }
   if(s0==null){ toast('Für dieses Video fehlt die Aufnahmezeit: kein Zeitcode im Ton (Time-Link) und keine Zeit im Namen (Videos aus «Filmen»).',5200); return; }
@@ -4963,10 +5002,7 @@ async function invFetch(c){ c=c||GD.clip; if(!c){ toast('Zuerst ein Video wähle
     L[0].name=nm; L[0].athlete=ath[1]+' '+ath[2]; L[0].run='Lauf '+best.run.run_number; L[0].source='innove';
     const tr=addTracks(L,{link:false})[0]; if(!tr) return;
     // Start und Ziel von innove statt aus der Bewegung (für Anzeige und Vergleich). Die Spur liegt allein nach der Uhrzeit auf dem Video – kein Abgleich von Hand
-    const at=t=>{ let k=0; while(k<tr.P.length-1&&tr.P[k].t<t) k++; return k; };
-    tr.iS=at(best.run.start_time/1000-tr.t0abs); tr.iE=tr.P.length-1; tr.tStart=best.run.start_time/1000-tr.t0abs; tr.tEnd=tr.P[tr.iE].t; // innove-Start = Nullpunkt der Laufzeit; Ende offen, weil Kameras auch nach der innove-Ziellinie stehen können
-    tr.vmax=Math.max(...tr.P.slice(tr.iS).map(p=>p.v)); tr.vmin=Math.min(...tr.P.slice(tr.iS).map(p=>p.v));
-    tr.innove={activity:best.tf.activity,timeframe:best.tf.id,run:best.run,cls:best.cls||null};
+    invRunApply(tr,best.run); tr.innove={activity:best.tf.activity,timeframe:best.tf.id,run:best.run,cls:best.cls||null};
     if(GD.clip!==c) GD.setClip(c); linkGps(c,tr,s0-tr.t0abs); c.gpsAuto=0; if(mode!=='gps') setMode('gps'); gpsTabUI(); gpsSelects();
     const sg=(best.run.segments||[]).filter(x=>!/start/i.test(x.name)), fin=sg.find(x=>/finish/i.test(x.name));
     toast(nm+' · '+((best.run.finish_time-best.run.start_time)/1000).toFixed(2)+' s'+(fin&&fin.speed?' · Ziel '+(fin.speed*3.6).toFixed(1)+' km/h':'')+' – Tempo liegt nach Aufnahmezeit auf dem Video.',5000);
@@ -5605,9 +5641,10 @@ function renderDemoList(){
     r.innerHTML=`<span class="ft-th${c.poster?' has':''}" style="${c.poster?`background-image:url(${c.poster})`:''}"><i>${c.dur?fmtDur(c.dur):''}</i></span>`
       +`<span class="ft-tx"><span class="ft-nm"></span><span class="ft-sub"></span></span>`
       +(mode==='cmp'?`<span class="ab-tags">${A.clip===c?'<em class="ta">A</em>':''}${B.clip===c?'<em class="tb">B</em>':''}</span><span class="ft-acts"><button data-a="a" class="ab-a" title="Als Video A">A</button><button data-a="b" class="ab-b" title="Als Video B">B</button></span>`:'');
-    $('.ft-nm',r).textContent=m.athlete||dispName(c); subCols($('.ft-sub',r),[m.run||DISC_LONG[m.disc]||m.cam,m.date]);
+    const gk2=x=>(x.meta.place||'')+'|'+(x.meta.disc||'')+'|'+(x.meta.date||''), mixCam=new Set(ds.filter(x=>gk2(x)===gk2(c)).map(x=>x.meta.cam||'')).size>1; // mehrere Kameras im selben Training → Kamera pro Video zeigen
+    $('.ft-nm',r).textContent=m.athlete||dispName(c); subCols($('.ft-sub',r),mixCam?[m.cam||m.run,m.run,m.date].filter((v,i,a)=>v&&a.indexOf(v)===i).slice(0,2):[m.run||DISC_LONG[m.disc]||m.cam,m.date]);
     const g=(m.place||'')+'|'+(m.disc||'')+'|'+(m.date||''); if(g!==grp){ grp=g; const h=document.createElement('div'); h.className='ft-demo-h'; const yr=m.date?m.date.slice(-4):'';
-      h.innerHTML='<b>'+(grp===((ds[0].meta.place||'')+'|'+(ds[0].meta.disc||'')+'|'+(ds[0].meta.date||''))?'Beispiel-Läufe':'')+'</b><span></span>'; $('span',h).textContent=[[m.place,yr].filter(Boolean).join(' '),DISC_LONG[m.disc]||m.disc,m.cam].filter(Boolean).join(' · '); if(!$('b',h).textContent) $('b',h).remove(); el.appendChild(h); }
+      h.innerHTML='<b>'+(grp===((ds[0].meta.place||'')+'|'+(ds[0].meta.disc||'')+'|'+(ds[0].meta.date||''))?'Beispiel-Läufe':'')+'</b><span></span>'; $('span',h).textContent=[[m.place,yr].filter(Boolean).join(' '),DISC_LONG[m.disc]||m.disc,mixCam?null:m.cam].filter(Boolean).join(' · '); if(!$('b',h).textContent) $('b',h).remove(); el.appendChild(h); }
     el.appendChild(r); });
 }
 const DISC_LONG={GS:'Riesenslalom',SL:'Slalom',SG:'Super-G',DH:'Abfahrt',AC:'Kombination',PS:'Parallel'};
@@ -5887,7 +5924,7 @@ document.addEventListener('visibilitychange',async()=>{ if(SER.on&&!document.hid
 setColor(LS.get('color',COLORS[0])); setTool('none');
 restoreSession();
 /* Beispiel-Rennvideos (Sölden 2025, RS Herren) – liegen neben der App im Ordner demo/ */
-const REAL_DEMO=[["Meillard_Soelden_251026_GS_M_L1.mp4", 15594565], ["Gratz_Soelden_251026_GS_M_L1.mp4", 14564292], ["Braathen_Soelden_251026_GS_M_L1.mp4", 14949042], ["boisset_vgh_dh_tr1_courchevel_260311.mp4", 21193253], ["kriechmayr_vgh_dh_tr1_courchevel_260311.mp4", 20048025], ["allegre_vgh_dh_tr1_courchevel_260311.mp4", 22408170], ["moltzan_wc_gs_l2_camGH_hafjell_260325.mp4", 20632437], ["rast_wc_gs_l2_camGH_hafjell_260325.mp4", 22233687], ["holdener_wc_sl_l1_camGH_hafjell_260324.mp4", 19428840], ["shiffrin_wc_sl_l1_camGH_hafjell_260324.mp4", 19594008], ["odermatt lauf1 261025 GS soelden v1.mp4", 2676704], ["braathen lauf1 261025 GS soelden v1.mp4", 1935003], ["haechler lauf1 261025 GS soelden v1.mp4", 2524449], ["shiffrin wc gs l1 cam1 soelden 261024.mp4", 4025103], ["holdener wc gs l1 cam1 soelden 261024.mp4", 4312801], ["allenbach wc gs l1 cam1 soelden 261024.mp4", 4315846], ["brignone_wc_sg_camGH_cortina_260212.mp4", 17302153], ["blanc_wc_sg_camGH_cortina_260212.mp4", 11442032], ["schmitt_wc_sg_camGH_cortina_260212.mp4", 16428581], ["curtoni_wc_dh_tr1_camGH_valdisere_251218.mp4", 19536464], ["delago_wc_dh_tr1_camGH_valdisere_251218.mp4", 18695552], ["durrer_wc_dh_tr1_camGH_valdisere_251218.mp4", 19497247], ["ming_wc_dh_tr1_camGH_valdisere_251218.mp4", 20160965]];
+const REAL_DEMO=[["Meillard_Soelden_251026_GS_M_L1.mp4", 15594565], ["Gratz_Soelden_251026_GS_M_L1.mp4", 14564292], ["Braathen_Soelden_251026_GS_M_L1.mp4", 14949042], ["monney_v1_sg_tr9_stelvio_261029.mp4", 4700405], ["monney_v2_sg_tr9_stelvio_261029.mp4", 6197945], ["monney_v4_sg_tr9_stelvio_261029.mp4", 7033808], ["rogentin_v1_sg_tr3_stelvio_261029.mp4", 5102860], ["rogentin_v2_sg_tr3_stelvio_261029.mp4", 6596645], ["rogentin_v4_sg_tr3_stelvio_261029.mp4", 8349539], ["boisset_vgh_dh_tr1_courchevel_260311.mp4", 21193253], ["kriechmayr_vgh_dh_tr1_courchevel_260311.mp4", 20048025], ["allegre_vgh_dh_tr1_courchevel_260311.mp4", 22408170], ["moltzan_wc_gs_l2_camGH_hafjell_260325.mp4", 20632437], ["rast_wc_gs_l2_camGH_hafjell_260325.mp4", 22233687], ["holdener_wc_sl_l1_camGH_hafjell_260324.mp4", 19428840], ["shiffrin_wc_sl_l1_camGH_hafjell_260324.mp4", 19594008], ["odermatt lauf1 261025 GS soelden v1.mp4", 2676704], ["braathen lauf1 261025 GS soelden v1.mp4", 1935003], ["haechler lauf1 261025 GS soelden v1.mp4", 2524449], ["shiffrin wc gs l1 cam1 soelden 261024.mp4", 4025103], ["holdener wc gs l1 cam1 soelden 261024.mp4", 4312801], ["allenbach wc gs l1 cam1 soelden 261024.mp4", 4315846], ["brignone_wc_sg_camGH_cortina_260212.mp4", 17302153], ["blanc_wc_sg_camGH_cortina_260212.mp4", 11442032], ["schmitt_wc_sg_camGH_cortina_260212.mp4", 16428581], ["curtoni_wc_dh_tr1_camGH_valdisere_251218.mp4", 19536464], ["delago_wc_dh_tr1_camGH_valdisere_251218.mp4", 18695552], ["durrer_wc_dh_tr1_camGH_valdisere_251218.mp4", 19497247], ["ming_wc_dh_tr1_camGH_valdisere_251218.mp4", 20160965]];
 // Zeitpunkt im Video, an dem alle Läufe derselben Serie am gleichen Ort sind (gemessen)
 const DEMO_OFF={'boisset_vgh_dh_tr1_courchevel_260311.mp4':0.7,'kriechmayr_vgh_dh_tr1_courchevel_260311.mp4':0.3,'allegre_vgh_dh_tr1_courchevel_260311.mp4':0,'moltzan_wc_gs_l2_camGH_hafjell_260325.mp4':0,'rast_wc_gs_l2_camGH_hafjell_260325.mp4':2.0,'holdener_wc_sl_l1_camGH_hafjell_260324.mp4':0.7,'shiffrin_wc_sl_l1_camGH_hafjell_260324.mp4':0};
 (async()=>{
@@ -5897,7 +5934,7 @@ const DEMO_OFF={'boisset_vgh_dh_tr1_courchevel_260311.mp4':0.7,'kriechmayr_vgh_d
   // Rennvideos nach vorne in der Liste
   real.slice().reverse().forEach(c=>{ const i=clips.indexOf(c); if(i>0){ clips.splice(i,1); clips.unshift(c); } });
   if(!S.clip||S.clip.demo){ S.setClip(real[0]); }
-  if(!GD.clip||GD.clip.demo){ GD.setClip(real[0]); if(typeof gpsSelects==='function') gpsSelects(); }
+  if(!GD.clip||GD.clip.demo){ GD.setClip(real.find(c=>/^monney_v1_.*stelvio/.test(c.name))||real[0]); if(typeof gpsSelects==='function') gpsSelects(); } // GPS-Ansicht: Beispiel mit echten innove-Daten
   if((!A.clip||A.clip.demo)&&(!B.clip||B.clip.demo)){ A.setClip(real[0]); B.setClip(real[1]);
   }
   syncSelects(); renderLib(); refreshSingleHead();
@@ -5918,7 +5955,7 @@ async function fieldSync(){ if(!window.indexedDB) return; let db;
   if(n||ch){ renderLib(); syncSelects(); }
   if(n) toast(n===1?'1 Lauf aus «Filmen» in der Liste':n+' Läufe aus «Filmen» in der Liste',3000); }
 setTimeout(fieldSync,600);
-{ const mq=matchMedia('(max-height:500px) and (orientation:landscape) and (pointer:coarse)'); const go=()=>{ if(!mq.matches) return; const v=mode==='single'?$('#viewSingle'):mode==='gps'?$('#viewGps'):$('#viewCmp'); setTimeout(()=>{ if(v) window.scrollTo({top:v.getBoundingClientRect().top+scrollY,behavior:'instant'}); decks.forEach(d=>{ d.dirty=true; d.annDirty=true; }); },250); }; try{ mq.addEventListener('change',go); }catch(e){ mq.addListener(go); } } // Handy quer drehen = Player bildschirmfüllend document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='visible') fieldSync(); });
+{ const mq=matchMedia('(max-height:500px) and (orientation:landscape) and (pointer:coarse)'); const go=()=>{ if(!mq.matches) return; const v=mode==='single'?$('#viewSingle'):mode==='gps'?$('#viewGps'):$('#viewCmp'); setTimeout(()=>{ if(v) window.scrollTo({top:v.getBoundingClientRect().top+scrollY,behavior:'instant'}); decks.forEach(d=>{ d.dirty=true; d.annDirty=true; }); },250); }; try{ mq.addEventListener('change',go); }catch(e){ mq.addListener(go); } } /* Handy quer drehen = Player bildschirmfüllend */ document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='visible') fieldSync(); });
 
 /* ---- Handy kompakt: «…» oben, Videoliste als Blatt, Speichern/«…» unten im Vergleich, Zoom der Zeitleiste mit zwei Fingern ---- */
 (()=>{ const MQ=matchMedia('(max-width:600px)'), I=(d)=>'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">'+d+'</svg>';
@@ -5936,9 +5973,9 @@ setTimeout(fieldSync,600);
   // Videoliste als Blatt
   const lc=$('.libcard'), bk=document.createElement('div'); bk.className='lib-back'; document.body.appendChild(bk);
   const sh=document.createElement('div'); sh.className='lib-sh'; sh.innerHTML='<b>Videos</b><button aria-label="Schliessen">'+I('<path d="M6 6l12 12M18 6L6 18"/>')+'</button>'; lc.prepend(sh);
-  window.libOpen=on=>{ document.body.classList.toggle('lib-open',!!on&&MQ.matches); };
+  window.libOpen=on=>{ if(on&&MQ.matches&&mode==='single'){ lc.scrollIntoView({behavior:'smooth',block:'start'}); return; } document.body.classList.toggle('lib-open',!!on&&MQ.matches); }; // Ein Video: Liste steht unten → hinscrollen
   bk.addEventListener('click',()=>libOpen(false)); $('button',sh).addEventListener('click',()=>libOpen(false));
-  lc.addEventListener('click',e=>{ if(!MQ.matches) return; if(e.target.closest('.clip.row .x,.clip.row .rn,input,.lib-view,.side-tabs,.ft-addmini')) return; if(e.target.closest('.clip.row,.ft-row.file,.ft-demo .ft-row,.demo-row')) setTimeout(()=>libOpen(false),180); });
+  lc.addEventListener('click',e=>{ if(!MQ.matches) return; if(e.target.closest('.clip.row .x,.clip.row .rn,input,.lib-view,.side-tabs,.ft-addmini')) return; if(e.target.closest('.clip.row,.ft-row.file,.ft-demo .ft-row,.demo-row')) setTimeout(()=>{ const wasSheet=document.body.classList.contains('lib-open'); libOpen(false); if(!wasSheet) window.scrollTo({top:0,behavior:'smooth'}); },180); }); // gewählt → zurück zum Player
   $('#sTitle').addEventListener('click',()=>{ if(MQ.matches) libOpen(true); });
   // Vergleich: Speichern + «…» in die Knopfleiste
   const tools=$('#viewCmp .cmp-tools'), sv=tools&&$('.save-w',tools), mb=document.createElement('button'); mb.className='ctl m-more'; mb.title='Mehr'; mb.innerHTML='<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg>';
@@ -6000,7 +6037,7 @@ if(false&&!LS.get('hint1',0)){ setTimeout(()=>{ toast(matchMedia('(pointer:coars
 
 /* Update-Hinweis: prüft version.json auf GitHub Pages; «Aktualisieren» lädt die Seite ohne Cache neu */
 (()=>{
-  const BUILD='20261030135357'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
+  const BUILD='20261030144233'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
   // nach einem Update die ?v=… aus der Adresse entfernen
   try{ const u=new URL(location.href); if(u.searchParams.has('v')){ u.searchParams.delete('v'); history.replaceState(null,'',u.pathname+(u.search||'')+u.hash); } }catch(e){}
   const el=$('#upd'); let latest=null, snoozed=null, busy=false;
