@@ -2196,7 +2196,27 @@ button.lg-it:hover{background:rgba(12,15,20,.8);border-color:rgba(255,255,255,.3
 .inv-list button:hover,.inv-list button:active{background:var(--field)}
 .inv-list small{color:var(--muted);font-weight:500}
 #gpsInv.busy{opacity:.6;pointer-events:none}
-@media (pointer:coarse),(max-width:760px){ .stage .osd-r .pill.rt{display:none!important} } /* Tempo steht schon in der Knopfleiste, auch quer */
+.stage .osd-r .pill.rt{display:none!important} /* Tempo steht schon in der Knopfleiste – nie im Bild */
+@media (max-width:760px){ #gpsInv{display:none!important} } /* innove steht in der Kopfzeile */
+
+.gv-btn{display:none}
+.gv-menu{position:fixed;z-index:400;background:var(--card,#1b1f26);color:var(--ink,#fff);border:1px solid rgba(255,255,255,.12);border-radius:12px;box-shadow:0 12px 32px rgba(0,0,0,.35);padding:5px;min-width:150px}
+.gv-menu button{display:flex;align-items:center;gap:10px;width:100%;border:0;background:none;color:inherit;font:600 14px var(--font);padding:9px 10px;border-radius:8px;text-align:left}
+.gv-menu button i{width:18px;height:18px;border-radius:5px;border:1.6px solid currentColor;opacity:.5;display:grid;place-items:center;font-style:normal;font-size:12px}
+.gv-menu button.on i{background:#DA291C;border-color:#DA291C;opacity:1;color:#fff}
+@media (max-width:600px){
+  #viewGps .gps-viewopts{display:none!important}
+  #viewGps .gv-btn{display:inline-flex!important;align-items:center;justify-content:center;gap:0;width:auto!important;min-width:0!important;padding:0 5px!important}
+  #viewGps .gv-btn svg{width:17px;height:17px}
+  #viewGps .gv-btn svg.dd{width:12px;height:12px;margin-left:1px;opacity:.7}
+  #viewGps .dock.dock3{padding:5px 4px!important;gap:5px 6px!important}
+  #viewGps .dz-c .grp{gap:3px!important}
+  #viewGps .dz-c .ctl:not(.play),#viewGps.inv-trk .dz-c .ctl:not(.play){min-width:34px!important;width:34px!important;height:34px!important}
+  #viewGps .dz-c .rate-btn,#viewGps .dz-c .gv-btn{width:auto!important;padding:0 6px!important;margin-left:3px!important;height:34px!important}
+  #viewGps .ctl.play,#viewGps.inv-trk .ctl.play{width:42px!important;height:42px!important;min-width:42px!important}
+  #viewGps .dz-r .ctl,#viewGps.inv-trk .dz-r .ctl{width:34px!important;min-width:34px!important;height:34px!important}
+  #viewGps .dz-l .ctl{height:34px!important}
+}
 </style>
 </head>
 <body class="m-single">
@@ -2319,7 +2339,7 @@ button.lg-it:hover{background:rgba(12,15,20,.8);border-color:rgba(255,255,255,.3
         <button class="ctl play" data-act="play" title="Abspielen / Pause (Leertaste)"></button>
         <button class="ctl" data-act="step" data-n="1" title="1 Bild vor"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/><path d="M18 6v12" opacity=".55"/></svg></button>
         <button class="ctl" data-act="step" data-n="10" title="10 Bilder vor"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.5 17l5-5-5-5"/><path d="M6 17l5-5-5-5"/></svg></button>
-      <button class="ctl rate-btn" data-act="rate" title="Tempo: Klick wechselt 1× → ½× → ¼× → 0.1× (↑ / ↓ auch 1.5× und 2×)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 16a8 8 0 1 1 15 0"/><path d="M12 12.5l3.5-4"/><circle cx="12" cy="13" r="1.3" fill="currentColor"/></svg><span>1×</span></button></div></div>
+      <button class="ctl rate-btn" data-act="rate" title="Tempo: Klick wechselt 1× → ½× → ¼× → 0.1× (↑ / ↓ auch 1.5× und 2×)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 16a8 8 0 1 1 15 0"/><path d="M12 12.5l3.5-4"/><circle cx="12" cy="13" r="1.3" fill="currentColor"/></svg><span>1×</span></button><button class="ctl gv-btn" id="gpsViewBtn" title="Anzeigen im Bild"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l9 5-9 5-9-5z"/><path d="M3 13l9 5 9-5"/></svg><svg class="dd" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M7 10l5 5 5-5"/></svg></button></div></div>
       <div class="dz dz-r"><div class="grp">
         
         
@@ -2406,7 +2426,7 @@ button.lg-it:hover{background:rgba(12,15,20,.8);border-color:rgba(255,255,255,.3
 <div class="modal" id="invModal">
   <div class="help inv" role="dialog" aria-label="Bei innove anmelden">
     <h3>Bei innove anmelden <button class="hdr-ico" id="invX" title="Schliessen">✕</button></h3>
-    <p class="inv-p">Derselbe Zugang wie in der alten Video-App. Das Passwort wird nicht gespeichert – das Video-Lab merkt sich nur die Anmeldung auf diesem Gerät und liest bei innove nur (keine Änderungen).</p>
+    <p class="inv-p">Derselbe Zugang wie in der alten Video-App. Das Passwort wird nicht gespeichert – das Video-Lab merkt sich nur die Anmeldung auf diesem Gerät und liest bei innove nur (keine Änderungen). Klappt die Anmeldung nicht, geht im Passwortfeld auch ein innove-Token (beginnt mit «eyJ»).</p>
     <form id="invForm" autocomplete="on"><label class="inv-l">Benutzername<input id="invU" name="username" autocomplete="username" autocapitalize="off" spellcheck="false"></label>
     <label class="inv-l">Passwort<input id="invP" name="password" type="password" autocomplete="current-password"></label>
     <p class="inv-err" id="invErr" hidden></p>
@@ -3433,18 +3453,21 @@ function tick(){
   try{ tickBody(); }catch(err){ console.error(err); }
   requestAnimationFrame(tick);
 }
+/* Jeder Teil einzeln abgesichert: ein Fehler in einem Teil darf die anderen Anzeigen (z. B. GPS) nicht anhalten */
+const TICKERR=new Set();
+function tickSafe(n,f){ try{ f(); }catch(err){ const m=n+': '+(err&&err.message||err); if(!TICKERR.has(m)){ TICKERR.add(m); console.error(err); if(TICKERR.size<=2&&typeof toast==='function') toast('Anzeigefehler ('+m.slice(0,90)+') – bitte melden.',5000); } } }
 function tickBody(){
   for(const d of decks){
     const vis=d.tl.offsetParent!==null;
-    if(d.ready&&!d.v.paused){ d.tickPlaying(); d.dirty=true; }
-    if(d.dirty&&vis){ d.dirty=false; d.draw(); }
-    if(d.annDirty&&vis){ d.annDirty=false; if(d.draft&&d.draft.t==='angle'&&d.draft._pv){ const keep=d.draft.p; d.draft={...d.draft,p:keep.concat([d.draft._pv])}; d.drawAnn(); d.draft.p=keep; } else d.drawAnn(); }
+    if(d.ready&&!d.v.paused) tickSafe('tick',()=>{ d.tickPlaying(); d.dirty=true; });
+    if(d.dirty&&vis){ d.dirty=false; tickSafe('draw',()=>d.draw()); }
+    if(d.annDirty&&vis) tickSafe('ann',()=>{ d.annDirty=false; if(d.draft&&d.draft.t==='angle'&&d.draft._pv){ const keep=d.draft.p; d.draft={...d.draft,p:keep.concat([d.draft._pv])}; d.drawAnn(); d.draft.p=keep; } else d.drawAnn(); });
   }
-  linkedTick();
-  if(EXP.live&&!EXP.wc) exportFrame();
-  if(mode==='cmp') renderOv();
-  if(mode==='cmp'&&G.linked&&!A.v.paused) updSync();
-  if(mode==='gps'&&(GPS.dirty||!GD.v.paused)){ GPS.dirty=false; drawGpsOverlay(); }
+  tickSafe('link',linkedTick);
+  if(EXP.live&&!EXP.wc) tickSafe('exp',exportFrame);
+  if(mode==='cmp') tickSafe('ov',renderOv);
+  if(mode==='cmp'&&G.linked&&!A.v.paused) tickSafe('sync',updSync);
+  if(mode==='gps'&&(GPS.dirty||!GD.v.paused)){ GPS.dirty=false; tickSafe('gps',()=>drawGpsOverlay()); }
 }
 listeners.add((ev,c)=>{ if(S.clip===c) refreshSingleHead(); cmpMeta(); decks.forEach(d=>{ if(d.clip===c){ d.dirty=true; d.annDirty=true; } }); });
 
@@ -4852,27 +4875,29 @@ function accCol(a,alpha=1){ const m=clamp(Math.abs(a)/0.4,0.25,1); return a>=0?`
 function fmtD(x,d=2){ return (x<=0?'−':'+')+Math.abs(x).toFixed(d); }
 
 /* ---------- Overlay auf dem Video ---------- */
-function drawGpsOverlay(){
-  const cv=$('canvas.gpsov',GD.stage); const N=gpsNow(); cv.hidden=!N; $('#gpsNo').hidden=!!N||!GD.ready; if(!N) return;
-  const {tr,cur}=N, W=GD.stage.clientWidth, H=GD.stage.clientHeight, d=DPR();
-  if(cv.width!==Math.round(W*d)||cv.height!==Math.round(H*d)){ cv.width=Math.round(W*d); cv.height=Math.round(H*d); }
-  const x=cv.getContext('2d'); x.setTransform(d,0,0,d,0,0); x.clearRect(0,0,W,H);
-  const R=GD.rect(), ff=getComputedStyle(document.body).fontFamily, ref=GPS.tracks.find(t=>t.id===tr.ref);
-  const P=tr.P, iS=tr.iS, iE=tr.iE, k=clamp(R.w/760,0.85,1.5), small=R.w<520;
+function drawGpsOverlay(T){ /* T={x,R}: direkt in den Export zeichnen (volle Auflösung, grosse Darstellung) */
+  const N=gpsNow(); let x, R;
+  if(T){ if(!N) return; x=T.x; R=T.R; x.save(); }
+  else { const cv=$('canvas.gpsov',GD.stage); cv.hidden=!N; $('#gpsNo').hidden=!!N||!GD.ready; if(!N) return;
+    const W=GD.stage.clientWidth, H=GD.stage.clientHeight, d=DPR();
+    if(cv.width!==Math.round(W*d)||cv.height!==Math.round(H*d)){ cv.width=Math.round(W*d); cv.height=Math.round(H*d); }
+    x=cv.getContext('2d'); x.setTransform(d,0,0,d,0,0); x.clearRect(0,0,W,H); R=GD.rect(); }
+  const {tr,cur}=N, ff=getComputedStyle(document.body).fontFamily, ref=GPS.tracks.find(t=>t.id===tr.ref);
+  const P=tr.P, iS=tr.iS, iE=tr.iE, k=T?R.h/430:clamp(R.w/760,0.85,1.5), small=!T&&R.w<520;
   const txt=(s,X,Y,size,col,al='left',w=800)=>{ x.font=`${w} ${size*k}px ${ff}`; x.textAlign=al; x.textBaseline='middle'; x.lineWidth=3*k; x.strokeStyle='rgba(0,0,0,.55)'; x.strokeText(s,X,Y); x.fillStyle=col; x.fillText(s,X,Y); };
   const rr=(X,Y,w,h,r)=>{ x.beginPath(); if(x.roundRect) x.roundRect(X,Y,w,h,r); else x.rect(X,Y,w,h); };
   const inRun=N.tg>=tr.tStart-0.3&&N.tg<=tr.tEnd+0.3;
   /* 1) Tacho unten rechts: Bogen füllt sich mit dem Tempo, Spitze und Referenz als Marken */
-  const TD=clamp(Math.min(R.w*0.26,R.h*0.42),112,230), TX=R.x+R.w-TD/2-12*k, TY=R.y+R.h-TD/2-10*k;
+  const TD=T?R.h*0.36:small?clamp(Math.min(R.w*0.24,R.h*0.36),76,104):clamp(Math.min(R.w*0.26,R.h*0.42),112,230), TX=R.x+R.w-TD/2-(small?6:12)*k, TY=R.y+R.h-TD/2-(small?6:10)*k;
   if(GPS.view.band){
     const have=N.tg>=P[0].t-0.3&&N.tg<=P[P.length-1].t+0.3, rad=TD/2, f=TD/200;
     const vhiK=Math.max(40,Math.ceil(KMH(Math.max(tr.vmax,ref?ref.vmax:0))*1.04/10)*10), A0=Math.PI*0.75, A1=Math.PI*2.25, AV=v=>A0+(A1-A0)*clamp(KMH(v)/vhiK,0,1), AK=kmh=>A0+(A1-A0)*clamp(kmh/vhiK,0,1);
     const g=x.createRadialGradient(TX,TY-rad*0.3,rad*0.1,TX,TY,rad); g.addColorStop(0,'rgba(28,34,44,.82)'); g.addColorStop(1,'rgba(8,11,16,.86)');
     x.fillStyle=g; x.beginPath(); x.arc(TX,TY,rad,0,7); x.fill(); x.strokeStyle='rgba(255,255,255,.14)'; x.lineWidth=1.2; x.stroke();
-    const ar=rad*0.8, aw=11*f;
+    const ar=rad*(small?0.84:0.8), aw=(small?14:11)*f;
     x.lineCap='round'; x.strokeStyle='rgba(255,255,255,.1)'; x.lineWidth=aw; x.beginPath(); x.arc(TX,TY,ar,A0,A1); x.stroke();
     /* Skala: kurze Striche alle 10 km/h, Zahlen alle 20 */
-    for(let v=0;v<=vhiK;v+=10){ const an=AK(v), maj=v%20===0, r1=ar-aw*0.5-3*f, r2=r1-(maj?9:5)*f;
+    for(let v=0;v<=vhiK;v+=small?20:10){ const an=AK(v), maj=v%20===0, r1=ar-aw*0.5-3*f, r2=r1-(maj?9:5)*f;
       x.strokeStyle=maj?'rgba(255,255,255,.6)':'rgba(255,255,255,.3)'; x.lineWidth=(maj?2:1.2)*f; x.lineCap='butt'; x.beginPath(); x.moveTo(TX+Math.cos(an)*r1,TY+Math.sin(an)*r1); x.lineTo(TX+Math.cos(an)*r2,TY+Math.sin(an)*r2); x.stroke();
       if(maj&&TD>=130){ const rl=r2-9*f; x.font=`700 ${10*f}px ${ff}`; x.fillStyle='rgba(255,255,255,.55)'; x.textAlign='center'; x.textBaseline='middle'; x.fillText(String(v),TX+Math.cos(an)*rl,TY+Math.sin(an)*rl); } }
     if(have){ const ae=AV(cur.v); let col='#DA291C';
@@ -4885,9 +4910,9 @@ function drawGpsOverlay(){
       x.fillStyle='#fff'; x.beginPath(); x.arc(TX+Math.cos(ae)*ar,TY+Math.sin(ae)*ar,aw*0.32,0,7); x.fill(); }
     /* Mitte: Tempo gross, darunter Einheit und Beschleunigung, unten Differenz zur Referenz */
     x.textAlign='center'; x.textBaseline='middle';
-    x.font=`800 ${36*f}px ${ff}`; x.fillStyle='#fff'; x.fillText(have?KMH(cur.v).toFixed(1):'—',TX,TY-2*f);
-    x.font=`700 ${11*f}px ${ff}`; x.fillStyle='rgba(255,255,255,.6)'; x.fillText('km/h',TX,TY+22*f);
-    if(have){ x.font=`700 ${12*f}px ${ff}`; x.fillStyle=cur.a>=0?'#5ee38a':'#ff7b72'; x.fillText((cur.a>=0?'+':'−')+Math.abs(cur.a).toFixed(2)+' g',TX,TY+38*f); }
+    x.font=`800 ${(small?44:36)*f}px ${ff}`; x.fillStyle='#fff'; x.fillText(have?(small?KMH(cur.v).toFixed(0):KMH(cur.v).toFixed(1)):'—',TX,TY-2*f);
+    x.font=`700 ${(small?17:11)*f}px ${ff}`; x.fillStyle='rgba(255,255,255,.6)'; x.fillText('km/h',TX,TY+(small?30:22)*f);
+    if(have&&!small){ x.font=`700 ${12*f}px ${ff}`; x.fillStyle=cur.a>=0?'#5ee38a':'#ff7b72'; x.fillText((cur.a>=0?'+':'−')+Math.abs(cur.a).toFixed(2)+' g',TX,TY+38*f); }
   }
   // 2) Fahrlinie («Schlange») rechts
   if(GPS.view.snake){
@@ -4903,7 +4928,9 @@ function drawGpsOverlay(){
       if(!ref||!tr.dt) col='#3b8bff'; else { const d0=tr.dt[Math.max(iS,j-6)],d1=tr.dt[Math.min(iE,j+6)]; col=d0==null||d1==null?'#3b8bff':(d1<=d0?'#34c759':'#ff453a'); } /* geglättet über ±0.6 s */
       x.strokeStyle=col; x.lineWidth=4.5*k; x.beginPath(); x.moveTo(...M(pts[i-1])); x.lineTo(...M(pts[i])); x.stroke(); }
     if(inRun){ const m=M(rot(cur)); x.fillStyle='#fff'; x.beginPath(); x.moveTo(m[0]-4*k,m[1]); x.lineTo(m[0]-16*k,m[1]-8*k); x.lineTo(m[0]-16*k,m[1]+8*k); x.closePath(); x.fill();
-      if(ref&&cur.dt!=null||!GPS.view.band){ const lx=m[0]-22*k, withRef=ref&&cur.dt!=null, bw2=(withRef?150:96)*k, bh2=(withRef?50:26)*k, by2=m[1]-bh2/2;
+      if(small&&ref&&cur.dt!=null){ const lead=cur.dt<=0, c2=lead?'#5ee38a':'#ff7b72', t2=(lead?'−':'+')+Math.abs(cur.dt).toFixed(2)+' s', lx=m[0]-20*k; x.font=`800 ${12*k}px ${ff}`; const w2=x.measureText(t2).width+14*k;
+        x.fillStyle='rgba(10,14,20,.7)'; rr(lx-w2,m[1]-11*k,w2,22*k,6*k); x.fill(); txt(t2,lx-7*k,m[1],12,c2,'right',800); }
+      else if(!small&&(ref&&cur.dt!=null||!GPS.view.band)){ const lx=m[0]-22*k, withRef=ref&&cur.dt!=null, bw2=(withRef?150:96)*k, bh2=(withRef?50:26)*k, by2=m[1]-bh2/2;
         x.fillStyle='rgba(10,14,20,.66)'; rr(lx-bw2,by2,bw2+4*k,bh2,8*k); x.fill();
         if(withRef){ const lead=cur.dt<=0, c2=lead?'#5ee38a':'#ff7b72';
           x.fillStyle=c2; rr(lx-bw2,by2,4*k,bh2,2*k); x.fill();
@@ -4913,14 +4940,16 @@ function drawGpsOverlay(){
   }
   // 3) Laufzeit & Differenz
   if(GPS.view.time){
-    const dIn=ref&&!(small&&GPS.view.snake), rt=N.tg-tr.tStart, bw=(dIn?210:120)*k, bh=52*k, bx=(small||GPS.view.band)?R.x+12*k:R.x+R.w-bw-12*k, by=GPS.view.band?R.y+((R.x<200&&!small)?44:10)*1:R.y+R.h-bh-12*k; /* mit Tacho oben links */
-    x.fillStyle='rgba(10,14,20,.62)'; rr(bx,by,bw,bh,10*k); x.fill();
+    const dIn=ref&&!(small&&GPS.view.snake), rt=N.tg-tr.tStart, bw=(dIn?210:120)*k, bh=52*k, bx=(small||GPS.view.band)?R.x+12*k:R.x+R.w-bw-12*k, by=GPS.view.band?R.y+((!T&&R.x<200&&!small)?44:10)*k:R.y+R.h-bh-12*k; /* mit Tacho oben links */
+    if(small&&!dIn){ const t3=rt<0?'—':Math.min(rt,tr.tEnd-tr.tStart).toFixed(2)+' s'; x.font=`800 ${14*k}px ${ff}`; const w3=x.measureText(t3).width+16*k, y3=R.y+8*k;
+      x.fillStyle='rgba(10,14,20,.62)'; rr(R.x+8*k,y3,w3,24*k,7*k); x.fill(); txt(t3,R.x+16*k,y3+12*k,14,'#fff','left',800); }
+    else { x.fillStyle='rgba(10,14,20,.62)'; rr(bx,by,bw,bh,10*k); x.fill();
     txt('Laufzeit',bx+12*k,by+14*k,10.5,'rgba(255,255,255,.7)','left',700);
     txt(rt<0?'—':Math.min(rt,tr.tEnd-tr.tStart).toFixed(2),bx+12*k,by+35*k,22,'#fff','left',800);
-    if(dIn){ txt('Differenz',bx+bw-12*k,by+14*k,10.5,'rgba(255,255,255,.7)','right',700); const dv=cur.dt; txt(dv==null||!inRun?'—':fmtD(dv),bx+bw-12*k,by+35*k,22,dv==null?'#fff':dv<=0?'#5ee38a':'#ff7b72','right',800); }
+    if(dIn){ txt('Differenz',bx+bw-12*k,by+14*k,10.5,'rgba(255,255,255,.7)','right',700); const dv=cur.dt; txt(dv==null||!inRun?'—':fmtD(dv),bx+bw-12*k,by+35*k,22,dv==null?'#fff':dv<=0?'#5ee38a':'#ff7b72','right',800); } }
   }
   // Kopfzeile: Lauf vs Referenz
-  x.font=`700 ${11*k}px ${ff}`;
+  if(T){ x.restore(); return; }
   drawGpsChart(N);
 }
 /* ---------- Profil unter dem Video ---------- */
@@ -4973,6 +5002,15 @@ $('#gpsSync').addEventListener('click',gpsSyncHere);
 $$('[data-gn]').forEach(b=>b.addEventListener('click',()=>{ const v=b.dataset.gn; gpsNudge(v.endsWith('f')?parseFloat(v)/GD.fps:parseFloat(v)); }));
 $('#gpsView').addEventListener('click',e=>{ const b=e.target.closest('[data-v]'); if(!b) return; GPS.view[b.dataset.v]=!GPS.view[b.dataset.v]; b.classList.toggle('on',GPS.view[b.dataset.v]); GPS.dirty=true; });
 false&&$('#gpsColor').addEventListener('click',e=>{ const b=e.target.closest('[data-c]'); if(!b) return; GPS.color=b.dataset.c; $$('#gpsColor button').forEach(x=>x.classList.toggle('on',x===b)); GPS.dirty=true; });
+
+/* Handy: Anzeigen (Tacho/Linie/Zeit) als Auswahlmenü in der Knopfleiste */
+$('#gpsViewBtn').addEventListener('click',e=>{ e.stopPropagation(); let m=$('#gvMenu'); if(m){ m.remove(); return; }
+  m=document.createElement('div'); m.id='gvMenu'; m.className='gv-menu';
+  const fill=()=>{ m.innerHTML=$$('#gpsView [data-v]').map(b=>`<button data-v="${b.dataset.v}" class="${b.classList.contains('on')?'on':''}"><i>${b.classList.contains('on')?'✓':''}</i>${b.textContent}</button>`).join(''); };
+  fill(); document.body.appendChild(m); const r=e.currentTarget.getBoundingClientRect(), mw=m.offsetWidth, mh=m.offsetHeight;
+  m.style.left=Math.max(8,Math.min(innerWidth-mw-8,r.right-mw))+'px'; m.style.top=(r.top-mh-6>8?r.top-mh-6:r.bottom+6)+'px';
+  m.addEventListener('click',ev=>{ ev.stopPropagation(); const b=ev.target.closest('[data-v]'); if(!b) return; $('#gpsView [data-v="'+b.dataset.v+'"]').click(); fill(); });
+  setTimeout(()=>document.addEventListener('click',function off(ev){ if(ev.target.closest&&ev.target.closest('#gpsView,#gvMenu')) return; const mm=$('#gvMenu'); if(mm) mm.remove(); document.removeEventListener('click',off); }),0); });
 $('#gpsChart').addEventListener('click',e=>{ const N=gpsNow(); if(!N) return; const r=e.currentTarget.getBoundingClientRect(); const {tr,c}=N, P=tr.P, s0=P[tr.iS].s, s1=P[tr.iE].s;
   const s=s0+clamp((e.clientX-r.left-64)/(r.width-74),0,1)*(s1-s0); let i=tr.iS; while(i<tr.iE&&P[i].s<s) i++; GD.pause(); GD.seekTime(P[i].t-c.gpsOff); GPS.dirty=true; });
 function importGpsFiles(files){ [...files].forEach(f=>{ const rd=new FileReader(); rd.onload=()=>{ try{ const made=addTracks(parseGps(String(rd.result),f.name)); if(made.length){ toast('GPS geladen: '+made.map(t=>t.name).join(', ')); if(mode!=='gps') setMode('gps'); gpsTabUI(); } }catch(err){ toast('GPS-Datei nicht lesbar: '+err.message,4500); } }; rd.readAsText(f); }); }
@@ -4983,7 +5021,10 @@ $('#gpsIn').addEventListener('change',e=>{ if(e.target.files&&e.target.files.len
    Überlappung (sonst der nächste innert 2 min) → Rohspur des Sensors ±5 s. Jede:r meldet sich mit dem eigenen innove-Zugang an; gespeichert wird nur das Token. */
 const INV={B:'https://api.innove.swiss/swissski/v1',TOL:120000,PAD:5000};
 const invAuth=()=>LS.get('innove',null);
-async function invLogin(u,p){ let r; try{ r=await fetch(INV.B+'/auth/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:u.trim(),password:p})}); }catch(e){ throw new Error('innove ist von diesem Gerät aus nicht erreichbar (Netz oder Sperre) – '+(e&&e.message||'kein Kontakt')+'.'); }
+async function invLogin(u,p){ p=String(p).trim()===p?p:p; /* Token statt Passwort (aus dem innove-Dashboard kopiert) */
+  if(/^eyJ[\w-]+\.[\w-]+\.[\w-]+$/.test(String(p).trim())){ LS.set('innove',{token:String(p).trim(),refresh:null,user:u||'Token'}); gpsTabUI(); if(typeof invBtnUI==='function') invBtnUI(); return true; }
+  try{ return await invLogin1(u,p); }catch(e){ if(/\[innove: 401/.test(e.message)&&u.includes('@')){ try{ return await invLogin1(u.split('@')[0],p); }catch(e2){} } throw e; } } /* manche Zugänge haben den Namen ohne @… */
+async function invLogin1(u,p){ let r; try{ r=await fetch(INV.B+'/auth/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:u.trim(),password:p})}); }catch(e){ throw new Error('innove ist von diesem Gerät aus nicht erreichbar (Netz oder Sperre) – '+(e&&e.message||'kein Kontakt')+'.'); }
   if(!r.ok){ let m=''; try{ m=((await r.json())||{}).message||''; }catch(e){} throw new Error((r.status===401?'innove kennt diese Kombination nicht – E-Mail und Passwort wie im GPS-Dashboard (dashboard.innove.ch) verwenden.':'Anmeldung fehlgeschlagen.')+' [innove: '+r.status+(m?' · '+m:'')+']'); }
   const j=await r.json(); LS.set('innove',{token:j.token,refresh:j.refreshToken,user:u}); gpsTabUI(); if(typeof invBtnUI==='function') invBtnUI(); return true; }
 async function invGet(path){ let a=invAuth(); if(!a) throw new Error('login'); const go=t=>fetch(INV.B+path,{headers:{Authorization:'Bearer '+t}});
@@ -5282,7 +5323,7 @@ function exportFrame(){
   let ox=0;
   (E.ovl?[A]:ds).forEach((d,i)=>{ const w=ws[i]; drawVid(x,d,ox,0,w,H); if(E.ovl){ ovDrawB(x,ox,0,w,H); if(opt.legend) legendDrawTo(x,ox,0,w,H); } else if(mode==='cmp'){ timDrawTo(x,d,ox,0,w,H); gateDrawTo(x,d,ox,0,w,H); } const R=d.rect();
     if(opt.ann&&d.clip.anns.length) drawAnns(x,{x:ox,y:0,w,h:H},d.clip.anns,w/Math.max(1,R.w));
-    if(mode==='gps'&&opt.gps){ const ov=$('canvas.gpsov',d.stage); if(ov&&!ov.hidden&&ov.width){ const dd=ov.width/d.stage.clientWidth; x.drawImage(ov,R.x*dd,R.y*dd,R.w*dd,R.h*dd,ox,0,w,H); } }
+    if(mode==='gps'&&opt.gps) drawGpsOverlay({x,R:{x:ox,y:0,w,h:H}});
     if(ds.length>1&&!E.ovl){ const k=H/540; x.fillStyle=i?'#e67e22':'#2f6fd0'; x.beginPath(); (x.roundRect?x.roundRect(ox+14*k,14*k,30*k,30*k,7*k):x.rect(ox+14*k,14*k,30*k,30*k)); x.fill(); x.fillStyle='#fff'; x.font=`800 ${17*k}px Geist,-apple-system,Segoe UI,Arial,sans-serif`; x.textAlign='center'; x.textBaseline='middle'; x.fillText(i?'B':'A',ox+29*k,30*k); }
     ox+=w+gap; });
   const k=H/540, ff='Geist,-apple-system,Segoe UI,Roboto,Arial,sans-serif';
@@ -6090,7 +6131,7 @@ if(false&&!LS.get('hint1',0)){ setTimeout(()=>{ toast(matchMedia('(pointer:coars
 
 /* Update-Hinweis: prüft version.json auf GitHub Pages; «Aktualisieren» lädt die Seite ohne Cache neu */
 (()=>{
-  const BUILD='20261030161522'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
+  const BUILD='20261030170552'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
   // nach einem Update die ?v=… aus der Adresse entfernen
   try{ const u=new URL(location.href); if(u.searchParams.has('v')){ u.searchParams.delete('v'); history.replaceState(null,'',u.pathname+(u.search||'')+u.hash); } }catch(e){}
   const el=$('#upd'); let latest=null, snoozed=null, busy=false;
