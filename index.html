@@ -2033,6 +2033,12 @@ body.no-hdr .cmp-tools>.save-w .ctl{height:34px!important}
 #viewCmp .ov-panel{position:relative}
 .ov-zl{display:flex;align-items:center;gap:10px;flex:none;min-width:0}
 #viewCmp .ov-steps li span{display:none!important}
+#viewCmp .ov-steps li.on span,#viewCmp .ov-steps li.nx span{display:inline!important;margin-left:7px;white-space:nowrap}
+#viewCmp .ov-steps li.on span{color:#ff8a7d;font-size:13.5px;font-weight:750;letter-spacing:-.01em}
+#viewCmp .ov-steps li.nx span{color:#7f8893;font-weight:600}
+#viewCmp .ov-steps li.on,#viewCmp .ov-steps li.nx{padding-right:8px!important}
+#ovPanel:not(.ov-done) .ov-ttl{display:none}
+#ovPanel.tight2 .ov-steps li.nx span{display:none!important}
 #viewCmp .ov-steps li{padding:3px!important}
 .ov-ttl{font-size:13.5px;font-weight:750;color:#ff8a7d;white-space:nowrap;letter-spacing:-.01em}
 .ov-ttl:empty{display:none}
@@ -2109,14 +2115,30 @@ body.no-hdr .cmp-tools>.save-w .ctl{height:34px!important}
 .vchip .meta{display:none!important}
 @media (max-width:600px){ .vchip{max-width:220px} .vc-lab small{display:none} }
 /* ---- Läufe als Legende im Overlay-Bild ---- */
-.ov-legend{position:absolute;z-index:6;display:flex;flex-wrap:wrap-reverse;gap:6px;pointer-events:auto}
+.ov-legend{display:contents}
+.vc-top .lg-it{pointer-events:auto}
 .ov-legend[hidden]{display:none}
-.lg-it{display:inline-flex;align-items:center;gap:6px;height:26px;padding:0 9px 0 8px;border-radius:999px;border:1px solid rgba(255,255,255,.16);background:rgba(12,15,20,.62);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);color:#fff;font:600 12px var(--font);white-space:nowrap;cursor:pointer;transition:opacity .2s,background .2s}
+.lg-it{display:inline-flex;align-items:center;gap:6px;height:34px;padding:0 10px 0 10px;border-radius:11px;border:1px solid rgba(255,255,255,.16);background:rgba(12,15,20,.66);box-shadow:0 6px 16px -8px rgba(0,0,0,.6);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);color:#fff;font:600 12px var(--font);white-space:nowrap;cursor:pointer;transition:opacity .2s,background .2s}
 button.lg-it:hover{background:rgba(12,15,20,.8);border-color:rgba(255,255,255,.3)}
 .lg-it.base{cursor:default}
 .lg-it i{width:9px;height:9px;border-radius:50%;flex:none}
 .lg-it b{font-weight:800}
 .lg-it span{color:rgba(255,255,255,.86)}
+.lg-it.lg-names svg.ic{width:15px;height:15px;margin:0;color:#ffd166}
+.lg-it.lg-names.off svg.ic{color:#aab4c0}
+.lg-it.lg-names.off span{text-decoration:none!important;color:#aab4c0}
+.vc-eye{display:none;flex:none;place-items:center;width:30px;height:32px;padding:0;border:none;border-left:1px solid rgba(255,255,255,.13);background:transparent;color:#d6dce4;cursor:pointer}
+.vc-eye:hover{background:rgba(255,255,255,.12);color:#fff}
+.vc-eye svg{width:16px;height:16px}
+.vchip.has-eye .vc-eye{display:grid}
+.vchip.off .vc-lab{opacity:.55;text-decoration:line-through;text-decoration-thickness:1.5px}
+.vchip.off .badge{opacity:.55}
+.vchip.off .vc-eye{color:#ffd166}
+#viewCmp.overlay .ov-namebtn{display:none!important}
+.vc-top .op-wrap{pointer-events:auto;display:inline-flex!important;align-items:center;gap:0;height:34px;padding:0 11px 0 10px;border-radius:11px;background:rgba(12,15,20,.66);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.16);box-shadow:0 6px 16px -8px rgba(0,0,0,.6);color:#fff;font-size:0!important}
+.vc-top .op-wrap::before{content:"";width:15px;height:15px;margin-right:8px;flex:none;background:currentColor;opacity:.8;-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.2'%3E%3Ccircle cx='12' cy='12' r='8.5'/%3E%3Cpath d='M12 3.5a8.5 8.5 0 0 1 0 17z' fill='black'/%3E%3C/svg%3E") center/contain no-repeat;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.2'%3E%3Ccircle cx='12' cy='12' r='8.5'/%3E%3Cpath d='M12 3.5a8.5 8.5 0 0 1 0 17z' fill='black'/%3E%3C/svg%3E") center/contain no-repeat}
+.vc-top .op-wrap input.op{width:84px!important;margin:0}
+#viewCmp.overlay .cmp-tools .op-wrap{display:none!important}
 .lg-it.off{opacity:.55}
 .lg-it.off i{background:transparent!important;box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.7)}
 .lg-it.off span:not(.lg-x){text-decoration:line-through;text-decoration-thickness:1.5px}
@@ -2124,6 +2146,27 @@ button.lg-it:hover{background:rgba(12,15,20,.8);border-color:rgba(255,255,255,.3
 .lg-x:hover{background:rgba(255,255,255,.18);color:#fff}
 .lg-x svg{width:10px;height:10px}
 #viewCmp.ov-leg .stage:first-child .tag-ab{display:none}
+#viewCmp.overlay.ov-fin .cmp-tools>.save-w{display:none!important}
+.ov-svmenu{min-width:270px}
+.ov-svmenu button{height:auto!important;padding:8px 10px!important;align-items:center}
+.ov-svmenu button>span{display:flex;flex-direction:column;gap:1px}
+.ov-svmenu b{font-size:13px;font-weight:700;color:#eef2f6}
+.ov-svmenu small{font-size:11px;font-weight:500;color:rgba(255,255,255,.55)}
+.ov-svmenu svg.ic{width:19px!important;height:19px!important}
+#viewCmp.overlay #btnTools,#viewCmp.overlay #cmpMore{display:none!important}
+/* ---- Videoliste einklappen ---- */
+.side-col-btn{display:none;flex:none;width:36px;height:36px;padding:0;border-radius:11px;border:1px solid var(--line,rgba(0,0,0,.08));background:transparent;color:inherit;cursor:pointer;place-items:center;opacity:.75;transition:opacity .2s,background .2s}
+.side-col-btn:hover{opacity:1;background:rgba(127,127,127,.12)}
+.side-col-btn svg{width:19px;height:19px;transition:transform .3s var(--ease-out)}
+@media (min-width:900px){
+  .side-col-btn{display:grid}
+  body.side-col .layout{grid-template-columns:60px minmax(0,1fr)!important}
+  body.side-col .libcard{padding:12px 8px!important;overflow:hidden}
+  body.side-col .libcard>:not(.side-top){display:none!important}
+  body.side-col .libcard .side-top{flex-direction:column;justify-content:flex-start!important;gap:8px}
+  body.side-col .libcard .side-top>:not(.side-col-btn):not(.btn-add){display:none!important}
+  body.side-col .side-col-btn .sc-ar{transform:translateX(-1px) scaleX(-1);transform-origin:14px 12px}
+}
 /* Eine Zeitleiste, sobald A und B gemeinsam laufen */
 #viewCmp.overlay.ov-one .strips>.tl:nth-child(2){display:none}
 @media (prefers-reduced-motion:reduce){
@@ -3034,6 +3077,7 @@ class Deck{
     else if(L&&(L.a!=null||L.b!=null)){ ctx.fillStyle='rgba(8,10,14,.66)'; if(L.a!=null){ const la=X(L.a-0.5); if(la>0) ctx.fillRect(0,0,la,TH); } else { const lb=X(L.b+0.5); if(lb<W) ctx.fillRect(lb,0,W-lb,TH); } }
     ctx.restore();
     want.sort((a,b)=>Math.abs(a.f-f0)-Math.abs(b.f-f0)); g.request(want,f0);
+    if(this===A&&typeof ovStrip==='function') ovStrip(ctx,f=>X(f),TH,W,this.fps);
     // Lineal
     ctx.fillStyle='#0c0f14'; ctx.fillRect(0,TH,W,RH);
     const fa=Math.max(0,Math.floor(f0-cx/ppf)), fb=Math.min(nF-1,Math.ceil(f0+cx/ppf));
@@ -3079,6 +3123,7 @@ class Deck{
     const cw=this.cv.clientWidth||W, half=cw/2/this.ppf;
     const a=clamp((this.fpos-half)/(nF-1),0,1)*W, b=clamp((this.fpos+half)/(nF-1),0,1)*W;
     ctx.fillStyle='rgba(255,255,255,.2)'; ctx.fillRect(a,0,Math.max(2,b-a),H); ctx.strokeStyle='#fff'; ctx.lineWidth=1.5; ctx.strokeRect(a+0.75,0.75,Math.max(3,b-a)-1.5,H-1.5);
+    if(this===A&&typeof ovStrip==='function') ovStrip(ctx,f=>fx(f),H,W,this.fps,true);
     ctx.fillStyle='#ff5a4e'; for(const m of this.clip.markers){ const x=fx(m); ctx.beginPath(); ctx.moveTo(x,2); ctx.lineTo(x+4,6); ctx.lineTo(x,10); ctx.lineTo(x-4,6); ctx.closePath(); ctx.fill(); }
     const px=fx(this.fpos); ctx.fillStyle='#DA291C'; ctx.fillRect(px-1.5,0,3,H);
     ctx.font='700 9.5px ui-monospace,Menlo,Consolas,monospace'; ctx.textBaseline='middle'; ctx.fillStyle='rgba(255,255,255,.85)';
@@ -3213,7 +3258,7 @@ function linkedTick(){
   else if(tight) B.v.playbackRate=clamp(A.rate*(1-G.errS*4),A.rate*0.75,A.rate*1.25);
   else B.v.playbackRate=clamp(A.rate*(1-err*1.5),A.rate*0.85,A.rate*1.15);
 }
-function setLayout(l){ if(l==='ghost') l='side'; if(l!=='overlay'&&typeof OV!=='undefined'&&OV.pick) OV.pick=null; setTimeout(()=>typeof ovUI==='function'&&ovUI(),0);  $$('#layoutSeg button').forEach(x=>x.classList.toggle('on',x.dataset.layout===l)); const v=$('#viewCmp'); v.classList.toggle('overlay',l==='overlay'); v.classList.toggle('ghost',l==='ghost'); if(typeof ghostUI==='function') ghostUI();  LS.set('layout',l); decks.forEach(d=>{ d.dirty=true; d.annDirty=true; }); if(typeof splitsUI==='function') splitsUI(); if(typeof tabsUI==='function') tabsUI(); }
+function setLayout(l){ if(l==='ghost') l='side'; if(l==='overlay'){ try{ if(DRAW.tool&&DRAW.tool!=='none') setTool('none'); if(TIM.on){ TIM.on=false; timUI(); } }catch(e){} } /* Werkzeuge gibt es im Übereinander-Modus nicht */ if(l!=='overlay'&&typeof OV!=='undefined'&&OV.pick) OV.pick=null; setTimeout(()=>typeof ovUI==='function'&&ovUI(),0);  $$('#layoutSeg button').forEach(x=>x.classList.toggle('on',x.dataset.layout===l)); const v=$('#viewCmp'); v.classList.toggle('overlay',l==='overlay'); v.classList.toggle('ghost',l==='ghost'); if(typeof ghostUI==='function') ghostUI();  LS.set('layout',l); decks.forEach(d=>{ d.dirty=true; d.annDirty=true; }); if(typeof splitsUI==='function') splitsUI(); if(typeof tabsUI==='function') tabsUI(); }
 $('#layoutSeg').addEventListener('click',e=>{ const b=e.target.closest('[data-layout]'); if(b) setLayout(b.dataset.layout); });
 $('#opRange').addEventListener('input',e=>$('#viewCmp').style.setProperty('--ovop',e.target.value));
 
@@ -3808,7 +3853,7 @@ function ovSim(pa,pb){ // Ähnlichkeits-Transformation B-Videopixel → A-Videop
   return [re,-im,a1[0]-(re*b1[0]-im*b1[1]),im,re,a1[1]-(im*b1[0]+re*b1[1])]; }
 function ovFollowOK(){ return OV.follow&&GH.state==='ready'&&ghostKey()===GH.key; }
 
-const OVI={info:`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 11v6"/><circle cx="12" cy="7.2" r=".6" fill="currentColor"/></svg>`,dots:`<svg class="ic" viewBox="0 0 24 24" fill="currentColor"><circle cx="5.5" cy="12" r="1.9"/><circle cx="12" cy="12" r="1.9"/><circle cx="18.5" cy="12" r="1.9"/></svg>`,dl:`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg>`,tag:`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12V5a2 2 0 0 1 2-2h7l9 9-9 9-9-9z"/><circle cx="8" cy="8" r="1.6"/></svg>`,plus:`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>`,reset:`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 1 0 2.3-5.6"/><path d="M4 4v4h4"/></svg>`,pause:`<svg class="ic" viewBox="0 0 24 24" fill="currentColor"><rect x="6.5" y="5" width="4" height="14" rx="1"/><rect x="13.5" y="5" width="4" height="14" rx="1"/></svg>`,play:`<svg class="ic" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>`,fix:`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M3 12h18"/><path d="M9 6l3-3 3 3M9 18l3 3 3-3M6 9l-3 3 3 3M18 9l3 3-3 3"/></svg>`,trash:`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg>`,side:`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="5" width="8.5" height="14" rx="2"/><rect x="13" y="5" width="8.5" height="14" rx="2"/></svg>`,cs:`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M8 4H5v16h3"/><path d="M11 12h8M16 9l3 3-3 3"/></svg>`,ce:`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h3v16h-3"/><path d="M13 12H5M8 9l-3 3 3 3"/></svg>`,ok:`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>`,pin:`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="10" r="3"/><path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0C18.5 15.4 12 21 12 21z"/></svg>`,go:`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/><path d="M19 16l.7 2 2 .7-2 .7-.7 2-.7-2-2-.7 2-.7z"/></svg>`,back:`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>`,x:`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"/></svg>`};
+const OVI={vid:`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="13" height="12" rx="2"/><path d="M16 10l5-3v10l-5-3z"/></svg>`,img:`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.6"/></svg>`,rec:`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4" fill="#ff4b3e" stroke="none"/></svg>`,cut:`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M8 4H5v16h3"/><path d="M16 4h3v16h-3"/><path d="M10 12h4"/></svg>`,info:`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 11v6"/><circle cx="12" cy="7.2" r=".6" fill="currentColor"/></svg>`,dots:`<svg class="ic" viewBox="0 0 24 24" fill="currentColor"><circle cx="5.5" cy="12" r="1.9"/><circle cx="12" cy="12" r="1.9"/><circle cx="18.5" cy="12" r="1.9"/></svg>`,dl:`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg>`,tag:`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12V5a2 2 0 0 1 2-2h7l9 9-9 9-9-9z"/><circle cx="8" cy="8" r="1.6"/></svg>`,plus:`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>`,reset:`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 1 0 2.3-5.6"/><path d="M4 4v4h4"/></svg>`,pause:`<svg class="ic" viewBox="0 0 24 24" fill="currentColor"><rect x="6.5" y="5" width="4" height="14" rx="1"/><rect x="13.5" y="5" width="4" height="14" rx="1"/></svg>`,play:`<svg class="ic" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>`,fix:`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M3 12h18"/><path d="M9 6l3-3 3 3M9 18l3 3 3-3M6 9l-3 3 3 3M18 9l3 3-3 3"/></svg>`,trash:`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg>`,side:`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="5" width="8.5" height="14" rx="2"/><rect x="13" y="5" width="8.5" height="14" rx="2"/></svg>`,cs:`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M8 4H5v16h3"/><path d="M11 12h8M16 9l3 3-3 3"/></svg>`,ce:`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h3v16h-3"/><path d="M13 12H5M8 9l-3 3 3 3"/></svg>`,ok:`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>`,pin:`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="10" r="3"/><path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0C18.5 15.4 12 21 12 21z"/></svg>`,go:`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/><path d="M19 16l.7 2 2 .7-2 .7-.7 2-.7-2-2-.7 2-.7z"/></svg>`,back:`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>`,x:`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"/></svg>`};
 function ovT0(){ return OV.cut.a!=null?Math.max(OV.cut.a,-G.off,0):G.syncA; }
 function ovStep(){ if(!G.linked||OV.edit) return 1; if(OV.pick) return 2; if(!OV.T&&!(OV.follow&&(GH.state==='busy'||ovFollowOK()))) return 2; return 3; }
 function ovApplyCut(){ // Ausschnitt als Loop in beiden Zeitleisten anzeigen
@@ -3818,6 +3863,10 @@ function ovApplyCut(){ // Ausschnitt als Loop in beiden Zeitleisten anzeigen
   mk(A,0); if(G.linked) mk(B,G.off); else { B.loopOv=null; B.dirty=true; } }
 function ovMore(items){ items=items.filter(Boolean); if(!items.length) return '';
   return `<span class="ov-morew">${ovBtn('more','',OVI.dots,'ico ghost'+(OV.more?' on':''),'Weitere Möglichkeiten')}${OV.more?`<span class="ov-menu">${items.map(([id,l,ic])=>`<button data-ov="${id}">${ic||''}<span>${l}</span></button>`).join('')}</span>`:''}</span>`; }
+const OVSTEPN=['Gleicher Moment','Erstellen','Fertig'];
+function ovSaveBtn(){ const cut=saveCutRange()==='ovcut';
+  const it=[['svvid','Video','Overlay als MP4 – Start/Ende, Zeitlupe, Anzeigen',OVI.vid],cut?['svcut','Nur Start/Ende',saveCutSub('ovcut')+' · sofort als MP4',OVI.cut]:null,['svimg','Standbild','Aktuelles Bild als PNG',OVI.img],['svrec','Aufnahme mit Ton','Bildschirm, Zeichnungen und Stimme',OVI.rec]].filter(Boolean);
+  return `<span class="ov-morew ov-savew">${ovBtn('save','Speichern',OVI.dl,'pri'+(OV.svm?' on':''),'Speichern: Video, Standbild oder Aufnahme')}${OV.svm?`<span class="ov-menu ov-svmenu">${it.map(([id,l,s,ic])=>`<button data-ov="${id}">${ic}<span><b>${l}</b><small>${s}</small></span></button>`).join('')}</span>`:''}</span>`; }
 function ovPrevBtn(){ const pl=!A.v.paused||!B.v.paused; return ovBtn('prev',pl?'Pause':'Vorschau',pl?OVI.pause:OVI.play,'prev'+(pl?' on':''),pl?'Vorschau anhalten':'Overlay von Anfang an abspielen'); }
 function ovPrevStart(){ // Overlay vom Start des Ausschnitts (bzw. der Berechnung) abspielen
   if(!A.v.paused||!B.v.paused){ cmpToggle(); cmpPlayIcon(); ovUI(); return; }
@@ -3835,7 +3884,7 @@ function ovUI(){ vchipPlace();
   if(v.classList.contains('ov-one')!==one){ v.classList.toggle('ov-one',one); decks.forEach(d=>{ d.dirty=true; d.annDirty=true; }); requestAnimationFrame(()=>decks.forEach(d=>{ d.dirty=true; })); }
   if(!ovActive()){ ovApplyCut(); return; }
   const st=ovStep(), busy=OV.follow&&GH.state==='busy', done=ovFollowOK();
-  $$('#ovSteps li').forEach(li=>{ const n=+li.dataset.st; li.classList.toggle('on',n===st&&!done); li.classList.toggle('done',n<st||done); $('i',li).innerHTML=(n<st||done)?OVI.ok:n; });
+  $$('#ovSteps li').forEach(li=>{ const n=+li.dataset.st; li.classList.toggle('on',n===st&&!done); li.classList.toggle('nx',n===st+1&&!done); li.classList.toggle('done',n<st||done); $('i',li).innerHTML=(n<st||done)?OVI.ok:n; });
   const cut=(OV.cut.a!=null||OV.cut.b!=null)?`<span class="ov-chip">${OVI.cs}${OV.cut.a!=null?fmtS(OV.cut.a):'Anfang'} – ${OV.cut.b!=null?fmtS(OV.cut.b):'Ende'}<button data-ov="cutx" title="Start/Ende entfernen">${OVI.x}</button></span>`:'';
   const cutBtns=`<span class="ov-cutg">${ovBtn('cuta','Start',OVI.cs,'','Start des Overlays = aktuelles Bild')}${ovBtn('cutb','Ende',OVI.ce,'','Ende des Overlays = aktuelles Bild')}</span>`;
   let ttl='', say='', tip='', chips='', acts='', dot=false;
@@ -3868,11 +3917,12 @@ function ovUI(){ vchipPlace();
     acts=ovBtn('edit','Zurück',OVI.back,'ghost','Gleichen Moment neu wählen')+cutBtns+ovMore([['pick','Referenzpunkte neu',OVI.pin],['hand','Von Hand nachschieben',OVI.fix]])+ovBtn('make','Overlay erstellen',OVI.go,'pri'); }
   else { const kc=OV.K.length?`<span class="ov-chip">${OVI.fix}${OV.K.length} Korrektur${OV.K.length>1?'en':''}<button data-ov="fixall" title="Alle Korrekturen entfernen">${OVI.x}</button></span>`:'';
     ttl='Fertig'; dot=true; say='B daneben? «Korrigieren».'; chips=cut+kc;
-    tip='Liegt B neben A: an der Stelle anhalten und «Korrigieren». Der Punkt links zeigt den Zustand an der aktuellen Stelle: grün ausgerichtet, gelb unsicher, rot Kameraschnitt. Läufe unten links im Bild antippen = ein- oder ausblenden.';
-    acts=cutBtns+ovBtn('fix','Korrigieren',OVI.fix,'ghost','B an dieser Stelle von Hand nachschieben')+ovBtn('nameset','Namen',OVI.tag,'ghost','Fahrer:innen antippen – die Namens-Pillen folgen dann genau ihnen')
-      +ovMore([LAY.length<3?['addrun','Weiteren Lauf dazunehmen',OVI.plus]:null,['make','Neu berechnen',OVI.go],['edit','Neu beginnen',OVI.back]])+ovPrevBtn()+ovBtn('save','Speichern',OVI.dl,'pri','Overlay als Video speichern'); }
+    tip='Liegt B neben A: an der Stelle anhalten und «Korrigieren». Der Punkt links und das Band in der Zeitleiste zeigen den Zustand: grün ausgerichtet, gelb unsicher, rot Kameraschnitt. Das Auge bei den Läufen oben links blendet einen Lauf ein oder aus.';
+    acts=cutBtns+ovBtn('fix','Korrigieren',OVI.fix,'ghost','B an dieser Stelle von Hand nachschieben')
+      +ovMore([['nameset','Namen setzen (Fahrer:innen antippen)',OVI.tag],LAY.length<3?['addrun','Weiteren Lauf dazunehmen',OVI.plus]:null,['make','Neu berechnen',OVI.go],['edit','Neu beginnen',OVI.back]])+ovPrevBtn()+ovSaveBtn(); }
   // drei Zonen: links Schritt (+ Zustand), Mitte kurzer Hinweis, rechts Knöpfe – nur neu zeichnen, wenn sich etwas ändert (sonst gehen Klicks verloren)
-  const te=$('#ovTtl'); if(te.textContent!==ttl) te.textContent=ttl; const pnl=$('#ovPanel'); if(pnl.classList.contains('ov-done')!==dot){ pnl.classList.toggle('ov-done',dot); ovFit(); } // Fertig: Schritte ausblenden, Platz für den Hinweis
+  const te=$('#ovTtl'); if(te.textContent!==ttl) te.textContent=ttl;
+  $$('#ovSteps li').forEach(li=>{ const n=+li.dataset.st, sp=$('span',li), tx=li.classList.contains('on')?ttl:OVSTEPN[n-1]; if(sp.textContent!==tx) sp.textContent=tx; }); const pnl=$('#ovPanel'); if(pnl.classList.contains('ov-done')!==dot){ pnl.classList.toggle('ov-done',dot); v.classList.toggle('ov-fin',dot); ovFit(); } // Fertig: Schritte ausblenden, Platz für den Hinweis
   const se=$('#ovSt'); if(se.hidden===dot){ se.hidden=!dot; se._k=null; } if(dot) ovStUpd();
   const t=chips+`<span class="ov-say">${say}</span>`+`<button class="ov-info" data-ovinfo aria-label="Hinweis anzeigen">${OVI.info}</button>`;
   OV.bubH=`<b>${ttl}</b> · ${say.replace(FI,'')}`+(tip?`<span class="ob-tip">${tip}</span>`:'');
@@ -3890,6 +3940,15 @@ function ovBub(on,pin){ const bb=$('#ovBub'), btn=$('#ovTxt [data-ovinfo]'); if(
   if(bb._h!==OV.bubH){ bb.innerHTML=OV.bubH; bb._h=OV.bubH; } bb.hidden=false; if(pin!=null) OV.bubPin=pin;
   const P=$('#ovPanel').getBoundingClientRect(), r=btn.getBoundingClientRect(), w=bb.offsetWidth, cx=r.left+r.width/2-P.left, l=clamp(cx-28,8,Math.max(8,P.width-w-8));
   bb.style.left=l+'px'; bb.style.setProperty('--ax',Math.round(cx-l-6)+'px'); }
+function ovStIdx(S,i){ const I=[1,0,0,0,1,0], cut=j=>{ const s=S[j]; if(!s) return false; if(s.cut!=null) return !!s.cut; return j>0&&!s.ok&&!!s.q&&s.q.every((v,k)=>v===I[k]); };
+  return cut(i)||cut(i-1)||cut(i+1)?'cut':S[i].ok?'ok':'unsure'; }
+const OVSTC={ok:'rgba(47,191,113,.85)',unsure:'#ffc93c',cut:'#ff4b3e'};
+function ovStrip(ctx,X,TH,W,fps,mini){ // Zeitleiste: berechneter Teil als Band, darin unsichere Stellen (gelb) und Kameraschnitte (rot)
+  if(!ovActive()||!ovFollowOK()||!GH.S||!GH.S.length||!(GH.step>0)) return; const S=GH.S, n=S.length, h=mini?4:6, y=mini?0:TH-h;
+  const fr=e=>(GH.t0+e)*fps; ctx.save(); ctx.fillStyle='rgba(8,10,14,.55)'; ctx.fillRect(X(fr(0)),y,Math.max(1,X(fr(GH.eEnd))-X(fr(0))),h);
+  let k=0; while(k<n){ const st=ovStIdx(S,k); let m=k+1; while(m<n&&ovStIdx(S,m)===st) m++;
+    const a=X(fr(Math.max(0,(k-0.5)*GH.step))), b=X(fr(Math.min(GH.eEnd,(m-0.5)*GH.step))); if(b>0&&a<W){ ctx.fillStyle=OVSTC[st]; ctx.globalAlpha=st==='ok'?0.55:1; ctx.fillRect(a,y+(st==='ok'?1:0),Math.max(st==='ok'?1:2,b-a),st==='ok'?h-2:h); } k=m; }
+  ctx.restore(); }
 function ovStAt(){ // Zustand an der aktuellen Stelle aus der Sicherheit pro Bild: ok · unsicher · Kameraschnitt
   if(!ovFollowOK()||!GH.S||!GH.S.length||!(GH.step>0)) return null; const e=ovE(); if(e<-0.03||e>GH.eEnd+0.03) return 'out';
   const S=GH.S, i=clamp(Math.round(e/GH.step),0,S.length-1), I=[1,0,0,0,1,0];
@@ -4103,20 +4162,35 @@ function layersClear(){ while(LAY.length) layerDel(0); }
 function ovRuns(){ const r=[{k:'a',let:'A',col:'#3e8bff',n:lastName(A.clip),base:true}];
   if(B.clip&&B.ready&&(ovAligned()||(OV.follow&&GH.state==='busy'))) r.push({k:'b',let:'B',col:'#f08a3c',n:lastName(B.clip),hid:!!OV.hideB});
   LAY.forEach((L,i)=>r.push({k:'l'+i,i,let:L.let,col:L.col,n:L.name,hid:!!L.hide,del:true})); return r; }
-function ovLegend(){ const st=A.stage, v=$('#viewCmp'); let el=st.querySelector('.ov-legend');
-  if(!el){ el=document.createElement('div'); el.className='ov-legend'; st.appendChild(el);
+function ovLegend(){ // Läufe an einem Ort: Chips A/B oben links (Auge bei B), dahinter C/D und «Namen»
+  const v=$('#viewCmp'); vchipPlace(); const top=A.stage.querySelector(':scope>.vc-top'); if(!top) return; let el=top.querySelector('.ov-legend');
+  if(!el){ el=document.createElement('div'); el.className='ov-legend';
     ['pointerdown','pointerup','pointermove','dblclick','wheel','contextmenu'].forEach(t=>el.addEventListener(t,e=>e.stopPropagation()));
     el.addEventListener('click',e=>{ e.stopPropagation(); e.preventDefault(); const d=e.target.closest('[data-lgdel]'); if(d){ layerDel(+d.dataset.lgdel); ovLegend(); return; }
-      const b=e.target.closest('[data-lg]'); if(!b) return; const k=b.dataset.lg; if(k==='b') OV.hideB=!OV.hideB; else { const L=LAY[+k.slice(1)]; if(L) L.hide=!L.hide; }
-      A.dirty=true; ovLegend(); }); }
+      if(e.target.closest('[data-lgnames]')){ $('#ovNames').click(); ovLegend(); return; }
+      const b=e.target.closest('[data-lg]'); if(!b) return; const L=LAY[+b.dataset.lg.slice(1)]; if(L) L.hide=!L.hide; A.dirty=true; ovLegend(); }); }
+  if(el.parentNode!==top||el.nextSibling) top.appendChild(el);
+  const cb=$('.vchip[data-k="b"]'); let eye=cb&&cb.querySelector('.vc-eye');
+  if(cb&&!eye){ eye=document.createElement('button'); eye.className='vc-eye'; cb.insertBefore(eye,cb.querySelector('.slot-flip'));
+    eye.addEventListener('click',e=>{ e.stopPropagation(); e.preventDefault(); OV.hideB=!OV.hideB; A.dirty=true; ovLegend(); }); }
   const on=ovActive()&&A.ready&&!OV.pick&&!OV.fix&&!v.classList.contains('ov-split')&&(ovAligned()||LAY.length>0||(OV.follow&&GH.state==='busy'));
-  v.classList.toggle('ov-leg',!!on); if(el.hidden===!on&&!on) return; el.hidden=!on; if(!on) return;
+  const runs=on?ovRuns():[], hasB=runs.some(r=>r.k==='b');
+  v.classList.toggle('ov-leg',!!on);
+  if(cb){ cb.classList.toggle('has-eye',hasB); cb.classList.toggle('off',hasB&&!!OV.hideB);
+    const eh=OV.hideB?EYE.off:EYE.on, et=OV.hideB?'Lauf B einblenden (gilt auch beim Speichern)':'Lauf B ausblenden (gilt auch beim Speichern)'; if(eye._h!==eh){ eye.innerHTML=eh; eye._h=eh; } eye.title=et; eye.setAttribute('aria-label',et); }
+  el.hidden=!on; if(!on){ opHome(); return; }
   const X='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M7 7l10 10M17 7L7 17"/></svg>';
-  const h=ovRuns().map(r=>r.base?`<span class="lg-it base" title="Lauf A – Grundlage, immer sichtbar"><i style="background:${r.col}"></i><b>${r.let}</b><span>${esc(r.n)}</span></span>`
-    :`<button class="lg-it${r.hid?' off':''}" data-lg="${r.k}" title="Lauf ${r.let} ${r.hid?'einblenden':'ausblenden'} (gilt auch beim Speichern)"><i style="background:${r.col}"></i><b>${r.let}</b><span>${esc(r.n)}</span>${r.del?`<span class="lg-x" data-lgdel="${r.i}" title="Lauf ${r.let} entfernen">${X}</span>`:''}</button>`).join('');
+  const nm=v.classList.contains('ov-names'), tagsOk=ovFollowOK()||LAY.length>0;
+  const h=runs.filter(r=>r.del).map(r=>`<button class="lg-it${r.hid?' off':''}" data-lg="${r.k}" title="Lauf ${r.let} ${r.hid?'einblenden':'ausblenden'} (gilt auch beim Speichern)"><i style="background:${r.col}"></i><b>${r.let}</b><span>${esc(r.n)}</span><span class="lg-x" data-lgdel="${r.i}" title="Lauf ${r.let} entfernen">${X}</span></button>`).join('')
+    +(tagsOk?`<button class="lg-it lg-names${nm?'':' off'}" data-lgnames title="Namen im Bild ${nm?'ausblenden':'einblenden'}">${OVI.tag}<span>Namen</span></button>`:'');
   if(el._h!==h){ el.innerHTML=h; el._h=h; }
-  const R=A.rect(), l=Math.round(Math.max(8,R.x+10)), bt=Math.round(Math.max(8,st.clientHeight-(R.y+R.h)+10)), ps=l+'|'+bt+'|'+Math.round(R.w-20);
-  if(el._p!==ps){ el.style.left=l+'px'; el.style.bottom=bt+'px'; el.style.maxWidth=Math.max(120,Math.round(R.w-20))+'px'; el._p=ps; } }
+  const op=$('#opRange').closest('label'); if(op&&(op.parentNode!==top||op.nextSibling)){ if(!OPHOME.p){ OPHOME.p=op.parentNode; OPHOME.n=op.nextSibling;
+      ['pointerdown','pointerup','pointermove','dblclick','wheel','contextmenu','click'].forEach(t=>op.addEventListener(t,e=>e.stopPropagation())); op.title='Deckkraft von B, C und D'; }
+    top.appendChild(op); } }
+const OPHOME={p:null,n:null};
+function opHome(){ const op=$('#opRange')&&$('#opRange').closest('label'); if(op&&OPHOME.p&&op.parentNode!==OPHOME.p) OPHOME.p.insertBefore(op,OPHOME.n&&OPHOME.n.parentNode===OPHOME.p?OPHOME.n:null); }
+const EYE={on:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>',
+  off:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M10.6 5.1A10.8 10.8 0 0 1 12 5c6.4 0 10 7 10 7a17 17 0 0 1-2.6 3.5M6.6 6.6A17 17 0 0 0 2 12s3.6 7 10 7a10 10 0 0 0 5.4-1.6"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/><path d="M3 3l18 18"/></svg>'};
 function legendDrawTo(x,ox,oy,w,h){ // dieselbe Legende ins gespeicherte Video
   const rs=ovRuns().filter(r=>!r.hid); if(rs.length<2) return; const k=w/1100, fs=Math.max(11,Math.round(13*k)), ph=Math.round(fs*1.9), pad=Math.round(fs*0.7), g=Math.round(6*k)+2, ff='Geist,-apple-system,Segoe UI,Roboto,Arial,sans-serif';
   x.save(); x.textBaseline='middle'; let cx=ox+Math.round(14*k), cy=oy+h-Math.round(14*k)-ph;
@@ -4197,9 +4271,12 @@ function renderOv(){
     else if(e.key==='Escape'){ e.stopPropagation(); e.preventDefault(); $('[data-ov="fixno"]').click(); } },true);
   ['pointerup','pointermove','click','dblclick'].forEach(t=>st.addEventListener(t,e=>{ block(e); },true));
   $('#ovPanel').addEventListener('click',e=>{ const b=e.target.closest('[data-ov]'); if(!b) return; const a=b.dataset.ov;
-    if(a==='more'){ OV.more=!OV.more; ovUI(); return; } OV.more=false;
+    if(a==='more'){ OV.more=!OV.more; OV.svm=false; ovUI(); return; } OV.more=false;
+    if(a==='save'){ OV.svm=!OV.svm; ovUI(); return; } OV.svm=false;
     if(a==='prev') return ovPrevStart();
-    if(a==='save'){ ovUI(); A.pause(); B.pause(); G.playing=false; cmpPlayIcon(); return openExport(); } if(/^(fixok|fixdel|fixall)$/.test(a)) setTimeout(resSave,50);
+    if(a==='svvid'){ ovUI(); A.pause(); B.pause(); G.playing=false; cmpPlayIcon(); return openExport(); }
+    if(a==='svcut'){ ovUI(); return saveCut(); }
+    if(a==='svimg'||a==='svrec'){ ovUI(); const t=$('#viewCmp [data-act="'+(a==='svimg'?'shot':'rec')+'"]'); if(t) t.click(); return; } if(/^(fixok|fixdel|fixall)$/.test(a)) setTimeout(resSave,50);
     if(a==='cuta'||a==='cutb'){ if(!A.ready) return; const t=A.time(), dn=ovFollowOK(); if(a==='cuta'){ OV.cut.a=t; if(OV.cut.b!=null&&OV.cut.b<=t) OV.cut.b=null; } else { OV.cut.b=t; if(OV.cut.a!=null&&OV.cut.a>=t) OV.cut.a=null; }
       const inside=dn&&t>=GH.t0-0.05&&t<=GH.t0+GH.eEnd+0.05; // fertiges Overlay: Start/Ende nur zum Abspielen und Exportieren – keine Neuberechnung nötig
       if(dn){ GH.key=ghostKey(); } else { OV.T=null; OV.follow=false; } toast((a==='cuta'?'Start':'Ende')+' des Overlays: '+fmtS(t)+(dn&&!inside?' – ausserhalb der Berechnung, «Neu berechnen»':''),dn&&!inside?3200:1400); ovApplyCut(); }
@@ -4248,8 +4325,8 @@ function renderOv(){
     if(window.ResizeObserver) new ResizeObserver(()=>ovFit()).observe($('#ovTxt')); }
   $('#ovSteps').addEventListener('click',e=>{ const li=e.target.closest('li'); if(!li||OV.pick||GH.state==='busy') return; const n=+li.dataset.st;
     OV.fix=null; if(n===1&&G.linked){ OV.edit=true; OV.T=null; OV.follow=false; unlink(); } else if(n===2&&G.linked){ OV.edit=false; OV.pick=null; } ovUI(); });
-  document.addEventListener('keydown',e=>{ if(e.key==='Escape'&&OV.more){ OV.more=false; ovUI(); return; } if(e.key==='Escape'&&OV.pick){ e.stopPropagation(); ovStop(); } },true);
-  document.addEventListener('pointerdown',e=>{ if(OV.more&&!e.target.closest('.ov-morew')){ OV.more=false; ovUI(); } });
+  document.addEventListener('keydown',e=>{ if(e.key==='Escape'&&(OV.more||OV.svm)){ OV.more=false; OV.svm=false; ovUI(); return; } if(e.key==='Escape'&&OV.pick){ e.stopPropagation(); ovStop(); } },true);
+  document.addEventListener('pointerdown',e=>{ if((OV.more||OV.svm)&&!e.target.closest('.ov-morew')){ OV.more=false; OV.svm=false; ovUI(); } });
   addEventListener('resize',ovMarks);
   setInterval(()=>{ if(ovActive()&&(OV.follow||!G.linked)) ovUI(); },400);
   setInterval(()=>{ if(OV.prevEnd==null) return; const pl=!A.v.paused||!B.v.paused; if(!pl){ OV.prevAt=A.time(); return; }
@@ -5704,27 +5781,41 @@ document.addEventListener('dragend',vdEnd);
 })();
 try{ tabsUI(); }catch(e){}
 setInterval(()=>{ try{ sideOpenUI(); }catch(e){} },1500);
+/* ---------- Videoliste ein-/ausklappen (mehr Platz fürs Video) ---------- */
+setTimeout(()=>{ const top=$('.libcard .side-top'); if(!top||$('#sideCol')) return;
+  const b=document.createElement('button'); b.id='sideCol'; b.className='side-col-btn'; b.type='button';
+  b.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="M9 4v16"/><path class="sc-ar" d="M15.5 9.5L13 12l2.5 2.5"/></svg>';
+  top.insertBefore(b,top.firstChild);
+  const set=on=>{ document.body.classList.toggle('side-col',on); LS.set('sideCol',on?1:0); const t=on?'Videoliste ausklappen ( [ )':'Videoliste einklappen ( [ )'; b.title=t; b.setAttribute('aria-label',t); b.setAttribute('aria-expanded',on?'false':'true');
+    requestAnimationFrame(()=>{ dispatchEvent(new Event('resize')); decks.forEach(d=>{ d.dirty=true; d.annDirty=true; }); }); };
+  b.addEventListener('click',()=>set(!document.body.classList.contains('side-col')));
+  document.addEventListener('keydown',e=>{ if(e.key==='['&&!e.metaKey&&!e.ctrlKey&&!e.altKey&&!/INPUT|SELECT|TEXTAREA/.test(e.target.tagName||'')&&!e.target.isContentEditable){ e.preventDefault(); b.click(); } });
+  set(!!LS.get('sideCol',0)); },0);
 try{ const so=$('#sideOpen'), st=$('#sideTree'); if(so&&st) st.parentNode.insertBefore(so,st);
   const top=$('.libcard .side-top'), tools=$('#ftTools'), fv=$('#ftView'); if(top){ top.insertAdjacentHTML('afterbegin','<span class="side-ttl">Videos</span>'); if(tools){ if(fv) tools.appendChild(fv); top.after(tools); } } const hr=$('#sideTree .side-hrow'); if(hr) hr.hidden=true; }catch(e){}
 
 /* ---------- Hilfe direkt beim Knopf: einmal zeigen, dann nie wieder ---------- */
-const COACH={el:null,cur:null,last:0};
+const COACH={el:null,cur:null,last:Date.now()+3500,act:0,played:false}; // erster Hinweis frühestens nach ~6 s
+['pointerdown','keydown'].forEach(t=>document.addEventListener(t,e=>{ if(!(e.target.closest&&e.target.closest('.coach'))) COACH.act=Date.now(); },true));
+document.addEventListener('play',e=>{ if(e.target&&e.target.closest&&e.target.closest('.stage')) COACH.played=true; },true);
 const TOUCH=matchMedia('(pointer:coarse)').matches;
 const COACHES=[
   {id:'play',sel:'#viewSingle [data-act="play"]',when:()=>mode==='single'&&S.ready,t:TOUCH?'Tippen aufs Video = Abspielen · Zeitleiste wischen = Bild für Bild':'Leertaste = Abspielen · ← / → = Bild für Bild'},
-  {id:'rate',sel:'#viewSingle [data-act="rate"]',when:()=>mode==='single'&&S.ready,t:'Hier auf Zeitlupe stellen: ½×, ¼× oder 0.1×.'},
-  {id:'inout',sel:'#viewSingle [data-act="in"]',when:()=>mode==='single'&&S.ready,t:'«Start» und «Ende» legen fest, welcher Teil abgespielt und gespeichert wird.'},
-  {id:'save',sel:'.player:not([hidden]) .save-btn',when:()=>mode!=='single'||(S.ready&&!!LS.get('coach:inout',0)),t:'Video, Standbild oder Aufnahme mit Ton – alles unter «Speichern».'},
+  {id:'rate',sel:'#viewSingle [data-act="rate"]',when:()=>mode==='single'&&S.ready&&COACH.played,t:'Hier auf Zeitlupe stellen: ½×, ¼× oder 0.1×.'},
+  {id:'inout',sel:'#viewSingle [data-act="in"]',when:()=>mode==='single'&&S.ready&&COACH.played&&!!LS.get('coach:rate',0),t:'«Start» und «Ende» legen fest, welcher Teil abgespielt und gespeichert wird.'},
+  {id:'save',sel:'.player:not([hidden]) .save-btn',when:()=>(mode==='single'&&S.ready&&!!S.clip.loop&&(S.clip.loop.a!=null||S.clip.loop.b!=null))||(mode==='cmp'&&!$('#viewCmp').classList.contains('overlay')&&G.linked),t:'Video, Standbild oder Aufnahme mit Ton – alles unter «Speichern».'},
   {id:'ovtab',sel:'#tabOv',when:()=>mode==='cmp'&&!$('#viewCmp').classList.contains('overlay'),t:'«Übereinander» legt beide Läufe in ein Bild.'},
   {id:'tools',sel:'#btnTools',when:()=>mode==='cmp'&&!$('#viewCmp').classList.contains('overlay'),t:'Gleicher Moment, Zeitmessung, Tore und Zeichnen findest du hier.'},
   {id:'ovnext',sel:'[data-ov="sync"]',when:()=>mode==='cmp',t:'A und B einzeln zum selben Tor ziehen, dann «Weiter».'},
   {id:'ovmake',sel:'[data-ov="make"]',when:()=>mode==='cmp'&&!(OV.follow&&GH.state==='busy'),t:'Ein Klick – B wird über A gelegt und folgt der Kamera.'},
-  {id:'ovprev',sel:'[data-ov="prev"]',when:()=>mode==='cmp',t:'Overlay abspielen. Liegt B daneben: anhalten und «Korrigieren».'}
+  {id:'ovprev',sel:'[data-ov="prev"]',when:()=>mode==='cmp'&&ovFollowOK(),t:'Overlay abspielen. Liegt B daneben: anhalten und «Korrigieren».'},
+  {id:'ovleg',sel:'.vchip.has-eye .vc-eye',when:()=>mode==='cmp'&&ovFollowOK()&&!!LS.get('coach:ovprev',0),t:'Auge = Lauf ein- oder ausblenden. Gilt auch beim Speichern.'},
+  {id:'ovsave',sel:'[data-ov="save"]',when:()=>mode==='cmp'&&ovFollowOK()&&!!LS.get('coach:ovleg',0),t:'Speichern: Video, nur Start/Ende, Standbild oder Aufnahme.'}
 ];
 function coachVis(el){ if(!el||!el.isConnected) return false; const r=el.getBoundingClientRect(); return r.width>4&&r.height>4&&r.bottom>0&&r.top<innerHeight&&getComputedStyle(el).visibility!=='hidden'&&el.offsetParent!==null; }
 function coachHide(mark){ if(!COACH.el) return; if(mark&&COACH.cur) LS.set('coach:'+COACH.cur.id,1); COACH.el.classList.remove('on'); const e=COACH.el; setTimeout(()=>e.remove(),220); COACH.el=null; COACH.cur=null; COACH.last=Date.now(); }
 function coachShow(c,el){
-  COACH.cur=c; COACH.t0=Date.now(); const b=document.createElement('div'); b.className='coach'; b.setAttribute('role','status');
+  COACH.cur=c; COACH.t0=Date.now(); COACH.n=(COACH.n||0)+1; const b=document.createElement('div'); b.className='coach'; b.setAttribute('role','status');
   b.innerHTML=`<span>${c.t}</span><button aria-label="Verstanden">OK</button><i class="coach-ar"></i>`; document.body.appendChild(b); COACH.el=b; COACH.tgt=el;
   coachPlace(); requestAnimationFrame(()=>b.classList.add('on'));
   b.querySelector('button').addEventListener('click',e=>{ e.stopPropagation(); coachHide(true); });
@@ -5735,7 +5826,7 @@ function coachPlace(){ const b=COACH.el; let el=COACH.tgt; if(!b) return; if(!co
   b.style.left=x+'px'; b.style.top=y+'px'; b.classList.toggle('up',up); b.querySelector('.coach-ar').style.left=Math.max(14,Math.min(w-14,cx-x))+'px'; }
 setInterval(()=>{ try{
   if(COACH.el){ coachPlace(); return; }
-  if(Date.now()-COACH.last<2500||document.hidden||document.body.classList.contains('touring')||$('.modal.on')||(typeof EXP!=='undefined'&&EXP.live)) return;
+  if(Date.now()-COACH.last<(COACH.n?30000:2500)||(COACH.n&&COACH.act<COACH.last)||document.hidden||document.body.classList.contains('touring')||$('.modal.on')||(typeof EXP!=='undefined'&&EXP.live)) return;
   for(const c of COACHES){ if(LS.get('coach:'+c.id,0)) continue; let ok=false; try{ ok=c.when(); }catch(e){} if(!ok) continue; const el=$(c.sel); if(coachVis(el)){ coachShow(c,el); break; } }
 }catch(e){} },900);
 addEventListener('resize',()=>{ if(COACH.el) coachPlace(); });
@@ -5805,7 +5896,7 @@ if(false&&!LS.get('hint1',0)){ setTimeout(()=>{ toast(matchMedia('(pointer:coars
 
 /* Update-Hinweis: prüft version.json auf GitHub Pages; «Aktualisieren» lädt die Seite ohne Cache neu */
 (()=>{
-  const BUILD='20261030072300'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
+  const BUILD='20261030075916'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
   // nach einem Update die ?v=… aus der Adresse entfernen
   try{ const u=new URL(location.href); if(u.searchParams.has('v')){ u.searchParams.delete('v'); history.replaceState(null,'',u.pathname+(u.search||'')+u.hash); } }catch(e){}
   const el=$('#upd'); let latest=null, snoozed=null, busy=false;
