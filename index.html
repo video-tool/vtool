@@ -2114,6 +2114,21 @@ button.lg-it:hover{background:rgba(12,15,20,.8);border-color:rgba(255,255,255,.3
   .coach{left:10px!important;right:10px!important;top:calc(56px + env(safe-area-inset-top,0px))!important;bottom:auto!important;max-width:none!important;font-size:12px!important;padding:7px 8px 7px 11px!important}
   .coach .coach-ar{display:none!important}
 }
+/* innove */
+.help.inv{max-width:420px;display:flex;flex-direction:column;gap:10px}
+.inv-p{margin:0;font-size:12.5px;color:var(--muted);line-height:1.45}
+.inv-l{display:flex;flex-direction:column;gap:4px;font-size:12px;font-weight:650;color:var(--muted);margin-top:6px}
+.inv-l input,.inv-q{height:42px;border-radius:10px;border:1px solid var(--line);background:var(--field);color:var(--ink);padding:0 12px;font:500 16px var(--font)}
+.inv-err{margin:4px 0 0;color:#e5484d;font-size:12.5px;font-weight:600}
+.inv-row{display:flex;gap:8px;margin-top:10px}
+.inv-row button{height:40px;padding:0 16px;border-radius:10px;font-weight:650}
+.inv-row .pri{background:var(--red);color:#fff;border:none}
+.inv-row .ghost{background:transparent;border:1px solid var(--line);color:var(--ink)}
+.inv-list{max-height:52vh;overflow:auto;display:flex;flex-direction:column;gap:2px}
+.inv-list button{display:flex;justify-content:space-between;gap:8px;height:40px;padding:0 10px;border:none;border-radius:9px;background:transparent;color:var(--ink);font:550 14px var(--font);text-align:left}
+.inv-list button:hover,.inv-list button:active{background:var(--field)}
+.inv-list small{color:var(--muted);font-weight:500}
+#gpsInv.busy{opacity:.6;pointer-events:none}
 </style>
 </head>
 <body class="m-single">
@@ -2216,12 +2231,13 @@ button.lg-it:hover{background:rgba(12,15,20,.8);border-color:rgba(255,255,255,.3
       <div class="gps-sel">
         <label class="ctl-lab" data-lab="Video">Video <select class="sel" id="gpsVideo"></select></label>
         <label class="ctl-lab" data-lab="GPS-Daten">GPS <select class="sel" id="gpsTrack"></select></label>
+        <button class="ctl inv-btn" id="gpsInv" title="GPS-Daten von innove holen – passend zum Video (Athlet:in und Aufnahmezeit)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.2 7-11.5A7 7 0 0 0 5 9.5C5 14.8 12 21 12 21z"/><path d="M12 7v5M9.5 9.5L12 12l2.5-2.5"/></svg><span>innove</span></button>
         <label class="ctl" for="gpsIn" title="GPS-Datei importieren (CSV, GPX, JSON)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V4M7 9l5-5 5 5M5 20h14"/></svg>Import</label>
         <label class="ctl-lab" data-lab="Referenz">Referenz <select class="sel" id="gpsRef"></select></label>
       </div>
       <input type="file" id="gpsIn" accept=".csv,.gpx,.json,.txt" multiple hidden>
     </div>
-    <div class="dev-note" role="note"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.6 2.6-2.4-.6-.6-2.4z"/></svg><span><b>Ist in Entwicklung …</b> Die GPS-Daten der Sensoren fliessen später automatisch ein. Bis dahin lassen sich GPS-Dateien (CSV, GPX, JSON) über «Import» testen.</span></div>
+    <div class="dev-note" role="note"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.6 2.6-2.4-.6-.6-2.4z"/></svg><span><b>GPS von innove:</b> «innove» holt Lauf, Zwischenzeiten und Tempo zum Video – mit deinem innove-Zugang (wie in der alten Video-App). Danach im Bild an der Startlinie anhalten und «GPS-Start = Bild». Oder eine GPS-Datei importieren.</span></div>
     <div class="stage-host" id="gHost"></div>
     <div id="gStrip"></div>
     <div class="dock dock3">
@@ -2317,6 +2333,23 @@ button.lg-it:hover{background:rgba(12,15,20,.8);border-color:rgba(255,255,255,.3
       <button class="btn-pri" id="strSave" disabled>PNG speichern</button>
     </div>
     <p class="str-hint">Tipp: Vorher auf die Mitte eines Schwungs stellen – gezeigt werden ±0.7 s. Funktioniert bei Kamera vom festen Standort (Schwenk und Zoom werden ausgeglichen).</p>
+  </div>
+</div>
+<div class="modal" id="invModal">
+  <div class="help inv" role="dialog" aria-label="Bei innove anmelden">
+    <h3>Bei innove anmelden <button class="hdr-ico" id="invX" title="Schliessen">✕</button></h3>
+    <p class="inv-p">Derselbe Zugang wie in der alten Video-App. Das Passwort wird nicht gespeichert – das Video-Lab merkt sich nur die Anmeldung auf diesem Gerät und liest bei innove nur (keine Änderungen).</p>
+    <form id="invForm" autocomplete="on"><label class="inv-l">Benutzername<input id="invU" name="username" autocomplete="username" autocapitalize="off" spellcheck="false"></label>
+    <label class="inv-l">Passwort<input id="invP" name="password" type="password" autocomplete="current-password"></label>
+    <p class="inv-err" id="invErr" hidden></p>
+    <div class="inv-row"><button type="button" class="ghost" id="invOut" hidden>Abmelden</button><span style="flex:1"></span><button type="submit" class="pri" id="invGo">Anmelden</button></div></form>
+  </div>
+</div>
+<div class="modal" id="invPick">
+  <div class="help inv" role="dialog" aria-label="Athlet:in bei innove wählen">
+    <h3><span id="invPickT">Athlet:in wählen</span> <button class="hdr-ico" id="invPickX" title="Schliessen">✕</button></h3>
+    <input id="invPickQ" class="inv-q" placeholder="Name suchen …" autocomplete="off">
+    <div class="inv-list" id="invPickL"></div>
   </div>
 </div>
 <div class="modal" id="expModal">
@@ -3263,7 +3296,7 @@ function switchMode(m){ if(m===mode) return;
   v.addEventListener('animationend',()=>v.classList.remove('view-in'),{once:true}); }
 function curLayout(){ return $('#viewCmp').classList.contains('overlay')?'overlay':'side'; }
 function tabsUI(){ const ly=curLayout(); $$('.tab').forEach(t=>t.classList.toggle('on',t.dataset.mode===mode&&(!t.dataset.lay||t.dataset.lay===ly))); gpsTabUI(); }
-function gpsTabUI(){ const t=$('#tabGps'); if(!t) return; const has=mode==='gps'||(typeof GPS!=='undefined'&&(GPS.tracks.some(x=>!x._demo)||clips.some(c=>c.gpsId&&GPS.tracks.some(x=>x.id===c.gpsId)))); t.hidden=!has; }
+function gpsTabUI(){ const t=$('#tabGps'); if(!t) return; const has=true||mode==='gps'||!!LS.get('innove',null)||(typeof GPS!=='undefined'&&(GPS.tracks.some(x=>!x._demo)||clips.some(c=>c.gpsId&&GPS.tracks.some(x=>x.id===c.gpsId)))); t.hidden=!has; }
 $$('.tab').forEach(t=>t.addEventListener('click',()=>{ if(t.dataset.lay){ if(curLayout()!==t.dataset.lay) setLayout(t.dataset.lay); } switchMode(t.dataset.mode); tabsUI(); }));
 
 /* Dateien */
@@ -4833,6 +4866,72 @@ $('#gpsChart').addEventListener('click',e=>{ const N=gpsNow(); if(!N) return; co
   const s=s0+clamp((e.clientX-r.left-64)/(r.width-74),0,1)*(s1-s0); let i=tr.iS; while(i<tr.iE&&P[i].s<s) i++; GD.pause(); GD.seekTime(P[i].t-c.gpsOff); GPS.dirty=true; });
 function importGpsFiles(files){ [...files].forEach(f=>{ const rd=new FileReader(); rd.onload=()=>{ try{ const made=addTracks(parseGps(String(rd.result),f.name)); if(made.length){ toast('GPS geladen: '+made.map(t=>t.name).join(', ')); if(mode!=='gps') setMode('gps'); gpsTabUI(); } }catch(err){ toast('GPS-Datei nicht lesbar: '+err.message,4500); } }; rd.readAsText(f); }); }
 $('#gpsIn').addEventListener('change',e=>{ if(e.target.files&&e.target.files.length) importGpsFiles(e.target.files); e.target.value=''; });
+
+/* ---------- innove: Lauf und GPS-Spur zum Video holen (nur lesen) ----------
+   Ablauf wie in der innove-Anleitung (30.10.2026): Athlet:in → Zeitfenster zur Videomitte → Läufe des Zeitfensters → Lauf mit der grössten
+   Überlappung (sonst der nächste innert 2 min) → Rohspur des Sensors ±5 s. Jede:r meldet sich mit dem eigenen innove-Zugang an; gespeichert wird nur das Token. */
+const INV={B:'https://api.innove.swiss/swissski/v1',TOL:120000,PAD:5000};
+const invAuth=()=>LS.get('innove',null);
+async function invLogin(u,p){ let r; try{ r=await fetch(INV.B+'/auth/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:u,password:p})}); }catch(e){ throw new Error('innove ist nicht erreichbar – Internet prüfen.'); }
+  if(!r.ok) throw new Error(r.status===401?'Benutzername oder Passwort stimmt nicht.':'Anmeldung fehlgeschlagen ('+r.status+').');
+  const j=await r.json(); LS.set('innove',{token:j.token,refresh:j.refreshToken,user:u}); gpsTabUI(); return true; }
+async function invGet(path){ let a=invAuth(); if(!a) throw new Error('login'); const go=t=>fetch(INV.B+path,{headers:{Authorization:'Bearer '+t}});
+  let r=await go(a.token);
+  if(r.status===401||r.status===403){ let t=null; try{ t=await fetch(INV.B+'/auth/token-refresh',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({refreshToken:a.refresh})}); }catch(e){}
+    if(!t||!t.ok){ LS.set('innove',null); throw new Error('login'); } const j=await t.json(); a={...a,token:j.token}; LS.set('innove',a); r=await go(a.token); }
+  if(r.status===404) return null; if(!r.ok) throw new Error('innove antwortet mit Fehler '+r.status); return r.json(); }
+async function invAthletes(force){ const c=LS.get('innove:aths',null); if(c&&!force&&Date.now()-c.at<7*864e5) return c.L; const L=[];
+  for(let p=1;p<20;p++){ const j=await invGet('/athletes/?limit=500&page='+p); const a=(j&&j.athletes)||[]; a.forEach(x=>L.push([x.id,x.first_name||'',x.last_name||''])); if(!a.length||L.length>=(j.total||0)) break; } // nur ID und Name
+  LS.set('innove:aths',{at:Date.now(),L}); return L; }
+const invNorm=s=>String(s||'').toLowerCase().replace(/ä/g,'ae').replace(/ö/g,'oe').replace(/ü/g,'ue').normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z]/g,'');
+function invPick(title,L){ return new Promise(res=>{ const m=$('#invPick'), q=$('#invPickQ'), l=$('#invPickL'); $('#invPickT').textContent=title;
+  const draw=()=>{ const t=invNorm(q.value); const F=L.filter(x=>!t||invNorm(x[1]+x[2]).includes(t)||invNorm(x[2]+x[1]).includes(t)).slice(0,80);
+    l.innerHTML=F.map(x=>`<button data-id="${x[0]}"><span>${esc(x[2])} ${esc(x[1])}</span><small>${x[0]}</small></button>`).join('')||'<p class="inv-p">Niemand gefunden.</p>'; };
+  const done=v=>{ m.classList.remove('on'); q.oninput=null; l.onclick=null; $('#invPickX').onclick=null; res(v); };
+  q.value=''; draw(); q.oninput=draw; l.onclick=e=>{ const b=e.target.closest('[data-id]'); if(b) done(L.find(x=>String(x[0])===b.dataset.id)); }; $('#invPickX').onclick=()=>done(null); m.classList.add('on'); setTimeout(()=>q.focus(),60); }); }
+async function invAthleteFor(c){ const name=(c.meta&&c.meta.athlete)||''; const key=invNorm(name), map=LS.get('innove:map',{}); const L=await invAthletes();
+  if(key&&map[key]){ const x=L.find(y=>y[0]===map[key]); if(x) return x; }
+  let C=key?L.filter(x=>invNorm(x[2])===key||invNorm(x[1]+x[2])===key||invNorm(x[2]+x[1])===key):[];
+  if(C.length!==1){ const x=await invPick(name?'Wer ist «'+name+'» bei innove?':'Athlet:in bei innove wählen',C.length?C:L); if(!x) return null; C=[x]; }
+  if(key){ map[key]=C[0][0]; LS.set('innove:map',map); } return C[0]; }
+async function invRun(aid,v0,v1){ const tf=async t=>(((await invGet('/timeframes/?athlete='+aid+'&timestamp_ms='+t+'&limit=50'))||{}).timeframes)||[];
+  const T=new Map(); (await tf(Math.round((v0+v1)/2))).forEach(x=>T.set(x.id,x)); if(!T.size){ for(const t of [v0,v1]) (await tf(t)).forEach(x=>T.set(x.id,x)); }
+  let best=null, w0=null; for(const t of T.values()){ const R=(await invGet('/activities/'+t.activity+'/runs?timeframe_id='+t.id))||[]; // Filter «athlete» wird hier ignoriert
+    for(const r of (Array.isArray(R)?R:[R])){ const a=r.start_time, b=r.finish_time, ov=Math.min(b,v1)-Math.max(a,v0), w=ov>0?ov:-Math.min(Math.abs(a-v1),Math.abs(v0-b)); if(ov<=0&&-w>INV.TOL) continue; if(w0==null||w>w0){ best={tf:t,run:r}; w0=w; } } }
+  if(best&&best.run.run_id){ try{ const k=await invGet('/timeframes/'+best.tf.id+'/runs/'+best.run.run_id+'/classification'); best.cls=(k&&k.classification)||null; }catch(e){} }
+  return {best,tfs:T.size}; }
+async function invTrack(dev,a,b){ const pages=[]; for(let p=1;p<40;p++){ const j=await invGet('/devices/'+dev+'/timeseries?startTs='+a+'&endTs='+b+'&page='+p+'&items_per_page=5000'); if(!j) break; pages.push(j); if(p>=(j.total_pages||1)) break; } return pages; }
+function invLoginUI(){ return new Promise(res=>{ const m=$('#invModal'), a=invAuth(); $('#invU').value=(a&&a.user)||LS.get('innove:user','')||''; $('#invP').value=''; $('#invErr').hidden=true; $('#invOut').hidden=!a;
+  const done=v=>{ m.classList.remove('on'); $('#invForm').onsubmit=null; $('#invX').onclick=null; $('#invOut').onclick=null; res(v); };
+  $('#invForm').onsubmit=async e=>{ e.preventDefault(); const u=$('#invU').value.trim(), p=$('#invP').value; if(!u||!p) return; $('#invGo').disabled=true;
+    try{ await invLogin(u,p); LS.set('innove:user',u); $('#invP').value=''; done(true); }catch(err){ $('#invErr').textContent=err.message; $('#invErr').hidden=false; } $('#invGo').disabled=false; };
+  $('#invX').onclick=()=>done(false); $('#invOut').onclick=()=>{ LS.set('innove',null); toast('Von innove abgemeldet.'); done(false); };
+  m.classList.add('on'); setTimeout(()=>($('#invU').value?$('#invP'):$('#invU')).focus(),60); }); }
+async function invFetch(c){ c=c||GD.clip; if(!c){ toast('Zuerst ein Video wählen.'); return; }
+  const s0=vidStart(c); if(s0==null){ toast('Für dieses Video fehlt die Aufnahmezeit. Sie steht im Namen von Videos aus «Filmen» (…_JJMMTT_hhmmssSSS).',5200); return; }
+  if(!invAuth()&&!(await invLoginUI())) return;
+  const btn=$('#gpsInv'); btn.classList.add('busy'); const lab=$('span',btn), lab0=lab.textContent;
+  try{ lab.textContent='Sucht …';
+    const ath=await invAthleteFor(c); if(!ath) return;
+    const v0=Math.round(s0*1000), v1=v0+Math.round((c.dur||60)*1000);
+    const {best,tfs}=await invRun(ath[0],v0,v1);
+    if(!best){ toast(tfs?'Kein Lauf von '+ath[2]+' zu diesem Video (auch nicht innert 2 Minuten). Läufe neuer Sensoren erscheinen bei innove erst nach der Berechnung – später nochmals versuchen.':'Zu dieser Zeit war '+ath[1]+' '+ath[2]+' bei innove kein Sensor zugeteilt.',6000); return; }
+    lab.textContent='Lädt GPS …';
+    const pages=await invTrack(best.tf.device,v0-INV.PAD,v1+INV.PAD);
+    const nm=ath[2]+' · Lauf '+best.run.run_number+(best.cls&&best.cls!=='OK'?' ('+best.cls+')':'');
+    const L=parseGps(JSON.stringify(pages.map(x=>x.data||x)),nm); if(!L.length||L[0].samples.length<5){ toast('innove hat zu diesem Lauf keine GPS-Punkte geliefert.',4000); return; }
+    L[0].name=nm; L[0].athlete=ath[1]+' '+ath[2]; L[0].run='Lauf '+best.run.run_number; L[0].source='innove';
+    const tr=addTracks(L,{link:false})[0]; if(!tr) return;
+    // Start und Ziel von innove statt aus der Bewegung: «GPS-Start = Bild» legt damit die Startlinie genau aufs Bild
+    const at=t=>{ let k=0; while(k<tr.P.length-1&&tr.P[k].t<t) k++; return k; };
+    tr.iS=at(best.run.start_time/1000-tr.t0abs); tr.iE=Math.max(tr.iS,at(best.run.finish_time/1000-tr.t0abs)); tr.tStart=best.run.start_time/1000-tr.t0abs; tr.tEnd=best.run.finish_time/1000-tr.t0abs;
+    tr.innove={activity:best.tf.activity,timeframe:best.tf.id,run:best.run,cls:best.cls||null};
+    if(GD.clip!==c) GD.setClip(c); linkGps(c,tr,s0-tr.t0abs); c.gpsAuto=0; if(mode!=='gps') setMode('gps'); gpsTabUI(); gpsSelects();
+    const sg=(best.run.segments||[]).filter(x=>!/start/i.test(x.name)), fin=sg.find(x=>/finish/i.test(x.name));
+    toast(nm+' · '+((best.run.finish_time-best.run.start_time)/1000).toFixed(2)+' s'+(fin&&fin.speed?' · Ziel '+(fin.speed*3.6).toFixed(1)+' km/h':'')+'. Feinabgleich: an der Startlinie anhalten → «GPS-Start = Bild».',6500);
+  }catch(err){ if(err.message==='login'){ toast('Anmeldung bei innove abgelaufen – bitte neu anmelden.',3500); if(await invLoginUI()) return invFetch(c); } else toast('innove: '+err.message,4500); }
+  finally{ btn.classList.remove('busy'); lab.textContent=lab0; } }
+$('#gpsInv').addEventListener('click',()=>invFetch(GD.clip));
 // Schnittstelle für den späteren externen Datenfluss
 window.VideoLab={
   loadGps(data,opt={}){ const list=typeof data==='string'?parseGps(data,opt.name):(Array.isArray(data)&&data.length&&(data[0].samples||data[0].points)?data:[data]).map(o=>({name:o.name||opt.name,athlete:o.athlete,run:o.run,source:o.source,samples:normSamples(o.samples||o.points||o)}));
@@ -5857,7 +5956,7 @@ if(false&&!LS.get('hint1',0)){ setTimeout(()=>{ toast(matchMedia('(pointer:coars
 
 /* Update-Hinweis: prüft version.json auf GitHub Pages; «Aktualisieren» lädt die Seite ohne Cache neu */
 (()=>{
-  const BUILD='20261030130258'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
+  const BUILD='20261030131828'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
   // nach einem Update die ?v=… aus der Adresse entfernen
   try{ const u=new URL(location.href); if(u.searchParams.has('v')){ u.searchParams.delete('v'); history.replaceState(null,'',u.pathname+(u.search||'')+u.hash); } }catch(e){}
   const el=$('#upd'); let latest=null, snoozed=null, busy=false;
