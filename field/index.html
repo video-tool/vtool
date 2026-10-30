@@ -307,6 +307,31 @@ svg{display:block}
 .big .bt b{font-size:clamp(13px,3.8vw,16.5px)!important;white-space:nowrap}
 .big .bt small{overflow-wrap:anywhere}
 @media (max-width:380px){ .big{padding:10px!important;gap:8px!important} .big .bi{width:32px!important;height:32px!important;border-radius:10px!important} .big .bt small{font-size:10.5px!important} }
+
+/* ---------- Zoom-Rad (wie iPhone-Kamera): hochkant über dem Auslöser, quer am rechten Rand ---------- */
+.zw{position:absolute;left:0;right:0;bottom:calc(var(--sb) + 140px);height:86px;z-index:3;touch-action:none;-webkit-user-select:none;user-select:none}
+.zw canvas{width:100%;height:100%;display:block}
+.camerr.on~.zw{display:none}
+@media (orientation:landscape){
+  .cambot{left:auto;top:0;bottom:0;right:0;grid-template-columns:none;grid-template-rows:1fr auto 1fr;justify-items:center;padding:calc(var(--st) + 14px) calc(var(--sr) + 16px) calc(var(--sb) + 14px) 14px;background:linear-gradient(90deg,transparent,rgba(0,0,0,.55))}
+  .cambot .side{justify-content:center;align-self:start}
+  .cambot .side.r{align-self:end}
+  .shut{width:72px;height:72px} .shut i{width:54px;height:54px}
+  .zw{left:auto;top:0;bottom:0;right:calc(var(--sr) + 104px);width:86px;height:auto}
+}
+
+/* Speicherplatz */
+.stor{display:block;width:100%;text-align:left;margin:0 0 10px;padding:10px 12px;border-radius:14px;background:var(--card);border:1px solid var(--line);color:inherit}
+.st-row{display:flex;justify-content:space-between;align-items:baseline;gap:8px;font-size:12.5px}
+.st-t{font-weight:700;white-space:nowrap} .st-u{font:600 12px var(--mono);color:var(--ink2);white-space:nowrap}
+.st-s{margin-top:6px;font-size:11.5px;color:var(--muted)} .st-s b{color:#ffb020;font-weight:700}
+.st-u b{color:#ffb020;font-weight:700}
+.st-bar{height:6px;border-radius:3px;background:rgba(255,255,255,.08);margin-top:7px;overflow:hidden}
+.st-bar i{display:block;height:100%;width:0;border-radius:3px;background:linear-gradient(90deg,#2bd4a0,#3b8bff);transition:width .4s}
+.stor.warn .st-bar i{background:linear-gradient(90deg,#ffb020,#ff7a00)} .stor.crit .st-bar i{background:#ff453a}
+.stor.warn{border-color:rgba(255,176,32,.45)} .stor.crit{border-color:rgba(255,69,58,.6);background:rgba(255,69,58,.08)}
+.st-w{margin-top:8px;font-size:12px;line-height:1.4;color:var(--ink2)} .st-w b{display:block;color:#ff7b72;font-size:12.5px}
+.pill.lowst{background:#b8620a} .pill.critst{background:#c62a1f}
 </style>
 </head>
 <body>
@@ -331,6 +356,7 @@ svg{display:block}
   <input type="file" id="fileIn" accept="video/*" multiple hidden>
   <button class="sess" id="sess"><span class="sess-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M8 3v4M16 3v4M3.5 10h17"/></svg></span><span class="sess-tx"><small>Trainingstag</small><b id="sessT"></b><em id="sessS"></em></span><span class="sess-go">Ändern</span></button>
   <div class="sec"><h2>Läufe</h2><span id="cnt"></span></div>
+  <button class="stor" id="stor" hidden><div class="st-row"><span class="st-t" id="stT"></span><span class="st-u" id="stU"></span></div><div class="st-bar"><i id="stBar"></i></div><div class="st-s" id="stS"></div><div class="st-w" id="stWarn" hidden></div></button>
   <div class="list" id="list"></div>
   <div class="selbar"><p id="selTxt">Zwei Läufe antippen</p><button class="ghost" id="selX">Abbrechen</button><button class="pri" id="selGo" disabled>Vergleichen</button></div>
   <div class="foot"><b>Videos bleiben auf dem Handy</b> · nichts wird hochgeladen</div>
@@ -342,9 +368,10 @@ svg{display:block}
   <div class="camerr" id="camErr"><b>Kamera nicht verfügbar</b><span id="camErrT">Bitte in den Einstellungen den Kamera-Zugriff für diese Seite erlauben.</span><button class="ghost" id="camRetry">Nochmals versuchen</button></div>
   <div class="camtop">
     <button class="rb" id="camX" aria-label="Schliessen"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
-    <div class="info"><span class="pill" id="camInfo">Kamera</span><span class="pill gps" id="camGps" hidden>GPS</span></div>
+    <div class="info"><span class="pill" id="camInfo">Kamera</span><span class="pill" id="camSt" hidden></span><span class="pill gps" id="camGps" hidden>GPS</span></div>
     <button class="rb" id="camFlip" aria-label="Kamera wechseln"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M20 7h-3l-2-3H9L7 7H4a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1V8a1 1 0 0 0-1-1z"/><path d="M9 13a3 3 0 0 1 5.2-2M15 13a3 3 0 0 1-5.2 2"/><path d="M14 9.5l.4 1.6-1.6.3M10 16.5l-.4-1.6 1.6-.3"/></svg></button>
   </div>
+  <div class="zw" id="zw"><canvas id="zwC"></canvas></div>
   <div class="cambot">
     <div class="side"><button class="lastth" id="camLast" aria-label="Letzte Aufnahme" hidden></button></div>
     <button class="shut" id="shut" aria-label="Aufnahme starten"><i></i></button>
@@ -572,7 +599,7 @@ async function saveBlob(blob,name){
   const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=name; document.body.appendChild(a); a.click(); setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); },4000); toast('Gespeichert in Downloads: '+name,3000); return true; }
 async function saveClip(c){ if(await saveBlob(c.blob,fileName(c))){ c.saved=true; dbPut(c).catch(()=>{}); render(); } }
 const dayClips=k=>CLIPS.filter(x=>new Date(x.created).toDateString()===k).sort((a,b)=>a.created-b.created);
-async function saveDay(k){ const L=dayClips(k); if(!L.length) return; const files=L.map(c=>new File([c.blob],fileName(c),{type:c.blob.type||'video/mp4'}));
+async function saveDay(k){ const L=Array.isArray(k)?k:dayClips(k); if(!L.length) return; const files=L.map(c=>new File([c.blob],fileName(c),{type:c.blob.type||'video/mp4'}));
   let ok=false; if(navigator.canShare&&navigator.canShare({files})){ try{ await navigator.share({files}); ok=true; }catch(e){ if(e&&e.name==='AbortError') return; } }
   if(!ok){ for(const c of L){ await saveBlob(c.blob,fileName(c)); await new Promise(r=>setTimeout(r,500)); } ok=true; }
   if(ok){ L.forEach(c=>{ c.saved=true; dbPut(c).catch(()=>{}); }); render(); toast(L.length+(L.length===1?' Lauf':' Läufe')+' gesichert',2200); } }
@@ -584,11 +611,22 @@ function dayMenu(k){ const L=dayClips(k), mb=L.reduce((a,c)=>a+(c.blob.size||0),
     else if(o==='del'){ if(!window.confirm(L.length+(L.length===1?' Lauf':' Läufe')+' löschen?'+(unsaved?' '+unsaved+' davon sind noch nicht gesichert.':''))) return;
       for(const c of L){ await dbDel(c.id); if(URLS.has(c.id)){ URL.revokeObjectURL(URLS.get(c.id)); URLS.delete(c.id); } } CLIPS=CLIPS.filter(c=>!L.includes(c)); render(); toast('Gelöscht – '+fmtMB(mb)+' frei'); } }); }
 const fmtMB=b=>b>=1e9?(b/1e9).toFixed(1)+' GB':Math.max(1,Math.round(b/1e6))+' MB';
-async function storageUI(){ const used=CLIPS.reduce((a,c)=>a+(c.blob&&c.blob.size||0),0); let free=null;
-  try{ if(navigator.storage&&navigator.storage.estimate){ const e=await navigator.storage.estimate(); if(e.quota) free=Math.max(0,e.quota-(e.usage||used)); } }catch(e){}
-  $('#cnt').textContent=CLIPS.length?CLIPS.length+(CLIPS.length===1?' Lauf':' Läufe')+' · '+fmtMB(used)+(free!=null?' · noch '+fmtMB(free)+' frei':''):'';
-  const w=$('#stWarn'); if(!w) return; const low=free!=null&&(free<1.5e9||used/(used+free)>0.85), uns=CLIPS.filter(c=>!c.saved).length;
-  w.hidden=!low; if(low) w.innerHTML=`<b>Speicher fast voll</b><span>Nur noch ${fmtMB(free)} frei. Läufe sichern (Fotos) und danach in der App löschen.${uns?' '+uns+' Läufe sind noch nicht gesichert.':''}</span>`; }
+const ST={free:null,quota:null,used:0}; const REC_BPS=1.6e6; /* ~12 Mbit/s → Bytes pro Sekunde Aufnahme */
+async function storEst(){ const used=CLIPS.reduce((a,c)=>a+(c.blob&&c.blob.size||0),0); let free=null, quota=null;
+  try{ if(navigator.storage&&navigator.storage.estimate){ const e=await navigator.storage.estimate(); if(e.quota){ quota=e.quota; free=Math.max(0,e.quota-(e.usage||used)); } } }catch(e){}
+  Object.assign(ST,{free,quota,used}); return ST; }
+const fmtMin=s=>s>=3600?(s/3600).toFixed(1).replace('.0','')+' h':Math.max(0,Math.floor(s/60))+' min';
+async function storageUI(){ const {used,free}=await storEst();
+  $('#cnt').textContent=CLIPS.length?CLIPS.length+(CLIPS.length===1?' Lauf':' Läufe'):'';
+  const b=$('#stor'); if(!b) return; const uns=CLIPS.filter(c=>!c.saved), unsMB=uns.reduce((a,c)=>a+(c.blob&&c.blob.size||0),0);
+  if(free==null&&!CLIPS.length){ b.hidden=true; return; } b.hidden=false;
+  const tot=free!=null?used+free:null, crit=free!=null&&free<0.5e9, warn=free!=null&&!crit&&(free<1.5e9||used/(tot||1)>0.85);
+  b.classList.toggle('warn',warn); b.classList.toggle('crit',crit);
+  $('#stT').textContent='Speicher'; $('#stU').textContent=free!=null?fmtMB(free)+' frei':fmtMB(used)+' belegt';
+  $('#stS').innerHTML=[free!=null?'ca. '+fmtMin(free/REC_BPS)+' Aufnahme':'','Läufe '+fmtMB(used),uns.length?'<b>'+uns.length+' nicht gesichert</b>':'alle gesichert'].filter(Boolean).join(' · ');
+  $('#stBar').style.width=(tot?Math.min(100,Math.max(1,used/tot*100)):0)+'%';
+  const w=$('#stWarn'); w.hidden=!(warn||crit); if(warn||crit) w.innerHTML=`<b>${crit?'Speicher voll':'Speicher wird knapp'}</b>Läufe in Fotos sichern und danach hier löschen${uns.length?' – '+(uns.length===1?'1 Lauf ('+fmtMB(unsMB)+') ist':uns.length+' Läufe ('+fmtMB(unsMB)+') sind')+' noch nicht gesichert':''}. Antippen = alle sichern.`; }
+$('#stor').addEventListener('click',()=>{ const uns=CLIPS.filter(c=>!c.saved); if(!uns.length){ toast('Alle Läufe sind gesichert.'); return; } if(typeof saveDay==='function'){ saveDay(uns); return; } uns.reduce((p,c)=>p.then(()=>saveClip(c)),Promise.resolve()); });
 
 /* ---------- Navigation ---------- */
 let SCR='home';
@@ -607,27 +645,79 @@ async function camStart(){ $('#camErr').classList.remove('on');
   const v=$('#camV'); v.srcObject=CAM.stream; v.style.transform=CAM.facing==='user'?'scaleX(-1)':''; try{ await v.play(); }catch(e){}
   const s=CAM.stream.getVideoTracks()[0].getSettings(); CAM.fps=s.frameRate||null; const hh=Math.min(s.width||0,s.height||0);
   $('#camInfo').textContent=(hh?(hh>=1080?'1080p':hh>=720?'720p':hh+'p'):'Kamera')+(CAM.fps?' · '+Math.round(CAM.fps)+' fps':'');
-  try{ wake=await navigator.wakeLock.request('screen'); }catch(e){} }
+  zwInit(); camStUI(); try{ wake=await navigator.wakeLock.request('screen'); }catch(e){} }
+/* Platz für wie viele Minuten Aufnahme? Unter 10 min orange, unter 3 min rot; während der Aufnahme: bei < 20 s automatisch stoppen und speichern */
+async function camStUI(){ const {free}=await storEst(); const el=$('#camSt'); if(!el) return; if(free==null){ el.hidden=true; return; } const sec=free/REC_BPS-(REC.on?(performance.now()-REC.t0)/1000:0);
+  el.hidden=sec>600&&!REC.on?true:false; el.textContent=sec>600?fmtMin(sec)+' frei':'noch '+fmtMin(Math.max(0,sec)); el.classList.toggle('lowst',sec<=600&&sec>180); el.classList.toggle('critst',sec<=180);
+  if(REC.on&&sec<20){ recStop(true); toast('Speicher voll – Aufnahme gestoppt und gespeichert.',4000); } }
+setInterval(()=>{ if(SCR==='cam'&&CAM.stream) camStUI(); },5000);
 function camErr(t){ $('#camErrT').textContent=t; $('#camErr').classList.add('on'); $('#camInfo').textContent='Kamera'; }
 function camStop(){ if(REC.on) recStop(false); if(CAM.stream){ CAM.stream.getTracks().forEach(t=>t.stop()); CAM.stream=null; } $('#camV').srcObject=null; try{ wake&&wake.release(); }catch(e){} wake=null; }
 function recMime(){ const L=['video/mp4;codecs=avc1.640028','video/mp4;codecs=avc1','video/mp4','video/webm;codecs=vp9','video/webm;codecs=vp8','video/webm']; return L.find(m=>window.MediaRecorder&&MediaRecorder.isTypeSupported&&MediaRecorder.isTypeSupported(m))||''; }
 function camGpsUI(){ const g=$('#camGps'); if(g) g.hidden=LS.get('gpsMode','gps')!=='gps'; }
 function recStart(){ if(!CAM.stream||REC.on) return; const mime=recMime(); let mr;
-  try{ mr=new MediaRecorder(CAM.stream,mime?{mimeType:mime,videoBitsPerSecond:12e6}:{}); }catch(e){ try{ mr=new MediaRecorder(CAM.stream); }catch(e2){ toast('Aufnahme wird hier nicht unterstützt.'); return; } }
+  const src=zwRecStream()||CAM.stream;
+  try{ mr=new MediaRecorder(src,mime?{mimeType:mime,videoBitsPerSecond:12e6}:{}); }catch(e){ try{ mr=new MediaRecorder(CAM.stream); }catch(e2){ toast('Aufnahme wird hier nicht unterstützt.'); return; } }
   REC.mr=mr; REC.chunks=[]; REC.on=true; REC.t0=performance.now(); REC.ts=Date.now(); REC.marks=[]; mr.onstart=()=>{ REC.ts=Date.now(); }; /* Startzeit (Handyuhr, ms) für die GPS-Verbindung im Video-Lab */ mr.ondataavailable=e=>{ if(e.data&&e.data.size) REC.chunks.push(e.data); };
   mr.start(500); $('span',$('#camMk')).textContent='Marker'; $('#cam').classList.add('recording'); $('#shut').setAttribute('aria-label','Aufnahme stoppen'); if(navigator.vibrate) navigator.vibrate(30);
   const pill=$('#camInfo'); pill.classList.add('live'); REC.tick=setInterval(()=>{ pill.textContent=((performance.now()-REC.t0)/1000).toFixed(1)+' s'; },100); }
-function recStop(keep=true){ if(!REC.on) return; REC.on=false; clearInterval(REC.tick); $('#cam').classList.remove('recording'); const pill=$('#camInfo'); pill.classList.remove('live');
+function recStop(keep=true){ if(!REC.on) return; REC.on=false; if(ZW.rec) setTimeout(()=>ZW.rec&&ZW.rec.stop(),600); clearInterval(REC.tick); $('#cam').classList.remove('recording'); const pill=$('#camInfo'); pill.classList.remove('live');
   const mr=REC.mr, fps=CAM.fps, t0=REC.ts, marks=(REC.marks||[]).slice(); mr.onstop=async()=>{ if(!keep) return; const type=(mr.mimeType||'video/mp4').split(';')[0]; const blob=new Blob(REC.chunks,{type}); REC.chunks=[];
     if(blob.size<2000){ toast('Aufnahme zu kurz.'); return; } busy(true,'Wird gespeichert …'); const c=await addClip(blob,{fps,t0,marks,gps:LS.get('gpsMode','gps')==='gps'}); busy(false);
     if(c){ $('#camLast').hidden=false; $('#camLast').style.backgroundImage=c.thumb?`url(${c.thumb})`:''; $('#camLast').dataset.id=c.id; openPlayer(c,{fresh:true}); askName(c); } };
   try{ mr.stop(); }catch(e){} if(navigator.vibrate) navigator.vibrate([20,40,20]); if(!keep) setTimeout(()=>{ $('#camInfo').textContent='Kamera'; },0); }
+
+/* ---------- Zoom-Rad ----------
+   Kann die Kamera selbst zoomen (track.getCapabilities().zoom), zoomt sie echt (scharf, auch in der Aufnahme).
+   Sonst digitaler Zoom: Vorschau vergrössert, Aufnahme über ein Zwischenbild (Canvas) mit gleichem Ausschnitt. */
+const ZW={z:1,min:1,max:4,hw:false,track:null,rec:null};
+function zwInit(){ const tr=CAM.stream&&CAM.stream.getVideoTracks()[0]; ZW.track=tr; let caps={}; try{ caps=tr&&tr.getCapabilities?tr.getCapabilities():{}; }catch(e){}
+  if(caps&&caps.zoom&&caps.zoom.max>caps.zoom.min){ ZW.hw=true; ZW.min=caps.zoom.min||1; ZW.max=Math.min(caps.zoom.max,10); } else { ZW.hw=false; ZW.min=1; ZW.max=4; }
+  ZW.z=ZW.min; zwApply(); zwDraw(); }
+function zwApply(){ const v=$('#camV'), m=CAM.facing==='user'?' scaleX(-1)':'';
+  if(ZW.hw){ v.style.transform=m.trim(); try{ ZW.track.applyConstraints({advanced:[{zoom:ZW.z}]}).catch(()=>{}); }catch(e){} }
+  else v.style.transform=('scale('+ZW.z.toFixed(3)+')'+m); }
+function zwSet(z){ z=Math.min(ZW.max,Math.max(ZW.min,z)); if(Math.abs(z-1)<0.04) z=1; if(Math.abs(z-ZW.z)<0.001) return;
+  if(REC.on&&!ZW.hw&&!ZW.rec){ zwHint(); return; } const crossed=[1,2,3,5].some(t=>(ZW.z-t)*(z-t)<0); ZW.z=z; zwApply(); zwDraw(); if(crossed&&navigator.vibrate) navigator.vibrate(8); }
+let zwHintT=0; function zwHint(){ if(Date.now()-zwHintT<4000) return; zwHintT=Date.now(); toast('Zoom auf diesem Handy vor dem Start wählen.'); }
+function zwDraw(){ const cv=$('#zwC'); if(!cv) return; const W=cv.clientWidth, H=cv.clientHeight; if(!W||!H) return; const d=Math.min(devicePixelRatio||1,3);
+  if(cv.width!==Math.round(W*d)||cv.height!==Math.round(H*d)){ cv.width=Math.round(W*d); cv.height=Math.round(H*d); } const x=cv.getContext('2d'); x.setTransform(d,0,0,d,0,0); x.clearRect(0,0,W,H);
+  const land=W<H, Rr=land?Math.max(H*0.9,260):Math.max(W*0.9,260), band=land?W:H;
+  /* Kreis: hochkant Mitte unterhalb, quer Mitte rechts ausserhalb */
+  const cx=land?W+Rr-band*0.92:W/2, cy=land?H/2:H+Rr-band*0.92, base=land?Math.PI:-Math.PI/2, K=0.55; /* Bogen pro ln-Einheit */
+  x.save(); x.beginPath(); x.arc(cx,cy,Rr,0,7); x.fillStyle='rgba(20,22,26,.55)'; x.fill(); x.strokeStyle='rgba(255,255,255,.18)'; x.lineWidth=1; x.stroke(); x.restore();
+  const lz=Math.log(ZW.z), ang=z=>base+(Math.log(z)-lz)*K*(land?-1:1);
+  x.save(); x.beginPath(); x.arc(cx,cy,Rr-1,0,7); x.clip();
+  for(let z=ZW.min;z<=ZW.max+1e-6;z=Math.round((z+(z<2?0.1:z<5?0.25:0.5))*100)/100){ const a=ang(z), maj=[1,2,3,5,10].includes(Math.round(z*100)/100)||Math.abs(z-ZW.min)<1e-6;
+    const r1=Rr-6, r2=Rr-(maj?20:13), ca=Math.cos(a), sa=Math.sin(a); x.strokeStyle=maj?'rgba(255,255,255,.95)':'rgba(255,255,255,.5)'; x.lineWidth=maj?2:1.2; x.beginPath(); x.moveTo(cx+ca*r1,cy+sa*r1); x.lineTo(cx+ca*r2,cy+sa*r2); x.stroke();
+    if(maj){ const rl=Rr-34; x.save(); x.translate(cx+ca*rl,cy+sa*rl); x.rotate(a-base); if(land) x.rotate(-Math.PI/2); x.font='700 12px -apple-system,system-ui,sans-serif'; x.fillStyle='#fff'; x.textAlign='center'; x.textBaseline='middle'; x.fillText((Math.round(z*10)/10)+'',0,0); x.restore(); } }
+  x.restore();
+  /* Zeiger + Wert (gelb) */
+  const ca=Math.cos(base), sa=Math.sin(base), tx=cx+ca*(Rr+1), ty=cy+sa*(Rr+1); x.fillStyle='#ffd60a'; x.beginPath();
+  if(land){ x.moveTo(tx,ty); x.lineTo(tx-9,ty-6); x.lineTo(tx-9,ty+6); } else { x.moveTo(tx,ty); x.lineTo(tx-6,ty-9); x.lineTo(tx+6,ty-9); } x.closePath(); x.fill();
+  const lab=(Math.round(ZW.z*10)/10)+'×', rv=Rr-50; x.save(); x.translate(cx+ca*rv,cy+sa*rv); if(land) x.rotate(-Math.PI/2); x.font='800 14px -apple-system,system-ui,sans-serif'; x.fillStyle='#ffd60a'; x.textAlign='center'; x.textBaseline='middle'; x.fillText(lab,0,0); x.restore(); }
+(()=>{ const el=$('#zw'); let st=null, moved=false;
+  el.addEventListener('pointerdown',e=>{ e.preventDefault(); el.setPointerCapture(e.pointerId); const land=el.clientWidth<el.clientHeight; st={p:land?e.clientY:e.clientX,z:ZW.z,land}; moved=false; });
+  el.addEventListener('pointermove',e=>{ if(!st) return; const p=st.land?e.clientY:e.clientX, dp=p-st.p; if(Math.abs(dp)>3) moved=true; /* nach links/oben drehen = näher */ zwSet(Math.exp(Math.log(st.z)-dp/140)); });
+  const up=()=>{ if(st&&!moved){ zwSet(ZW.z<1.9?2:1); } st=null; }; el.addEventListener('pointerup',up); el.addEventListener('pointercancel',()=>{ st=null; });
+  addEventListener('resize',()=>setTimeout(zwDraw,60)); addEventListener('orientationchange',()=>setTimeout(zwDraw,300));
+  /* zwei Finger auf dem Bild = zoomen */
+  const cv=$('#camV'); let pz=null; const tp=new Map();
+  cv.addEventListener('pointerdown',e=>{ tp.set(e.pointerId,[e.clientX,e.clientY]); if(tp.size===2){ const [a,b]=[...tp.values()]; pz={d:Math.hypot(a[0]-b[0],a[1]-b[1])||1,z:ZW.z}; } });
+  cv.addEventListener('pointermove',e=>{ if(!tp.has(e.pointerId)) return; tp.set(e.pointerId,[e.clientX,e.clientY]); if(pz&&tp.size===2){ const [a,b]=[...tp.values()]; zwSet(pz.z*Math.hypot(a[0]-b[0],a[1]-b[1])/pz.d); } });
+  const end=e=>{ tp.delete(e.pointerId); if(tp.size<2) pz=null; }; cv.addEventListener('pointerup',end); cv.addEventListener('pointercancel',end); cv.style.touchAction='none';
+})();
+/* digitaler Zoom in der Aufnahme: Ausschnitt in ein Canvas zeichnen und dieses aufnehmen */
+function zwRecStream(){ if(ZW.hw||ZW.z<=1.01) return null; const v=$('#camV'), s=ZW.track.getSettings(), w=s.width||v.videoWidth||1280, h=s.height||v.videoHeight||720;
+  const cv=document.createElement('canvas'); cv.width=w; cv.height=h; const x=cv.getContext('2d'); let on=true;
+  const loop=()=>{ if(!on) return; const z=ZW.z, sw=w/z, sh=h/z; try{ x.drawImage(v,(w-sw)/2,(h-sh)/2,sw,sh,0,0,w,h); }catch(e){} requestAnimationFrame(loop); }; loop();
+  const st=cv.captureStream(Math.round(CAM.fps||30)); ZW.rec={stop:()=>{ on=false; st.getTracks().forEach(t=>t.stop()); ZW.rec=null; }}; return st; }
 /* Vor dem Filmen: mit oder ohne GPS (Sensor fährt mit) – mit GPS holt das Video-Lab später Tempo und Lauf von innove */
 function gpsAsk(go){ const last=LS.get('gpsMode','gps'), PIN='<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.2 7-11.5A7 7 0 0 0 5 9.5C5 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.4"/></svg>', NO='<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="13" height="12" rx="2"/><path d="M16 10l5-3v10l-5-3z"/></svg>';
   sheet(`<h3>Filmen</h3><p class="gq">Fährt die Athletin / der Athlet mit GPS-Sensor (innove)?</p>
     <button class="opt gopt${last==='gps'?' on':''}" data-o="gps">${PIN}<span><b>Mit GPS</b><small>Tempo und Lauf kommen im Video-Lab automatisch dazu</small></span></button>
     <button class="opt gopt${last==='no'?' on':''}" data-o="no">${NO}<span><b>Ohne GPS</b><small>Nur Video</small></span></button>`,o=>{ LS.set('gpsMode',o); closeSheet(); go(); }); }
-$('#goCam').addEventListener('click',()=>{ const go0=()=>{ show('cam'); camStart(); camGpsUI(); }, go=()=>gpsAsk(go0); if(!SESS.disc&&!LS.get('sessAsk',0)){ LS.set('sessAsk',1); sessSheet(go); return; } go(); });
+$('#goCam').addEventListener('click',()=>{ if(ST.free!=null&&ST.free<0.5e9) toast('Speicher fast voll – noch ca. '+fmtMin(ST.free/REC_BPS)+' Aufnahme. Läufe sichern und löschen.',4500); const go0=()=>{ show('cam'); camStart(); camGpsUI(); }, go=()=>gpsAsk(go0); if(!SESS.disc&&!LS.get('sessAsk',0)){ LS.set('sessAsk',1); sessSheet(go); return; } go(); });
 $('#camX').addEventListener('click',()=>show('home'));
 $('#camRetry').addEventListener('click',camStart);
 $('#shut').addEventListener('click',()=>REC.on?recStop(true):recStart());

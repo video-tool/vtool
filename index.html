@@ -1459,7 +1459,17 @@ body.no-hdr .cmp-tools .op-wrap::before{content:"";width:15px;height:15px;margin
   body.no-hdr .cmp-tools .tut-open,body.no-hdr .cmp-tools .ov-namebtn{width:auto!important;padding:0 10px 0 8px!important}
 }
 body.no-hdr #viewGps .pbar .ttl{display:none}
-body.no-hdr #viewGps .pbar{flex-wrap:nowrap!important}
+/* Ein Video, schmaler Computer: Titel/Angaben dürfen nicht über die Reiter laufen → bei Platzmangel zweite Zeile */
+body.no-hdr #viewSingle .pbar{flex-wrap:wrap!important}
+body.no-hdr #viewSingle .pbar .ttl-wrap{min-width:auto!important;flex:1 1 auto}
+body.no-hdr #viewSingle .pbar .ttl{min-width:0;flex:1 1 auto}
+body.no-hdr #viewGps .pbar{flex-wrap:wrap!important}
+body.no-hdr #viewGps .gps-sel{flex:1 1 100%;min-width:0;flex-wrap:nowrap!important;justify-content:flex-start}
+body.no-hdr #viewGps .gps-sel .ctl-lab{flex:1 1 0;min-width:0;max-width:300px}
+body.no-hdr #viewGps .gps-sel .ctl-lab .sel{width:100%!important;max-width:none!important;min-width:0!important}
+body.no-hdr #viewGps .gps-sel #gpsInv{flex:none;order:9}
+@media (max-width:1300px){ body.no-hdr #viewGps .gps-sel #gpsInv span{display:none} body.no-hdr #viewGps .gps-sel #gpsInv{padding:0 10px!important} }
+#viewGps label[for="gpsIn"]{display:none!important} /* GPS-Dateien nimmt das «+» oben an */
 body.no-hdr .gps-sel{flex-wrap:nowrap!important;gap:6px!important;margin-left:auto}
 body.no-hdr .gps-sel .ctl-lab select.sel{height:40px!important;padding-top:13px!important;min-width:150px!important;max-width:220px!important;font-size:12.5px!important}
 body.no-hdr .gps-sel>label.ctl[for="gpsIn"]{height:40px!important;padding:0 12px!important}
@@ -2285,9 +2295,11 @@ button.lg-it:hover{background:rgba(12,15,20,.8);border-color:rgba(255,255,255,.3
 .st-fs svg{width:16px;height:16px} .st-fs .fs-out{display:none}
 body.pfs .st-fs .fs-out,body.rfs .st-fs .fs-out{display:block} body.pfs .st-fs .fs-in,body.rfs .st-fs .fs-in{display:none}
 #cStages .stage:nth-child(2) .st-fs{display:none}
-#viewCmp.overlay .st-fs{top:auto;bottom:8px}
 /* eigenes Vollbild (iPhone) */
-body.pfs header,body.pfs .tabs,body.pfs .libcard,body.pfs .lib-sh,body.pfs #ovActs{display:none!important}
+body.pfs header,body.pfs .tabs,body.pfs .libcard,body.pfs .lib-sh{display:none!important}
+body.pfs #viewCmp.overlay #ovActs{bottom:0!important;z-index:320!important} body.pfs .modal{z-index:420!important} body.pfs .toast{z-index:430!important} body.pfs .m-menu,body.pfs .save-menu{z-index:410!important}
+body.pfs #viewGps .gv-btn{display:inline-flex!important;align-items:center;gap:2px;padding:0 8px!important}
+body.pfs #viewGps .gv-btn svg{width:16px;height:16px} body.pfs #viewGps .gv-btn svg.dd{width:11px;height:11px}
 body.pfs{overflow:hidden!important;padding:0!important}
 body.pfs .card.player:not([hidden]){position:fixed!important;inset:0!important;z-index:300!important;margin:0!important;border-radius:0!important;overflow:auto!important;min-height:0!important;padding:max(6px,env(safe-area-inset-top,0px)) max(8px,env(safe-area-inset-right,0px)) max(6px,env(safe-area-inset-bottom,0px)) max(8px,env(safe-area-inset-left,0px))!important}
 body.pfs #sHost .stage,body.pfs #gHost .stage{max-height:calc(100dvh - 150px)!important;width:auto!important;margin:0 auto}
@@ -2329,6 +2341,7 @@ body.pfs .gps-sel,body.pfs .gps-foot,body.pfs #gpsChart,body.pfs #viewGps .ctl-l
   body.pfs .player>.pbar,body.pfs .player>.c-head,body.pfs #ovTxt,body.pfs #ovSteps{display:none!important}  body.pfs #viewGps .dock.dock3{display:flex!important;flex-wrap:nowrap!important;justify-content:center!important;gap:6px!important}
   body.pfs #viewGps .dock.dock3>.dz{flex:none!important;margin:0!important}
 }
+.stage canvas.ovgps{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:4}
 </style>
 </head>
 <body class="m-single">
@@ -3442,7 +3455,7 @@ function linkedTick(){
   else if(tight) B.v.playbackRate=clamp(A.rate*(1-G.errS*4),A.rate*0.75,A.rate*1.25);
   else B.v.playbackRate=clamp(A.rate*(1-err*1.5),A.rate*0.85,A.rate*1.15);
 }
-function setLayout(l){ if(l==='ghost') l='side'; if(l==='overlay'){ try{ if(DRAW.tool&&DRAW.tool!=='none') setTool('none'); if(TIM.on){ TIM.on=false; timUI(); } }catch(e){} } /* Werkzeuge gibt es im Übereinander-Modus nicht */ if(l!=='overlay'&&typeof OV!=='undefined'&&OV.pick) OV.pick=null; setTimeout(()=>typeof ovUI==='function'&&ovUI(),0);  $$('#layoutSeg button').forEach(x=>x.classList.toggle('on',x.dataset.layout===l)); const v=$('#viewCmp'); v.classList.toggle('overlay',l==='overlay'); v.classList.toggle('ghost',l==='ghost'); if(typeof ghostUI==='function') ghostUI();  LS.set('layout',l); decks.forEach(d=>{ d.dirty=true; d.annDirty=true; }); if(typeof splitsUI==='function') splitsUI(); if(typeof tabsUI==='function') tabsUI(); }
+function setLayout(l){ if(l==='ghost') l='side'; if(l==='overlay'&&document.body.classList.contains('pfs')&&typeof pfsSet==='function') pfsSet(false); /* Overlay einrichten braucht Schritte und Leiste */ if(l==='overlay'){ try{ if(DRAW.tool&&DRAW.tool!=='none') setTool('none'); if(TIM.on){ TIM.on=false; timUI(); } }catch(e){} } /* Werkzeuge gibt es im Übereinander-Modus nicht */ if(l!=='overlay'&&typeof OV!=='undefined'&&OV.pick) OV.pick=null; setTimeout(()=>typeof ovUI==='function'&&ovUI(),0);  $$('#layoutSeg button').forEach(x=>x.classList.toggle('on',x.dataset.layout===l)); const v=$('#viewCmp'); v.classList.toggle('overlay',l==='overlay'); v.classList.toggle('ghost',l==='ghost'); if(typeof ghostUI==='function') ghostUI();  LS.set('layout',l); decks.forEach(d=>{ d.dirty=true; d.annDirty=true; }); if(typeof splitsUI==='function') splitsUI(); if(typeof tabsUI==='function') tabsUI(); }
 $('#layoutSeg').addEventListener('click',e=>{ const b=e.target.closest('[data-layout]'); if(b) setLayout(b.dataset.layout); });
 $('#opRange').addEventListener('input',e=>$('#viewCmp').style.setProperty('--ovop',e.target.value));
 
@@ -3498,7 +3511,7 @@ $$('.dock [data-act], .cmp-tools [data-act]').forEach(b=>b.addEventListener('cli
 
 /* Modus */
 function setMode(m){
-  if(window.mMenuClose) mMenuClose(); const gm=$('#gvMenu'); if(gm) gm.remove();
+  if(window.mMenuClose) mMenuClose(); const gm=$('#gvMenu'); if(gm) gm.remove(); setTimeout(()=>window.pfsAutoCheck&&pfsAutoCheck(),50); /* quer: neue Ansicht wieder im Vollbild */
   mode=m; document.body.classList.toggle('m-cmp',m==='cmp'); document.body.classList.toggle('m-single',m==='single');
   tabsUI();
   $('#viewSingle').hidden=m!=='single'; $('#viewCmp').hidden=m!=='cmp'; $('#viewGps').hidden=m!=='gps';
@@ -3599,6 +3612,7 @@ function tickBody(){
   tickSafe('link',linkedTick);
   if(EXP.live&&!EXP.wc) tickSafe('exp',exportFrame);
   if(mode==='cmp') tickSafe('ov',renderOv);
+  if(mode==='cmp') tickSafe('ovgps',()=>drawOvGps());
   if(mode==='cmp'&&G.linked&&!A.v.paused) tickSafe('sync',updSync);
   if(mode==='gps'&&(GPS.dirty||!GD.v.paused)){ GPS.dirty=false; tickSafe('gps',()=>drawGpsOverlay()); }
 }
@@ -4100,7 +4114,7 @@ function ovUI(){ vchipPlace();
     ttl=GH.coarse?'Vorschau':'Fertig'; dot=true; say=GH.bg?'Wird verfeinert · '+Math.round((GH.bg.p||0)*100)+' %':GH.coarse?'Grob gerechnet – «…» › «Neu berechnen» rechnet fein.':'B daneben? «Korrigieren».'; chips=cut+kc;
     tip='Liegt B neben A: an der Stelle anhalten und «Korrigieren». Der Punkt links und das Band in der Zeitleiste zeigen den Zustand: grün ausgerichtet, gelb unsicher, rot Kameraschnitt. Das Auge bei den Läufen oben links blendet einen Lauf ein oder aus.';
     acts=cutBtns+ovBtn('fix','Korrigieren',OVI.fix,'ghost','B an dieser Stelle von Hand nachschieben')
-      +ovMore([['nameset','Namen setzen (Fahrer:innen antippen)',OVI.tag],LAY.length<3?['addrun','Weiteren Lauf dazunehmen',OVI.plus]:null,['series','Serie gegen A rechnen …',OVI.go],['make','Neu berechnen',OVI.go],['edit','Neu beginnen',OVI.back]])+ovSaveBtn(); }
+      +ovMore([ovGpsPair()?['ovgps',OVG.on?'GPS-Tacho ausblenden':'GPS-Tacho einblenden',OVI.go]:null,['nameset','Namen setzen (Fahrer:innen antippen)',OVI.tag],LAY.length<3?['addrun','Weiteren Lauf dazunehmen',OVI.plus]:null,['series','Serie gegen A rechnen …',OVI.go],['make','Neu berechnen',OVI.go],['edit','Neu beginnen',OVI.back]])+ovSaveBtn(); }
   if(SER.on){ ttl='Serie '+(SER.i+1)+' / '+SER.list.length; dot=false; chips=''; say='<b>'+esc(lastName(SER.cur)||'')+'</b> · '+(busy?((($('#ghostBar .gprog span')||{}).textContent)||'Overlay wird erstellt'):SER.msg);
     tip='Alle gewählten Läufe werden nacheinander gegen A gerechnet und gespeichert. Tab offen lassen.'; acts=ovBtn('serstop','Serie abbrechen','','ghost','Nach dem laufenden Schritt aufhören'); }
   // drei Zonen: links Schritt (+ Zustand), Mitte kurzer Hinweis, rechts Knöpfe – nur neu zeichnen, wenn sich etwas ändert (sonst gehen Klicks verloren)
@@ -4486,6 +4500,7 @@ function renderOv(){
     else if(a==='make'){ OV.follow=true; OV.fix=null; if(!(GH.state==='ready'&&ghostKey()===GH.key)){ OV.K=[]; ovUI(); ghostCompute({coarse:!document.body.classList.contains('touring')}); return; } if(GH.coarse&&!GH.bg){ ghostCompute({bg:true}); } ovUI(); return; }
     else if(a==='fix'){ A.pause(); B.pause(); G.playing=false; cmpPlayIcon(); const D=ovDAt(ovE()); OV.fix={...D}; OV.fix0={...D}; }
     else if(a==='hand') return ovAlign();
+    else if(a==='ovgps'){ OVG.on=!OVG.on; LS.set('ovGps',OVG.on?1:0); }
     else if(a==='fixreset'){ if(OV.fix){ OV.fix.dx=0; OV.fix.dy=0; OV.fix.s=1; OV.fix.r=0; A.dirty=true; } return; }
     else if(a==='fixno'){ if(!ovFollowOK()&&OV.handNew){ OV.T=null; } OV.handNew=false; OV.fix=null; }
     else if(a==='addrun'){ return layerAdd(); }
@@ -5012,13 +5027,16 @@ function drawGpsOverlay(T){ /* T={x,R}: direkt in den Export zeichnen (volle Auf
   const N=gpsNow(); let x, R;
   if(T){ if(!N) return; x=T.x; R=T.R; x.save(); }
   else { const cv=$('canvas.gpsov',GD.stage); cv.hidden=!N; $('#gpsNo').hidden=!!N||!GD.ready; if(!N) return;
-    const W=GD.stage.clientWidth, H=GD.stage.clientHeight, d=DPR();
+    const W=GD.stage.clientWidth, H=GD.stage.clientHeight, d=Math.min(window.devicePixelRatio||1,3);
     if(cv.width!==Math.round(W*d)||cv.height!==Math.round(H*d)){ cv.width=Math.round(W*d); cv.height=Math.round(H*d); }
     x=cv.getContext('2d'); x.setTransform(d,0,0,d,0,0); x.clearRect(0,0,W,H); R=GD.rect(); }
   const {tr,cur}=N, ff=getComputedStyle(document.body).fontFamily, ref=GPS.tracks.find(t=>t.id===tr.ref);
   const P=tr.P, iS=tr.iS, iE=tr.iE, k=T?R.h/430:clamp(R.w/760,0.85,1.5), small=!T&&R.w<520;
-  const txt=(s,X,Y,size,col,al='left',w=800)=>{ x.font=`${w} ${size*k}px ${ff}`; x.textAlign=al; x.textBaseline='middle'; x.lineWidth=3*k; x.strokeStyle='rgba(0,0,0,.55)'; x.strokeText(s,X,Y); x.fillStyle=col; x.fillText(s,X,Y); };
+  const txt=(s,X,Y,size,col,al='left',w=800)=>{ x.save(); x.font=`${w} ${size*k}px ${ff}`; x.textAlign=al; x.textBaseline='middle'; x.shadowColor='rgba(0,0,0,.45)'; x.shadowBlur=3*k; x.shadowOffsetY=0.5*k; x.fillStyle=col; x.fillText(s,X,Y); x.restore(); };
   const rr=(X,Y,w,h,r)=>{ x.beginPath(); if(x.roundRect) x.roundRect(X,Y,w,h,r); else x.rect(X,Y,w,h); };
+  const box=(X,Y,w,h,r,a=.62)=>{ x.save(); x.shadowColor='rgba(0,0,0,.28)'; x.shadowBlur=10*k; x.shadowOffsetY=2*k; rr(X,Y,w,h,r); x.fillStyle=`rgba(12,16,22,${a})`; x.fill(); x.restore(); rr(X+.5,Y+.5,w-1,h-1,r); x.strokeStyle='rgba(255,255,255,.10)'; x.lineWidth=1; x.stroke(); };
+  const smooth=(arr,w)=>arr.map((p,i)=>{ let sx=0,sy=0,n=0; for(let j=Math.max(0,i-w);j<=Math.min(arr.length-1,i+w);j++){ sx+=arr[j][0]; sy+=arr[j][1]; n++; } return [sx/n,sy/n]; });
+  const path=(ps)=>{ x.beginPath(); if(!ps.length) return; x.moveTo(ps[0][0],ps[0][1]); for(let i=1;i<ps.length-1;i++){ const mx=(ps[i][0]+ps[i+1][0])/2, my=(ps[i][1]+ps[i+1][1])/2; x.quadraticCurveTo(ps[i][0],ps[i][1],mx,my); } const l=ps[ps.length-1]; x.lineTo(l[0],l[1]); };
   const inRun=N.tg>=tr.tStart-0.3&&N.tg<=tr.tEnd+0.3;
   /* 1) Tacho unten rechts: Bogen füllt sich mit dem Tempo, Spitze und Referenz als Marken */
   const TD=T?R.h*0.36:small?clamp(Math.min(R.w*0.2,R.h*0.3),64,88):clamp(Math.min(R.w*0.26,R.h*0.42),112,230), TX=R.x+R.w-TD/2-(small?6:12)*k, TY=R.y+R.h-TD/2-(small?6:10)*k;
@@ -5056,16 +5074,23 @@ function drawGpsOverlay(T){ /* T={x,R}: direkt in den Export zeichnen (volle Auf
     const pts=P.slice(iS,iE+1).map(rot), rpts=ref?ref.P.slice(ref.iS,ref.iE+1).map(rot):[];
     const L=Math.max(...pts.map(p=>p[0]),1), Q=Math.max(...pts.concat(rpts).map(p=>Math.abs(p[1])),0.5);
     const M=p=>[sx+sw/2+p[1]/Q*sw*0.45, sy+clamp(p[0]/L,-0.02,1.02)*sh];
-    if(rpts.length){ x.strokeStyle='rgba(255,255,255,.55)'; x.lineWidth=2*k; x.beginPath(); rpts.forEach((p,i)=>{ const m=M(p); i?x.lineTo(...m):x.moveTo(...m); }); x.stroke(); }
-    x.lineCap='round'; x.lineJoin='round'; x.strokeStyle='rgba(0,0,0,.35)'; x.lineWidth=7.5*k; x.beginPath(); pts.forEach((p,i)=>{ const m=M(p); i?x.lineTo(...m):x.moveTo(...m); }); x.stroke(); /* Schatten einmal, sonst deckt er die Farbe zu */
-    for(let i=1;i<pts.length;i++){ const j=iS+i; let col;
-      if(!ref||!tr.dt) col='#3b8bff'; else { const d0=tr.dt[Math.max(iS,j-6)],d1=tr.dt[Math.min(iE,j+6)]; col=d0==null||d1==null?'#3b8bff':(d1<=d0?'#34c759':'#ff453a'); } /* geglättet über ±0.6 s */
-      x.strokeStyle=col; x.lineWidth=4.5*k; x.beginPath(); x.moveTo(...M(pts[i-1])); x.lineTo(...M(pts[i])); x.stroke(); }
-    if(inRun){ const m=M(rot(cur)); x.fillStyle='#fff'; x.beginPath(); x.moveTo(m[0]-4*k,m[1]); x.lineTo(m[0]-16*k,m[1]-8*k); x.lineTo(m[0]-16*k,m[1]+8*k); x.closePath(); x.fill();
+    /* geglättet (GPS-Rauschen), weiche Kurven, Farbabschnitte als ganze Linien */
+    const sp=smooth(pts.map(M),2), rsp=rpts.length?smooth(rpts.map(M),2):[];
+    x.lineCap='round'; x.lineJoin='round';
+    if(rsp.length){ x.save(); x.setLineDash([5*k,4*k]); x.strokeStyle='rgba(255,255,255,.75)'; x.lineWidth=1.8*k; x.shadowColor='rgba(0,0,0,.5)'; x.shadowBlur=3*k; path(rsp); x.stroke(); x.restore(); }
+    x.save(); x.strokeStyle='rgba(5,8,12,.45)'; x.lineWidth=8*k; path(sp); x.stroke(); x.restore();
+    /* Farbe: gewinnt/verliert über ±2 s, kurze Wechsel (< 2 s) werden geschluckt → ruhige Abschnitte */
+    const cols=pts.map((_,i)=>{ const j=iS+i; if(!ref||!tr.dt) return '#3b8bff'; const d0=tr.dt[Math.max(iS,j-20)],d1=tr.dt[Math.min(iE,j+20)]; return d0==null||d1==null?'#3b8bff':(d1<=d0?'#34c759':'#ff453a'); });
+    for(let pass=0;pass<2;pass++){ let i=0; while(i<cols.length){ let j=i; while(j<cols.length&&cols[j]===cols[i]) j++; if(j-i<20&&i>0) for(let q=i;q<j;q++) cols[q]=cols[i-1]; i=j; } }
+    const colAt=i=>cols[Math.min(i,cols.length-1)];
+    let r0=0; for(let i=1;i<=sp.length;i++){ if(i<sp.length&&colAt(i)===colAt(r0)) continue; const c=colAt(r0); x.save(); x.strokeStyle=c; x.lineWidth=4.2*k; x.shadowColor=c; x.shadowBlur=6*k; path(sp.slice(Math.max(0,r0-1),i+1)); x.stroke(); x.restore(); r0=i; }
+    /* gefahrener Teil leicht heller: weisse Kernlinie bis zur aktuellen Stelle */
+    if(inRun){ let ic=0; for(let i=0;i<pts.length;i++){ if(P[iS+i].t<=N.tg) ic=i; } x.save(); x.strokeStyle='rgba(255,255,255,.55)'; x.lineWidth=1.2*k; path(sp.slice(0,ic+1)); x.stroke(); x.restore(); }
+    if(inRun){ const m=M(rot(cur)), mc=ref&&cur.dt!=null?(cur.dt<=0?'#34c759':'#ff453a'):'#3b8bff'; x.save(); x.fillStyle=mc; x.globalAlpha=.28; x.beginPath(); x.arc(m[0],m[1],10*k,0,7); x.fill(); x.globalAlpha=1; x.shadowColor='rgba(0,0,0,.5)'; x.shadowBlur=4*k; x.fillStyle='#fff'; x.beginPath(); x.arc(m[0],m[1],5.5*k,0,7); x.fill(); x.restore(); x.fillStyle=mc; x.beginPath(); x.arc(m[0],m[1],3*k,0,7); x.fill();
       if(small&&ref&&cur.dt!=null){ const lead=cur.dt<=0, c2=lead?'#5ee38a':'#ff7b72', t2=(lead?'−':'+')+Math.abs(cur.dt).toFixed(2)+' s', lx=m[0]-20*k; x.font=`800 ${12*k}px ${ff}`; const w2=x.measureText(t2).width+14*k;
-        x.fillStyle='rgba(10,14,20,.7)'; rr(lx-w2,m[1]-11*k,w2,22*k,6*k); x.fill(); txt(t2,lx-7*k,m[1],12,c2,'right',800); }
+        box(lx-w2,m[1]-11*k,w2,22*k,7*k,.72); txt(t2,lx-7*k,m[1],12,c2,'right',800); }
       else if(!small&&(ref&&cur.dt!=null||!GPS.view.band)){ const lx=m[0]-22*k, withRef=ref&&cur.dt!=null, bw2=(withRef?150:96)*k, bh2=(withRef?50:26)*k, by2=m[1]-bh2/2;
-        x.fillStyle='rgba(10,14,20,.66)'; rr(lx-bw2,by2,bw2+4*k,bh2,8*k); x.fill();
+        box(lx-bw2,by2,bw2+4*k,bh2,9*k,.7);
         if(withRef){ const lead=cur.dt<=0, c2=lead?'#5ee38a':'#ff7b72';
           x.fillStyle=c2; rr(lx-bw2,by2,4*k,bh2,2*k); x.fill();
           txt((lead?'Vorsprung ':'Rückstand ')+Math.abs(cur.dt).toFixed(2)+' s',lx-6*k,by2+15*k,13,c2,'right',800);
@@ -5076,8 +5101,8 @@ function drawGpsOverlay(T){ /* T={x,R}: direkt in den Export zeichnen (volle Auf
   if(GPS.view.time){
     const dIn=ref&&!(small&&GPS.view.snake), rt=N.tg-tr.tStart, bw=(dIn?210:120)*k, bh=52*k, bx=(small||GPS.view.band)?R.x+12*k:R.x+R.w-bw-12*k, by=GPS.view.band?R.y+((!T&&R.x<200&&!small)?44:10)*k:R.y+R.h-bh-12*k; /* mit Tacho oben links */
     if(small&&!dIn){ const t3=rt<0?'—':Math.min(rt,tr.tEnd-tr.tStart).toFixed(2)+' s'; x.font=`800 ${14*k}px ${ff}`; const w3=x.measureText(t3).width+16*k, y3=R.y+8*k;
-      x.fillStyle='rgba(10,14,20,.62)'; rr(R.x+8*k,y3,w3,24*k,7*k); x.fill(); txt(t3,R.x+16*k,y3+12*k,14,'#fff','left',800); }
-    else { x.fillStyle='rgba(10,14,20,.62)'; rr(bx,by,bw,bh,10*k); x.fill();
+      box(R.x+8*k,y3,w3,24*k,7*k); txt(t3,R.x+16*k,y3+12*k,14,'#fff','left',800); }
+    else { box(bx,by,bw,bh,11*k);
     txt('Laufzeit',bx+12*k,by+14*k,10.5,'rgba(255,255,255,.7)','left',700);
     txt(rt<0?'—':Math.min(rt,tr.tEnd-tr.tStart).toFixed(2),bx+12*k,by+35*k,22,'#fff','left',800);
     if(dIn){ txt('Differenz',bx+bw-12*k,by+14*k,10.5,'rgba(255,255,255,.7)','right',700); const dv=cur.dt; txt(dv==null||!inRun?'—':fmtD(dv),bx+bw-12*k,by+35*k,22,dv==null?'#fff':dv<=0?'#5ee38a':'#ff7b72','right',800); } }
@@ -5088,7 +5113,7 @@ function drawGpsOverlay(T){ /* T={x,R}: direkt in den Export zeichnen (volle Auf
 }
 /* ---------- Profil unter dem Video ---------- */
 function drawGpsChart(N){
-  const cv=$('#gpsChart'); if(!cv||cv.offsetParent===null) return; const W=cv.clientWidth,H=cv.clientHeight,d=DPR(); if(!W) return;
+  const cv=$('#gpsChart'); if(!cv||cv.offsetParent===null) return; const W=cv.clientWidth,H=cv.clientHeight,d=Math.min(window.devicePixelRatio||1,3); if(!W) return;
   if(cv.width!==Math.round(W*d)||cv.height!==Math.round(H*d)){ cv.width=Math.round(W*d); cv.height=Math.round(H*d); } const x=cv.getContext('2d'); x.setTransform(d,0,0,d,0,0); x.clearRect(0,0,W,H);
   if(!N) return; const {tr,cur}=N, ref=GPS.tracks.find(t=>t.id===tr.ref), P=tr.P, s0=P[tr.iS].s, s1=P[tr.iE].s;
   const st=getComputedStyle(cv), ink=st.getPropertyValue('--muted').trim(), line=st.getPropertyValue('--line').trim(), ff=getComputedStyle(document.body).fontFamily;
@@ -5097,18 +5122,71 @@ function drawGpsChart(N){
   const kLo=KMH(Math.min(tr.vmin,ref?ref.vmin:1e9)), kHi=KMH(Math.max(tr.vmax,ref?ref.vmax:0)), stp=kHi-kLo>70?40:kHi-kLo>30?20:10, gLo=Math.max(0,Math.floor(kLo/stp)*stp), gHi=Math.ceil(kHi/stp)*stp;
   const vlo=gLo/3.6, vhi=Math.max(gLo+stp,gHi)/3.6, Y=v=>6+(h1-12)*(1-(v-vlo)/Math.max(0.1,vhi-vlo));
   x.font='600 10px '+ff; x.textAlign='right'; x.textBaseline='middle'; x.lineWidth=1;
-  for(let k=gLo;k<=gHi+0.01;k+=stp){ const y=Y(k/3.6); x.strokeStyle=line; x.globalAlpha=.6; x.beginPath(); x.moveTo(pl,y); x.lineTo(W-pr,y); x.stroke(); x.globalAlpha=1; x.fillStyle=ink; x.fillText(k+(k===gHi?' km/h':''),pl-6,y); }
+  for(let k=gLo;k<=gHi+0.01;k+=stp){ const y=Y(k/3.6); const yy=Math.round(y)+.5; x.strokeStyle=line; x.globalAlpha=.55; x.beginPath(); x.moveTo(pl,yy); x.lineTo(W-pr,yy); x.stroke(); x.globalAlpha=1; x.fillStyle=ink; x.fillText(k+(k===gHi?' km/h':''),pl-6,y); }
   /* Start und Ziel */
   x.textAlign='left'; [[s0,'Start'],[s1,'Ziel']].forEach(([sv,l],i)=>{ const X0=X(sv); x.strokeStyle=ink; x.globalAlpha=.45; x.setLineDash([2,3]); x.beginPath(); x.moveTo(X0,4); x.lineTo(X0,h1); x.stroke(); x.setLineDash([]); x.globalAlpha=1; x.fillStyle=ink; x.textAlign=i?'right':'left'; x.fillText(l,X0+(i?-4:4),h1-6); });
   x.textAlign='right';
-  if(ref){ x.strokeStyle=ink; x.globalAlpha=.6; x.setLineDash([4,4]); x.lineWidth=1.5; x.beginPath(); for(let i=ref.iS;i<=ref.iE;i++){ const p=ref.P[i]; const X2=X(p.s-ref.P[ref.iS].s+s0); i===ref.iS?x.moveTo(X2,Y(p.v)):x.lineTo(X2,Y(p.v)); } x.stroke(); x.setLineDash([]); x.globalAlpha=1; }
-  x.strokeStyle=ref?'#DA291C':'#3b8bff'; x.lineWidth=2.2; x.beginPath(); for(let i=tr.iS;i<=tr.iE;i++){ const p=P[i]; i===tr.iS?x.moveTo(X(p.s),Y(p.v)):x.lineTo(X(p.s),Y(p.v)); } x.stroke();
-  { let im=tr.iS; for(let i=tr.iS;i<=tr.iE;i++) if(P[i].v>P[im].v) im=i; const mx=X(P[im].s), my=Y(P[im].v); x.fillStyle=ref?'#DA291C':'#3b8bff'; x.beginPath(); x.arc(mx,my,3.5,0,7); x.fill(); x.strokeStyle=st.getPropertyValue('--film').trim()||'#111'; x.lineWidth=1.5; x.stroke();
+  /* weiche Kurven: leicht geglättet, Fläche mit Verlauf, Referenz fein gestrichelt */
+  const sm=(arr)=>arr.map((p,i)=>{ let a2=0,n=0; for(let j=Math.max(0,i-2);j<=Math.min(arr.length-1,i+2);j++){ a2+=arr[j][1]; n++; } return [p[0],a2/n]; });
+  const curve=ps=>{ x.beginPath(); x.moveTo(ps[0][0],ps[0][1]); for(let i=1;i<ps.length-1;i++){ x.quadraticCurveTo(ps[i][0],ps[i][1],(ps[i][0]+ps[i+1][0])/2,(ps[i][1]+ps[i+1][1])/2); } const l=ps[ps.length-1]; x.lineTo(l[0],l[1]); };
+  const col=ref?'#DA291C':'#3b8bff', mine=sm(P.slice(tr.iS,tr.iE+1).map(p=>[X(p.s),Y(p.v)]));
+  x.lineJoin='round'; x.lineCap='round';
+  { const g=x.createLinearGradient(0,6,0,h1); g.addColorStop(0,ref?'rgba(218,41,28,.30)':'rgba(59,139,255,.32)'); g.addColorStop(1,'rgba(0,0,0,0)'); curve(mine); x.lineTo(mine[mine.length-1][0],h1); x.lineTo(mine[0][0],h1); x.closePath(); x.fillStyle=g; x.fill(); }
+  if(ref){ const r0=ref.P[ref.iS].s; const rp=sm(ref.P.slice(ref.iS,ref.iE+1).map(p=>[X(p.s-r0+s0),Y(p.v)])); x.save(); x.strokeStyle=ink; x.globalAlpha=.8; x.setLineDash([4,3]); x.lineWidth=1.3; curve(rp); x.stroke(); x.restore(); }
+  x.save(); x.strokeStyle=col; x.lineWidth=2.2; x.shadowColor=col; x.shadowBlur=4; curve(mine); x.stroke(); x.restore();
+  { let im=tr.iS; for(let i=tr.iS;i<=tr.iE;i++) if(P[i].v>P[im].v) im=i; const mx=X(P[im].s), my=Y(P[im].v); x.fillStyle=col; x.beginPath(); x.arc(mx,my,3.5,0,7); x.fill(); x.strokeStyle=st.getPropertyValue('--film').trim()||'#111'; x.lineWidth=1.5; x.stroke();
     x.font='700 10px '+ff; x.fillStyle=st.getPropertyValue('--ink').trim(); x.textAlign=mx>W-70?'right':'center'; x.fillText('max '+KMH(P[im].v).toFixed(1),mx>W-70?mx-6:mx,Math.max(9,my-9)); x.textAlign='right'; }
   /* Δ-Zeit-Linie entfernt: Vorsprung/Rückstand steht an der Spur im Video */
   x.textAlign='center'; x.fillStyle=ink; const L=s1-s0, nT=Math.max(3,Math.floor(W/70)), step=[5,10,20,50,100,200,250,500,1000].find(v=>L/v<=nT)||1000; for(let m=0;m<=L;m+=step) x.fillText(m+' m',X(s0+m),H-5);
-  x.fillStyle=st.getPropertyValue('--ink').trim(); x.fillRect(X(cur.s)-1,2,2,H-14);
+  { const cx=Math.round(X(cur.s))+.5, inR=cur.s>=s0&&cur.s<=s1, cy=Y(cur.v), ink2=st.getPropertyValue('--ink').trim();
+    x.strokeStyle=ink2; x.globalAlpha=.55; x.lineWidth=1; x.beginPath(); x.moveTo(cx,2); x.lineTo(cx,h1); x.stroke(); x.globalAlpha=1;
+    if(inR){ x.save(); x.fillStyle=col; x.globalAlpha=.25; x.beginPath(); x.arc(cx,cy,7,0,7); x.fill(); x.restore(); x.fillStyle='#fff'; x.beginPath(); x.arc(cx,cy,4,0,7); x.fill(); x.fillStyle=col; x.beginPath(); x.arc(cx,cy,2.2,0,7); x.fill();
+      const t=KMH(cur.v).toFixed(1); x.font='800 10.5px '+ff; const tw=x.measureText(t).width+10, tx=clamp(cx,pl+tw/2,W-pr-tw/2), ty=Math.max(10,cy-15);
+      x.fillStyle=col; x.beginPath(); if(x.roundRect) x.roundRect(tx-tw/2,ty-8,tw,16,5); else x.rect(tx-tw/2,ty-8,tw,16); x.fill(); x.fillStyle='#fff'; x.textAlign='center'; x.fillText(t,tx,ty+0.5); } }
 }
+
+/* ---------- Overlay mit GPS: beide Athlet:innen mit eigenem Tacho, dazwischen Vorsprung/Rückstand ----------
+   A blau, B orange (wie die Schilder). Vergleich A gegen B über die Strecke (gleicher Ort), wie in der GPS-Ansicht. */
+const OVG={key:'',dt:null,dv:null,on:LS.get('ovGps',1)!==0,prep:''};
+function ovGpsPrep(){ const k=(A.clip&&A.clip.id)+'|'+(B.clip&&B.clip.id); if(OVG.prep===k) return; OVG.prep=k;
+  [A.clip,B.clip].forEach(c=>{ if(!c) return; try{ demoGpsFor(c); }catch(e){} if(!c.demo&&typeof invAuth==='function'&&invAuth()&&!c.gpsId&&!c._invTried){ c._invTried=true; try{ invFetch(c); }catch(e){} } }); }
+function ovGpsPair(){ const ta=trackOf(A.clip), tb=trackOf(B.clip); if(!ta||!tb||ta===tb) return null; const k=ta.id+'|'+tb.id+'|'+ta.iS+'|'+tb.iS+'|'+ta.iE+'|'+tb.iE;
+  if(OVG.key!==k){ const tmp=Object.assign({},ta); compareTracks(tmp,tb); OVG.key=k; OVG.dt=tmp.dt; OVG.dv=tmp.dv; } return {ta,tb}; }
+function ovGpsShow(){ return OVG.on&&ovActive()&&!OV.fix&&!OV.pick&&(!!OV.T||ovFollowOK())&&A.ready&&B.ready&&!!ovGpsPair(); }
+function drawOvGps(T){ let x,R; const cv=$('canvas.ovgps',A.stage);
+  if(ovActive()) ovGpsPrep();
+  const on=ovGpsShow();
+  if(!T){ if(!cv) return; cv.hidden=!on; if(!on) return; const W=A.stage.clientWidth, H=A.stage.clientHeight, d=Math.min(window.devicePixelRatio||1,3);
+    if(cv.width!==Math.round(W*d)||cv.height!==Math.round(H*d)){ cv.width=Math.round(W*d); cv.height=Math.round(H*d); } x=cv.getContext('2d'); x.setTransform(d,0,0,d,0,0); x.clearRect(0,0,W,H); R=A.rect(); }
+  else { if(!on) return; x=T.x; R=T.R; x.save(); }
+  const pr=ovGpsPair(), {ta,tb}=pr, ff=getComputedStyle(document.body).fontFamily, small=!T&&R.w<520, k=T?R.h/430:clamp(R.w/760,0.85,1.5);
+  const vt=d=>d.v.paused?(d.frame+0.5)/d.fps:d.v.currentTime;
+  const tgA=vt(A)+A.clip.gpsOff, tgB=vt(B)+B.clip.gpsOff, ca=at(Object.assign({},ta,{dt:OVG.dt,dv:OVG.dv}),tgA), cb=at(tb,tgB);
+  const inA=tgA>=ta.tStart-0.3&&tgA<=ta.tEnd+0.3, inB=tgB>=tb.tStart-0.3&&tgB<=tb.tEnd+0.3;
+  const vhiK=Math.max(40,Math.ceil(KMH(Math.max(ta.vmax,tb.vmax))*1.04/10)*10);
+  const TD=T?R.h*0.24:small?clamp(R.h*0.3,56,76):clamp(Math.min(R.w*0.15,R.h*0.27),80,150), gap=8*k, mY=R.y+R.h-TD/2-(small?6:10)*k;
+  const gauge=(cx,cy,v,col,lab,nm)=>{ const rad=TD/2, f=TD/200, A0=Math.PI*0.75, A1=Math.PI*2.25, vS=KMH(v)>=3?v:0, ae=A0+(A1-A0)*clamp(KMH(vS)/vhiK,0,1);
+    x.save(); x.shadowColor='rgba(0,0,0,.35)'; x.shadowBlur=10*f; const g=x.createRadialGradient(cx,cy-rad*0.3,rad*0.1,cx,cy,rad); g.addColorStop(0,'rgba(28,34,44,.84)'); g.addColorStop(1,'rgba(8,11,16,.88)'); x.fillStyle=g; x.beginPath(); x.arc(cx,cy,rad,0,7); x.fill(); x.restore();
+    x.strokeStyle='rgba(255,255,255,.12)'; x.lineWidth=1; x.beginPath(); x.arc(cx,cy,rad-.5,0,7); x.stroke();
+    const ar=rad*0.8, aw=(small?14:12)*f; x.lineCap='round'; x.strokeStyle='rgba(255,255,255,.1)'; x.lineWidth=aw; x.beginPath(); x.arc(cx,cy,ar,A0,A1); x.stroke();
+    if(vS>0){ x.save(); x.strokeStyle=col; x.lineWidth=aw; x.shadowColor=col; x.shadowBlur=8*f; x.beginPath(); x.arc(cx,cy,ar,A0,ae); x.stroke(); x.restore(); x.fillStyle='#fff'; x.beginPath(); x.arc(cx+Math.cos(ae)*ar,cy+Math.sin(ae)*ar,aw*0.32,0,7); x.fill(); }
+    x.textAlign='center'; x.textBaseline='middle'; x.fillStyle='#fff'; x.font=`800 ${(small?46:40)*f}px ${ff}`; x.fillText(vS?(small||T?KMH(vS).toFixed(0):KMH(vS).toFixed(1)):'0',cx,cy-2*f);
+    x.font=`700 ${(small?18:13)*f}px ${ff}`; x.fillStyle='rgba(255,255,255,.6)'; x.fillText('km/h',cx,cy+(small?30:24)*f);
+    /* Schild unten: Buchstabe + Name */
+    const t=lab+(nm&&!small?'  '+nm:''); x.font=`800 ${(small?11:11.5)*k}px ${ff}`; const tw=x.measureText(t).width+14*k, th=18*k, ty=cy+rad-th*0.55;
+    x.fillStyle=col; x.beginPath(); if(x.roundRect) x.roundRect(cx-tw/2,ty,tw,th,6*k); else x.rect(cx-tw/2,ty,tw,th); x.fill(); x.fillStyle='#fff'; x.fillText(t,cx,ty+th/2+0.5*k); };
+  const xB=R.x+R.w-TD/2-(small?6:10)*k, xA=xB-TD-gap;
+  gauge(xA,mY,inA||tgA<ta.tStart?ca.v:ca.v,'#2f6fd0','A',lastName(A.clip)); gauge(xB,mY,cb.v,'#e67e22','B',lastName(B.clip));
+  /* Vorsprung: wer liegt am gleichen Ort vorne */
+  if(inA&&inB&&ca.dt!=null){ const lead=ca.dt<=0, col=lead?'#2f6fd0':'#e67e22', who=lead?'A':'B', t=(small?'':who+' vorne ')+Math.abs(ca.dt).toFixed(2)+' s', dk=ca.dv!=null?KMH(ca.dv)*(lead?1:-1):null;
+    x.font=`800 ${(small?12:14)*k}px ${ff}`; const t2=dk!=null&&!small?'  '+(dk>=0?'+':'−')+Math.abs(dk).toFixed(1)+' km/h':''; const w1=x.measureText(t).width; x.font=`700 ${12*k}px ${ff}`; const w2=t2?x.measureText(t2).width:0;
+    const bw=w1+w2+(small?26:34)*k, bh=(small?22:28)*k, cx=(xA+xB)/2, by=mY-TD/2-bh-8*k;
+    x.save(); x.shadowColor='rgba(0,0,0,.3)'; x.shadowBlur=10*k; x.fillStyle='rgba(12,16,22,.78)'; x.beginPath(); if(x.roundRect) x.roundRect(cx-bw/2,by,bw,bh,bh/2); else x.rect(cx-bw/2,by,bw,bh); x.fill(); x.restore();
+    x.fillStyle=col; x.beginPath(); x.arc(cx-bw/2+bh/2,by+bh/2,(small?5:6)*k,0,7); x.fill();
+    x.textBaseline='middle'; x.textAlign='left'; x.font=`800 ${(small?12:14)*k}px ${ff}`; x.fillStyle='#fff'; const tx=cx-bw/2+bh/2+(small?9:12)*k; x.fillText(t,tx,by+bh/2+0.5*k);
+    if(t2){ x.font=`700 ${12*k}px ${ff}`; x.fillStyle='rgba(255,255,255,.7)'; x.fillText(t2,tx+w1,by+bh/2+0.5*k); } }
+  if(T) x.restore(); }
+A.stage.insertAdjacentHTML('beforeend','<canvas class="ovgps" hidden></canvas>');
 /* ---------- Bedienung ---------- */
 function gpsSyncBtnUI(){ if(typeof invBtnUI==='function') invBtnUI(); const b=$('#gpsSync'); if(!b) return; const tr=trackOf(GD.clip); if($('#viewGps').classList.contains('no-trk')!==!tr){ $('#viewGps').classList.toggle('no-trk',!tr); GPS.dirty=true; } /* Profil erst nach dem Einblenden zeichnen */ b.hidden=!!(tr&&tr.source==='innove'); $$('#viewGps [data-gn]').forEach(x=>x.hidden=!!(tr&&tr.source==='innove')); $('#viewGps').classList.toggle('inv-trk',!!(tr&&tr.source==='innove')); } // innove: Zeit genügt, kein Startabgleich von Hand
 function gpsSnakeAuto(){ if(GPS.snakeUser) return; const tr=trackOf(GD.clip), on=!!(tr&&tr.ref); if(GPS.view.snake!==on){ GPS.view.snake=on; GPS.dirty=true; } const b=$('#gpsView [data-v="snake"]'); if(b) b.classList.toggle('on',on); } /* Fahrlinie: Standard nur im Vergleich */
@@ -5368,7 +5446,7 @@ function openExport(){
   $('#expNotesRow').hidden=!(mode==='single');
   $('#expAnnRow').hidden=!ds.some(d=>d.clip&&d.clip.anns&&d.clip.anns.length); // nur zeigen, wenn es Zeichnungen gibt
   const ovN=mode==='cmp'&&$('#viewCmp').classList.contains('overlay')&&$('#viewCmp').classList.contains('ov-names'); $('#expNamesRow').hidden=!ovN; if(ovN) $('#expNames').checked=true; const ovL=mode==='cmp'&&$('#viewCmp').classList.contains('overlay'); $('#expLegRow').hidden=!ovL; $('#expLegend').checked=true;
-  $('#expGps').hidden=mode!=='gps';
+  $('#expGps').hidden=!(mode==='gps'||(ovActive()&&typeof ovGpsShow==='function'&&ovGpsShow()));
   $('#expProg').hidden=true; $('#expGo').disabled=false; $('#expGo').textContent='Speichern'; $('#expAdv').hidden=true; $('#expAdvBtn').classList.remove('on'); $('#expAnn').checked=true; $('#expInfo').checked=true;
   expSummary(); $('#expModal').classList.add('on');
 }
@@ -5463,7 +5541,7 @@ function exportFrame(){
   const E=EXP; if(!E.live||!E.started) return; E.lastCb=performance.now(); const {x,W,H,bar,ws,gap,opt,ds,D}=E;
   x.fillStyle='#0d1116'; x.fillRect(0,0,W,H+bar);
   let ox=0;
-  (E.ovl?[A]:ds).forEach((d,i)=>{ const w=ws[i]; drawVid(x,d,ox,0,w,H); if(E.ovl){ ovDrawB(x,ox,0,w,H); if(opt.legend) legendDrawTo(x,ox,0,w,H); } else if(mode==='cmp'){ timDrawTo(x,d,ox,0,w,H); gateDrawTo(x,d,ox,0,w,H); } const R=d.rect();
+  (E.ovl?[A]:ds).forEach((d,i)=>{ const w=ws[i]; drawVid(x,d,ox,0,w,H); if(E.ovl){ ovDrawB(x,ox,0,w,H); if(opt.legend) legendDrawTo(x,ox,0,w,H); if(opt.gps&&!$('#expGps').hidden) drawOvGps({x,R:{x:ox,y:0,w,h:H}}); } else if(mode==='cmp'){ timDrawTo(x,d,ox,0,w,H); gateDrawTo(x,d,ox,0,w,H); } const R=d.rect();
     if(opt.ann&&d.clip.anns.length) drawAnns(x,{x:ox,y:0,w,h:H},d.clip.anns,w/Math.max(1,R.w));
     if(mode==='gps'&&opt.gps) drawGpsOverlay({x,R:{x:ox,y:0,w,h:H}});
     if(ds.length>1&&!E.ovl){ const k=H/540; x.fillStyle=i?'#e67e22':'#2f6fd0'; x.beginPath(); (x.roundRect?x.roundRect(ox+14*k,14*k,30*k,30*k,7*k):x.rect(ox+14*k,14*k,30*k,30*k)); x.fill(); x.fillStyle='#fff'; x.font=`800 ${17*k}px Geist,-apple-system,Segoe UI,Arial,sans-serif`; x.textAlign='center'; x.textBaseline='middle'; x.fillText(i?'B':'A',ox+29*k,30*k); }
@@ -6093,9 +6171,11 @@ function coachPlace(){ const b=COACH.el; let el=COACH.tgt; if(!b) return; if(!co
   const cx=r.left+r.width/2, x=Math.max(10,Math.min(innerWidth-w-10,cx-w/2)), y=up?r.top-h-12:r.bottom+12;
   b.style.left=x+'px'; b.style.top=y+'px'; b.classList.toggle('up',up); b.querySelector('.coach-ar').style.left=Math.max(14,Math.min(w-14,cx-x))+'px'; }
 setInterval(()=>{ try{
+  if(!COACH.readyAt&&S.ready) COACH.readyAt=Date.now(); /* Zeitpunkt, ab dem das erste Video bereit ist */
   if(COACH.el){ if($('.modal.on')||(typeof SER!=='undefined'&&SER.on)) coachHide(false); else coachPlace(); return; }
   if(Date.now()-COACH.last<(COACH.n?30000:2500)||(COACH.n&&COACH.act<COACH.last)||document.hidden||document.body.classList.contains('touring')||$('.modal.on')||(typeof SER!=='undefined'&&SER.on)||(typeof EXP!=='undefined'&&EXP.live)) return;
   if(innerWidth<=600||innerHeight<=500) return; /* Handy (auch quer): keine Hilfe-Blasen, Bild bleibt frei */
+  if(!COACH.readyAt||Date.now()-COACH.readyAt<4000) return; /* erster Hinweis erst ein paar Sekunden nach dem ersten Video */
   for(const c of COACHES){ if(LS.get('coach:'+c.id,0)) continue; let ok=false; try{ ok=c.when(); }catch(e){} if(!ok) continue; const el=$(c.sel); if(coachVis(el)){ coachShow(c,el); break; } }
 }catch(e){} },900);
 addEventListener('resize',()=>{ if(COACH.el) coachPlace(); });
@@ -6192,8 +6272,8 @@ async function fieldSync(){ if(!window.indexedDB) return; let db;
   if(n) toast(n===1?'1 Lauf aus «Filmen» in der Liste':n+' Läufe aus «Filmen» in der Liste',3000); }
 setTimeout(fieldSync,600);
 { const mq=matchMedia('(max-height:500px) and (orientation:landscape) and (pointer:coarse)'); let auto=false;
-  const go=()=>{ if(mq.matches){ if(!document.body.classList.contains('pfs')&&!$('.modal.on')){ auto=true; pfsSet(true); } } else if(auto){ auto=false; if(document.body.classList.contains('pfs')) pfsSet(false); } };
-  try{ mq.addEventListener('change',go); }catch(e){ mq.addListener(go); } setTimeout(go,300); } /* Handy quer drehen = Player bildschirmfüllend */ document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='visible') fieldSync(); });
+  const go=()=>{ if(mq.matches){ if(!document.body.classList.contains('pfs')&&!$('.modal.on')&&!(mode==='cmp'&&$('#viewCmp').classList.contains('overlay'))){ auto=true; pfsSet(true); } } else if(auto){ auto=false; if(document.body.classList.contains('pfs')) pfsSet(false); } };
+  window.pfsAutoCheck=()=>{ if(mq.matches) go(); }; try{ mq.addEventListener('change',go); }catch(e){ mq.addListener(go); } setTimeout(go,300); } /* Handy quer drehen = Player bildschirmfüllend */ document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='visible') fieldSync(); });
 
 /* ---- Handy kompakt: «…» oben, Videoliste als Blatt, Speichern/«…» unten im Vergleich, Zoom der Zeitleiste mit zwei Fingern ---- */
 (()=>{ const MQ=matchMedia('(max-width:600px)'), I=(d)=>'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">'+d+'</svg>';
@@ -6277,7 +6357,7 @@ if(false&&!LS.get('hint1',0)){ setTimeout(()=>{ toast(matchMedia('(pointer:coars
 
 /* Update-Hinweis: prüft version.json auf GitHub Pages; «Aktualisieren» lädt die Seite ohne Cache neu */
 (()=>{
-  const BUILD='20261030181926'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
+  const BUILD='20261030232727'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
   // nach einem Update die ?v=… aus der Adresse entfernen
   try{ const u=new URL(location.href); if(u.searchParams.has('v')){ u.searchParams.delete('v'); history.replaceState(null,'',u.pathname+(u.search||'')+u.hash); } }catch(e){}
   const el=$('#upd'); let latest=null, snoozed=null, busy=false;
@@ -6456,7 +6536,7 @@ async function preOvLoad(){ if(PRE_OV) return PRE_OV; try{ const r=await fetch('
 })();
 
 /* Höhe der unteren Leiste messen → Overlay-Leiste sitzt genau darauf (keine Lücke, nichts scheint durch) */
-(function(){ const set=()=>{ const t=$('.tabs'); if(t&&getComputedStyle(t).position==='fixed') document.documentElement.style.setProperty('--tabsH',Math.round(innerHeight-t.getBoundingClientRect().top)+'px'); }; addEventListener('resize',set); addEventListener('orientationchange',()=>setTimeout(set,300)); setTimeout(set,0); setTimeout(set,800); try{ new ResizeObserver(set).observe($('.tabs')); }catch(e){} })();
+(function(){ const set=()=>{ const t=$('.tabs'); if(t&&t.offsetParent!==null&&getComputedStyle(t).position==='fixed') document.documentElement.style.setProperty('--tabsH',Math.round(innerHeight-t.getBoundingClientRect().top)+'px'); }; addEventListener('resize',set); addEventListener('orientationchange',()=>setTimeout(set,300)); setTimeout(set,0); setTimeout(set,800); try{ new ResizeObserver(set).observe($('.tabs')); }catch(e){} })();
 </script>
 </body>
 </html>
