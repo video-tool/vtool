@@ -4654,7 +4654,12 @@ function parseGps(text,fname){
     const rows=pts.map(p=>({lat:p.getAttribute('lat'),lon:p.getAttribute('lon'),ele:(p.getElementsByTagName('ele')[0]||{}).textContent,time:(p.getElementsByTagName('time')[0]||{}).textContent,speed:(p.getElementsByTagName('speed')[0]||{}).textContent}));
     return [{name,samples:normSamples(rows)}];
   }
-  if(tx.startsWith('{')||tx.startsWith('[')){ let j=JSON.parse(tx); const arr=Array.isArray(j)&&j.length&&(j[0].samples||j[0].points)?j:[j];
+  if(tx.startsWith('{')||tx.startsWith('[')){ let j=JSON.parse(tx);
+    { // innove-Zeitreihe: {data:{latitude:[{ts,value}],…}} (Rohspur, auch mehrere Seiten als Liste) oder ohne Hülle (Spur eines Laufs). Zeiten UTC-ms, Werte als Text, Tempo 3D aus speedN/E/D
+      const pages=(Array.isArray(j)?j:[j]).map(x=>x&&x.data&&x.data.latitude?x.data:x).filter(x=>x&&Array.isArray(x.latitude)&&x.latitude.length&&x.latitude[0].ts!=null);
+      if(pages.length){ const by=new Map(); for(const pg of pages) for(const [k,arr] of Object.entries(pg)) if(Array.isArray(arr)) for(const q of arr){ if(!q||q.ts==null) continue; let o=by.get(q.ts); if(!o) by.set(q.ts,o={}); o[k]=parseFloat(q.value); }
+        const rows=[...by.entries()].sort((a,b)=>a[0]-b[0]).filter(([,o])=>isFinite(o.latitude)&&isFinite(o.longitude)).map(([ts,o])=>({t:ts,lat:o.latitude,lon:o.longitude,alt:o.altitude,speed:(o.speedN!=null||o.speedE!=null)?Math.hypot(o.speedN||0,o.speedE||0,o.speedD||0):''}));
+        return [{name,source:'innove',samples:normSamples(rows)}]; } } const arr=Array.isArray(j)&&j.length&&(j[0].samples||j[0].points)?j:[j];
     return arr.map((o,i)=>{ const rows=Array.isArray(o)?o:(o.samples||o.points||o.data||[]); return {name:o.name||((o.athlete?o.athlete+' – ':'')+(o.run||name+(arr.length>1?' '+(i+1):''))),athlete:o.athlete,run:o.run,source:o.source,samples:normSamples(rows)}; }); }
   const lines=tx.split(/\r?\n/).filter(l=>l.trim()); const sep=[';','\t',','].map(c=>[c,lines[0].split(c).length]).sort((a,b)=>b[1]-a[1])[0][0];
   const head=lines[0].split(sep).map(h=>h.trim().replace(/^"|"$/g,'')); const rows=lines.slice(1).map(l=>{ const c=l.split(sep); const o={}; head.forEach((h,i)=>o[h]=(c[i]||'').trim().replace(/^"|"$/g,'').replace(/^(-?\d+),(\d+)$/,'$1.$2')); return o; });
@@ -5852,7 +5857,7 @@ if(false&&!LS.get('hint1',0)){ setTimeout(()=>{ toast(matchMedia('(pointer:coars
 
 /* Update-Hinweis: prüft version.json auf GitHub Pages; «Aktualisieren» lädt die Seite ohne Cache neu */
 (()=>{
-  const BUILD='20261030125156'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
+  const BUILD='20261030130258'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
   // nach einem Update die ?v=… aus der Adresse entfernen
   try{ const u=new URL(location.href); if(u.searchParams.has('v')){ u.searchParams.delete('v'); history.replaceState(null,'',u.pathname+(u.search||'')+u.hash); } }catch(e){}
   const el=$('#upd'); let latest=null, snoozed=null, busy=false;
