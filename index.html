@@ -970,7 +970,6 @@ canvas.strip:hover{box-shadow:inset 0 0 0 1px rgba(255,255,255,.1),0 10px 30px -
 }
 /* Handy quer: Video so gross wie möglich */
 @media (max-height:500px) and (orientation:landscape) and (pointer:coarse){
-  header{display:none!important}
   main.wrap{padding-top:8px!important}
   .toast{top:auto!important;bottom:12px!important}
   header{padding-top:4px;margin-bottom:6px}
@@ -2078,7 +2077,7 @@ button.lg-it:hover{background:rgba(12,15,20,.8);border-color:rgba(255,255,255,.3
   #viewCmp.overlay #ovActs .ov-morew{flex:none}
   #viewCmp.overlay #ovActs .ov-savew{flex:1 1 auto}
   #viewCmp.overlay #ovActs .ov-savew>.ov-b{width:100%}
-  #viewCmp.overlay #ovActs .ov-menu{top:auto!important;bottom:calc(100% + 8px)!important}
+  #viewCmp.overlay #ovActs .ov-menu{top:auto!important;bottom:calc(100% + 8px)!important;left:0!important;right:auto!important;max-width:calc(100vw - 20px)}
   #viewCmp.overlay #ovActs .ov-cutg .ov-b{padding:0 10px!important}
   /* Side-by-Side: verbunden → eine gemeinsame Zeitleiste */
   #viewCmp.cmp-linked:not(.overlay) .strips>.tl:nth-child(2){display:none}
@@ -2234,7 +2233,8 @@ button.lg-it:hover{background:rgba(12,15,20,.8);border-color:rgba(255,255,255,.3
   .tabs{padding:3px 8px calc(3px + env(safe-area-inset-bottom,0px))!important}
   .tabs .tab{min-height:0!important;padding-top:3px!important;padding-bottom:3px!important;font-size:11.5px!important;gap:1px!important}
   .tabs .tab svg{width:18px!important;height:18px!important}
-  .card.player:not([hidden]),#viewGps,#viewCmp:not(.overlay){padding:8px 7px 7px!important}
+  .card.player:not([hidden]),#viewGps,#viewCmp:not(.overlay){padding:5px 4px 5px!important}
+  main.wrap{padding-left:6px!important;padding-right:6px!important}
   .player .tl,#viewGps .tl{margin-top:6px!important}
   .player .dock,#viewGps .dock{margin-top:6px!important;padding:4px!important}
   .player .dock .ctl:not(.play):not(.rate-btn):not(.gv-btn):not(.ctl-lab):not(:has(span)){width:36px!important;min-width:36px!important;height:36px!important;padding:0!important}
@@ -2255,13 +2255,13 @@ button.lg-it:hover{background:rgba(12,15,20,.8);border-color:rgba(255,255,255,.3
   #viewSingle .dock.dock3 .dz-l .ctl svg,#viewSingle .dock.dock3 .dz-r .ctl svg{width:15px!important;height:15px!important}
   #viewSingle .dz-l .grp,#viewSingle .dz-r .grp{gap:3px!important}
   /* Side-by-Side: alles in einer Zeile, Werkzeuge/Speichern/Mehr nur als Symbol */
-  #viewCmp:not(.overlay) .dock.dock3{display:flex!important;flex-wrap:wrap!important;justify-content:center!important;align-items:center!important;gap:4px!important;overflow:visible!important}
-  #viewCmp:not(.overlay) .dock.dock3>.dz-c{order:1;flex:0 0 auto!important;width:auto!important;margin:0!important}
-  #viewCmp:not(.overlay) .dock.dock3>.dz-l,#viewCmp:not(.overlay) .dock.dock3>.dz-r{flex:0 0 auto!important;width:auto!important}
-  #viewCmp:not(.overlay) .dock.dock3>.dz-r:empty{display:none!important}
-  #viewCmp:not(.overlay) .dock.dock3>.dz-l{order:2;gap:3px!important;margin:0!important}
-  #viewCmp:not(.overlay) .dock.dock3>.dz-r{order:3}
-  #viewCmp:not(.overlay) .dock.dock3>.dz-more{order:4;flex-basis:100%}
+  #viewCmp .dock.dock3{display:flex!important;flex-wrap:wrap!important;justify-content:center!important;align-items:center!important;gap:4px!important;overflow:visible!important}
+  #viewCmp .dock.dock3>.dz-c{order:1;flex:0 0 auto!important;width:auto!important;margin:0!important}
+  #viewCmp .dock.dock3>.dz-l,#viewCmp .dock.dock3>.dz-r{flex:0 0 auto!important;width:auto!important}
+  #viewCmp .dock.dock3>.dz-r:empty{display:none!important}
+  #viewCmp .dock.dock3>.dz-l{order:2;gap:3px!important;margin:0!important}
+  #viewCmp .dock.dock3>.dz-r{order:3}
+  #viewCmp .dock.dock3>.dz-more{order:4;flex-basis:100%}
   #viewCmp .dz-c .grp{gap:3px!important}
   #viewCmp .dz-c .ctl:not(.play){width:32px!important;min-width:32px!important;height:32px!important;padding:0!important}
   #viewCmp .dz-c .rate-btn{width:auto!important;min-width:32px!important;padding:0 6px!important;font-size:12px!important}
@@ -2277,6 +2277,44 @@ button.lg-it:hover{background:rgba(12,15,20,.8);border-color:rgba(255,255,255,.3
   .vc-lab{font-size:11.5px!important} .vc-lab small{font-size:10.5px!important}
   .vc-car{width:10px!important;height:10px!important}
   .vchip .slot-flip{width:26px!important;height:24px!important}
+}
+
+/* Vollbild-Knopf oben rechts im Video */
+.st-fs{position:absolute;top:8px;right:8px;z-index:6;width:32px;height:32px;border-radius:9px;border:1px solid rgba(255,255,255,.18);background:rgba(12,15,20,.55);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);color:#fff;display:none;align-items:center;justify-content:center;padding:0;cursor:pointer}
+.stage.has .st-fs{display:flex}
+.st-fs svg{width:16px;height:16px} .st-fs .fs-out{display:none}
+body.pfs .st-fs .fs-out,body.rfs .st-fs .fs-out{display:block} body.pfs .st-fs .fs-in,body.rfs .st-fs .fs-in{display:none}
+#cStages .stage:nth-child(2) .st-fs{display:none}
+#viewCmp.overlay .st-fs{top:auto;bottom:8px}
+/* eigenes Vollbild (iPhone) */
+body.pfs header,body.pfs .tabs,body.pfs .libcard,body.pfs .lib-sh,body.pfs #ovActs{display:none!important}
+body.pfs{overflow:hidden!important;padding:0!important}
+body.pfs .card.player:not([hidden]){position:fixed!important;inset:0!important;z-index:300!important;margin:0!important;border-radius:0!important;overflow:auto!important;min-height:0!important;padding:max(6px,env(safe-area-inset-top,0px)) max(8px,env(safe-area-inset-right,0px)) max(6px,env(safe-area-inset-bottom,0px)) max(8px,env(safe-area-inset-left,0px))!important}
+body.pfs #sHost .stage,body.pfs #gHost .stage{max-height:calc(100dvh - 150px)!important;width:auto!important;margin:0 auto}
+body.pfs #cStages .stage{max-height:calc(100dvh - 160px)}
+body.pfs .gps-sel,body.pfs .gps-foot,body.pfs #gpsChart,body.pfs #viewGps .ctl-lab,body.pfs #viewGps .gps-top{display:none!important}
+
+/* Handy quer: Kopfzeile in einer schlanken Zeile, Video möglichst gross */
+@media (max-height:500px) and (orientation:landscape) and (pointer:coarse){
+  header{margin:0 0 4px!important;padding-top:max(2px,env(safe-area-inset-top,0px))!important}
+  header .head-in{min-height:0!important;height:40px!important;padding:3px 8px!important;flex-wrap:nowrap!important;gap:6px!important;border-radius:12px!important}
+  header .logo{width:28px!important;height:28px!important}
+  header .tabs{position:static!important;height:32px!important;min-height:0!important;padding:2px!important;flex:0 1 auto!important}
+  header .tabs .tab{height:28px!important;padding:0 10px!important;font-size:12px!important}
+  header .tabs .tab svg{width:14px!important;height:14px!important}
+  header .dev-tag{display:none!important}
+  header .btn-cam{height:30px!important;padding:0 10px!important;font-size:12.5px!important}
+  header .btn-add,header .hdr-ico,header .ham-btn{width:30px!important;height:30px!important;min-width:30px!important}
+  header .ham-btn img,header .ham-btn{border-width:1px!important}
+  header .btn-add{display:inline-flex!important;align-items:center;justify-content:center;padding:0!important;color:#fff!important}
+  header .btn-add svg{display:block!important;width:16px!important;height:16px!important;margin:0!important;flex:none}
+  #btnTheme,#btnHelp{display:none!important}
+  #hdrMore{display:inline-flex!important}
+  #sHost .stage,#gHost .stage{max-height:calc(100svh - 168px)!important}
+  #cStages .stage,#viewCmp:not(.overlay) .stages .stage{max-height:calc(100svh - 178px)!important}
+  .player .dock,#viewGps .dock{margin-top:4px!important;padding:3px 6px!important}
+  .player .tl,#viewGps .tl{margin-top:4px!important}
+  canvas.strip{height:40px!important}
 }
 </style>
 </head>
@@ -2953,6 +2991,7 @@ const STAGE_HTML=(lab,col)=>`<div class="stage">
   <div class="zoomer"><video playsinline muted preload="auto" disablepictureinpicture></video><canvas class="ovb" hidden></canvas><canvas class="ann"></canvas></div>
   <div class="osd"><span class="pill of">F –</span><span class="pill ot">–</span></div>
   <div class="osd-r"><span class="pill lp" hidden>Loop</span><span class="pill rt">1×</span></div>
+  <button class="st-fs" type="button" title="Vollbild" aria-label="Vollbild"><svg class="fs-in" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3M21 8V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3M16 21h3a2 2 0 0 0 2-2v-3"/></svg><svg class="fs-out" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3v3a2 2 0 0 1-2 2H3M21 8h-3a2 2 0 0 1-2-2V3M3 16h3a2 2 0 0 1 2 2v3M16 21v-3a2 2 0 0 1 2-2h3"/></svg></button>
   ${lab?`<span class="tag-ab" style="background:${col}">${lab}</span>`:''}
   <span class="pill zoom-badge">Lupe <b class="zv">2×</b> · Doppelklick = zurück</span>
   <span class="pill hintpill" hidden></span>
@@ -3117,6 +3156,13 @@ class Deck{
       if(tap&&Math.hypot(e.clientX-tap.x,e.clientY-tap.y)>6) tap=null;
       if(pan){ this.z.x+=e.clientX-pan.x; this.z.y+=e.clientY-pan.y; pan={x:e.clientX,y:e.clientY}; this.clampPan(st.clientWidth,st.clientHeight); this.applyZoom(); }
     });
+    /* iPhone: Wischen zusätzlich über Touch-Ereignisse (Safari bricht Zeiger-Ereignisse beim Scrollen ab) */
+    let tsw=null;
+    st.addEventListener('touchstart',e=>{ if(!this.ready||e.touches.length!==1||DRAW.tool!=='none'||this.z.s>1||e.target.closest('.empty,.rail,.st-fs,.vchip,button')){ tsw=null; return; } const t=e.touches[0]; tsw={x:t.clientX,y:t.clientY,f:this.frame,on:false}; },{passive:true});
+    st.addEventListener('touchmove',e=>{ if(!tsw||e.touches.length!==1) return; const t=e.touches[0], dx=t.clientX-tsw.x, dy=t.clientY-tsw.y;
+      if(!tsw.on){ if(Math.abs(dx)>10&&Math.abs(dx)>Math.abs(dy)*1.3){ tsw.on=true; tsw.x=t.clientX; this.pause(); } else if(Math.abs(dy)>14){ tsw=null; return; } }
+      if(tsw.on){ e.preventDefault(); const n=clamp(tsw.f+Math.round((t.clientX-tsw.x)/9),0,this.nF-1); if(n!==this.frame) this.seekFrame(n,true); } },{passive:false});
+    st.addEventListener('touchend',()=>{ tsw=null; }); st.addEventListener('touchcancel',()=>{ tsw=null; });
     const up=e=>{ pts.delete(e.pointerId); if(pts.size<2) pinch=null; if(pts.size===0) swipe=null;
       if(drawing&&this.draft){ drawing=null; const p=this.draft.p; const big=p.length>2||(p.length===2&&Math.hypot(p[1][0]-p[0][0],p[1][1]-p[0][1])>0.01);
         if(big){ this.clip.anns.push(this.draft); saveClip(this.clip); } this.draft=null; decks.forEach(x=>{ if(x.clip===this.clip) x.annDirty=true; }); }
@@ -3421,7 +3467,15 @@ function act(name,btn){
   else if(name==='strobe') openStrobe();
   else if(name==='fs') fullscreen();
 }
-function fullscreen(){ const el=mode==='single'?$('#viewSingle'):mode==='gps'?$('#viewGps'):$('#viewCmp'); try{ if(document.fullscreenElement) document.exitFullscreen(); else if(el.requestFullscreen) el.requestFullscreen().catch(()=>toast('Vollbild ist hier nicht verfügbar.')); else if(el.webkitRequestFullscreen) el.webkitRequestFullscreen(); else toast('Vollbild ist hier nicht verfügbar.'); }catch(e){ toast('Vollbild ist hier nicht verfügbar.'); } }
+function fullscreen(){ const el=mode==='single'?$('#viewSingle'):mode==='gps'?$('#viewGps'):$('#viewCmp');
+  if(document.body.classList.contains('pfs')){ pfsSet(false); return; }
+  try{ if(document.fullscreenElement){ document.exitFullscreen(); return; } if(el.requestFullscreen&&document.fullscreenEnabled!==false){ el.requestFullscreen().catch(()=>pfsSet(true)); return; } if(el.webkitRequestFullscreen&&document.webkitFullscreenEnabled){ el.webkitRequestFullscreen(); return; } }catch(e){}
+  pfsSet(true); } /* iPhone kann keine Seitenteile ins Vollbild nehmen → Ansicht füllt den Bildschirm */
+function pfsSet(on){ document.body.classList.toggle('pfs',on); scrollTo(0,0); setTimeout(()=>{ dispatchEvent(new Event('resize')); decks.forEach(d=>{ d.dirty=true; d.annDirty=true; }); if(typeof GPS!=='undefined') GPS.dirty=true; },60); }
+document.addEventListener('fullscreenchange',()=>document.body.classList.toggle('rfs',!!document.fullscreenElement));
+document.addEventListener('click',e=>{ const b=e.target.closest('.st-fs'); if(!b) return; e.preventDefault(); e.stopPropagation(); fullscreen(); },true);
+['pointerdown','pointerup','touchstart','touchend','mousedown','mouseup','dblclick'].forEach(t=>document.addEventListener(t,e=>{ if(e.target.closest&&e.target.closest('.st-fs')) e.stopPropagation(); },true)); /* Tippen auf Vollbild startet nicht das Video */
+document.addEventListener('keydown',e=>{ if(e.key==='Escape'&&document.body.classList.contains('pfs')) pfsSet(false); });
 document.addEventListener('fullscreenchange',()=>decks.forEach(d=>{ d.dirty=true; d.annDirty=true; }));
 $$('.dock [data-act], .cmp-tools [data-act]').forEach(b=>b.addEventListener('click',()=>act(b.dataset.act,b)));
 
@@ -5019,16 +5073,12 @@ function drawGpsChart(N){
   if(cv.width!==Math.round(W*d)||cv.height!==Math.round(H*d)){ cv.width=Math.round(W*d); cv.height=Math.round(H*d); } const x=cv.getContext('2d'); x.setTransform(d,0,0,d,0,0); x.clearRect(0,0,W,H);
   if(!N) return; const {tr,cur}=N, ref=GPS.tracks.find(t=>t.id===tr.ref), P=tr.P, s0=P[tr.iS].s, s1=P[tr.iE].s;
   const st=getComputedStyle(cv), ink=st.getPropertyValue('--muted').trim(), line=st.getPropertyValue('--line').trim(), ff=getComputedStyle(document.body).fontFamily;
-  const pl=64, pr=10, h1=H*0.56, X=s=>pl+(W-pl-pr)*clamp((s-s0)/Math.max(1,s1-s0),0,1);
+  const pl=64, pr=10, h1=H-16, X=s=>pl+(W-pl-pr)*clamp((s-s0)/Math.max(1,s1-s0),0,1);
   const vlo=Math.min(tr.vmin,ref?ref.vmin:1e9), vhi=Math.max(tr.vmax,ref?ref.vmax:0), Y=v=>6+(h1-12)*(1-(v-vlo)/Math.max(0.1,vhi-vlo));
   x.font='600 10px '+ff; x.fillStyle=ink; x.textAlign='right'; x.textBaseline='middle'; x.fillText(KMH(vhi).toFixed(0)+' km/h',pl-6,Y(vhi)); x.fillText(KMH(vlo).toFixed(0),pl-6,Y(vlo));
   if(ref){ x.strokeStyle=ink; x.globalAlpha=.6; x.setLineDash([4,4]); x.lineWidth=1.5; x.beginPath(); for(let i=ref.iS;i<=ref.iE;i++){ const p=ref.P[i]; const X2=X(p.s-ref.P[ref.iS].s+s0); i===ref.iS?x.moveTo(X2,Y(p.v)):x.lineTo(X2,Y(p.v)); } x.stroke(); x.setLineDash([]); x.globalAlpha=1; }
   x.strokeStyle=ref?'#DA291C':'#3b8bff'; x.lineWidth=2.2; x.beginPath(); for(let i=tr.iS;i<=tr.iE;i++){ const p=P[i]; i===tr.iS?x.moveTo(X(p.s),Y(p.v)):x.lineTo(X(p.s),Y(p.v)); } x.stroke();
-  // Δt
-  const dts=tr.dt?tr.dt.filter(v=>v!=null):[]; const mx=Math.max(0.05,...dts.map(Math.abs))*1.15, Y2=v=>h1+6+(H-h1-18)*(0.5-v/(2*mx));
-  x.strokeStyle=line; x.lineWidth=1; x.beginPath(); x.moveTo(pl,Y2(0)); x.lineTo(W-pr,Y2(0)); x.stroke();
-  x.fillStyle=ink; x.fillText(ref?'Δ +'+mx.toFixed(2)+' s':'Δ –',pl-6,Y2(mx*0.75)); if(ref) x.fillText('−'+mx.toFixed(2)+' s',pl-6,Y2(-mx*0.75));
-  if(tr.dt){ x.lineWidth=2.4; for(let i=tr.iS+1;i<=tr.iE;i++){ const a=tr.dt[i-1], b=tr.dt[i]; if(a==null||b==null) continue; x.strokeStyle=b<=a?'#1f9d6b':'#DA291C'; x.beginPath(); x.moveTo(X(P[i-1].s),Y2(a)); x.lineTo(X(P[i].s),Y2(b)); x.stroke(); } }
+  /* Δ-Zeit-Linie entfernt: Vorsprung/Rückstand steht an der Spur im Video */
   x.textAlign='center'; x.fillStyle=ink; const L=s1-s0, nT=Math.max(3,Math.floor(W/70)), step=[5,10,20,50,100,200,250,500,1000].find(v=>L/v<=nT)||1000; for(let m=0;m<=L;m+=step) x.fillText(m+' m',X(s0+m),H-5);
   x.fillStyle=st.getPropertyValue('--ink').trim(); x.fillRect(X(cur.s)-1,2,2,H-14);
 }
@@ -6015,7 +6065,7 @@ function coachPlace(){ const b=COACH.el; let el=COACH.tgt; if(!b) return; if(!co
 setInterval(()=>{ try{
   if(COACH.el){ if($('.modal.on')||(typeof SER!=='undefined'&&SER.on)) coachHide(false); else coachPlace(); return; }
   if(Date.now()-COACH.last<(COACH.n?30000:2500)||(COACH.n&&COACH.act<COACH.last)||document.hidden||document.body.classList.contains('touring')||$('.modal.on')||(typeof SER!=='undefined'&&SER.on)||(typeof EXP!=='undefined'&&EXP.live)) return;
-  if(innerWidth<=600) return; /* Handy: keine Hilfe-Blasen, Bild bleibt frei */
+  if(innerWidth<=600||innerHeight<=500) return; /* Handy (auch quer): keine Hilfe-Blasen, Bild bleibt frei */
   for(const c of COACHES){ if(LS.get('coach:'+c.id,0)) continue; let ok=false; try{ ok=c.when(); }catch(e){} if(!ok) continue; const el=$(c.sel); if(coachVis(el)){ coachShow(c,el); break; } }
 }catch(e){} },900);
 addEventListener('resize',()=>{ if(COACH.el) coachPlace(); });
@@ -6194,7 +6244,7 @@ if(false&&!LS.get('hint1',0)){ setTimeout(()=>{ toast(matchMedia('(pointer:coars
 
 /* Update-Hinweis: prüft version.json auf GitHub Pages; «Aktualisieren» lädt die Seite ohne Cache neu */
 (()=>{
-  const BUILD='20261030173443'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
+  const BUILD='20261030175007'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
   // nach einem Update die ?v=… aus der Adresse entfernen
   try{ const u=new URL(location.href); if(u.searchParams.has('v')){ u.searchParams.delete('v'); history.replaceState(null,'',u.pathname+(u.search||'')+u.hash); } }catch(e){}
   const el=$('#upd'); let latest=null, snoozed=null, busy=false;
