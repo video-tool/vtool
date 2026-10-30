@@ -2050,6 +2050,7 @@ body.no-hdr .cmp-tools>.save-w .ctl{height:34px!important}
 #ovPanel.tight3 .ov-acts .ov-b.ghost:not(.ico) svg.ic,#ovPanel.tight3 .ov-acts .ov-b.prev svg.ic{margin:0}
 #ovPanel.tight3 .ov-acts .ov-b.ghost:not(.ico),#ovPanel.tight3 .ov-acts .ov-b.prev{padding:0 9px!important}
 #ovPanel.tight4 .ov-steps{display:none}
+#ovPanel.ov-done .ov-steps{display:none}
 #viewCmp .ov-txt{display:flex!important;align-items:center;gap:8px;min-width:0;overflow:hidden;text-overflow:clip!important}
 #viewCmp .ov-txt>b:first-child{color:inherit}
 .ov-say{flex:0 1 auto;min-width:0;overflow:hidden;white-space:nowrap}
@@ -3811,7 +3812,7 @@ const OVI={info:`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="current
 function ovT0(){ return OV.cut.a!=null?Math.max(OV.cut.a,-G.off,0):G.syncA; }
 function ovStep(){ if(!G.linked||OV.edit) return 1; if(OV.pick) return 2; if(!OV.T&&!(OV.follow&&(GH.state==='busy'||ovFollowOK()))) return 2; return 3; }
 function ovApplyCut(){ // Ausschnitt als Loop in beiden Zeitleisten anzeigen
-  const on=ovActive()&&(OV.cut.a!=null||OV.cut.b!=null)&&A.ready;
+  const on=ovActive()&&(OV.cut.a!=null||OV.cut.b!=null)&&A.ready&&!(typeof EXP!=='undefined'&&EXP.live); // während dem Speichern keine Schlaufe
   const mk=(d,sh)=>{ if(!on||!d.ready){ d.loopOv=null; d.dirty=true; return; } const a=OV.cut.a!=null?OV.cut.a:0, b=OV.cut.b!=null?OV.cut.b:A.dur;
     d.loopOv={a:clamp(Math.round((a+sh)*d.fps),0,d.nF-1),b:clamp(Math.round((b+sh)*d.fps),0,d.nF-1),on:true}; d.dirty=true; };
   mk(A,0); if(G.linked) mk(B,G.off); else { B.loopOv=null; B.dirty=true; } }
@@ -3871,7 +3872,7 @@ function ovUI(){ vchipPlace();
     acts=cutBtns+ovBtn('fix','Korrigieren',OVI.fix,'ghost','B an dieser Stelle von Hand nachschieben')+ovBtn('nameset','Namen',OVI.tag,'ghost','Fahrer:innen antippen – die Namens-Pillen folgen dann genau ihnen')
       +ovMore([LAY.length<3?['addrun','Weiteren Lauf dazunehmen',OVI.plus]:null,['make','Neu berechnen',OVI.go],['edit','Neu beginnen',OVI.back]])+ovPrevBtn()+ovBtn('save','Speichern',OVI.dl,'pri','Overlay als Video speichern'); }
   // drei Zonen: links Schritt (+ Zustand), Mitte kurzer Hinweis, rechts Knöpfe – nur neu zeichnen, wenn sich etwas ändert (sonst gehen Klicks verloren)
-  const te=$('#ovTtl'); if(te.textContent!==ttl) te.textContent=ttl;
+  const te=$('#ovTtl'); if(te.textContent!==ttl) te.textContent=ttl; const pnl=$('#ovPanel'); if(pnl.classList.contains('ov-done')!==dot){ pnl.classList.toggle('ov-done',dot); ovFit(); } // Fertig: Schritte ausblenden, Platz für den Hinweis
   const se=$('#ovSt'); if(se.hidden===dot){ se.hidden=!dot; se._k=null; } if(dot) ovStUpd();
   const t=chips+`<span class="ov-say">${say}</span>`+`<button class="ov-info" data-ovinfo aria-label="Hinweis anzeigen">${OVI.info}</button>`;
   OV.bubH=`<b>${ttl}</b> · ${say.replace(FI,'')}`+(tip?`<span class="ob-tip">${tip}</span>`:'');
@@ -5070,22 +5071,23 @@ async function startExport(){
     const muxer=new Mp4Muxer.Muxer({target:new Mp4Muxer.ArrayBufferTarget(),video:{codec:'avc',width:cv.width,height:cv.height},fastStart:'in-memory',firstTimestampBehavior:'offset'});
     const enc=new VideoEncoder({output:(ch,meta)=>{ try{ muxer.addVideoChunk(ch,meta); }catch(e){ EXP.wcErr=e; } },error:e=>{ EXP.wcErr=e; }}); enc.configure(wcCfg);
     const name=base(D.clip.name)+(mode==='cmp'?(ovl?'_overlay_':'_vs_')+base(B.clip.name):'')+'_F'+r.a+'-'+r.b+(EXP.rate<1?'_'+String(EXP.rate).replace('.',',')+'x':'');
-    Object.assign(EXP,{live:true,wc:true,muxer,enc,wcErr:null,ovl,x,cv,W,H,bar,ws,gap,opt,ds,D,tEnd:(r.b+0.5)/D.fps,t0:r.a/D.fps,prevRate,prevLoop,name,mime:'video/mp4',started:true,cancel:false,nf:0,lastTs:-1,rew:0,okN:0});
+    Object.assign(EXP,{live:true,wc:true,muxer,enc,wcErr:null,ovl,x,cv,W,H,bar,ws,gap,opt,ds,D,tEnd:(r.b+0.5)/D.fps,t0:r.a/D.fps,prevRate,prevLoop,name,mime:'video/mp4',started:true,cancel:false,nf:0,lastTs:-1,rew:0,okN:0,expN:r.b-r.a+1,srcN:0,drop:0});
     $('#expGo').textContent='Abbrechen'; $('#expProg').hidden=false;
     const dup=Math.max(1,Math.round(25/(D.fps*EXP.rate))), fdt=1/(D.fps*EXP.rate); // mind. ~25 Bilder/s im Ergebnis
-    let lastF=null, spd=1;
+    let lastF=r.a-1, spd=1; // ab dem ersten Bild: fehlt der Anfang, wird zurückgesprungen
     const onF=(now,md)=>{ const E=EXP; if(!E.live||!E.wc) return;
       const fr=Math.round(md.mediaTime*D.fps);
-      if(lastF!=null&&fr>lastF+1&&fr>r.a&&spd>0.16&&(E.rew=(E.rew||0)+1)<400){ // Bild verpasst (Gerät ausgelastet) → zurück zum fehlenden Bild und langsamer weiter (Zeitstempel kommen vom Video, Tempo egal)
+      if(lastF!=null&&fr>lastF+1&&fr>r.a&&(E.rew=(E.rew||0)+1)<Math.max(400,E.expN*3)){ // auch bei kleinstem Tempo weiter zurückspringen statt Bilder auszulassen // Bild verpasst (Gerät ausgelastet) → zurück zum fehlenden Bild und langsamer weiter (Zeitstempel kommen vom Video, Tempo egal)
         spd=Math.max(0.15,spd*0.6); setRate(spd); D.seekFrame(lastF+1);
         if(mode==='cmp'&&G.linked&&B.ready){ B.v.currentTime=(lastF+1)/D.fps+G.off; } D.v.requestVideoFrameCallback(onF); return; }
       if(lastF!=null&&fr<lastF-Math.max(3,D.fps*0.5)&&lastF>=r.b-2){ finishExport(); return; }
       if(lastF!=null&&fr<=lastF){ D.v.requestVideoFrameCallback(onF); return; } lastF=fr;
-      E.lastCb=performance.now(); D.frame=clamp(fr,0,D.nF-1); exportFrame(); if(!E.live) return;
+      E.lastCb=performance.now(); D.frame=clamp(fr,0,D.nF-1); E.inCb=true; exportFrame(); E.inCb=false; if(!E.live) return;
       if(spd<1&&++E.okN%12===0){ spd=Math.min(1,spd*1.12); setRate(spd); }
       const t=(md.mediaTime-E.t0)/EXP.rate;
-      if(t>=-0.01) for(let k=0;k<dup;k++){ const ts=Math.round((Math.max(0,t)+k*fdt/dup)*1e6); if(ts<=E.lastTs) continue; E.lastTs=ts;
-        if(E.enc.encodeQueueSize>30) break; const vf=new VideoFrame(cv,{timestamp:ts,duration:Math.round(fdt/dup*1e6)}); E.enc.encode(vf,{keyFrame:E.nf%60===0}); vf.close(); E.nf++; }
+      if(t>=-0.01){ E.srcN++; (E.frs=E.frs||[]).push(fr); if(E.frs.length>4000) E.frs.shift(); for(let k=0;k<dup;k++){ const ts=Math.round((Math.max(0,t)+k*fdt/dup)*1e6); if(ts<=E.lastTs) continue; E.lastTs=ts;
+        if(E.enc.encodeQueueSize>30){ E.drop++; break; } const vf=new VideoFrame(cv,{timestamp:ts,duration:Math.round(fdt/dup*1e6)}); E.enc.encode(vf,{keyFrame:E.nf%60===0}); vf.close(); E.nf++; } }
+      if(fr>=r.b||E.cancel||D.v.ended){ finishExport(); return; } // erst nach dem Kodieren des letzten Bildes abschliessen
       D.v.requestVideoFrameCallback(onF); };
     D.v.requestVideoFrameCallback(onF);
     if(mode==='cmp'){ if(G.linked){ G.playing=true; A.play(); } else { A.play(); B.play(); } } else D.play();
@@ -5108,7 +5110,7 @@ async function startExport(){
 }
 // Am Ende kommt kein neues Bild mehr – darum separat prüfen, ob das Video fertig ist (sonst bleibt der Export bei 100 % stehen)
 function expWatch(){ const E=EXP; clearInterval(E.wd); E.lastCb=null; E.wd=setInterval(()=>{ if(!EXP.live){ clearInterval(E.wd); return; } const D=E.D, v=D&&D.v; if(!v) return;
-    const stuck=E.lastCb!=null&&performance.now()-E.lastCb>4000, end=v.ended||v.currentTime>=E.tEnd-0.6/D.fps||(mode==='cmp'&&B.v.ended);
+    const stuck=E.lastCb!=null&&performance.now()-E.lastCb>4000, end=v.ended||(mode==='cmp'&&B.v.ended)||(E.wc?v.currentTime>=E.tEnd+1.5:v.currentTime>=E.tEnd-0.6/D.fps); // Schnell-Export schliesst selbst nach dem letzten Bild ab
     if(end||(stuck&&v.currentTime>=E.tEnd-1)) finishExport(); else if(stuck&&v.paused&&!E.cancel){ E.lastCb=performance.now(); try{ v.play(); }catch(e){} } },300); } // nur am Schluss beenden – sonst bei Stillstand weiterlaufen lassen
 function exportFrame(){
   const E=EXP; if(!E.live||!E.started) return; E.lastCb=performance.now(); const {x,W,H,bar,ws,gap,opt,ds,D}=E;
@@ -5130,18 +5132,22 @@ function exportFrame(){
     const t=(D.frame/D.fps).toFixed(2)+' s · F '+D.frame+(EXP.rate<1?'  ·  '+fmtRate(EXP.rate)+' Zeitlupe':''); x.fillText(t+'   Swiss-Ski Video-Lab',W-bar*0.45,y);
     x.fillStyle='#DA291C'; x.fillRect(0,H,W*clamp((D.v.currentTime-E.t0)/(E.tEnd-E.t0),0,1),Math.max(2,Math.round(bar*0.05))); }
   const f=clamp((D.v.currentTime-E.t0)/(E.tEnd-E.t0),0,1); $('#expProg i').style.width=(f*100)+'%'; $('#expProg span').textContent='Export läuft · '+Math.round(f*100)+' %';
+  if(E.inCb) return; // Schnell-Export: Abschluss im Bild-Rückruf
   if(E.cancel||D.v.currentTime>=E.tEnd||D.v.ended||(D.v.paused&&f>0.02)) finishExport();
 }
 async function wcConfig(w,h,fps){ if(typeof VideoEncoder==='undefined'||typeof VideoFrame==='undefined'||typeof Mp4Muxer==='undefined'||!HTMLVideoElement.prototype.requestVideoFrameCallback) return null;
   for(const codec of ['avc1.640028','avc1.640033','avc1.4d0033','avc1.42003e']){ const c={codec,width:w,height:h,bitrate:w*h>1e6?14e6:9e6,framerate:Math.max(25,Math.round(fps)),avc:{format:'avc'}};
     try{ const r=await VideoEncoder.isConfigSupported(c); if(r&&r.supported) return c; }catch(e){} } return null; }
+function expCheck(E){ // nach dem Speichern: sind alle Bilder drin?
+  const got=Math.min(E.srcN,E.expN), miss=E.expN-got+E.drop, lim=Math.max(2,Math.round(E.expN*0.03)); EXP.last={exp:E.expN,got,drop:E.drop,ok:miss<=lim};
+  if(miss>lim) setTimeout(()=>toast('Achtung: im gespeicherten Video fehlen '+miss+' von '+E.expN+' Bildern – das Gerät war ausgelastet. Bitte nochmals speichern (andere Programme schliessen) oder mit ½× speichern.',7000),1600); }
 function finishExport(){
   const E=EXP; if(!E.live) return; E.live=false; E.started=false; clearInterval(E.wd);
   expDecks().forEach(d=>d.pause()); G.playing=false; S.useLoop=E.prevLoop; if(E.prevLov){ A.loopOv=E.prevLov[0]; B.loopOv=E.prevLov[1]; E.prevLov=null; } setRate(E.prevRate);
   if(E.wc){ (async()=>{ $('#expGo').textContent='Speichern'; $('#expProg').hidden=true;
       if(E.cancel){ try{ E.enc.close(); }catch(e){} toast('Export abgebrochen.'); return; }
       try{ await E.enc.flush(); E.enc.close(); E.muxer.finalize(); if(E.wcErr) throw E.wcErr;
-        const bl=new Blob([E.muxer.target.buffer],{type:'video/mp4'}); $('#expModal').classList.remove('on'); saveOut(bl,E.name+'.mp4',(expDecks()[0]||{}).clip,'Clip'); }
+        const bl=new Blob([E.muxer.target.buffer],{type:'video/mp4'}); $('#expModal').classList.remove('on'); saveOut(bl,E.name+'.mp4',(expDecks()[0]||{}).clip,'Clip'); expCheck(E); }
       catch(err){ console.error(err); toast('Export fehlgeschlagen – bitte nochmals versuchen.',4000); } })(); return; }
   const r=E.rec; r.onstop=()=>{ $('#expGo').textContent='Speichern'; $('#expProg').hidden=true;
     if(E.cancel){ toast('Export abgebrochen.'); return; }
@@ -5799,7 +5805,7 @@ if(false&&!LS.get('hint1',0)){ setTimeout(()=>{ toast(matchMedia('(pointer:coars
 
 /* Update-Hinweis: prüft version.json auf GitHub Pages; «Aktualisieren» lädt die Seite ohne Cache neu */
 (()=>{
-  const BUILD='20261029134307'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
+  const BUILD='20261030072300'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
   // nach einem Update die ?v=… aus der Adresse entfernen
   try{ const u=new URL(location.href); if(u.searchParams.has('v')){ u.searchParams.delete('v'); history.replaceState(null,'',u.pathname+(u.search||'')+u.hash); } }catch(e){}
   const el=$('#upd'); let latest=null, snoozed=null, busy=false;
