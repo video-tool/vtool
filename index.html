@@ -2003,6 +2003,42 @@ button.lg-it:hover{background:rgba(12,15,20,.8);border-color:rgba(255,255,255,.3
   *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
   .aurora{display:none}
 }
+/* Filmen-Knopf nur auf Handy/Tablet mit Kamera */
+.btn-cam{display:none;align-items:center;gap:6px;height:36px;padding:0 12px 0 10px;border-radius:11px;background:var(--red);color:#fff;font-weight:700;font-size:13px;text-decoration:none;flex:none}
+.btn-cam svg{width:17px;height:17px}
+@media (pointer:coarse){ .btn-cam{display:inline-flex} }
+/* ---- Handy: feste Leisten oben und unten, nichts scrollt dahinter · Bedienung in zwei Zeilen ---- */
+@media (max-width:600px){
+  header{position:sticky!important;top:0!important;z-index:110;margin:0 -0px 8px!important;padding:env(safe-area-inset-top,0px) 0 0!important;background:var(--bg)!important;border-bottom:1px solid var(--line)!important}
+  header .head-in{min-height:48px!important;padding:0 10px!important;background:transparent!important;border:none!important;border-radius:0!important;box-shadow:none!important;gap:8px!important}
+  .tabs{left:0!important;right:0!important;bottom:0!important;height:auto!important;min-height:0!important;padding:5px 8px calc(5px + env(safe-area-inset-bottom,0px))!important;border-radius:0!important;border:none!important;border-top:1px solid var(--line)!important;background:var(--bg)!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important;box-shadow:none!important}
+  .tabs .tab{height:44px!important;border-radius:11px!important;gap:2px!important;font-size:10.5px!important}
+  .tabs .tab svg{width:19px!important;height:19px!important}
+  .tabs.has-ind>.seg-ind{border-radius:11px}
+  body{padding-bottom:calc(64px + env(safe-area-inset-bottom,0px))!important}
+  .upd,.toast{bottom:calc(66px + env(safe-area-inset-bottom,0px))!important}
+  /* Ein Video: Zeile 1 Abspielen, Zeile 2 Start/Ende + Werkzeuge */
+  #viewSingle .dock.dock3{display:grid!important;grid-template-columns:auto auto;justify-content:center;align-items:center;gap:8px 10px!important;padding:8px 6px!important}
+  #viewSingle .dock.dock3 .dz-c{grid-column:1 / -1;order:0;justify-content:center}
+  #viewSingle .dock.dock3 .dz-l{order:1;margin:0!important;flex:none}
+  #viewSingle .dock.dock3 .dz-r{order:2;flex:none!important;flex-wrap:nowrap!important;gap:4px!important}
+  #viewSingle .dz-r .grp{gap:4px!important;flex-wrap:nowrap}
+  #viewSingle .dz-l .ctl,#viewSingle .dz-r .ctl{min-width:38px!important;width:38px;height:38px!important;padding:0!important;justify-content:center}
+  #viewSingle .dz-r .ctl-lab{display:none!important}
+  #viewSingle .dz-c .ctl:not(.play){min-width:40px;width:40px;height:40px}
+  #viewSingle .ctl.play{width:52px!important;height:52px!important;min-width:52px!important}
+  /* Filmen: führt in die Field-App (gleiche Seite, bleibt in der installierten App) */
+  .btn-cam{display:inline-flex!important}
+  header .head-in{flex-wrap:nowrap!important;gap:6px!important}
+  header .brand{min-width:0;flex:0 1 auto}
+  .btn-cam{height:34px;padding:0 10px 0 8px;font-size:12.5px;gap:5px}
+  header .btn-add,header .hdr-ico,header .ham-btn{width:34px!important;height:34px!important;min-width:34px;flex:none}
+  header .btn-add{padding:0!important;justify-content:center}
+  /* Overlay-Schritte: nur der aktuelle mit Namen, sonst wird die Seite breiter als der Bildschirm */
+  .ov-zl{min-width:0;max-width:100%;overflow:hidden}
+  .ov-steps li:not(.on) span{display:none}
+  .ov-steps li:not(.on){padding-right:3px}
+}
 </style>
 </head>
 <body class="m-single">
@@ -2023,6 +2059,7 @@ button.lg-it:hover{background:rgba(12,15,20,.8);border-color:rgba(255,255,255,.3
     </nav>
     <div class="head-spacer"></div>
     <span class="local-chip" title="Videos werden nur im Browser geöffnet und nie hochgeladen."><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>100 % lokal</span>
+    <a class="btn-cam" href="field/" title="Mit dem Handy filmen (Video-Lab Field)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="3.6" fill="currentColor" stroke="none"/></svg><span>Filmen</span></a>
     <label class="btn-add" for="fileIn" title="Videos hinzufügen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg><span>Videos</span></label>
     <input type="file" id="fileIn" accept="video/*,.mp4,.mov,.m4v,.mkv,.webm" multiple hidden>
     <button class="ham-btn" id="hamBtn" title="Psst …" aria-label="Überraschung" style="background-image:url(data:image/jpeg;base64,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)"></button>
@@ -2151,7 +2188,8 @@ button.lg-it:hover{background:rgba(12,15,20,.8);border-color:rgba(255,255,255,.3
     <div class="ov-panel" id="ovPanel">
       <div class="ov-zl"><ol class="ov-steps" id="ovSteps">
         <li data-st="1" title="Schritt 1 · Gleicher Moment"><i>1</i><span>Gleicher Moment</span></li>
-        <li data-st="2" title="Schritt 2 · Overlay"><i>2</i><span>Overlay</span></li>
+        <li data-st="2" title="Schritt 2 · Übereinanderlegen"><i>2</i><span>Übereinanderlegen</span></li>
+        <li data-st="3" title="Schritt 3 · Overlay"><i>3</i><span>Overlay</span></li>
       </ol><b class="ov-ttl" id="ovTtl"></b><span class="ov-st" id="ovSt" hidden title="Zustand des Overlays an der aktuellen Stelle"><i></i><span></span></span></div>
       <div class="ov-row">
         <div class="ov-txt" id="ovTxt"></div>
@@ -2271,7 +2309,7 @@ button.lg-it:hover{background:rgba(12,15,20,.8);border-color:rgba(255,255,255,.3
       <dt>Side-by-Side</dt><dd>A und B wählen, beide zum gleichen Tor ziehen und unter «Werkzeuge» «Gleicher Moment» drücken (<kbd>t</kbd> öffnet die Werkzeuge)</dd>
       <dt>Zeitmessung</dt><dd>Stoppuhr-Knopf: Start = gleicher Moment · Fahne A / B setzt das Ziel · Zeit und Differenz stehen im Bild</dd>
       <dt>Tore</dt><dd><kbd>m</kbd> Tor in A · <kbd>n</kbd> Tor in B → Abschnittszeiten · <kbd>Alt</kbd> + ← → bewegt nur B</dd>
-      <dt>Overlay</dt><dd>1 A und B zum gleichen Tor ziehen (oder «Automatisch suchen»), dann «Weiter» – das Overlay wird gleich erstellt, zuerst als Vorschau, dann fein · 2 Abspielen läuft von Start bis Ende; liegt B daneben: anhalten, «Korrigieren» · «…» › «Serie gegen A rechnen» rechnet alle Läufe derselben Serie</dd>
+      <dt>Overlay</dt><dd>1 A und B zum gleichen Tor ziehen (oder «Automatisch suchen»), dann «Weiter» · 2 B über A schieben, bis die Tore übereinanderliegen (oder «Automatisch»), dann «Overlay erstellen» – zuerst als Vorschau, dann fein · 3 Abspielen läuft von Start bis Ende; liegt B daneben: anhalten, «Korrigieren» · «…» › «Serie gegen A rechnen» rechnet alle Läufe derselben Serie</dd>
       <dt>Hineinziehen</dt><dd>Ein Video aus der Liste links direkt ins Bild, auf A oder B ziehen</dd>
       <dt>Korrigieren</dt><dd>Während der Berechnung: Pause · 1 s zurück · Korrigieren. Im fertigen Overlay: anhalten → «Korrigieren» – ab dort wird neu gerechnet</dd>
       <dt>Von Hand</dt><dd>B ziehen · Rechtsklick ziehen (oder Ctrl / Alt) = drehen · Mausrad = Grösse · Pfeiltasten = fein · Enter = übernehmen</dd>
@@ -3461,7 +3499,7 @@ async function ghostCompute(opt){ // opt.resume: ab Bild opt.j mit fester Lage o
     prev={p,M}; prevPA=PA; prevPB=PB;
     if(!bg){ GH.curLen=S.length; drawLive(M); }
     if(!bg&&!cutWarn&&cuts.a+cuts.b>=2){ cutWarn=true; toast('Achtung: '+(cuts.a&&cuts.b?'A und B haben':cuts.a?'Video A hat':'Video B hat')+' Kameraschnitte (TV-Bild) – Overlay braucht eine durchgehende Kamera vom gleichen Standort.',6000); }
-    if(bg){ GH.bg.p=(i+1)/n; await new Promise(r=>setTimeout(r,0)); while(EXP.live&&!stop()) await new Promise(r=>setTimeout(r,300)); } // beim Speichern pausieren else { const el=(performance.now()-t0)/1000, rest=el/(i+1)*(n-i-1); ghostProgress((i+1)/n,'Bild '+(i+1)+' / '+n+' · bei '+fmtS(GH.t0+e)+' · noch ca. '+Math.ceil(rest)+' s'); await new Promise(r=>setTimeout(r,0)); }
+    if(bg){ GH.bg.p=(i+1)/n; await new Promise(r=>setTimeout(r,0)); while(EXP.live&&!stop()) await new Promise(r=>setTimeout(r,300)); } /* beim Speichern pausieren */ else { const el=(performance.now()-t0)/1000, rest=el/(i+1)*(n-i-1); ghostProgress((i+1)/n,'Bild '+(i+1)+' / '+n+' · bei '+fmtS(GH.t0+e)+' · noch ca. '+Math.ceil(rest)+' s'); await new Promise(r=>setTimeout(r,0)); }
     while(!bg&&GH.paused&&!GH.abort&&GH.rewind==null){ // angehalten: Vorschau zeigen, Korrektur übernehmen
       await new Promise(r=>setTimeout(r,60));
       if(GH.fixApply){ const D=ovDMat(GH.fixApply,W0); GH.fixApply=null; M=affMul(M,affInv(D)); const p2=affToSim(M,W0,hA,W0,hB); p2[4]=p[4]; p=p2;
@@ -3665,7 +3703,7 @@ function ovApplyCut(){ // Ausschnitt als Loop in beiden Zeitleisten anzeigen
   mk(A,0); if(G.linked) mk(B,G.off); else { B.loopOv=null; B.dirty=true; } }
 function ovMore(items){ items=items.filter(Boolean); if(!items.length) return '';
   return `<span class="ov-morew">${ovBtn('more','',OVI.dots,'ico ghost'+(OV.more?' on':''),'Weitere Möglichkeiten')}${OV.more?`<span class="ov-menu">${items.map(([id,l,ic])=>`<button data-ov="${id}">${ic||''}<span>${l}</span></button>`).join('')}</span>`:''}</span>`; }
-const OVSTEPN=['Gleicher Moment','Overlay'];
+const OVSTEPN=['Gleicher Moment','Übereinanderlegen','Overlay'];
 function ovSaveBtn(){ const cut=saveCutRange()==='ovcut';
   const it=[['svvid','Video','Overlay als MP4 – Start/Ende, Zeitlupe, Anzeigen',OVI.vid],cut?['svcut','Nur Start/Ende',saveCutSub('ovcut')+' · sofort als MP4',OVI.cut]:null,['svimg','Standbild','Aktuelles Bild als PNG',OVI.img],['svrec','Aufnahme mit Ton','Bildschirm, Zeichnungen und Stimme',OVI.rec]].filter(Boolean);
   return `<span class="ov-morew ov-savew">${ovBtn('save','Speichern',OVI.dl,'pri'+(OV.svm?' on':''),'Speichern: Video, Standbild oder Aufnahme')}${OV.svm?`<span class="ov-menu ov-svmenu">${it.map(([id,l,s,ic])=>`<button data-ov="${id}">${ic}<span><b>${l}</b><small>${s}</small></span></button>`).join('')}</span>`:''}</span>`; }
@@ -3677,7 +3715,7 @@ function ovPrevStart(){ // Overlay vom Start des Ausschnitts (bzw. der Berechnun
   if(here) return go(); A.seekTime(Math.max(0,t)); A.onUserSeek&&A.onUserSeek(A); setTimeout(go,160); }
 function ovBtn(id,label,icon,cls,title){ return `<button class="ov-b ${cls||''}" data-ov="${id}" ${title?`title="${title}"`:''}>${icon||''}<span>${label}</span></button>`; }
 function ovUI(){ vchipPlace();
-  const v=$('#viewCmp'), k=A.clip&&B.clip?A.clip.id+'|'+B.clip.id:''; if(k!==OV.key){ OV.key=k; OV.T=null; OV.follow=false; OV.pick=null; OV.cut={a:null,b:null}; OV.edit=false; OV.found=null; OV.foundEx=null; OV.hideB=false; }
+  const v=$('#viewCmp'), k=A.clip&&B.clip?A.clip.id+'|'+B.clip.id:''; if(k!==OV.key){ OV.key=k; OV.T=null; OV.follow=false; OV.pick=null; OV.cut={a:null,b:null}; OV.edit=false; OV.found=null; OV.foundEx=null; OV.hideB=false; OV.fix=null; }
   v.classList.toggle('ov-pick-a',OV.pick==='a'); v.classList.toggle('ov-pick-b',OV.pick==='b');
   const split=ovActive()&&!OV.pick&&!OV.T&&!(OV.follow&&(GH.state==='busy'||ovFollowOK())); // bis B ausgerichtet ist: nebeneinander // Schritt 1: nebeneinander, damit A und B einzeln eingestellt werden können
   if(v.classList.contains('ov-split')!==split){ v.classList.toggle('ov-split',split); decks.forEach(d=>{ d.dirty=true; d.annDirty=true; }); requestAnimationFrame(()=>{ decks.forEach(d=>{ d.dirty=true; }); if(typeof ovMarks==='function') ovMarks(); }); }
@@ -3685,7 +3723,7 @@ function ovUI(){ vchipPlace();
   if(v.classList.contains('ov-one')!==one){ v.classList.toggle('ov-one',one); decks.forEach(d=>{ d.dirty=true; d.annDirty=true; }); requestAnimationFrame(()=>decks.forEach(d=>{ d.dirty=true; })); }
   if(!ovActive()){ ovApplyCut(); return; }
   const st=ovStep(), busy=OV.follow&&GH.state==='busy', done=ovFollowOK();
-  { const sd=st===1?1:2; $$('#ovSteps li').forEach(li=>{ const n=+li.dataset.st; li.classList.toggle('on',n===sd&&!done); li.classList.toggle('nx',n===sd+1&&!done); li.classList.toggle('done',n<sd||done); $('i',li).innerHTML=(n<sd||done)?OVI.ok:n; }); } // zwei Schritte: Gleicher Moment → Overlay
+  { const sd=st===1?1:(OV.follow&&(busy||done))?3:2; $$('#ovSteps li').forEach(li=>{ const n=+li.dataset.st; li.classList.toggle('on',n===sd&&!done); li.classList.toggle('nx',n===sd+1&&!done); li.classList.toggle('done',n<sd||done); $('i',li).innerHTML=(n<sd||done)?OVI.ok:n; }); } // drei Schritte: Gleicher Moment → Übereinanderlegen → Overlay
   const cut=(OV.cut.a!=null||OV.cut.b!=null)?`<span class="ov-chip">${OVI.cs}${OV.cut.a!=null?fmtS(OV.cut.a):'Anfang'} – ${OV.cut.b!=null?fmtS(OV.cut.b):'Ende'}<button data-ov="cutx" title="Start/Ende entfernen">${OVI.x}</button></span>`:'';
   const cutBtns=`<span class="ov-cutg">${ovBtn('cuta','Start',OVI.cs,'','Start des Overlays = aktuelles Bild')}${ovBtn('cutb','Ende',OVI.ce,'','Ende des Overlays = aktuelles Bild')}</span>`;
   let ttl='', say='', tip='', chips='', acts='', dot=false;
@@ -3701,8 +3739,8 @@ function ovUI(){ vchipPlace();
     tip=OV.pick==='a'?'Am besten eine Torflagge – die zwei Punkte weit auseinander.':'Die gestrichelten Kreise zeigen die Lage der Punkte in A.';
     acts=ovBtn('cancel','Abbrechen'); }
   else if(OV.nameQ&&OV.nameQ.length){ const it=OV.nameQ[0]; ttl='Namen'; say=`Im Bild auf <b>${it.n}</b> tippen`; acts=ovBtn('nameskip','Überspringen','','ghost')+ovBtn('namedone','Fertig',OVI.ok,'pri'); }
-  else if(OV.fix&&!done){ ttl='Von Hand'; say='B auf die Tore ziehen '+FI; tip='Danach «Übernehmen». '+HT;
-    acts=ovBtn('fixreset','Auf 0',OVI.reset,'ghost','Handkorrektur zurücksetzen')+ovBtn('fixno','Abbrechen','','ghost')+ovBtn('fixok','Übernehmen',OVI.ok,'pri'); }
+  else if(OV.fix&&!done){ ttl='Übereinanderlegen'; say='B auf A schieben – Tore übereinander '+FI; tip='Im Bild ziehen = verschieben. '+HT+' Das Overlay beginnt an diesem Bild. Ohne Schieben: «Automatisch» – die App legt B selbst über A.';
+    acts=ovBtn('edit','Zurück',OVI.back,'ghost','Gleichen Moment neu wählen')+ovMore([['pick','Referenzpunkte antippen',OVI.pin],['fixreset','Auf 0 setzen',OVI.reset]])+ovBtn('automk','Automatisch','','ghost','Ohne Schieben – B selbst über A legen und rechnen')+ovBtn('mkhand','Overlay erstellen',OVI.go,'pri','Mit dieser Lage rechnen – B folgt danach der Kamera'); }
   else if(OV.fix){ const near=OV.K.some(k=>Math.abs(k.e-ovE())<0.15); ttl='Korrigieren'; say='B auf die Tore ziehen '+FI; tip='Ab diesem Bild wird mit deiner Lage neu gerechnet – davor bleibt alles. '+HT;
     acts=(near?ovBtn('fixdel','Korrektur löschen',OVI.trash,'ghost'):'')+ovBtn('fixreset','Auf 0',OVI.reset,'ghost','Handkorrektur zurücksetzen')+ovBtn('fixno','Abbrechen','','ghost')+ovBtn('fixok','Übernehmen & ab hier neu rechnen',OVI.ok,'pri','Ab diesem Bild wird mit deiner Lage neu berechnet – davor bleibt alles'); }
   else if(st===1&&OV.found&&!AS.busy){ const F=OV.found, o=F.r.off; ttl='Gleicher Moment';
@@ -3712,9 +3750,9 @@ function ovUI(){ vchipPlace();
   else if(st===1){ ttl='Gleicher Moment'; say='A und B zum selben Tor ziehen – oder suchen lassen.';
     tip='A und B einzeln in ihrer Zeitleiste zum selben Tor ziehen, dann «Weiter» – das Overlay wird gleich erstellt. «Automatisch suchen» findet den gleichen Moment selbst, wenn beide vom gleichen Standort gefilmt sind.';
     acts=ovMore([['series','Serie gegen A rechnen …',OVI.go]])+ovBtn('auto',AS.busy?'Sucht …':'Automatisch suchen',OVI.go,'ghost','Gleichen Moment in A und B automatisch suchen (gleicher Kamerastandort)')+ovBtn('sync','Weiter',OVI.ok,'pri','A und B an diesem Moment verbinden und Overlay erstellen'); }
-  else if(st===2){ ttl='Bereit'; say='Jetzt «Overlay erstellen».'; tip='B wird über A gelegt und folgt der Kamera. Mit «Start» und «Ende» nur einen Teil der Strecke übereinanderlegen.'; chips=cut;
-    acts=ovBtn('edit','Zurück',OVI.back,'ghost','Gleichen Moment neu wählen')+cutBtns+ovMore([['pick','Referenzpunkte antippen',OVI.pin],['hand','Von Hand übereinanderlegen',OVI.fix]])+ovBtn('make','Overlay erstellen',OVI.go,'pri','B automatisch über A legen und der Kamera folgen'); }
-  else if(!done){ ttl='B liegt über A'; say='Gilt nur für dieses Bild.'; tip='«Overlay erstellen» legt B über die ganze Strecke und folgt auch der Kamera.'; chips=cut;
+  else if(st===2){ ttl='Übereinanderlegen'; say='B über A schieben oder gleich «Overlay erstellen».'; tip='B wird über A gelegt und folgt der Kamera. Mit «Start» und «Ende» nur einen Teil der Strecke übereinanderlegen.'; chips=cut;
+    acts=ovBtn('edit','Zurück',OVI.back,'ghost','Gleichen Moment neu wählen')+cutBtns+ovMore([['pick','Referenzpunkte antippen',OVI.pin]])+ovBtn('hand','B schieben',OVI.fix,'','B von Hand über A legen')+ovBtn('make','Overlay erstellen',OVI.go,'pri','B automatisch über A legen und der Kamera folgen'); }
+  else if(!done){ ttl='Übereinanderlegen'; say='Gilt nur für dieses Bild.'; tip='«Overlay erstellen» legt B über die ganze Strecke und folgt auch der Kamera.'; chips=cut;
     acts=ovBtn('edit','Zurück',OVI.back,'ghost','Gleichen Moment neu wählen')+cutBtns+ovMore([['pick','Referenzpunkte neu',OVI.pin],['hand','Von Hand nachschieben',OVI.fix]])+ovBtn('make','Overlay erstellen',OVI.go,'pri'); }
   else { const kc=OV.K.length?`<span class="ov-chip">${OVI.fix}${OV.K.length} Korrektur${OV.K.length>1?'en':''}<button data-ov="fixall" title="Alle Korrekturen entfernen">${OVI.x}</button></span>`:'';
     ttl=GH.coarse?'Vorschau':'Fertig'; dot=true; say=GH.bg?'Wird verfeinert · '+Math.round((GH.bg.p||0)*100)+' %':GH.coarse?'Grob gerechnet – «…» › «Neu berechnen» rechnet fein.':'B daneben? «Korrigieren».'; chips=cut+kc;
@@ -3760,8 +3798,15 @@ function ovStAt(){ // Zustand an der aktuellen Stelle aus der Sicherheit pro Bil
 const OVST={ok:['ausgerichtet','B liegt hier sicher über A'],unsure:['unsicher','Hier ist die Ausrichtung unsicher – kurz prüfen, bei Bedarf «Korrigieren»'],cut:['Kameraschnitt','Hier springt das Bild (Kameraschnitt) – Overlay nicht verlässlich'],out:['ausserhalb','Ausserhalb des berechneten Teils']};
 function ovStUpd(){ const el=$('#ovSt'); if(!el||el.hidden) return; const k=ovStAt()||'out'; if(el._k===k) return; el._k=k; el.className='ov-st '+k; $('span',el).textContent=OVST[k][0]; el.title=OVST[k][1]; }
 function ovThumb(v){ const c=document.createElement('canvas'); c.width=144; c.height=Math.max(2,Math.round(144*(v.videoHeight||9)/(v.videoWidth||16))); try{ c.getContext('2d').drawImage(v,0,0,c.width,c.height); return c.toDataURL('image/jpeg',0.78); }catch(e){ return ''; } }
-function ovMakeNow(){ // nach «Weiter»/«Passt» gleich losrechnen (in der Anleitung nicht – dort sind die Ergebnisse vorbereitet)
-  if(document.body.classList.contains('touring')){ ovUI(); return; } OV.follow=true; OV.fix=null; OV.K=[]; ovUI(); ghostCompute({coarse:true}); }
+function ovMakeNow(){ // nach «Weiter»/«Passt»: Schritt 2 – B von Hand über A schieben (in der Anleitung nicht – dort sind die Ergebnisse vorbereitet)
+  if(document.body.classList.contains('touring')){ ovUI(); return; } ovAlign(); }
+function ovAlign(){ if(!A.ready||!B.ready) return; A.pause(); B.pause(); G.playing=false; cmpPlayIcon();
+  if(!G.linked||OV.edit){ doSync(); OV.edit=false; } OV.follow=false; OV.pick=null;
+  if(!OV.T){ OV.T=[A.v.videoWidth/B.v.videoWidth,0,0,0,A.v.videoHeight/B.v.videoHeight,0]; } OV.handNew=false; OV.fix={dx:0,dy:0,s:1,r:0}; ovUI(); }
+function ovGo(hand){ // Schritt 2 → 3: mit der geschobenen Lage (oder ohne: automatisch) rechnen
+  if(hand&&OV.fix&&OV.T){ OV.T=affMul(ovDMat(OV.fix,A.v.videoWidth),OV.T);
+    const t=A.time(), fr=1/(A.fps||30); if(Math.abs(t-ovT0())>fr*0.6){ if(OV.cut.a!=null) OV.cut.a=t; else doSync(); } } // die Lage gilt für dieses Bild → hier beginnt das Overlay
+  if(!hand) OV.T=null; OV.fix=null; OV.handNew=false; OV.follow=true; OV.K=[]; ovUI(); ghostCompute({coarse:!document.body.classList.contains('touring')}); }
 function ovAutoRun(ex){ if(AS.busy||!A.ready||!B.ready) return; A.pause(); B.pause(); G.playing=false; cmpPlayIcon(); const prev=OV.found; OV.found=null; AS.busy=true; AS.abort=false; ovUI(); const ca=A.clip, cb=B.clip;
   (async()=>{ let r=null; try{ r=await autoSyncFind(ca,cb,f=>{ const b=$('[data-ov="auto"] span')||$('[data-ov="auto"]'); if(b) b.lastChild.textContent='Sucht … '+Math.round(f*100)+' %'; },ex); }catch(e){} AS.busy=false;
     if(A.clip!==ca||B.clip!==cb){ ovUI(); return; }
@@ -3789,7 +3834,7 @@ function ovPoint(e){
   if(OV.pick==='a'){ OV.pa.push(pt); if(OV.pa.length===2) OV.pick='b'; }
   else { OV.pb.push(pt); if(OV.pb.length===2){ const T=ovSim(OV.pa,OV.pb); OV.pick=null;
     if(!T){ toast('Punkte liegen zu nah beieinander oder passen nicht zusammen – bitte nochmals.'); }
-    else { OV.T=T; OV.follow=false; toast('B ist an A ausgerichtet. Bei Kameraschwenk: «Kamera folgen».',4000); } } }
+    else { OV.T=T; OV.follow=false; OV.fix={dx:0,dy:0,s:1,r:0}; toast('B liegt über A – bei Bedarf noch schieben, dann «Overlay erstellen».',3600); } } }
   ovUI(); }
 function ovAligned(){ return ovActive()&&!OV.pick&&(!!OV.T||ovFollowOK())&&A.ready&&B.ready; }
 function ovDrawB(x,ox,oy,w,h){ // B ausgerichtet über ein A-Bild der Grösse w×h zeichnen (Export, Standbild)
@@ -4072,8 +4117,8 @@ function renderOv(){
   document.addEventListener('keydown',e=>{ if(!OV.fix||/INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName)) return;
     const st1=(e.shiftKey?10:1)/((A.v.videoWidth)||1280), m={ArrowLeft:[-1,0],ArrowRight:[1,0],ArrowUp:[0,-1],ArrowDown:[0,1]}[e.key];
     if(m){ e.stopPropagation(); e.preventDefault(); OV.fix.dx+=m[0]*st1; OV.fix.dy+=m[1]*st1; A.dirty=true; }
-    else if(e.key==='Enter'){ e.stopPropagation(); e.preventDefault(); $('[data-ov="fixok"]').click(); }
-    else if(e.key==='Escape'){ e.stopPropagation(); e.preventDefault(); $('[data-ov="fixno"]').click(); } },true);
+    else if(e.key==='Enter'){ e.stopPropagation(); e.preventDefault(); const b=$('[data-ov="fixok"]')||$('[data-ov="mkhand"]'); if(b) b.click(); }
+    else if(e.key==='Escape'){ const b=$('[data-ov="fixno"]'); if(!b) return; e.stopPropagation(); e.preventDefault(); b.click(); } },true);
   ['pointerup','pointermove','click','dblclick'].forEach(t=>st.addEventListener(t,e=>{ block(e); },true));
   $('#ovPanel').addEventListener('click',e=>{ const b=e.target.closest('[data-ov]'); if(!b) return; const a=b.dataset.ov;
     if(a==='more'){ OV.more=!OV.more; OV.svm=false; ovUI(); return; } OV.more=false;
@@ -4087,19 +4132,18 @@ function renderOv(){
       if(dn){ GH.key=ghostKey(); } else { OV.T=null; OV.follow=false; } toast((a==='cuta'?'Start':'Ende')+' des Overlays: '+fmtS(t)+(dn&&!inside?' – ausserhalb der Berechnung, «Neu berechnen»':''),dn&&!inside?3200:1400); ovApplyCut(); }
     else if(a==='cutx'){ const dn=ovFollowOK(); OV.cut={a:null,b:null}; if(dn) GH.key=ghostKey(); else { OV.T=null; OV.follow=false; } ovApplyCut(); }
     else if(a==='sync'){ OV.found=null; OV.foundEx=null; doSync(); OV.edit=false; OV.T=null; OV.follow=false; OV.pick=null; return ovMakeNow(); }
-    else if(a==='edit'){ ovKill(); tagsReset(); OV.edit=true; OV.T=null; OV.follow=false; OV.pick=null; unlink(); toast('A und B einzeln zum selben Tor ziehen, dann «Weiter».',2600); }
+    else if(a==='edit'){ ovKill(); tagsReset(); OV.edit=true; OV.T=null; OV.fix=null; OV.follow=false; OV.pick=null; unlink(); toast('A und B einzeln zum selben Tor ziehen, dann «Weiter».',2600); }
     else if(a==='auto'){ OV.foundEx=null; return ovAutoRun([]); }
     else if(a==='autoagain'){ const F=OV.found; return ovAutoRun(F?F.ex:(OV.foundEx||[])); }
     else if(a==='autook'){ OV.found=null; OV.foundEx=null; doSync(); OV.edit=false; OV.T=null; OV.follow=false; OV.pick=null; return ovMakeNow(); }
     else if(a==='autohand'){ OV.found=null; OV.foundEx=null; toast('A und B einzeln zum selben Tor ziehen, dann «Weiter».',2600); }
-    else if(a==='pick') return ovStart();
+    else if(a==='pick'){ OV.fix=null; return ovStart(); }
+    else if(a==='mkhand') return ovGo(true);
+    else if(a==='automk') return ovGo(false);
     else if(a==='cancel') return ovStop();
     else if(a==='make'){ OV.follow=true; OV.fix=null; if(!(GH.state==='ready'&&ghostKey()===GH.key)){ OV.K=[]; ovUI(); ghostCompute({coarse:!document.body.classList.contains('touring')}); return; } if(GH.coarse&&!GH.bg){ ghostCompute({bg:true}); } ovUI(); return; }
     else if(a==='fix'){ A.pause(); B.pause(); G.playing=false; cmpPlayIcon(); const D=ovDAt(ovE()); OV.fix={...D}; OV.fix0={...D}; }
-    else if(a==='hand'){ if(!A.ready||!B.ready) return; A.pause(); B.pause(); G.playing=false; cmpPlayIcon();
-      if(!G.linked||OV.edit){ doSync(); OV.edit=false; } OV.follow=false; OV.pick=null;
-      if(!OV.T){ const k=A.v.videoWidth/B.v.videoWidth, kh=A.v.videoHeight/B.v.videoHeight; OV.T=[k,0,0,0,kh,0]; OV.handNew=true; } else OV.handNew=false;
-      OV.fix={dx:0,dy:0,s:1,r:0}; }
+    else if(a==='hand') return ovAlign();
     else if(a==='fixreset'){ if(OV.fix){ OV.fix.dx=0; OV.fix.dy=0; OV.fix.s=1; OV.fix.r=0; A.dirty=true; } return; }
     else if(a==='fixno'){ if(!ovFollowOK()&&OV.handNew){ OV.T=null; } OV.handNew=false; OV.fix=null; }
     else if(a==='addrun'){ return layerAdd(); }
@@ -4131,7 +4175,7 @@ function renderOv(){
     addEventListener('resize',()=>{ ovFit(); if(!$('#ovBub').hidden) ovBub(true); });
     if(window.ResizeObserver) new ResizeObserver(()=>ovFit()).observe($('#ovTxt')); }
   $('#ovSteps').addEventListener('click',e=>{ const li=e.target.closest('li'); if(!li||OV.pick||GH.state==='busy') return; const n=+li.dataset.st;
-    OV.fix=null; if(n===1&&G.linked){ OV.edit=true; OV.T=null; OV.follow=false; unlink(); } else if(n===2&&G.linked){ OV.edit=false; OV.pick=null; } ovUI(); });
+    OV.fix=null; if(n===1&&G.linked){ OV.edit=true; OV.T=null; OV.follow=false; unlink(); } else if(n===2&&G.linked){ OV.edit=false; return ovAlign(); } ovUI(); });
   document.addEventListener('keydown',e=>{ if(e.key==='Escape'&&(OV.more||OV.svm)){ OV.more=false; OV.svm=false; ovUI(); return; } if(e.key==='Escape'&&OV.pick){ e.stopPropagation(); ovStop(); } },true);
   document.addEventListener('pointerdown',e=>{ if((OV.more||OV.svm)&&!e.target.closest('.ov-morew')){ OV.more=false; OV.svm=false; ovUI(); } });
   addEventListener('resize',ovMarks);
@@ -4568,7 +4612,15 @@ function addTracks(list,opt={}){
   gpsSelects(); GPS.dirty=true; return made;
 }
 function trackOf(c){ return c&&c.gpsId?GPS.tracks.find(t=>t.id===c.gpsId):null; }
-function linkGps(c,tr,off){ if(!c) return; c.gpsId=tr?tr.id:null; if(tr){ c.gpsOff=off!=null?off:(c.gpsOff!=null?c.gpsOff:tr.tStart); if(!tr.ref){ const other=GPS.tracks.find(x=>x!==tr); if(other) tr.ref=other.id; } compareTracks(tr,GPS.tracks.find(x=>x.id===tr.ref)); } GPS.dirty=true; gpsSelects(); }
+/* Aufnahmestart aus dem Dateinamen (Field-App: …_JJMMTT_hhmmssSSS, Ortszeit) → GPS-Versatz.
+   Die Zeitzone beim Filmen ist unbekannt: zuerst die eigene, sonst die halbe Stunde, bei der Video und GPS-Spur sich überlappen. */
+function vidStart(c){ const m=c&&c.meta; if(!m||m.tod==null||!m.key) return null; const k=String(m.key), t=m.tod; return new Date(2000+ +k.slice(0,2),+k.slice(2,4)-1,+k.slice(4,6),Math.floor(t/3600),Math.floor(t/60)%60,Math.floor(t)%60,Math.round(t%1*1000)).getTime()/1000; } // Datum+Zeit zusammen, sonst falsch am Tag der Zeitumstellung
+function autoGpsOff(c,tr){ const v0=vidStart(c); if(v0==null||!tr||!(tr.t0abs>1e9)) return null; const dur=c.dur||60, span=tr.P[tr.P.length-1].t;
+  const base=v0-tr.t0abs, ov=o=>Math.min(o+dur,span)-Math.max(o,0);
+  const sh=[0]; for(let k=1;k<=28;k++) sh.push(k*1800,-k*1800);
+  for(const d of sh){ if(ov(base+d)>Math.min(dur,span)*0.3) return {off:base+d,shift:d}; } return null; }
+function linkGps(c,tr,off){ if(!c) return; c.gpsId=tr?tr.id:null; if(tr){ const au=off==null?autoGpsOff(c,tr):null; if(au&&(c.gpsOff==null||c.gpsAuto)){ c.gpsAuto=1; toast('GPS nach Aufnahmezeit gesetzt'+(au.shift?' (Zeitzone '+(au.shift>0?'+':'−')+Math.abs(au.shift/3600)+' h)':'')+' – mit einem Bild feinjustieren.',3500); }
+    c.gpsOff=off!=null?off:au&&c.gpsAuto?au.off:(c.gpsOff!=null?c.gpsOff:tr.tStart); if(!tr.ref){ const other=GPS.tracks.find(x=>x!==tr); if(other) tr.ref=other.id; } compareTracks(tr,GPS.tracks.find(x=>x.id===tr.ref)); } GPS.dirty=true; gpsSelects(); }
 function at(tr,tg){ const P=tr.P; if(tg<=P[0].t) return {...P[0],i:0,f:0}; if(tg>=P[P.length-1].t) return {...P[P.length-1],i:P.length-1,f:0};
   let lo=0,hi=P.length-1; while(hi-lo>1){ const m=(lo+hi)>>1; if(P[m].t<=tg) lo=m; else hi=m; } const a=P[lo],b=P[hi],f=(tg-a.t)/(b.t-a.t);
   const o={i:lo,f}; for(const k of ['t','x','y','v','a','s']) o[k]=a[k]+(b[k]-a[k])*f;
@@ -4671,7 +4723,7 @@ function gpsSelects(){
   else info.innerHTML=`${tr.P.length} Punkte · ${(1/((tr.P[tr.P.length-1].t-tr.P[0].t)/(tr.P.length-1))).toFixed(0)} Hz · Start bei GPS ${tr.tStart.toFixed(2)} s · Versatz <b>${fmtD(c.gpsOff-tr.tStart,3)} s</b>`;
   GPS.dirty=true;
 }
-function gpsSyncHere(){ const c=GD.clip, tr=trackOf(c); if(!tr||!GD.ready){ toast('Zuerst Video und GPS-Daten wählen.'); return; } c.gpsOff=tr.tStart-(GD.frame+0.5)/GD.fps; gpsSelects(); toast('GPS-Start = Bild F '+GD.frame); }
+function gpsSyncHere(){ const c=GD.clip, tr=trackOf(c); if(!tr||!GD.ready){ toast('Zuerst Video und GPS-Daten wählen.'); return; } c.gpsOff=tr.tStart-(GD.frame+0.5)/GD.fps; c.gpsAuto=0; gpsSelects(); toast('GPS-Start = Bild F '+GD.frame); }
 function gpsNudge(dt){ const c=GD.clip; if(!trackOf(c)) return; c.gpsOff+=dt; gpsSelects(); }
 
 const GD=new Deck('g',$('#gHost'),$('#gStrip'));
@@ -4715,6 +4767,7 @@ function capW(t){ return t.split('-').map(p=>p.charAt(0).toUpperCase()+p.slice(1
 function parseName(n){
   const tok=n.replace(/\.[^.]+$/,'').split(/[_\s–.,()]+/).filter(Boolean).flatMap(t=>/^[A-Za-zÄÖÜäöüéèàçñ]+(-[A-Za-zÄÖÜäöüéèàçñ]+)+$/.test(t)?[t]:t.split('-')).filter(Boolean), m={}, rest=[];
   for(const t of tok){ const u=t.toUpperCase();
+    if(!m.tod&&/^\d{9}$/.test(t)){ const h=+t.slice(0,2), mi=+t.slice(2,4), se=+t.slice(4,6); if(h<24&&mi<60&&se<60){ m.tod=h*3600+mi*60+se+(+t.slice(6))/1000; m.time=t.slice(0,2)+':'+t.slice(2,4)+':'+t.slice(4,6); continue; } }
     if(!m.date&&/^\d{6}$/.test(t)){ const mm=+t.slice(2,4), dd=+t.slice(4,6); if(mm>=1&&mm<=12&&dd>=1&&dd<=31){ m.date=t.slice(4,6)+'.'+t.slice(2,4)+'.20'+t.slice(0,2); m.key=+t; continue; } }
     if(!m.date&&/^20\d{6}$/.test(t)){ m.date=t.slice(6,8)+'.'+t.slice(4,6)+'.'+t.slice(0,4); m.key=+t.slice(2); continue; }
     if(!m.disc&&DISC[u]){ m.disc=u; continue; }
@@ -4729,7 +4782,7 @@ function parseName(n){
   m.ok=!!m.athlete&&!!(m.date||m.disc||m.run);
   return m;
 }
-function metaLine(c){ const m=c.meta; if(!m||!m.ok) return null; return [m.date,m.disc?(m.disc+(m.sex?' '+m.sex:'')):null,m.run,m.cam].filter(Boolean).join(' · '); }
+function metaLine(c){ const m=c.meta; if(!m||!m.ok) return null; return [m.date,m.time,m.disc?(m.disc+(m.sex?' '+m.sex:'')):null,m.run,m.cam].filter(Boolean).join(' · '); }
 function metaTitle(c){ const m=c.meta; return m&&m.ok?m.athlete+(m.place?' · '+m.place:''):dispName(c); }
 
 /* ---------- Videos merken (Datei-Zugriff des Browsers) ---------- */
@@ -5664,7 +5717,7 @@ if(false&&!LS.get('hint1',0)){ setTimeout(()=>{ toast(matchMedia('(pointer:coars
 
 /* Update-Hinweis: prüft version.json auf GitHub Pages; «Aktualisieren» lädt die Seite ohne Cache neu */
 (()=>{
-  const BUILD='20261030103233'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
+  const BUILD='20261030114314'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
   // nach einem Update die ?v=… aus der Adresse entfernen
   try{ const u=new URL(location.href); if(u.searchParams.has('v')){ u.searchParams.delete('v'); history.replaceState(null,'',u.pathname+(u.search||'')+u.hash); } }catch(e){}
   const el=$('#upd'); let latest=null, snoozed=null, busy=false;
@@ -5755,7 +5808,7 @@ async function preOvLoad(){ if(PRE_OV) return PRE_OV; try{ const r=await fetch('
        run:async()=>{ setLayout('overlay'); A.setClip(demo(BO)); B.setClip(demo(KR)); unlink(); syncSelects(); renderLib(); await waitReady(); A.seekTime(0.5); B.seekTime(1.5); OV.cut={a:null,b:null}; OV.T=null; OV.follow=false; OV.edit=false; OV.pick=null; ovUI(); await sleep(500); await scrub(A,PRE_OV.cut.a,1400); await scrub(B,PRE_OV.cut.a+PRE_OV.off,1400); }},
       {t:'Weiter',p:'«Weiter» verbindet A und B an diesem Moment. «Automatisch suchen» findet die Stelle auch selbst, wenn beide vom gleichen Standort gefilmt sind.',f:'[data-ov="sync"]',run:async()=>{ await clickEl('[data-ov="sync"]'); }},
       {t:'Start und Ende (optional)',p:'Mit «Start» und «Ende» wählst du den Teil der Strecke, der übereinandergelegt wird. Ohne Angabe gilt das ganze Video.',f:'.ov-cutg',run:async()=>{ await clickEl('[data-ov="cuta"]'); }},
-      {t:'2 · Overlay erstellen',p:'«Overlay erstellen» – die App legt B selbst über A und führt es von Start bis Ende mit, auch wenn die Kamera schwenkt und zoomt. Das dauert etwa 2–3 Minuten (hier vorbereitet).',f:'[data-ov="make"]',
+      {t:'2 · Übereinanderlegen',p:'Im echten Ablauf schiebst du jetzt B auf A, bis die Tore übereinanderliegen («B schieben»), oder lässt es die App machen. «Overlay erstellen» – die App legt B über A und führt es von Start bis Ende mit, auch wenn die Kamera schwenkt und zoomt. Das dauert etwa 2–3 Minuten (hier vorbereitet).',f:'[data-ov="make"]',
        run:async()=>{ OV.cut.b=PRE_OV.cut.b; ovUI(); preloadOv(); await clickEl('[data-ov="make"]'); }},
       {t:'3 · Fertig',p:'Abspielen oder scrubben: Boisset und Kriechmayr fahren im selben Bild. Liegt B irgendwo daneben: anhalten und «Korrigieren». «Speichern» exportiert das Overlay als Video.',f:stage,
        run:async()=>{ A.seekTime(26); A.onUserSeek(A); await sleep(700); cmpToggle(); await sleep(4200); if(!A.v.paused) cmpToggle(); }}
