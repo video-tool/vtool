@@ -301,6 +301,12 @@ svg{display:block}
 .sh .gopt span{display:flex;flex-direction:column;gap:2px}
 .sh .gopt small{font-size:12.5px;font-weight:500;color:var(--muted)}
 .pill.gps{background:rgba(31,157,107,.85)!important;color:#fff}
+
+/* schmale Handys: Kacheln mit Luft, Schrift passt sich an */
+.big .bt{min-width:0;flex:1 1 auto}
+.big .bt b{font-size:clamp(13px,3.8vw,16.5px)!important;white-space:nowrap}
+.big .bt small{overflow-wrap:anywhere}
+@media (max-width:380px){ .big{padding:10px!important;gap:8px!important} .big .bi{width:32px!important;height:32px!important;border-radius:10px!important} .big .bt small{font-size:10.5px!important} }
 </style>
 </head>
 <body>

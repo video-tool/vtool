@@ -2316,6 +2316,19 @@ body.pfs .gps-sel,body.pfs .gps-foot,body.pfs #gpsChart,body.pfs #viewGps .ctl-l
   .player .tl,#viewGps .tl{margin-top:4px!important}
   canvas.strip{height:40px!important}
 }
+
+/* Handy quer im Vollbild: alles ohne Scrollen sichtbar */
+@media (max-height:500px) and (orientation:landscape){
+  body.pfs #sHost .stage,body.pfs #gHost .stage{max-height:calc(100dvh - 112px)!important}
+  body.pfs #cStages .stage,body.pfs #viewCmp .stages .stage{max-height:calc(100dvh - 118px)!important}
+  body.pfs canvas.strip{height:34px!important}
+  body.pfs .player .tl,body.pfs #viewGps .tl{margin-top:3px!important}
+  body.pfs .player .dock,body.pfs #viewGps .dock{margin-top:3px!important;padding:2px 6px!important;flex-wrap:nowrap!important}
+  body.pfs .player .dock .ctl:not(.play),body.pfs #viewGps .dock .ctl:not(.play){height:32px!important;min-height:0!important}
+  body.pfs .player .dock .ctl.play,body.pfs #viewGps .ctl.play{width:38px!important;height:38px!important;min-width:38px!important}
+  body.pfs .player>.pbar,body.pfs .player>.c-head,body.pfs #ovTxt,body.pfs #ovSteps{display:none!important}  body.pfs #viewGps .dock.dock3{display:flex!important;flex-wrap:nowrap!important;justify-content:center!important;gap:6px!important}
+  body.pfs #viewGps .dock.dock3>.dz{flex:none!important;margin:0!important}
+}
 </style>
 </head>
 <body class="m-single">
@@ -2865,11 +2878,15 @@ class ThumbGen{
       if(this.dead) return;
       try{
         const w=Math.round(TH_H*(c.w&&c.h?c.w/c.h:16/9)); const cv=document.createElement('canvas'); cv.width=w; cv.height=TH_H;
-        cv.getContext('2d').drawImage(v,0,0,w,TH_H); this.store(job,cv);
-        if(job===this.posterF&&!c.poster){ try{ const p=document.createElement('canvas'); p.width=400; p.height=225; p.getContext('2d').drawImage(v,0,0,400,225); c.poster=p.toDataURL('image/jpeg',0.8); renderLib(); }catch(e){} }
+        const cx2=cv.getContext('2d'); cx2.drawImage(v,0,0,w,TH_H);
+        /* iPhone liefert direkt nach dem Springen manchmal ein schwarzes Bild → später nochmals holen */
+        let dark=false; try{ const d=cx2.getImageData(0,0,w,TH_H).data; let m=0,n=0; for(let i=0;i<d.length;i+=40){ m+=d[i]+d[i+1]+d[i+2]; n++; } dark=m/n/3<6; }catch(e){}
+        this.retry=this.retry||{}; if(dark&&(this.retry[job]=(this.retry[job]||0)+1)<=3){ this.bg.push(job); }
+        else { this.store(job,cv);
+        if(job===this.posterF&&!c.poster){ try{ const p=document.createElement('canvas'); p.width=400; p.height=225; p.getContext('2d').drawImage(v,0,0,400,225); c.poster=p.toDataURL('image/jpeg',0.8); renderLib(); }catch(e){} } }
       }catch(e){}
       this.busy=false; decks.forEach(d=>{ if(d.clip===c) d.dirty=true; });
-      setTimeout(()=>this.pump(),0);
+      setTimeout(()=>this.pump(),this.retry&&this.retry[job]&&!this.map.has(job)?350:0);
     };
     v.addEventListener('seeked',done); setTimeout(done,3000);
     if(Math.abs(v.currentTime-t)<1e-6) v.currentTime=t+1e-4; else v.currentTime=t;
@@ -3273,9 +3290,9 @@ class Deck{
       ctx.fillStyle='#ff5a4e'; for(const m of c.markers) ctx.fillRect(ux(m)-0.5,1,1.5,3); ctx.fillStyle='#DA291C'; ctx.fillRect(ux(this.fpos)-1,0,2,5); } }
     const px=X(this.fpos); ctx.fillStyle='#DA291C'; ctx.fillRect(Math.round(px)-1,0,2,TH);
     ctx.beginPath(); ctx.moveTo(px-6,0); ctx.lineTo(px+6,0); ctx.lineTo(px,7); ctx.closePath(); ctx.fill();
-    const lab=(this.frame/this.fps).toFixed(2)+' s'; ctx.font='800 10.5px ui-monospace,Menlo,Consolas,monospace';
-    const lw=ctx.measureText(lab).width+12, lx=clamp(px,lw/2+2,W-lw/2-2); ctx.beginPath(); if(ctx.roundRect) ctx.roundRect(lx-lw/2,TH+3,lw,16,4); else ctx.rect(lx-lw/2,TH+3,lw,16); ctx.fill();
-    ctx.fillStyle='#fff'; ctx.fillText(lab,lx,TH+15);
+    const sm=innerWidth<=600||innerHeight<=500, lab=(this.frame/this.fps).toFixed(2)+(sm?'':' s'); ctx.font=sm?'800 9px ui-monospace,Menlo,Consolas,monospace':'800 10.5px ui-monospace,Menlo,Consolas,monospace';
+    const lh=sm?13:16, lw=ctx.measureText(lab).width+(sm?8:12), lx=clamp(px,lw/2+2,W-lw/2-2); ctx.beginPath(); if(ctx.roundRect) ctx.roundRect(lx-lw/2,TH+3,lw,lh,sm?3:4); else ctx.rect(lx-lw/2,TH+3,lw,lh); ctx.fill();
+    ctx.fillStyle='#fff'; ctx.fillText(lab,lx,TH+(sm?13:15));
   }
   drawOv(){
     const [ctx,W,H]=this.sizeCanvas(this.ov); if(!W) return;
@@ -3481,6 +3498,7 @@ $$('.dock [data-act], .cmp-tools [data-act]').forEach(b=>b.addEventListener('cli
 
 /* Modus */
 function setMode(m){
+  if(window.mMenuClose) mMenuClose(); const gm=$('#gvMenu'); if(gm) gm.remove();
   mode=m; document.body.classList.toggle('m-cmp',m==='cmp'); document.body.classList.toggle('m-single',m==='single');
   tabsUI();
   $('#viewSingle').hidden=m!=='single'; $('#viewCmp').hidden=m!=='cmp'; $('#viewGps').hidden=m!=='gps';
@@ -4063,7 +4081,7 @@ function ovUI(){ vchipPlace();
     tip=OV.pick==='a'?'Am besten eine Torflagge – die zwei Punkte weit auseinander.':'Die gestrichelten Kreise zeigen die Lage der Punkte in A.';
     acts=ovBtn('cancel','Abbrechen'); }
   else if(OV.nameQ&&OV.nameQ.length){ const it=OV.nameQ[0]; ttl='Namen'; say=`Im Bild auf <b>${it.n}</b> tippen`; acts=ovBtn('nameskip','Überspringen','','ghost')+ovBtn('namedone','Fertig',OVI.ok,'pri'); }
-  else if(OV.fix&&!done){ ttl='Übereinanderlegen'; say='B auf A schieben – Tore übereinander '+FI; tip='Im Bild ziehen = verschieben. '+HT+' Das Overlay beginnt an diesem Bild. Ohne Schieben: «Automatisch» – die App legt B selbst über A.';
+  else if(OV.fix&&!done){ ttl='Übereinanderlegen'; say='B auf A schieben '+FI; tip='Im Bild ziehen = verschieben. '+HT+' Das Overlay beginnt an diesem Bild. Ohne Schieben: «Automatisch» – die App legt B selbst über A.';
     acts=ovBtn('edit','Zurück',OVI.back,'ghost','Gleichen Moment neu wählen')+ovMore([['pick','Referenzpunkte antippen',OVI.pin],['fixreset','Auf 0 setzen',OVI.reset]])+ovBtn('automk','Automatisch','','ghost','Ohne Schieben – B selbst über A legen und rechnen')+ovBtn('mkhand','Overlay erstellen',OVI.go,'pri','Mit dieser Lage rechnen – B folgt danach der Kamera'); }
   else if(OV.fix){ const near=OV.K.some(k=>Math.abs(k.e-ovE())<0.15); ttl='Korrigieren'; say='B auf die Tore ziehen '+FI; tip='Ab diesem Bild wird mit deiner Lage neu gerechnet – davor bleibt alles. '+HT;
     acts=(near?ovBtn('fixdel','Korrektur löschen',OVI.trash,'ghost'):'')+ovBtn('fixreset','Auf 0',OVI.reset,'ghost','Handkorrektur zurücksetzen')+ovBtn('fixno','Abbrechen','','ghost')+ovBtn('fixok','Übernehmen & ab hier neu rechnen',OVI.ok,'pri','Ab diesem Bild wird mit deiner Lage neu berechnet – davor bleibt alles'); }
@@ -5015,7 +5033,8 @@ function drawGpsOverlay(T){ /* T={x,R}: direkt in den Export zeichnen (volle Auf
     for(let v=0;v<=vhiK;v+=small?20:10){ const an=AK(v), maj=v%20===0, r1=ar-aw*0.5-3*f, r2=r1-(maj?9:5)*f;
       x.strokeStyle=maj?'rgba(255,255,255,.6)':'rgba(255,255,255,.3)'; x.lineWidth=(maj?2:1.2)*f; x.lineCap='butt'; x.beginPath(); x.moveTo(TX+Math.cos(an)*r1,TY+Math.sin(an)*r1); x.lineTo(TX+Math.cos(an)*r2,TY+Math.sin(an)*r2); x.stroke();
       if(maj&&TD>=130){ const rl=r2-9*f; x.font=`700 ${10*f}px ${ff}`; x.fillStyle='rgba(255,255,255,.55)'; x.textAlign='center'; x.textBaseline='middle'; x.fillText(String(v),TX+Math.cos(an)*rl,TY+Math.sin(an)*rl); } }
-    if(have){ const ae=AV(cur.v); let col='#DA291C';
+    const vS=have&&KMH(cur.v)>=3?cur.v:0; /* unter 3 km/h = Stand (GPS-Rauschen) */
+    if(have&&vS>0){ const ae=AV(vS); let col='#DA291C';
       if(x.createConicGradient){ col=x.createConicGradient(A0-0.05,TX,TY); col.addColorStop(0,'#2bd4c6'); col.addColorStop(0.45,'#ffd23f'); col.addColorStop(0.75,'#DA291C'); col.addColorStop(1,'#DA291C'); }
       x.lineCap='round'; x.strokeStyle=col; x.lineWidth=aw; x.shadowColor='rgba(218,41,28,.55)'; x.shadowBlur=10*f; x.beginPath(); x.arc(TX,TY,ar,A0,Math.max(A0+0.001,ae)); x.stroke(); x.shadowBlur=0;
       /* Spitze dieses Laufs und Referenz-Tempo im selben Moment */
@@ -5025,9 +5044,9 @@ function drawGpsOverlay(T){ /* T={x,R}: direkt in den Export zeichnen (volle Auf
       x.fillStyle='#fff'; x.beginPath(); x.arc(TX+Math.cos(ae)*ar,TY+Math.sin(ae)*ar,aw*0.32,0,7); x.fill(); }
     /* Mitte: Tempo gross, darunter Einheit und Beschleunigung, unten Differenz zur Referenz */
     x.textAlign='center'; x.textBaseline='middle';
-    x.font=`800 ${(small?44:36)*f}px ${ff}`; x.fillStyle='#fff'; x.fillText(have?(small?KMH(cur.v).toFixed(0):KMH(cur.v).toFixed(1)):'—',TX,TY-2*f);
+    x.font=`800 ${(small?44:36)*f}px ${ff}`; x.fillStyle='#fff'; x.fillText(have?(vS?(small?KMH(vS).toFixed(0):KMH(vS).toFixed(1)):'0'):'—',TX,TY-2*f);
     x.font=`700 ${(small?17:11)*f}px ${ff}`; x.fillStyle='rgba(255,255,255,.6)'; x.fillText('km/h',TX,TY+(small?30:22)*f);
-    if(have&&!small){ x.font=`700 ${12*f}px ${ff}`; x.fillStyle=cur.a>=0?'#5ee38a':'#ff7b72'; x.fillText((cur.a>=0?'+':'−')+Math.abs(cur.a).toFixed(2)+' g',TX,TY+38*f); }
+    if(have&&!small&&vS>0){ x.font=`700 ${12*f}px ${ff}`; x.fillStyle=cur.a>=0?'#5ee38a':'#ff7b72'; x.fillText((cur.a>=0?'+':'−')+Math.abs(cur.a).toFixed(2)+' g',TX,TY+38*f); }
   }
   // 2) Fahrlinie («Schlange») rechts
   if(GPS.view.snake){
@@ -5073,11 +5092,19 @@ function drawGpsChart(N){
   if(cv.width!==Math.round(W*d)||cv.height!==Math.round(H*d)){ cv.width=Math.round(W*d); cv.height=Math.round(H*d); } const x=cv.getContext('2d'); x.setTransform(d,0,0,d,0,0); x.clearRect(0,0,W,H);
   if(!N) return; const {tr,cur}=N, ref=GPS.tracks.find(t=>t.id===tr.ref), P=tr.P, s0=P[tr.iS].s, s1=P[tr.iE].s;
   const st=getComputedStyle(cv), ink=st.getPropertyValue('--muted').trim(), line=st.getPropertyValue('--line').trim(), ff=getComputedStyle(document.body).fontFamily;
-  const pl=64, pr=10, h1=H-16, X=s=>pl+(W-pl-pr)*clamp((s-s0)/Math.max(1,s1-s0),0,1);
-  const vlo=Math.min(tr.vmin,ref?ref.vmin:1e9), vhi=Math.max(tr.vmax,ref?ref.vmax:0), Y=v=>6+(h1-12)*(1-(v-vlo)/Math.max(0.1,vhi-vlo));
-  x.font='600 10px '+ff; x.fillStyle=ink; x.textAlign='right'; x.textBaseline='middle'; x.fillText(KMH(vhi).toFixed(0)+' km/h',pl-6,Y(vhi)); x.fillText(KMH(vlo).toFixed(0),pl-6,Y(vlo));
+  const pl=W<500?56:64, pr=10, h1=H-16, X=s=>pl+(W-pl-pr)*clamp((s-s0)/Math.max(1,s1-s0),0,1);
+  /* runde Achse in km/h (Schritt 20, bei kleinem Bereich 10) */
+  const kLo=KMH(Math.min(tr.vmin,ref?ref.vmin:1e9)), kHi=KMH(Math.max(tr.vmax,ref?ref.vmax:0)), stp=kHi-kLo>70?40:kHi-kLo>30?20:10, gLo=Math.max(0,Math.floor(kLo/stp)*stp), gHi=Math.ceil(kHi/stp)*stp;
+  const vlo=gLo/3.6, vhi=Math.max(gLo+stp,gHi)/3.6, Y=v=>6+(h1-12)*(1-(v-vlo)/Math.max(0.1,vhi-vlo));
+  x.font='600 10px '+ff; x.textAlign='right'; x.textBaseline='middle'; x.lineWidth=1;
+  for(let k=gLo;k<=gHi+0.01;k+=stp){ const y=Y(k/3.6); x.strokeStyle=line; x.globalAlpha=.6; x.beginPath(); x.moveTo(pl,y); x.lineTo(W-pr,y); x.stroke(); x.globalAlpha=1; x.fillStyle=ink; x.fillText(k+(k===gHi?' km/h':''),pl-6,y); }
+  /* Start und Ziel */
+  x.textAlign='left'; [[s0,'Start'],[s1,'Ziel']].forEach(([sv,l],i)=>{ const X0=X(sv); x.strokeStyle=ink; x.globalAlpha=.45; x.setLineDash([2,3]); x.beginPath(); x.moveTo(X0,4); x.lineTo(X0,h1); x.stroke(); x.setLineDash([]); x.globalAlpha=1; x.fillStyle=ink; x.textAlign=i?'right':'left'; x.fillText(l,X0+(i?-4:4),h1-6); });
+  x.textAlign='right';
   if(ref){ x.strokeStyle=ink; x.globalAlpha=.6; x.setLineDash([4,4]); x.lineWidth=1.5; x.beginPath(); for(let i=ref.iS;i<=ref.iE;i++){ const p=ref.P[i]; const X2=X(p.s-ref.P[ref.iS].s+s0); i===ref.iS?x.moveTo(X2,Y(p.v)):x.lineTo(X2,Y(p.v)); } x.stroke(); x.setLineDash([]); x.globalAlpha=1; }
   x.strokeStyle=ref?'#DA291C':'#3b8bff'; x.lineWidth=2.2; x.beginPath(); for(let i=tr.iS;i<=tr.iE;i++){ const p=P[i]; i===tr.iS?x.moveTo(X(p.s),Y(p.v)):x.lineTo(X(p.s),Y(p.v)); } x.stroke();
+  { let im=tr.iS; for(let i=tr.iS;i<=tr.iE;i++) if(P[i].v>P[im].v) im=i; const mx=X(P[im].s), my=Y(P[im].v); x.fillStyle=ref?'#DA291C':'#3b8bff'; x.beginPath(); x.arc(mx,my,3.5,0,7); x.fill(); x.strokeStyle=st.getPropertyValue('--film').trim()||'#111'; x.lineWidth=1.5; x.stroke();
+    x.font='700 10px '+ff; x.fillStyle=st.getPropertyValue('--ink').trim(); x.textAlign=mx>W-70?'right':'center'; x.fillText('max '+KMH(P[im].v).toFixed(1),mx>W-70?mx-6:mx,Math.max(9,my-9)); x.textAlign='right'; }
   /* Δ-Zeit-Linie entfernt: Vorsprung/Rückstand steht an der Spur im Video */
   x.textAlign='center'; x.fillStyle=ink; const L=s1-s0, nT=Math.max(3,Math.floor(W/70)), step=[5,10,20,50,100,200,250,500,1000].find(v=>L/v<=nT)||1000; for(let m=0;m<=L;m+=step) x.fillText(m+' m',X(s0+m),H-5);
   x.fillStyle=st.getPropertyValue('--ink').trim(); x.fillRect(X(cur.s)-1,2,2,H-14);
@@ -5388,7 +5415,7 @@ async function startExport(){
     const muxer=new Mp4Muxer.Muxer({target:new Mp4Muxer.ArrayBufferTarget(),video:{codec:'avc',width:cv.width,height:cv.height},fastStart:'in-memory',firstTimestampBehavior:'offset'});
     const enc=new VideoEncoder({output:(ch,meta)=>{ try{ muxer.addVideoChunk(ch,meta); }catch(e){ EXP.wcErr=e; } },error:e=>{ EXP.wcErr=e; }}); enc.configure(wcCfg);
     const name=base(D.clip.name)+(mode==='cmp'?(ovl?'_overlay_':'_vs_')+base(B.clip.name):'')+'_F'+r.a+'-'+r.b+(EXP.rate<1?'_'+String(EXP.rate).replace('.',',')+'x':'');
-    Object.assign(EXP,{live:true,wc:true,muxer,enc,wcErr:null,ovl,x,cv,W,H,bar,ws,gap,opt,ds,D,tEnd:(r.b+0.5)/D.fps,t0:r.a/D.fps,prevRate,prevLoop,name,mime:'video/mp4',started:true,cancel:false,nf:0,lastTs:-1,rew:0,okN:0,expN:r.b-r.a+1,srcN:0,drop:0});
+    Object.assign(EXP,{pt:null,hang:false,live:true,wc:true,muxer,enc,wcErr:null,ovl,x,cv,W,H,bar,ws,gap,opt,ds,D,tEnd:(r.b+0.5)/D.fps,t0:r.a/D.fps,prevRate,prevLoop,name,mime:'video/mp4',started:true,cancel:false,nf:0,lastTs:-1,rew:0,okN:0,expN:r.b-r.a+1,srcN:0,drop:0});
     $('#expGo').textContent='Abbrechen'; $('#expProg').hidden=false;
     const dup=Math.max(1,Math.round(25/(D.fps*EXP.rate))), fdt=1/(D.fps*EXP.rate); // mind. ~25 Bilder/s im Ergebnis
     let lastF=r.a-1, spd=1; // ab dem ersten Bild: fehlt der Anfang, wird zurückgesprungen
@@ -5419,7 +5446,7 @@ async function startExport(){
   D.seekFrame(r.a); if(mode==='cmp') B.seekFrame(r.bStart);
   await new Promise(res=>setTimeout(res,450));
   const name=base(D.clip.name)+(mode==='cmp'?(ovl?'_overlay_':'_vs_')+base(B.clip.name):'')+'_F'+r.a+'-'+r.b+(EXP.rate<1?'_'+String(EXP.rate).replace('.',',')+'x':'');
-  Object.assign(EXP,{live:true,wc:false,ovl,x,cv,W,H,bar,ws,gap,opt,ds,D,tEnd:(r.b+0.5)/D.fps,t0:r.a/D.fps,rec,chunks,prevRate,prevLoop,name,mime,started:false,cancel:false});
+  Object.assign(EXP,{pt:null,hang:false,wcErr:null,live:true,wc:false,ovl,x,cv,W,H,bar,ws,gap,opt,ds,D,tEnd:(r.b+0.5)/D.fps,t0:r.a/D.fps,rec,chunks,prevRate,prevLoop,name,mime,started:false,cancel:false});
   $('#expGo').textContent='Abbrechen'; $('#expProg').hidden=false;
   rec.start(250);
   if(mode==='cmp'){ if(G.linked){ G.playing=true; A.play(); } else { A.play(); B.play(); } } else D.play();
@@ -5427,6 +5454,9 @@ async function startExport(){
 }
 // Am Ende kommt kein neues Bild mehr – darum separat prüfen, ob das Video fertig ist (sonst bleibt der Export bei 100 % stehen)
 function expWatch(){ const E=EXP; clearInterval(E.wd); E.lastCb=null; E.wd=setInterval(()=>{ if(!EXP.live){ clearInterval(E.wd); return; } const D=E.D, v=D&&D.v; if(!v) return;
+    if(E.pt==null||Math.abs(v.currentTime-E.pt)>0.01){ E.pt=v.currentTime; E.ptT=performance.now(); }
+    else if(performance.now()-E.ptT>12000&&!E.cancel){ E.cancel=true; E.hang=true; finishExport(); toast('Der Export kommt auf diesem Gerät nicht weiter. Bitte am Computer speichern – Standbild und Aufnahme gehen auch hier.',6500); return; }
+    if(E.wcErr&&!E.cancel){ E.cancel=true; finishExport(); toast('Der Export ist auf diesem Gerät fehlgeschlagen ('+String(E.wcErr.message||E.wcErr).slice(0,60)+'). Bitte am Computer speichern.',6500); return; }
     const stuck=E.lastCb!=null&&performance.now()-E.lastCb>4000, end=v.ended||(mode==='cmp'&&B.v.ended)||(E.wc?v.currentTime>=E.tEnd+1.5:v.currentTime>=E.tEnd-0.6/D.fps); // Schnell-Export schliesst selbst nach dem letzten Bild ab
     if(end||(stuck&&v.currentTime>=E.tEnd-1)) finishExport(); else if(stuck&&v.paused&&!E.cancel){ E.lastCb=performance.now(); try{ v.play(); }catch(e){} } },300); } // nur am Schluss beenden – sonst bei Stillstand weiterlaufen lassen
 function exportFrame(){
@@ -5462,7 +5492,7 @@ function finishExport(){
   const E=EXP; if(!E.live) return; E.live=false; E.started=false; clearInterval(E.wd);
   expDecks().forEach(d=>d.pause()); G.playing=false; S.useLoop=E.prevLoop; if(E.prevLov){ A.loopOv=E.prevLov[0]; B.loopOv=E.prevLov[1]; E.prevLov=null; } setRate(E.prevRate);
   if(E.wc){ (async()=>{ $('#expGo').textContent='Speichern'; $('#expProg').hidden=true;
-      if(E.cancel){ try{ E.enc.close(); }catch(e){} toast('Export abgebrochen.'); return; }
+      if(E.cancel){ try{ E.enc.close(); }catch(e){} if(!E.hang&&!E.wcErr) toast('Export abgebrochen.'); return; }
       try{ await E.enc.flush(); E.enc.close(); E.muxer.finalize(); if(E.wcErr) throw E.wcErr;
         const bl=new Blob([E.muxer.target.buffer],{type:'video/mp4'}); $('#expModal').classList.remove('on'); saveOut(bl,E.name+'.mp4',(expDecks()[0]||{}).clip,'Clip'); expCheck(E); }
       catch(err){ console.error(err); toast('Export fehlgeschlagen – bitte nochmals versuchen.',4000); } })(); return; }
@@ -6161,11 +6191,14 @@ async function fieldSync(){ if(!window.indexedDB) return; let db;
   if(n||ch){ renderLib(); syncSelects(); }
   if(n) toast(n===1?'1 Lauf aus «Filmen» in der Liste':n+' Läufe aus «Filmen» in der Liste',3000); }
 setTimeout(fieldSync,600);
-{ const mq=matchMedia('(max-height:500px) and (orientation:landscape) and (pointer:coarse)'); const go=()=>{ if(!mq.matches) return; const v=mode==='single'?$('#viewSingle'):mode==='gps'?$('#viewGps'):$('#viewCmp'); setTimeout(()=>{ if(v) window.scrollTo({top:v.getBoundingClientRect().top+scrollY,behavior:'instant'}); decks.forEach(d=>{ d.dirty=true; d.annDirty=true; }); },250); }; try{ mq.addEventListener('change',go); }catch(e){ mq.addListener(go); } } /* Handy quer drehen = Player bildschirmfüllend */ document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='visible') fieldSync(); });
+{ const mq=matchMedia('(max-height:500px) and (orientation:landscape) and (pointer:coarse)'); let auto=false;
+  const go=()=>{ if(mq.matches){ if(!document.body.classList.contains('pfs')&&!$('.modal.on')){ auto=true; pfsSet(true); } } else if(auto){ auto=false; if(document.body.classList.contains('pfs')) pfsSet(false); } };
+  try{ mq.addEventListener('change',go); }catch(e){ mq.addListener(go); } setTimeout(go,300); } /* Handy quer drehen = Player bildschirmfüllend */ document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='visible') fieldSync(); });
 
 /* ---- Handy kompakt: «…» oben, Videoliste als Blatt, Speichern/«…» unten im Vergleich, Zoom der Zeitleiste mit zwei Fingern ---- */
 (()=>{ const MQ=matchMedia('(max-width:600px)'), I=(d)=>'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">'+d+'</svg>';
   let menu=null; const close=()=>{ if(menu){ menu.remove(); menu=null; } };
+  window.mMenuClose=close; addEventListener('scroll',close,{passive:true});
   window.mMenu=(btn,items)=>{ if(menu){ close(); return; } menu=document.createElement('div'); menu.className='m-menu';
     items.filter(Boolean).forEach(([l,ic,fn])=>{ const b=document.createElement('button'); b.innerHTML=ic+'<span>'+l+'</span>'; b.onclick=e=>{ e.stopPropagation(); close(); fn(); }; menu.appendChild(b); });
     document.body.appendChild(menu); const r=btn.getBoundingClientRect(), h=menu.offsetHeight; menu.style.top=(r.bottom+h+8<innerHeight?r.bottom+6:Math.max(8,r.top-h-6))+'px'; };
@@ -6244,7 +6277,7 @@ if(false&&!LS.get('hint1',0)){ setTimeout(()=>{ toast(matchMedia('(pointer:coars
 
 /* Update-Hinweis: prüft version.json auf GitHub Pages; «Aktualisieren» lädt die Seite ohne Cache neu */
 (()=>{
-  const BUILD='20261030175007'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
+  const BUILD='20261030181926'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
   // nach einem Update die ?v=… aus der Adresse entfernen
   try{ const u=new URL(location.href); if(u.searchParams.has('v')){ u.searchParams.delete('v'); history.replaceState(null,'',u.pathname+(u.search||'')+u.hash); } }catch(e){}
   const el=$('#upd'); let latest=null, snoozed=null, busy=false;
