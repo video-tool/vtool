@@ -2216,7 +2216,8 @@ button.lg-it:hover{background:rgba(12,15,20,.8);border-color:rgba(255,255,255,.3
   #viewGps .ctl.play,#viewGps.inv-trk .ctl.play{width:42px!important;height:42px!important;min-width:42px!important}
   #viewGps .dz-r .ctl,#viewGps.inv-trk .dz-r .ctl{width:34px!important;min-width:34px!important;height:34px!important}
   #viewGps .dz-l .ctl{height:34px!important}
-  #viewGps .dz-c .rate-btn svg{display:none!important}
+  .dock .rate-btn svg{display:none!important} /* Handy: nur «1×», in allen Ansichten */
+  .dock .rate-btn{gap:0!important;justify-content:center}
   #viewGps .dz-c .rate-btn{min-width:34px!important;width:auto!important;padding:0 7px!important;justify-content:center;font-size:12.5px!important}
   #viewGps .dz-c .rate-btn span{margin:0!important}
   #viewGps .dz-c .gv-btn{width:40px!important;min-width:40px!important;padding:0!important;margin-left:0!important;justify-content:center;gap:0!important}
@@ -6137,7 +6138,7 @@ if(false&&!LS.get('hint1',0)){ setTimeout(()=>{ toast(matchMedia('(pointer:coars
 
 /* Update-Hinweis: prüft version.json auf GitHub Pages; «Aktualisieren» lädt die Seite ohne Cache neu */
 (()=>{
-  const BUILD='20261030170925'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
+  const BUILD='20261030171333'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
   // nach einem Update die ?v=… aus der Adresse entfernen
   try{ const u=new URL(location.href); if(u.searchParams.has('v')){ u.searchParams.delete('v'); history.replaceState(null,'',u.pathname+(u.search||'')+u.hash); } }catch(e){}
   const el=$('#upd'); let latest=null, snoozed=null, busy=false;
