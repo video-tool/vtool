@@ -76,6 +76,10 @@ svg{display:block}
 .clip .tx{min-width:0}
 .clip .tx b{display:block;font-size:15.5px;font-weight:650;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .clip .tx span{display:block;font:500 12px var(--mono);color:var(--muted);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.clip .tx span i{font-style:normal;color:var(--ink2)}
+.grp{display:flex;align-items:baseline;gap:8px;margin:12px 4px 6px;font-size:12px;font-weight:700;color:var(--ink2)}
+.grp small{font:500 11.5px var(--mono);color:var(--muted)}
+.grp+.clip,.day+.clip{margin-top:0}
 .clip .more{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;color:var(--muted)}
 .clip .ck{position:absolute;left:14px;top:14px;width:26px;height:26px;border-radius:50%;border:2px solid #fff;background:rgba(0,0,0,.35);display:none;align-items:center;justify-content:center;font:800 13px var(--font)}
 .sel .clip .ck{display:flex}
@@ -255,6 +259,8 @@ svg{display:block}
 .sess-tx{flex:1;min-width:0}
 .sess-tx small{display:block;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
 .sess-tx b{display:block;font-size:15.5px;font-weight:700;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sess-tx em{display:block;font-style:normal;font-size:13px;font-weight:550;color:var(--ink2);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sess-tx em:empty{display:none}
 .sess-go{font-size:13px;font-weight:650;color:var(--ink2);padding:7px 11px;border-radius:10px;background:var(--card2)}
 .sh label.fl{display:block;font-size:12px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);margin:14px 4px 7px}
 .sh input[type=date]{-webkit-appearance:none;appearance:none}
@@ -284,7 +290,7 @@ svg{display:block}
     <button class="big imp" id="goImp"><span class="bi"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="3"/><circle cx="9" cy="10" r="2"/><path d="M21 16l-5-5-9 9"/></svg></span><div class="bt"><b>Hinzufügen</b><small>Aus Fotos oder Dateien</small></div></button>
   </div>
   <input type="file" id="fileIn" accept="video/*" multiple hidden>
-  <button class="sess" id="sess"><span class="sess-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M8 3v4M16 3v4M3.5 10h17"/></svg></span><span class="sess-tx"><small>Trainingstag</small><b id="sessT"></b></span><span class="sess-go">Ändern</span></button>
+  <button class="sess" id="sess"><span class="sess-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M8 3v4M16 3v4M3.5 10h17"/></svg></span><span class="sess-tx"><small>Trainingstag</small><b id="sessT"></b><em id="sessS"></em></span><span class="sess-go">Ändern</span></button>
   <div class="sec"><h2>Läufe</h2><span id="cnt"></span></div>
   <div class="list" id="list"></div>
   <div class="selbar"><p id="selTxt">Zwei Läufe antippen</p><button class="ghost" id="selX">Abbrechen</button><button class="pri" id="selGo" disabled>Vergleichen</button></div>
@@ -437,14 +443,18 @@ async function addClip(blob,o){ const m=await meta(blob); if(!o.fps){ try{ o.fps
 const SEL={on:false,a:null,b:null};
 function dayLabel(ts){ const d=new Date(ts), n=new Date(); const k=x=>x.toDateString(); if(k(d)===k(n)) return 'Heute'; const y=new Date(n); y.setDate(n.getDate()-1); if(k(d)===k(y)) return 'Gestern'; return d.toLocaleDateString('de-CH',{weekday:'long',day:'numeric',month:'long'}); }
 const hhmm=ts=>new Date(ts).toLocaleTimeString('de-CH',{hour:'2-digit',minute:'2-digit'});
+const camName=k=>(CAMS.find(x=>x[0]===k)||[])[1]||'', kindName=k=>(KINDS.find(x=>x[0]===k)||[])[1]||'';
+function sessKey(c){ const S=c.sess; return S?[S.place||'',S.disc||''].join('|'):''; }
+function clipSub(c){ const S=c.sess||{}, a=[]; if(c.run) a.push('<i>'+(S.kind==='l'?'Rennen':'Lauf')+' '+esc(c.run)+'</i>'); if(S.cam) a.push(esc(camName(S.cam))); if(!a.length) a.push(hhmm(c.created)); return a.join(' · '); }
 function clipRow(c,opts={}){ const r=document.createElement('div'); r.className='clip'+(SEL.a===c.id?' pa':SEL.b===c.id?' pb':''); r.dataset.id=c.id;
-  r.innerHTML=`<span class="th" style="${c.thumb?`background-image:url(${c.thumb})`:''}"><em>${fmtDur(c.dur)}</em>${c.saved?'<i class="sv" title="In Fotos gesichert">'+IC.ok+'</i>':''}</span><span class="tx"><b>${esc(c.ath?[c.ath,c.run?'Lauf '+c.run:''].filter(Boolean).join(' · '):c.name)}</b><span>${c.ath&&c.sess?esc([c.sess.place,c.sess.disc].filter(Boolean).join(' ')+' · '):''}${hhmm(c.created)}${c.fps?' · '+Math.round(c.fps)+' fps':''}</span></span>`+(opts.noMore?'':`<button class="more" aria-label="Optionen">${IC.more}</button>`)+`<span class="ck">${SEL.a===c.id?'A':SEL.b===c.id?'B':''}</span>`;
+  r.innerHTML=`<span class="th" style="${c.thumb?`background-image:url(${c.thumb})`:''}"><em>${fmtDur(c.dur)}</em>${c.saved?'<i class="sv" title="In Fotos gesichert">'+IC.ok+'</i>':''}</span><span class="tx"><b>${esc(c.ath||c.name)}</b><span>${clipSub(c)}</span></span>`+(opts.noMore?'':`<button class="more" aria-label="Optionen">${IC.more}</button>`)+`<span class="ck">${SEL.a===c.id?'A':SEL.b===c.id?'B':''}</span>`;
   return r; }
 function render(){ const el=$('#list'); el.innerHTML=''; $('#cnt').textContent=CLIPS.length?CLIPS.length+(CLIPS.length===1?' Lauf':' Läufe'):'';
   if(!CLIPS.length){ el.innerHTML=`<div class="empty">${IC.film}Noch keine Läufe.<br>«Filmen» drücken oder ein Video aus Fotos hinzufügen.</div>`; return; }
   const warn=document.createElement('div'); warn.className='warn'; warn.id='stWarn'; warn.hidden=true; el.appendChild(warn);
-  let day=null; CLIPS.forEach(c=>{ const d=dayLabel(c.created); if(d!==day){ day=d; const k=new Date(c.created).toDateString(), n=CLIPS.filter(x=>new Date(x.created).toDateString()===k), ok=n.every(x=>x.saved);
-      const h=document.createElement('div'); h.className='day'; h.innerHTML=`<span>${esc(d)}</span><button class="dayb" data-day="${esc(k)}">${ok?IC.ok+'Gesichert':IC.save+'Alle sichern'}</button><button class="dayb dm" data-daym="${esc(k)}" aria-label="Optionen für diesen Tag">${IC.more}</button>`; el.appendChild(h); } el.appendChild(clipRow(c)); });
+  let day=null, grp=null; CLIPS.forEach(c=>{ const d=dayLabel(c.created); if(d!==day){ day=d; const k=new Date(c.created).toDateString(), n=CLIPS.filter(x=>new Date(x.created).toDateString()===k), ok=n.every(x=>x.saved);
+      const h=document.createElement('div'); h.className='day'; h.innerHTML=`<span>${esc(d)}</span><button class="dayb" data-day="${esc(k)}">${ok?IC.ok+'Gesichert':IC.save+'Alle sichern'}</button><button class="dayb dm" data-daym="${esc(k)}" aria-label="Optionen für diesen Tag">${IC.more}</button>`; el.appendChild(h); grp=null; }
+    const g=sessKey(c); if(g&&g!==grp){ const n=CLIPS.filter(x=>sessKey(x)===g&&new Date(x.created).toDateString()===new Date(c.created).toDateString()).length, gh=document.createElement('div'); gh.className='grp'; gh.innerHTML=esc([c.sess.place,c.sess.disc].filter(Boolean).join(' · '))+`<small>${n} ${n===1?'Lauf':'Läufe'}</small>`; el.appendChild(gh); } grp=g; el.appendChild(clipRow(c)); });
   storageUI();
   $('#home').classList.toggle('sel',SEL.on); $('#selGo').disabled=!(SEL.a&&SEL.b); $('#selTxt').textContent=!SEL.a?'Lauf A antippen':!SEL.b?'Lauf B antippen':'Bereit zum Vergleichen'; }
 $('#list').addEventListener('click',e=>{ const db=e.target.closest('[data-day]'), dm=e.target.closest('[data-daym]');
@@ -699,7 +709,7 @@ const CAMS=[['vgh','Gegenhang'],['vpi','Piste'],['vs','Start'],['vz','Ziel']], K
 const isoDay=d=>{ const x=new Date(d); return x.getFullYear()+'-'+String(x.getMonth()+1).padStart(2,'0')+'-'+String(x.getDate()).padStart(2,'0'); };
 let SESS=LS.get('sess',{date:isoDay(Date.now()),disc:'',place:'',cam:'vgh',kind:'tr'}); if(!SESS.cam) SESS.cam='vgh'; if(!SESS.kind) SESS.kind='tr'; if(SESS.date<isoDay(Date.now())){ SESS.date=isoDay(Date.now()); LS.set('sess',SESS); } // neuer Tag: Datum von selbst auf heute
 const sessDay=d=>new Date(d+'T12:00').toLocaleDateString('de-CH',{weekday:'short',day:'numeric',month:'numeric'});
-function sessUI(){ const el=$('#sess'); el.classList.toggle('need',!SESS.disc); $('#sessT').textContent=SESS.disc?[sessDay(SESS.date),SESS.disc,SESS.place,(CAMS.find(c=>c[0]===SESS.cam)||[])[1]].filter(Boolean).join(' · '):'Disziplin wählen'; $('.sess-go',el).textContent=SESS.disc?'Ändern':'Einrichten'; }
+function sessUI(){ const el=$('#sess'); el.classList.toggle('need',!SESS.disc); $('#sessT').textContent=SESS.disc?[sessDay(SESS.date),SESS.place].filter(Boolean).join(' · '):'Disziplin wählen'; $('#sessS').textContent=SESS.disc?[SESS.disc,camName(SESS.cam),kindName(SESS.kind)].filter(Boolean).join(' · '):''; $('.sess-go',el).textContent=SESS.disc?'Ändern':'Einrichten'; }
 function sessSheet(after){ const places=LS.get('places',[]);
   sheet(`<h3>Trainingstag</h3><label class="fl">Datum</label><input type="date" id="sdDate" value="${SESS.date}">
     <label class="fl">Disziplin</label><div class="chips disc" id="sdDisc">${DISC.map(([k,l])=>`<button data-o="disc" data-k="${k}" class="${SESS.disc===k?'on':''}" title="${l}">${k} <span style="opacity:.6;font-weight:500">${l}</span></button>`).join('')}</div>
