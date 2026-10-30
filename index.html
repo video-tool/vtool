@@ -2096,7 +2096,7 @@ button.lg-it:hover{background:rgba(12,15,20,.8);border-color:rgba(255,255,255,.3
   #viewCmp .dock.dock3>.dz{flex:none;flex-wrap:nowrap!important}
 }
 /* ---- Handy kompakt (30.10.): Kopfzeile «…», Titel in einer Zeile, Videoliste als Blatt, Werkzeuge unten ---- */
-.hdr-more,.m-more,.lib-sh,.hdr-inv{display:none}
+.hdr-more,.m-more,.lib-sh,.hdr-inv,.m-draw{display:none}
 .hdr-inv{position:relative}
 .hdr-inv i{position:absolute;right:5px;top:5px;width:8px;height:8px;border-radius:50%;background:#9aa3ae;box-shadow:0 0 0 2px var(--bg)}
 .hdr-inv.on i{background:#1f9d6b}
@@ -2138,7 +2138,13 @@ button.lg-it:hover{background:rgba(12,15,20,.8);border-color:rgba(255,255,255,.3
   #viewCmp.overlay:not(.ov-fin) .dock .save-w{display:none!important}
   #viewCmp.overlay:not(.ov-fin) #ovActs .ov-cutg{display:none!important}
   #viewGps .dev-note{display:none!important}
-  .stage .osd-r .pill.rt{display:none!important} /* Tempo steht schon in der Knopfleiste */
+  .m-draw{display:inline-flex!important}
+  .m-draw.on{background:#fff!important;color:#0f1216!important}
+  /* Stift nicht im Bild: im «Ein Video» über die Knopfleiste, in GPS nicht nötig */
+  #sHost .rail.collapsed,#gHost .rail.collapsed{display:none!important}
+  #sHost .rail:not(.collapsed) .rail-tg{display:inline-flex!important}
+  /* nur die wichtigsten Werkzeuge: Linie, Pfeil, Winkel, Kreis, Farbe, Rückgängig */
+  .rail [data-tool="none"],.rail [data-tool="free"],.rail [data-rail="fx"],.rail [data-rail="grid"],.rail [data-rail="clear"]{display:none!important}
   html,body{touch-action:manipulation} /* kein Zoomen der Seite per Doppeltipp */
   html,body{overflow-x:hidden;overscroll-behavior-x:none;max-width:100vw} /* Seite lässt sich nicht seitlich verschieben (Hintergrund-Leuchten ragt sonst hinaus) */
   .aurora{display:none!important}
@@ -2157,7 +2163,7 @@ button.lg-it:hover{background:rgba(12,15,20,.8);border-color:rgba(255,255,255,.3
   #viewGps.no-trk .gps-foot,#viewGps.no-trk canvas.gchart{display:none!important}
   #viewGps #gpsInfo,#viewGps .gv-lab{display:none!important}
   #viewGps .gps-foot{margin-top:6px}
-  #viewGps .gps-viewopts{display:grid!important;grid-template-columns:repeat(6,1fr);gap:4px;width:100%}
+  #viewGps .gps-viewopts{display:grid!important;grid-template-columns:repeat(3,1fr);gap:4px;width:100%}
   #viewGps .gps-viewopts>.chips,#viewGps .gps-viewopts>.seg{display:contents!important}
   #viewGps .gps-viewopts::-webkit-scrollbar{display:none}
   #viewGps .gps-viewopts .chip,#viewGps .gps-viewopts .seg button{height:32px!important;padding:0 4px!important;font-size:12px!important;white-space:nowrap;min-width:0;border-radius:9px!important;justify-content:center;display:flex;align-items:center}
@@ -2190,6 +2196,7 @@ button.lg-it:hover{background:rgba(12,15,20,.8);border-color:rgba(255,255,255,.3
 .inv-list button:hover,.inv-list button:active{background:var(--field)}
 .inv-list small{color:var(--muted);font-weight:500}
 #gpsInv.busy{opacity:.6;pointer-events:none}
+@media (pointer:coarse),(max-width:760px){ .stage .osd-r .pill.rt{display:none!important} } /* Tempo steht schon in der Knopfleiste, auch quer */
 </style>
 </head>
 <body class="m-single">
@@ -2275,7 +2282,7 @@ button.lg-it:hover{background:rgba(12,15,20,.8);border-color:rgba(255,255,255,.3
         <button class="ctl" data-act="step" data-n="1" title="1 Bild vor (→ / x)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/><path d="M18 6v12" opacity=".55"/></svg></button>
         <button class="ctl" data-act="step" data-n="10" title="10 Bilder vor (Shift+→ / s)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.5 17l5-5-5-5"/><path d="M6 17l5-5-5-5"/></svg></button>
       <button class="ctl rate-btn" data-act="rate" title="Tempo: Klick wechselt 1× → ½× → ¼× → 0.1× (↑ / ↓ auch 1.5× und 2×)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 16a8 8 0 1 1 15 0"/><path d="M12 12.5l3.5-4"/><circle cx="12" cy="13" r="1.3" fill="currentColor"/></svg><span>1×</span></button></div></div>
-      <div class="dz dz-r"><button class="ctl" data-act="marker" title="Marker setzen / entfernen (m) – z. B. Torwechsel, Kantenwechsel"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><path d="M12 3l7 9-7 9-7-9z"/></svg></button><div class="ctl-sep"></div><div class="grp">
+      <div class="dz dz-r"><button class="ctl m-draw" data-act="draw" title="Zeichnen und Messen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></svg></button><button class="ctl" data-act="marker" title="Marker setzen / entfernen (m) – z. B. Torwechsel, Kantenwechsel"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><path d="M12 3l7 9-7 9-7-9z"/></svg></button><div class="ctl-sep"></div><div class="grp">
         <label class="ctl-lab fps-edit" title="Bilder pro Sekunde – wird beim Laden gemessen">fps <input class="num" id="sFps" type="number" min="1" max="1000" step="0.01"></label>
         <button class="ctl" data-act="sound" title="Ton ein / aus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5L6 9H2v6h4l5 4z"/><path class="snd-on" d="M15.5 8.5a5 5 0 0 1 0 7" hidden/><path class="snd-off" d="M16 9l5 6M21 9l-5 6"/></svg></button>
         <button class="ctl" data-act="shot" title="Standbild mit Zeichnungen als PNG speichern (p)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.6"/></svg></button>
@@ -2321,7 +2328,7 @@ button.lg-it:hover{background:rgba(12,15,20,.8);border-color:rgba(255,255,255,.3
         <button class="ctl" data-act="fs" title="Vollbild (f)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3M21 8V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3M16 21h3a2 2 0 0 0 2-2v-3"/></svg></button>
       </div></div>
     </div>
-    <div class="gps-foot"><span id="gpsInfo"></span><span class="gps-viewopts"><span class="gv-lab">Anzeige</span><div class="chips gpsv" id="gpsView"><button class="chip on" data-v="band" title="Tempo-Kurve im Bild">Kurve</button><button class="chip on" data-v="snake" title="Fahrlinie im Bild">Linie</button><button class="chip on" data-v="time" title="Laufzeit im Bild">Zeit</button></div><div class="seg" id="gpsColor" title="Färbung der Fahrlinie"><button data-c="speed" class="on">Tempo</button><button data-c="accel">Beschl.</button><button data-c="delta">Δ Ref.</button></div></span><span class="gleg"><i style="background:#DA291C"></i>Lauf <i class="dash"></i>Referenz · Δ Zeit: <b style="color:var(--good)">grün</b> = gewinnt, <b style="color:var(--red)">rot</b> = verliert</span></div>
+    <div class="gps-foot"><span id="gpsInfo"></span><span class="gps-viewopts"><span class="gv-lab">Anzeige</span><div class="chips gpsv" id="gpsView"><button class="chip on" data-v="band" title="Tacho im Bild">Tacho</button><button class="chip on" data-v="snake" title="Fahrlinie im Bild">Linie</button><button class="chip on" data-v="time" title="Laufzeit im Bild">Zeit</button></div></span><span class="gleg"><i style="background:#3b8bff"></i>nur GPS · mit Referenz: <b style="color:var(--good)">grün</b> = gewinnt, <b style="color:var(--red)">rot</b> = verliert <i class="dash"></i>Referenz</span></div>
     <canvas class="gchart" id="gpsChart" title="Tempo (rot = dieser Lauf, gestrichelt = Referenz) und Zeitdifferenz über die Distanz · klicken = hinspringen"></canvas>
   </section>
 
@@ -3323,6 +3330,7 @@ function act(name,btn){
   const single=mode!=='cmp', D=mode==='gps'?GD:S;
   if(name==='play'){ single?D.toggle():(cmpToggle(),A.flash()); }
   else if(name==='step'){ const n=+btn.dataset.n; single?D.step(n):cmpStep(n); }
+  else if(name==='draw'){ const tg=$('#sHost .rail-tg'); if(tg) tg.click(); setTimeout(()=>{ const on=!!$('#sHost .rail:not(.collapsed)'); $$('.m-draw').forEach(b=>b.classList.toggle('on',on)); },30); } // Handy: Stift in der Knopfleiste statt im Bild
   else if(name==='marker'){ S.toggleMarker(); renderMarks(); }
   else if(name==='in') setIn(); else if(name==='out') setOut(); else if(name==='loop') toggleLoop();
   else if(name==='sound'){ S.v.muted=!S.v.muted; const sv=btn.querySelector('svg'); $('.snd-on',sv).hidden=S.v.muted; $('.snd-off',sv).hidden=!S.v.muted; btn.classList.toggle('on',!S.v.muted); }
@@ -4830,7 +4838,7 @@ function autoGpsOff(c,tr){ const v0=vidStart(c); if(v0==null||!tr||!(tr.t0abs>1e
   const sh=[0]; for(let k=1;k<=28;k++) sh.push(k*1800,-k*1800);
   for(const d of sh){ if(ov(base+d)>Math.min(dur,span)*0.3) return {off:base+d,shift:d}; } return null; }
 function linkGps(c,tr,off){ if(!c) return; c.gpsId=tr?tr.id:null; if(tr){ const au=off==null?autoGpsOff(c,tr):null; if(au&&(c.gpsOff==null||c.gpsAuto)){ c.gpsAuto=1; toast('GPS nach Aufnahmezeit gesetzt'+(au.shift?' (Zeitzone '+(au.shift>0?'+':'−')+Math.abs(au.shift/3600)+' h)':'')+' – mit einem Bild feinjustieren.',3500); }
-    c.gpsOff=off!=null?off:au&&c.gpsAuto?au.off:(c.gpsOff!=null?c.gpsOff:tr.tStart); if(!tr.ref){ const other=GPS.tracks.find(x=>x!==tr); if(other) tr.ref=other.id; } compareTracks(tr,GPS.tracks.find(x=>x.id===tr.ref)); } GPS.dirty=true; gpsSelects(); }
+    c.gpsOff=off!=null?off:au&&c.gpsAuto?au.off:(c.gpsOff!=null?c.gpsOff:tr.tStart); compareTracks(tr,GPS.tracks.find(x=>x.id===tr.ref)); } GPS.dirty=true; gpsSelects(); }
 function at(tr,tg){ const P=tr.P; if(tg<=P[0].t) return {...P[0],i:0,f:0}; if(tg>=P[P.length-1].t) return {...P[P.length-1],i:P.length-1,f:0};
   let lo=0,hi=P.length-1; while(hi-lo>1){ const m=(lo+hi)>>1; if(P[m].t<=tg) lo=m; else hi=m; } const a=P[lo],b=P[hi],f=(tg-a.t)/(b.t-a.t);
   const o={i:lo,f}; for(const k of ['t','x','y','v','a','s']) o[k]=a[k]+(b[k]-a[k])*f;
@@ -4854,55 +4862,62 @@ function drawGpsOverlay(){
   const txt=(s,X,Y,size,col,al='left',w=800)=>{ x.font=`${w} ${size*k}px ${ff}`; x.textAlign=al; x.textBaseline='middle'; x.lineWidth=3*k; x.strokeStyle='rgba(0,0,0,.55)'; x.strokeText(s,X,Y); x.fillStyle=col; x.fillText(s,X,Y); };
   const rr=(X,Y,w,h,r)=>{ x.beginPath(); if(x.roundRect) x.roundRect(X,Y,w,h,r); else x.rect(X,Y,w,h); };
   const inRun=N.tg>=tr.tStart-0.3&&N.tg<=tr.tEnd+0.3;
-  // 1) Band: Tempo mitlaufend über die Zeit – aktuelle Geschwindigkeit immer sichtbar (auch vor dem Start und nach dem Ziel)
+  /* 1) Tacho unten rechts: Bogen füllt sich mit dem Tempo, Spitze und Referenz als Marken */
+  const TD=clamp(Math.min(R.w*0.26,R.h*0.42),112,230), TX=R.x+R.w-TD/2-12*k, TY=R.y+R.h-TD/2-10*k;
   if(GPS.view.band){
-    const top=(R.x<200&&!small)?44:10, bx=R.x+10*k, by=R.y+top, bw=R.w-20*k, bh=clamp(R.h*0.2,58,120);
-    x.fillStyle='rgba(10,14,20,.58)'; rr(bx,by,bw,bh,10*k); x.fill();
-    const WIN=small?7:10, t0=N.tg-WIN*0.65, t1=N.tg+WIN*0.35, have=N.tg>=P[0].t-0.3&&N.tg<=P[P.length-1].t+0.3;
-    const vhi=Math.max(tr.vmax,ref?ref.vmax:0,1)*1.06, vlo=0, gx=bx+12*k, gw=bw-24*k, gy=by+32*k, gh=bh-40*k;
-    const X=t=>gx+gw*(t-t0)/(t1-t0), Y=v=>gy+gh-gh*clamp((v-vlo)/(vhi-vlo),0,1);
-    txt(KMH(vhi).toFixed(0)+' km/h',bx+bw-10*k,by+13*k,10,'rgba(255,255,255,.55)','right',700);
-    x.save(); x.beginPath(); x.rect(gx,by,gw,bh); x.clip();
-    // Start- und Ziellinie als feine senkrechte Striche
-    [[tr.tStart,'Start'],[tr.tEnd,'Ziel']].forEach(([t,l])=>{ if(t>t0&&t<t1){ x.strokeStyle='rgba(255,255,255,.28)'; x.lineWidth=1*k; x.beginPath(); x.moveTo(X(t),gy); x.lineTo(X(t),gy+gh); x.stroke(); txt(l,X(t)+3*k,gy+gh-6*k,9,'rgba(255,255,255,.55)','left',700); } });
-    if(ref){ x.strokeStyle='rgba(255,255,255,.4)'; x.lineWidth=1.6*k; x.setLineDash([4*k,4*k]); x.beginPath(); let st=false; const sh=tr.tStart-ref.tStart; // Referenz ab gleichem Start
-      for(const p of ref.P){ const t=p.t+sh; if(t<t0-0.3||t>t1+0.3) continue; if(!st){ x.moveTo(X(t),Y(p.v)); st=true; } else x.lineTo(X(t),Y(p.v)); } x.stroke(); x.setLineDash([]); }
-    x.lineWidth=3.2*k; x.lineCap='round';
-    for(let i2=1;i2<P.length;i2++){ const a=P[i2-1], b=P[i2]; if(b.t<t0-0.2||a.t>t1+0.2) continue; x.strokeStyle=b.t<=N.tg?accCol(b.a):'rgba(255,255,255,.22)'; x.beginPath(); x.moveTo(X(a.t),Y(a.v)); x.lineTo(X(b.t),Y(b.v)); x.stroke(); }
-    const nx=X(N.tg); x.strokeStyle='rgba(255,255,255,.55)'; x.lineWidth=1.2*k; x.beginPath(); x.moveTo(nx,gy-2*k); x.lineTo(nx,gy+gh); x.stroke();
-    if(have){ const cy=Y(cur.v); x.fillStyle='#fff'; x.beginPath(); x.arc(nx,cy,5.5*k,0,7); x.fill(); x.strokeStyle='rgba(0,0,0,.45)'; x.lineWidth=1.5*k; x.stroke(); }
-    x.restore();
-    // grosse Anzeige oben links: aktuelles Tempo und Beschleunigung
-    if(have){ txt(KMH(cur.v).toFixed(1)+' km/h',bx+12*k,by+16*k,19,'#fff','left',800); x.font=`800 ${19*k}px ${ff}`; const w1=x.measureText(KMH(cur.v).toFixed(1)+' km/h').width;
-      txt((cur.a>=0?'+':'−')+Math.abs(cur.a).toFixed(2)+' g',bx+12*k+w1+10*k,by+17*k,11,cur.a>=0?'#5ee38a':'#ff7b72','left',700); }
-    else txt('Tempo',bx+12*k,by+15*k,11,'rgba(255,255,255,.85)','left',700);
+    const have=N.tg>=P[0].t-0.3&&N.tg<=P[P.length-1].t+0.3, rad=TD/2, f=TD/200;
+    const vhiK=Math.max(40,Math.ceil(KMH(Math.max(tr.vmax,ref?ref.vmax:0))*1.04/10)*10), A0=Math.PI*0.75, A1=Math.PI*2.25, AV=v=>A0+(A1-A0)*clamp(KMH(v)/vhiK,0,1), AK=kmh=>A0+(A1-A0)*clamp(kmh/vhiK,0,1);
+    const g=x.createRadialGradient(TX,TY-rad*0.3,rad*0.1,TX,TY,rad); g.addColorStop(0,'rgba(28,34,44,.82)'); g.addColorStop(1,'rgba(8,11,16,.86)');
+    x.fillStyle=g; x.beginPath(); x.arc(TX,TY,rad,0,7); x.fill(); x.strokeStyle='rgba(255,255,255,.14)'; x.lineWidth=1.2; x.stroke();
+    const ar=rad*0.8, aw=11*f;
+    x.lineCap='round'; x.strokeStyle='rgba(255,255,255,.1)'; x.lineWidth=aw; x.beginPath(); x.arc(TX,TY,ar,A0,A1); x.stroke();
+    /* Skala: kurze Striche alle 10 km/h, Zahlen alle 20 */
+    for(let v=0;v<=vhiK;v+=10){ const an=AK(v), maj=v%20===0, r1=ar-aw*0.5-3*f, r2=r1-(maj?9:5)*f;
+      x.strokeStyle=maj?'rgba(255,255,255,.6)':'rgba(255,255,255,.3)'; x.lineWidth=(maj?2:1.2)*f; x.lineCap='butt'; x.beginPath(); x.moveTo(TX+Math.cos(an)*r1,TY+Math.sin(an)*r1); x.lineTo(TX+Math.cos(an)*r2,TY+Math.sin(an)*r2); x.stroke();
+      if(maj&&TD>=130){ const rl=r2-9*f; x.font=`700 ${10*f}px ${ff}`; x.fillStyle='rgba(255,255,255,.55)'; x.textAlign='center'; x.textBaseline='middle'; x.fillText(String(v),TX+Math.cos(an)*rl,TY+Math.sin(an)*rl); } }
+    if(have){ const ae=AV(cur.v); let col='#DA291C';
+      if(x.createConicGradient){ col=x.createConicGradient(A0-0.05,TX,TY); col.addColorStop(0,'#2bd4c6'); col.addColorStop(0.45,'#ffd23f'); col.addColorStop(0.75,'#DA291C'); col.addColorStop(1,'#DA291C'); }
+      x.lineCap='round'; x.strokeStyle=col; x.lineWidth=aw; x.shadowColor='rgba(218,41,28,.55)'; x.shadowBlur=10*f; x.beginPath(); x.arc(TX,TY,ar,A0,Math.max(A0+0.001,ae)); x.stroke(); x.shadowBlur=0;
+      /* Spitze dieses Laufs und Referenz-Tempo im selben Moment */
+      const mark=(an,c2,w2)=>{ x.strokeStyle=c2; x.lineWidth=w2*f; x.lineCap='round'; x.beginPath(); x.moveTo(TX+Math.cos(an)*(ar+aw*0.5+2*f),TY+Math.sin(an)*(ar+aw*0.5+2*f)); x.lineTo(TX+Math.cos(an)*(ar-aw*0.5-2*f),TY+Math.sin(an)*(ar-aw*0.5-2*f)); x.stroke(); };
+      mark(AV(tr.vmax),'rgba(255,255,255,.75)',2);
+      if(ref&&cur.dv!=null&&inRun) mark(AV(cur.v-cur.dv),'#8ab4ff',3);
+      x.fillStyle='#fff'; x.beginPath(); x.arc(TX+Math.cos(ae)*ar,TY+Math.sin(ae)*ar,aw*0.32,0,7); x.fill(); }
+    /* Mitte: Tempo gross, darunter Einheit und Beschleunigung, unten Differenz zur Referenz */
+    x.textAlign='center'; x.textBaseline='middle';
+    x.font=`800 ${36*f}px ${ff}`; x.fillStyle='#fff'; x.fillText(have?KMH(cur.v).toFixed(1):'—',TX,TY-2*f);
+    x.font=`700 ${11*f}px ${ff}`; x.fillStyle='rgba(255,255,255,.6)'; x.fillText('km/h',TX,TY+22*f);
+    if(have){ x.font=`700 ${12*f}px ${ff}`; x.fillStyle=cur.a>=0?'#5ee38a':'#ff7b72'; x.fillText((cur.a>=0?'+':'−')+Math.abs(cur.a).toFixed(2)+' g',TX,TY+38*f); }
   }
   // 2) Fahrlinie («Schlange») rechts
   if(GPS.view.snake){
-    const sw=clamp(R.w*0.11,48,150), sh=R.h*(GPS.view.band?(small?0.5:0.6):0.78), sx=R.x+R.w-sw-16*k, sy=R.y+R.h-sh-(GPS.view.time?70:16)*k;
+    const sw=clamp(R.w*0.11,48,150), sy=R.y+14*k, sh=GPS.view.band?Math.max(40,TY-TD/2-16*k-sy):R.h*0.78-(GPS.view.time?54:0)*k, sx=GPS.view.band?TX-sw/2:R.x+R.w-sw-16*k;
     const a=P[iS], b=P[iE], ang=Math.atan2(b.y-a.y,b.x-a.x), ca=Math.cos(-ang), sa=Math.sin(-ang);
     const rot=p=>{ const dx=p.x-a.x, dy=p.y-a.y; return [dx*ca-dy*sa, dx*sa+dy*ca]; }; // [längs, quer]
     const pts=P.slice(iS,iE+1).map(rot), rpts=ref?ref.P.slice(ref.iS,ref.iE+1).map(rot):[];
     const L=Math.max(...pts.map(p=>p[0]),1), Q=Math.max(...pts.concat(rpts).map(p=>Math.abs(p[1])),0.5);
     const M=p=>[sx+sw/2+p[1]/Q*sw*0.45, sy+clamp(p[0]/L,-0.02,1.02)*sh];
     if(rpts.length){ x.strokeStyle='rgba(255,255,255,.55)'; x.lineWidth=2*k; x.beginPath(); rpts.forEach((p,i)=>{ const m=M(p); i?x.lineTo(...m):x.moveTo(...m); }); x.stroke(); }
-    x.lineWidth=5*k; x.lineCap='round';
+    x.lineCap='round'; x.lineJoin='round'; x.strokeStyle='rgba(0,0,0,.35)'; x.lineWidth=7.5*k; x.beginPath(); pts.forEach((p,i)=>{ const m=M(p); i?x.lineTo(...m):x.moveTo(...m); }); x.stroke(); /* Schatten einmal, sonst deckt er die Farbe zu */
     for(let i=1;i<pts.length;i++){ const j=iS+i; let col;
-      if(GPS.color==='speed') col=speedCol(P[j].v,tr.vmin,tr.vmax); else if(GPS.color==='accel') col=accCol(P[j].a); else { const d0=tr.dt[j-1],d1=tr.dt[j]; col=d0==null||d1==null?'rgba(255,255,255,.6)':(d1<=d0?'#34c759':'#ff453a'); }
-      x.strokeStyle='rgba(0,0,0,.35)'; x.lineWidth=7*k; x.beginPath(); x.moveTo(...M(pts[i-1])); x.lineTo(...M(pts[i])); x.stroke();
+      if(!ref||!tr.dt) col='#3b8bff'; else { const d0=tr.dt[Math.max(iS,j-6)],d1=tr.dt[Math.min(iE,j+6)]; col=d0==null||d1==null?'#3b8bff':(d1<=d0?'#34c759':'#ff453a'); } /* geglättet über ±0.6 s */
       x.strokeStyle=col; x.lineWidth=4.5*k; x.beginPath(); x.moveTo(...M(pts[i-1])); x.lineTo(...M(pts[i])); x.stroke(); }
     if(inRun){ const m=M(rot(cur)); x.fillStyle='#fff'; x.beginPath(); x.moveTo(m[0]-4*k,m[1]); x.lineTo(m[0]-16*k,m[1]-8*k); x.lineTo(m[0]-16*k,m[1]+8*k); x.closePath(); x.fill();
-      if(!(small&&GPS.view.band)){ const lx=m[0]-22*k; x.fillStyle='rgba(10,14,20,.5)'; rr(lx-118*k,m[1]-26*k,122*k,(cur.dt!=null?58:24)*k,8*k); x.fill(); txt(KMH(cur.v).toFixed(2)+' km/h',lx,m[1]-14*k,15,'#fff','right');
-      if(cur.dv!=null) txt((cur.dv>=0?'+':'−')+Math.abs(KMH(cur.dv)).toFixed(2)+' km/h',lx,m[1]+4*k,13,cur.dv>=0?'#5ee38a':'#ff7b72','right',750);
-      if(cur.dt!=null) txt(fmtD(cur.dt)+' s',lx,m[1]+21*k,13,cur.dt<=0?'#5ee38a':'#ff7b72','right',750); } }
+      if(ref&&cur.dt!=null||!GPS.view.band){ const lx=m[0]-22*k, withRef=ref&&cur.dt!=null, bw2=(withRef?150:96)*k, bh2=(withRef?50:26)*k, by2=m[1]-bh2/2;
+        x.fillStyle='rgba(10,14,20,.66)'; rr(lx-bw2,by2,bw2+4*k,bh2,8*k); x.fill();
+        if(withRef){ const lead=cur.dt<=0, c2=lead?'#5ee38a':'#ff7b72';
+          x.fillStyle=c2; rr(lx-bw2,by2,4*k,bh2,2*k); x.fill();
+          txt((lead?'Vorsprung ':'Rückstand ')+Math.abs(cur.dt).toFixed(2)+' s',lx-6*k,by2+15*k,13,c2,'right',800);
+          if(cur.dv!=null){ const dk=KMH(cur.dv); txt((dk>=0?'+':'−')+Math.abs(dk).toFixed(1)+' km/h',lx-6*k,by2+35*k,12,dk>=0?'#5ee38a':'#ff7b72','right',750); } }
+        else txt(KMH(cur.v).toFixed(1)+' km/h',lx-6*k,m[1],13,'#fff','right',800); } }
   }
   // 3) Laufzeit & Differenz
   if(GPS.view.time){
-    const rt=N.tg-tr.tStart, bw=(ref?210:120)*k, bh=52*k, bx=small?R.x+12*k:R.x+R.w-bw-12*k, by=R.y+R.h-bh-12*k; // schmal: links, damit der Stift rechts frei bleibt
+    const dIn=ref&&!(small&&GPS.view.snake), rt=N.tg-tr.tStart, bw=(dIn?210:120)*k, bh=52*k, bx=(small||GPS.view.band)?R.x+12*k:R.x+R.w-bw-12*k, by=GPS.view.band?R.y+((R.x<200&&!small)?44:10)*1:R.y+R.h-bh-12*k; /* mit Tacho oben links */
     x.fillStyle='rgba(10,14,20,.62)'; rr(bx,by,bw,bh,10*k); x.fill();
     txt('Laufzeit',bx+12*k,by+14*k,10.5,'rgba(255,255,255,.7)','left',700);
     txt(rt<0?'—':Math.min(rt,tr.tEnd-tr.tStart).toFixed(2),bx+12*k,by+35*k,22,'#fff','left',800);
-    if(ref){ txt('Differenz',bx+bw-12*k,by+14*k,10.5,'rgba(255,255,255,.7)','right',700); const dv=cur.dt; txt(dv==null||!inRun?'—':fmtD(dv),bx+bw-12*k,by+35*k,22,dv==null?'#fff':dv<=0?'#5ee38a':'#ff7b72','right',800); }
+    if(dIn){ txt('Differenz',bx+bw-12*k,by+14*k,10.5,'rgba(255,255,255,.7)','right',700); const dv=cur.dt; txt(dv==null||!inRun?'—':fmtD(dv),bx+bw-12*k,by+35*k,22,dv==null?'#fff':dv<=0?'#5ee38a':'#ff7b72','right',800); }
   }
   // Kopfzeile: Lauf vs Referenz
   x.font=`700 ${11*k}px ${ff}`;
@@ -4918,7 +4933,7 @@ function drawGpsChart(N){
   const vlo=Math.min(tr.vmin,ref?ref.vmin:1e9), vhi=Math.max(tr.vmax,ref?ref.vmax:0), Y=v=>6+(h1-12)*(1-(v-vlo)/Math.max(0.1,vhi-vlo));
   x.font='600 10px '+ff; x.fillStyle=ink; x.textAlign='right'; x.textBaseline='middle'; x.fillText(KMH(vhi).toFixed(0)+' km/h',pl-6,Y(vhi)); x.fillText(KMH(vlo).toFixed(0),pl-6,Y(vlo));
   if(ref){ x.strokeStyle=ink; x.globalAlpha=.6; x.setLineDash([4,4]); x.lineWidth=1.5; x.beginPath(); for(let i=ref.iS;i<=ref.iE;i++){ const p=ref.P[i]; const X2=X(p.s-ref.P[ref.iS].s+s0); i===ref.iS?x.moveTo(X2,Y(p.v)):x.lineTo(X2,Y(p.v)); } x.stroke(); x.setLineDash([]); x.globalAlpha=1; }
-  x.strokeStyle='#DA291C'; x.lineWidth=2.2; x.beginPath(); for(let i=tr.iS;i<=tr.iE;i++){ const p=P[i]; i===tr.iS?x.moveTo(X(p.s),Y(p.v)):x.lineTo(X(p.s),Y(p.v)); } x.stroke();
+  x.strokeStyle=ref?'#DA291C':'#3b8bff'; x.lineWidth=2.2; x.beginPath(); for(let i=tr.iS;i<=tr.iE;i++){ const p=P[i]; i===tr.iS?x.moveTo(X(p.s),Y(p.v)):x.lineTo(X(p.s),Y(p.v)); } x.stroke();
   // Δt
   const dts=tr.dt?tr.dt.filter(v=>v!=null):[]; const mx=Math.max(0.05,...dts.map(Math.abs))*1.15, Y2=v=>h1+6+(H-h1-18)*(0.5-v/(2*mx));
   x.strokeStyle=line; x.lineWidth=1; x.beginPath(); x.moveTo(pl,Y2(0)); x.lineTo(W-pr,Y2(0)); x.stroke();
@@ -4957,7 +4972,7 @@ $('#gpsRef').addEventListener('change',e=>{ const tr=trackOf(GD.clip); if(!tr) r
 $('#gpsSync').addEventListener('click',gpsSyncHere);
 $$('[data-gn]').forEach(b=>b.addEventListener('click',()=>{ const v=b.dataset.gn; gpsNudge(v.endsWith('f')?parseFloat(v)/GD.fps:parseFloat(v)); }));
 $('#gpsView').addEventListener('click',e=>{ const b=e.target.closest('[data-v]'); if(!b) return; GPS.view[b.dataset.v]=!GPS.view[b.dataset.v]; b.classList.toggle('on',GPS.view[b.dataset.v]); GPS.dirty=true; });
-$('#gpsColor').addEventListener('click',e=>{ const b=e.target.closest('[data-c]'); if(!b) return; GPS.color=b.dataset.c; $$('#gpsColor button').forEach(x=>x.classList.toggle('on',x===b)); GPS.dirty=true; });
+false&&$('#gpsColor').addEventListener('click',e=>{ const b=e.target.closest('[data-c]'); if(!b) return; GPS.color=b.dataset.c; $$('#gpsColor button').forEach(x=>x.classList.toggle('on',x===b)); GPS.dirty=true; });
 $('#gpsChart').addEventListener('click',e=>{ const N=gpsNow(); if(!N) return; const r=e.currentTarget.getBoundingClientRect(); const {tr,c}=N, P=tr.P, s0=P[tr.iS].s, s1=P[tr.iE].s;
   const s=s0+clamp((e.clientX-r.left-64)/(r.width-74),0,1)*(s1-s0); let i=tr.iS; while(i<tr.iE&&P[i].s<s) i++; GD.pause(); GD.seekTime(P[i].t-c.gpsOff); GPS.dirty=true; });
 function importGpsFiles(files){ [...files].forEach(f=>{ const rd=new FileReader(); rd.onload=()=>{ try{ const made=addTracks(parseGps(String(rd.result),f.name)); if(made.length){ toast('GPS geladen: '+made.map(t=>t.name).join(', ')); if(mode!=='gps') setMode('gps'); gpsTabUI(); } }catch(err){ toast('GPS-Datei nicht lesbar: '+err.message,4500); } }; rd.readAsText(f); }); }
@@ -5013,7 +5028,7 @@ async function demoGpsFor(c){ if(!c||!/_stelvio_261029\.mp4$/.test(c.name)||c.gp
   const D=await (DGPS||(DGPS=fetch('demo/stelvio_gps.json').then(r=>r.ok?r.json():null).catch(()=>null))); const v=D&&D.videos[c.name]; if(!v) return;
   if(!GPS.tracks.some(t=>t._stel)){ const made=D.tracks.map(o=>{ const nm=o.athlete.split(' ').slice(1).join(' ')+' · Lauf '+o.run.run_number;
       const t=addTracks([{name:nm,athlete:o.athlete,run:'Lauf '+o.run.run_number,source:'innove',samples:normSamples(o.S.map(([t,lat,lon,alt,speed])=>({t,lat,lon,alt,speed})))}],{link:false})[0]; if(t){ t._stel=o.key; t._demo=true; invRunApply(t,o.run); t.innove={run:o.run}; } return t; }).filter(Boolean);
-    if(made.length===2){ made[0].ref=made[1].id; made[1].ref=made[0].id; compareTracks(made[0],made[1]); compareTracks(made[1],made[0]); } } // Monney und Rogentin gegeneinander
+    } /* Standard ohne Referenz: Vergleich wählt man selbst */
   const tr=GPS.tracks.find(t=>t._stel===v.track); if(!tr) return;
   let s0=null; try{ s0=await ltcRead(c); }catch(e){} if(s0==null) s0=v.ltc0; // Zeitcode aus dem Ton, sonst gespeicherter Wert
   linkGps(c,tr,s0-tr.t0abs); c.gpsAuto=0; GPS.dirty=true; gpsSelects(); }
@@ -5785,8 +5800,8 @@ if(clips[0]){ S.setClip(clips[0]); A.setClip(clips[0]); }
 if(clips[1]) B.setClip(clips[1]);
 try{ const demoG=addTracks(DEMO_GPS.map(o=>({...o,samples:normSamples(o.samples)})),{link:false}); demoG.forEach(t=>t._demo=true);
   const c1=clips.find(c=>c.demo&&/Adelboden.*_L1/.test(c.name)), c2=clips.find(c=>c.demo&&/Adelboden.*_L2/.test(c.name));
-  if(c1&&demoG[0]){ c1.gpsId=demoG[0].id; c1.gpsOff=1.0; demoG[0].ref=demoG[1]?demoG[1].id:null; compareTracks(demoG[0],demoG[1]); GD.setClip(c1); }
-  if(c2&&demoG[1]){ c2.gpsId=demoG[1].id; c2.gpsOff=1.0; demoG[1].ref=demoG[0].id; compareTracks(demoG[1],demoG[0]); }
+  if(c1&&demoG[0]){ c1.gpsId=demoG[0].id; c1.gpsOff=1.0;  GD.setClip(c1); }
+  if(c2&&demoG[1]){ c2.gpsId=demoG[1].id; c2.gpsOff=1.0;  }
 }catch(e){ console.error(e); }
 /* ---------- Video aus der Liste direkt in Basic, A oder B ziehen ---------- */
 let VDRAG=null;
@@ -5961,7 +5976,7 @@ document.addEventListener('visibilitychange',async()=>{ if(SER.on&&!document.hid
 setColor(LS.get('color',COLORS[0])); setTool('none');
 restoreSession();
 /* Beispiel-Rennvideos (Sölden 2025, RS Herren) – liegen neben der App im Ordner demo/ */
-const REAL_DEMO=[["Meillard_Soelden_251026_GS_M_L1.mp4", 15594565], ["Gratz_Soelden_251026_GS_M_L1.mp4", 14564292], ["Braathen_Soelden_251026_GS_M_L1.mp4", 14949042], ["monney_v1_sg_tr9_stelvio_261029.mp4", 4700405], ["monney_v2_sg_tr9_stelvio_261029.mp4", 6197945], ["monney_v4_sg_tr9_stelvio_261029.mp4", 7033808], ["rogentin_v1_sg_tr3_stelvio_261029.mp4", 5102860], ["rogentin_v2_sg_tr3_stelvio_261029.mp4", 6596645], ["rogentin_v4_sg_tr3_stelvio_261029.mp4", 8349539], ["boisset_vgh_dh_tr1_courchevel_260311.mp4", 21193253], ["kriechmayr_vgh_dh_tr1_courchevel_260311.mp4", 20048025], ["allegre_vgh_dh_tr1_courchevel_260311.mp4", 22408170], ["moltzan_wc_gs_l2_camGH_hafjell_260325.mp4", 20632437], ["rast_wc_gs_l2_camGH_hafjell_260325.mp4", 22233687], ["holdener_wc_sl_l1_camGH_hafjell_260324.mp4", 19428840], ["shiffrin_wc_sl_l1_camGH_hafjell_260324.mp4", 19594008], ["odermatt lauf1 261025 GS soelden v1.mp4", 2676704], ["braathen lauf1 261025 GS soelden v1.mp4", 1935003], ["haechler lauf1 261025 GS soelden v1.mp4", 2524449], ["shiffrin wc gs l1 cam1 soelden 261024.mp4", 4025103], ["holdener wc gs l1 cam1 soelden 261024.mp4", 4312801], ["allenbach wc gs l1 cam1 soelden 261024.mp4", 4315846], ["brignone_wc_sg_camGH_cortina_260212.mp4", 17302153], ["blanc_wc_sg_camGH_cortina_260212.mp4", 11442032], ["schmitt_wc_sg_camGH_cortina_260212.mp4", 16428581], ["curtoni_wc_dh_tr1_camGH_valdisere_251218.mp4", 19536464], ["delago_wc_dh_tr1_camGH_valdisere_251218.mp4", 18695552], ["durrer_wc_dh_tr1_camGH_valdisere_251218.mp4", 19497247], ["ming_wc_dh_tr1_camGH_valdisere_251218.mp4", 20160965]];
+const REAL_DEMO=[["Meillard_Soelden_251026_GS_M_L1.mp4", 15594565], ["Gratz_Soelden_251026_GS_M_L1.mp4", 14564292], ["Braathen_Soelden_251026_GS_M_L1.mp4", 14949042], ["monney_v1_sg_tr9_stelvio_261029.mp4", 6591501], ["monney_v2_sg_tr9_stelvio_261029.mp4", 8210753], ["monney_v4_sg_tr9_stelvio_261029.mp4", 10912089], ["rogentin_v1_sg_tr3_stelvio_261029.mp4", 6865780], ["rogentin_v2_sg_tr3_stelvio_261029.mp4", 8499273], ["rogentin_v4_sg_tr3_stelvio_261029.mp4", 12637917], ["boisset_vgh_dh_tr1_courchevel_260311.mp4", 21193253], ["kriechmayr_vgh_dh_tr1_courchevel_260311.mp4", 20048025], ["allegre_vgh_dh_tr1_courchevel_260311.mp4", 22408170], ["moltzan_wc_gs_l2_camGH_hafjell_260325.mp4", 20632437], ["rast_wc_gs_l2_camGH_hafjell_260325.mp4", 22233687], ["holdener_wc_sl_l1_camGH_hafjell_260324.mp4", 19428840], ["shiffrin_wc_sl_l1_camGH_hafjell_260324.mp4", 19594008], ["odermatt lauf1 261025 GS soelden v1.mp4", 2676704], ["braathen lauf1 261025 GS soelden v1.mp4", 1935003], ["haechler lauf1 261025 GS soelden v1.mp4", 2524449], ["shiffrin wc gs l1 cam1 soelden 261024.mp4", 4025103], ["holdener wc gs l1 cam1 soelden 261024.mp4", 4312801], ["allenbach wc gs l1 cam1 soelden 261024.mp4", 4315846], ["brignone_wc_sg_camGH_cortina_260212.mp4", 17302153], ["blanc_wc_sg_camGH_cortina_260212.mp4", 11442032], ["schmitt_wc_sg_camGH_cortina_260212.mp4", 16428581], ["curtoni_wc_dh_tr1_camGH_valdisere_251218.mp4", 19536464], ["delago_wc_dh_tr1_camGH_valdisere_251218.mp4", 18695552], ["durrer_wc_dh_tr1_camGH_valdisere_251218.mp4", 19497247], ["ming_wc_dh_tr1_camGH_valdisere_251218.mp4", 20160965]];
 // Zeitpunkt im Video, an dem alle Läufe derselben Serie am gleichen Ort sind (gemessen)
 const DEMO_OFF={'boisset_vgh_dh_tr1_courchevel_260311.mp4':0.7,'kriechmayr_vgh_dh_tr1_courchevel_260311.mp4':0.3,'allegre_vgh_dh_tr1_courchevel_260311.mp4':0,'moltzan_wc_gs_l2_camGH_hafjell_260325.mp4':0,'rast_wc_gs_l2_camGH_hafjell_260325.mp4':2.0,'holdener_wc_sl_l1_camGH_hafjell_260324.mp4':0.7,'shiffrin_wc_sl_l1_camGH_hafjell_260324.mp4':0};
 (async()=>{
@@ -6075,7 +6090,7 @@ if(false&&!LS.get('hint1',0)){ setTimeout(()=>{ toast(matchMedia('(pointer:coars
 
 /* Update-Hinweis: prüft version.json auf GitHub Pages; «Aktualisieren» lädt die Seite ohne Cache neu */
 (()=>{
-  const BUILD='20261030154841'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
+  const BUILD='20261030161522'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
   // nach einem Update die ?v=… aus der Adresse entfernen
   try{ const u=new URL(location.href); if(u.searchParams.has('v')){ u.searchParams.delete('v'); history.replaceState(null,'',u.pathname+(u.search||'')+u.hash); } }catch(e){}
   const el=$('#upd'); let latest=null, snoozed=null, busy=false;
