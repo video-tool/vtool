@@ -2031,6 +2031,17 @@ button.lg-it:hover{background:rgba(12,15,20,.8);border-color:rgba(255,255,255,.3
   #viewSingle .dock.dock3{gap:10px 14px!important}
   #viewSingle .dz-c .ctl:not(.play){min-width:40px;width:40px;height:40px}
   #viewSingle .ctl.play{width:52px!important;height:52px!important;min-width:52px!important}
+  /* GPS: wie «Ein Video» – oben Abspielen, darunter Start-Abgleich, Feinschieben und Speichern in einer Zeile */
+  #viewGps .dock.dock3{display:grid!important;grid-template-columns:auto auto;justify-content:center;align-items:center;gap:8px 8px!important;padding:8px 6px!important}
+  #viewGps .dock.dock3 .dz-c{grid-column:1 / -1;justify-content:center}
+  #viewGps .dock.dock3 .dz-l,#viewGps .dock.dock3 .dz-r{margin:0!important;flex:none;flex-wrap:nowrap!important}
+  #viewGps .dz-l .grp,#viewGps .dz-r .grp{gap:4px!important;flex-wrap:nowrap!important}
+  #viewGps .dz-l .ctl,#viewGps .dz-r .ctl{height:40px!important;min-width:0!important;padding:0 8px!important;font-size:12.5px!important;justify-content:center}
+  #viewGps #gpsSync{width:40px;padding:0!important}
+  #viewGps #gpsSync span{display:none}
+  #viewGps #gpsSync svg{margin:0!important}
+  #viewGps .dz-c .ctl:not(.play){min-width:40px;width:40px;height:40px}
+  #viewGps .ctl.play{width:52px!important;height:52px!important;min-width:52px!important}
   /* Filmen: führt in die Field-App (gleiche Seite, bleibt in der installierten App) */
   .btn-cam{display:inline-flex!important}
   header .head-in{flex-wrap:nowrap!important;gap:6px!important}
@@ -2237,13 +2248,13 @@ button.lg-it:hover{background:rgba(12,15,20,.8);border-color:rgba(255,255,255,.3
       </div>
       <input type="file" id="gpsIn" accept=".csv,.gpx,.json,.txt" multiple hidden>
     </div>
-    <div class="dev-note" role="note"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.6 2.6-2.4-.6-.6-2.4z"/></svg><span><b>GPS von innove:</b> «innove» holt Lauf, Zwischenzeiten und Tempo zum Video – mit deinem innove-Zugang (wie in der alten Video-App). Danach im Bild an der Startlinie anhalten und «GPS-Start = Bild». Oder eine GPS-Datei importieren.</span></div>
+    <div class="dev-note" role="note"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.6 2.6-2.4-.6-.6-2.4z"/></svg><span><b>GPS von innove:</b> «innove» holt Lauf, Zwischenzeiten und Tempo zum Video – mit deinem innove-Zugang (wie in der alten Video-App). Die Tempo-Spur liegt automatisch nach der Aufnahmezeit auf dem Video. Oder eine GPS-Datei importieren.</span></div>
     <div class="stage-host" id="gHost"></div>
     <div id="gStrip"></div>
     <div class="dock dock3">
       <div class="dz dz-l"><div class="grp" title="Video und GPS zeitlich verbinden">
-        <button class="ctl" id="gpsSync" title="Aktuelles Bild = Start im GPS (Fahrer:in setzt sich in Bewegung)"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2.2"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg>GPS-Start = dieses Bild</button>
-        <button class="ctl" data-gn="-0.1" title="GPS 0.1 s früher">−0.1</button><button class="ctl" data-gn="-1f" title="GPS 1 Bild früher">−1F</button><button class="ctl" data-gn="1f" title="GPS 1 Bild später">+1F</button><button class="ctl" data-gn="0.1" title="GPS 0.1 s später">+0,1</button>
+        <button class="ctl" id="gpsSync" title="Aktuelles Bild = Start im GPS (Fahrer:in setzt sich in Bewegung)"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2.2"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg><span>GPS-Start = dieses Bild</span></button>
+        <button class="ctl" data-gn="-0.1" title="GPS 0.1 s früher">−0.1</button><button class="ctl" data-gn="-1f" title="GPS 1 Bild früher">−1F</button><button class="ctl" data-gn="1f" title="GPS 1 Bild später">+1F</button><button class="ctl" data-gn="0.1" title="GPS 0.1 s später">+0.1</button>
       </div></div>
       <div class="dz dz-c"><div class="grp">
         <button class="ctl" data-act="step" data-n="-10" title="10 Bilder zurück"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M11.5 17l-5-5 5-5"/><path d="M18 17l-5-5 5-5"/></svg></button>
@@ -3281,7 +3292,7 @@ function setMode(m){
   tabsUI();
   $('#viewSingle').hidden=m!=='single'; $('#viewCmp').hidden=m!=='cmp'; $('#viewGps').hidden=m!=='gps';
   [S,A,B,GD].forEach(d=>{ if(!(m==='single'&&d===S)&&!(m==='cmp'&&(d===A||d===B))&&!(m==='gps'&&d===GD)) d.pause(); });
-  if(m==='gps') gpsSelects(); GPS.dirty=true;
+  if(m==='gps'){ gpsSelects(); if(typeof invAuto==='function') setTimeout(invAuto,0); } GPS.dirty=true;
   setRateUI(); renderLib(); syncSelects(); updSync(); splitsUI(); fxUI(); if(typeof ftRender==='function') ftRender();
   decks.forEach(d=>{ d.dirty=true; d.annDirty=true; }); LS.set('mode',m); if(window.placeChrome) placeChrome();
   try{ history.replaceState(null,'',m==='cmp'?'#vergleich':m==='gps'?'#gps':'#einzel'); }catch(e){}
@@ -4736,7 +4747,34 @@ function addTracks(list,opt={}){
 function trackOf(c){ return c&&c.gpsId?GPS.tracks.find(t=>t.id===c.gpsId):null; }
 /* Aufnahmestart aus dem Dateinamen (Field-App: …_JJMMTT_hhmmssSSS, Ortszeit) → GPS-Versatz.
    Die Zeitzone beim Filmen ist unbekannt: zuerst die eigene, sonst die halbe Stunde, bei der Video und GPS-Spur sich überlappen. */
-function vidStart(c){ const m=c&&c.meta; if(!m||m.tod==null||!m.key) return null; const k=String(m.key), t=m.tod; return new Date(2000+ +k.slice(0,2),+k.slice(2,4)-1,+k.slice(4,6),Math.floor(t/3600),Math.floor(t/60)%60,Math.floor(t)%60,Math.round(t%1*1000)).getTime()/1000; } // Datum+Zeit zusammen, sonst falsch am Tag der Zeitumstellung
+/* Zeitcode (LTC) im Ton lesen – die Time-Link Sync Unit schreibt per AUX die echte Uhrzeit (UTC) und das Datum (User-Bits TT MM JJ) auf einen Tonkanal.
+   Ergebnis: c.ltc0 = Videobeginn als UTC-Sekunden, damit GPS (innove) auf die Hundertstelsekunde zur Videozeit passt. */
+const LTC_TAI=37; // Time-Link schreibt TAI-Zeit: 37 s vor UTC (geprüft an Stelvio 29.10.2026: Start im Bild = innove-Startlinie, beide Athleten, Kamera 1 und 4)
+function ltcDecode(x,sr){ // x: Float32Array eines Kanals → Liste {t,tc,ub} (t = Sekunde im Video, tc = Sekunden seit Mitternacht)
+  let pk=0; for(let i=0;i<x.length;i+=7){ const v=Math.abs(x[i]); if(v>pk) pk=v; } if(pk<0.02) return [];
+  const thr=pk*0.25, tr=[]; let cur=1; for(let i=0;i<x.length;i++){ const v=x[i]; const s=v>thr?1:v<-thr?-1:0; if(s&&s!==cur){ tr.push(i); cur=s; } }
+  if(tr.length<200) return []; const d=new Float32Array(tr.length-1); for(let i=1;i<tr.length;i++) d[i-1]=tr[i]-tr[i-1];
+  const srt=Array.from(d).sort((a,b)=>a-b), full=srt[Math.floor(srt.length*0.9)], lim=0.75*full; if(!(full>4)) return [];
+  const bits=[], pos=[]; for(let i=0;i<d.length;){ if(d[i]>lim){ bits.push(0); pos.push(tr[i]); i++; } else if(i+1<d.length&&d[i+1]<=lim){ bits.push(1); pos.push(tr[i]); i+=2; } else i++; }
+  const SY=[0,0,1,1,1,1,1,1,1,1,1,1,1,1,0,1], out=[];
+  for(let k=64;k+16<=bits.length;k++){ let ok=true; for(let j=0;j<16;j++) if(bits[k+j]!==SY[j]){ ok=false; break; } if(!ok) continue;
+    const f=bits.slice(k-64,k), n=(lo,c)=>{ let v=0; for(let j=0;j<c;j++) v|=f[lo+j]<<j; return v; };
+    const fr=n(0,4)+10*n(8,2), se=n(16,4)+10*n(24,3), mi=n(32,4)+10*n(40,3), hr=n(48,4)+10*n(56,2); if(fr>29||se>59||mi>59||hr>23) continue;
+    out.push({t:pos[k-64]/sr,fr,s:hr*3600+mi*60+se,ub:[4,12,20,28,36,44].map(b=>n(b,4))}); }
+  return out; }
+async function ltcRead(c){ if(c.ltc0!==undefined) return c.ltc0; c.ltc0=null;
+  try{ const buf=await (await fetch(c.url)).arrayBuffer(); const AC=window.OfflineAudioContext||window.webkitOfflineAudioContext; const ac=new AC(1,8000,48000);
+    const ab=await new Promise((res,rej)=>{ const p=ac.decodeAudioData(buf,res,rej); if(p&&p.then) p.then(res,rej); });
+    let best=[]; for(let ch=0;ch<ab.numberOfChannels;ch++){ const L=ltcDecode(ab.getChannelData(ch),ab.sampleRate); if(L.length>best.length) best=L; }
+    if(best.length<10) return null;
+    const fps=Math.max(24,Math.min(30,Math.max(...best.map(q=>q.fr))+1)), off=best.map(q=>q.s+q.fr/fps-q.t).sort((a,b)=>a-b), tod=off[off.length>>1];
+    const good=best.filter(q=>Math.abs(q.s+q.fr/fps-q.t-tod)<0.1); if(good.length<best.length*0.6) return null;
+    const ub=good[good.length>>1].ub, dd=ub[0]+10*ub[1], mm=ub[2]+10*ub[3], yy=ub[4]+10*ub[5];
+    let day=null; if(dd>=1&&dd<=31&&mm>=1&&mm<=12) day=Date.UTC(2000+yy,mm-1,dd)/1000; // Datum aus den User-Bits
+    else if(c.meta&&c.meta.key){ const k=String(c.meta.key); day=Date.UTC(2000+ +k.slice(0,2),+k.slice(2,4)-1,+k.slice(4,6))/1000; }
+    if(day==null) return null; c.ltc0=day+tod-LTC_TAI; c.ltcFps=fps; return c.ltc0; }catch(e){ return null; } }
+function vidStart(c){ if(c&&c.ltc0) return c.ltc0; // Zeitcode im Ton geht vor der Handyuhr
+  const m=c&&c.meta; if(!m||m.tod==null||!m.key) return null; const k=String(m.key), t=m.tod; return new Date(2000+ +k.slice(0,2),+k.slice(2,4)-1,+k.slice(4,6),Math.floor(t/3600),Math.floor(t/60)%60,Math.floor(t)%60,Math.round(t%1*1000)).getTime()/1000; } // Datum+Zeit zusammen, sonst falsch am Tag der Zeitumstellung
 function autoGpsOff(c,tr){ const v0=vidStart(c); if(v0==null||!tr||!(tr.t0abs>1e9)) return null; const dur=c.dur||60, span=tr.P[tr.P.length-1].t;
   const base=v0-tr.t0abs, ov=o=>Math.min(o+dur,span)-Math.max(o,0);
   const sh=[0]; for(let k=1;k<=28;k++) sh.push(k*1800,-k*1800);
@@ -4833,7 +4871,8 @@ function drawGpsChart(N){
   x.fillStyle=st.getPropertyValue('--ink').trim(); x.fillRect(X(cur.s)-1,2,2,H-14);
 }
 /* ---------- Bedienung ---------- */
-function gpsSelects(){
+function gpsSyncBtnUI(){ const b=$('#gpsSync'); if(!b) return; const tr=trackOf(GD.clip); b.hidden=!!(tr&&tr.source==='innove'); } // innove: Zeit genügt, kein Startabgleich von Hand
+function gpsSelects(){ setTimeout(()=>{ gpsSyncBtnUI(); if(typeof invAuto==='function') invAuto(); },0);
   const sv=$('#gpsVideo'), st=$('#gpsTrack'), sr=$('#gpsRef'); const c=GD.clip, tr=trackOf(c);
   sv.innerHTML='<option value="">– Video wählen –</option>'+clips.map(c=>{ const m=c.meta; const t=m&&m.ok?metaTitle(c)+(m.run?' · '+m.run:''):dispName(c); return `<option value="${c.id}" title="${esc(dispName(c))}">${esc(t)}</option>`; }).join(''); sv.value=c?c.id:'';
   const opts=GPS.tracks.map(t=>`<option value="${t.id}">${esc(t.name)}</option>`).join('');
@@ -4855,7 +4894,7 @@ $$('#viewGps [data-rates]').forEach(seg=>{ seg.innerHTML=RATES.map(r=>`<button t
 $$('#viewGps .ctl.play').forEach(b=>b.innerHTML=ICON.play);
 GD.onChange=()=>{ $('#viewGps .ctl.play').innerHTML=GD.v.paused?ICON.play:ICON.pause; GPS.dirty=true; };
 GD.v.addEventListener('seeked',()=>GPS.dirty=true); addEventListener('resize',()=>GPS.dirty=true);
-$('#gpsVideo').addEventListener('change',e=>{ GD.setClip(clips.find(c=>c.id==e.target.value)||null); gpsSelects(); });
+$('#gpsVideo').addEventListener('change',e=>{ GD.setClip(clips.find(c=>c.id==e.target.value)||null); gpsSelects(); invAuto(); });
 $('#gpsTrack').addEventListener('change',e=>{ linkGps(GD.clip,GPS.tracks.find(t=>t.id==e.target.value)||null); });
 $('#gpsRef').addEventListener('change',e=>{ const tr=trackOf(GD.clip); if(!tr) return; tr.ref=+e.target.value||null; compareTracks(tr,GPS.tracks.find(t=>t.id===tr.ref)); gpsSelects(); });
 $('#gpsSync').addEventListener('click',gpsSyncHere);
@@ -4891,7 +4930,7 @@ function invPick(title,L){ return new Promise(res=>{ const m=$('#invPick'), q=$(
   q.value=''; draw(); q.oninput=draw; l.onclick=e=>{ const b=e.target.closest('[data-id]'); if(b) done(L.find(x=>String(x[0])===b.dataset.id)); }; $('#invPickX').onclick=()=>done(null); m.classList.add('on'); setTimeout(()=>q.focus(),60); }); }
 async function invAthleteFor(c){ const name=(c.meta&&c.meta.athlete)||''; const key=invNorm(name), map=LS.get('innove:map',{}); const L=await invAthletes();
   if(key&&map[key]){ const x=L.find(y=>y[0]===map[key]); if(x) return x; }
-  let C=key?L.filter(x=>invNorm(x[2])===key||invNorm(x[1]+x[2])===key||invNorm(x[2]+x[1])===key):[];
+  let C=key?L.filter(x=>invNorm(x[2])===key||invNorm(x[1])===key||invNorm(x[1]+x[2])===key||invNorm(x[2]+x[1])===key):[]; // bei innove sind Vor- und Nachname teils vertauscht
   if(C.length!==1){ const x=await invPick(name?'Wer ist «'+name+'» bei innove?':'Athlet:in bei innove wählen',C.length?C:L); if(!x) return null; C=[x]; }
   if(key){ map[key]=C[0][0]; LS.set('innove:map',map); } return C[0]; }
 async function invRun(aid,v0,v1){ const tf=async t=>(((await invGet('/timeframes/?athlete='+aid+'&timestamp_ms='+t+'&limit=50'))||{}).timeframes)||[];
@@ -4908,7 +4947,8 @@ function invLoginUI(){ return new Promise(res=>{ const m=$('#invModal'), a=invAu
   $('#invX').onclick=()=>done(false); $('#invOut').onclick=()=>{ LS.set('innove',null); toast('Von innove abgemeldet.'); done(false); };
   m.classList.add('on'); setTimeout(()=>($('#invU').value?$('#invP'):$('#invU')).focus(),60); }); }
 async function invFetch(c){ c=c||GD.clip; if(!c){ toast('Zuerst ein Video wählen.'); return; }
-  const s0=vidStart(c); if(s0==null){ toast('Für dieses Video fehlt die Aufnahmezeit. Sie steht im Namen von Videos aus «Filmen» (…_JJMMTT_hhmmssSSS).',5200); return; }
+  let s0=vidStart(c); if(s0==null&&c.ltc0===undefined){ toast('Zeitcode im Ton wird gelesen …',2500); s0=await ltcRead(c); }
+  if(s0==null){ toast('Für dieses Video fehlt die Aufnahmezeit: kein Zeitcode im Ton (Time-Link) und keine Zeit im Namen (Videos aus «Filmen»).',5200); return; }
   if(!invAuth()&&!(await invLoginUI())) return;
   const btn=$('#gpsInv'); btn.classList.add('busy'); const lab=$('span',btn), lab0=lab.textContent;
   try{ lab.textContent='Sucht …';
@@ -4918,20 +4958,23 @@ async function invFetch(c){ c=c||GD.clip; if(!c){ toast('Zuerst ein Video wähle
     if(!best){ toast(tfs?'Kein Lauf von '+ath[2]+' zu diesem Video (auch nicht innert 2 Minuten). Läufe neuer Sensoren erscheinen bei innove erst nach der Berechnung – später nochmals versuchen.':'Zu dieser Zeit war '+ath[1]+' '+ath[2]+' bei innove kein Sensor zugeteilt.',6000); return; }
     lab.textContent='Lädt GPS …';
     const pages=await invTrack(best.tf.device,v0-INV.PAD,v1+INV.PAD);
-    const nm=ath[2]+' · Lauf '+best.run.run_number+(best.cls&&best.cls!=='OK'?' ('+best.cls+')':'');
+    const who=(c.meta&&c.meta.athlete)||ath[2], nm=who+' · Lauf '+best.run.run_number+(best.cls&&best.cls!=='OK'?' ('+best.cls+')':'');
     const L=parseGps(JSON.stringify(pages.map(x=>x.data||x)),nm); if(!L.length||L[0].samples.length<5){ toast('innove hat zu diesem Lauf keine GPS-Punkte geliefert.',4000); return; }
     L[0].name=nm; L[0].athlete=ath[1]+' '+ath[2]; L[0].run='Lauf '+best.run.run_number; L[0].source='innove';
     const tr=addTracks(L,{link:false})[0]; if(!tr) return;
-    // Start und Ziel von innove statt aus der Bewegung: «GPS-Start = Bild» legt damit die Startlinie genau aufs Bild
+    // Start und Ziel von innove statt aus der Bewegung (für Anzeige und Vergleich). Die Spur liegt allein nach der Uhrzeit auf dem Video – kein Abgleich von Hand
     const at=t=>{ let k=0; while(k<tr.P.length-1&&tr.P[k].t<t) k++; return k; };
-    tr.iS=at(best.run.start_time/1000-tr.t0abs); tr.iE=Math.max(tr.iS,at(best.run.finish_time/1000-tr.t0abs)); tr.tStart=best.run.start_time/1000-tr.t0abs; tr.tEnd=best.run.finish_time/1000-tr.t0abs;
+    tr.iS=at(best.run.start_time/1000-tr.t0abs); tr.iE=tr.P.length-1; tr.tStart=best.run.start_time/1000-tr.t0abs; tr.tEnd=tr.P[tr.iE].t; // innove-Start = Nullpunkt der Laufzeit; Ende offen, weil Kameras auch nach der innove-Ziellinie stehen können
+    tr.vmax=Math.max(...tr.P.slice(tr.iS).map(p=>p.v)); tr.vmin=Math.min(...tr.P.slice(tr.iS).map(p=>p.v));
     tr.innove={activity:best.tf.activity,timeframe:best.tf.id,run:best.run,cls:best.cls||null};
     if(GD.clip!==c) GD.setClip(c); linkGps(c,tr,s0-tr.t0abs); c.gpsAuto=0; if(mode!=='gps') setMode('gps'); gpsTabUI(); gpsSelects();
     const sg=(best.run.segments||[]).filter(x=>!/start/i.test(x.name)), fin=sg.find(x=>/finish/i.test(x.name));
-    toast(nm+' · '+((best.run.finish_time-best.run.start_time)/1000).toFixed(2)+' s'+(fin&&fin.speed?' · Ziel '+(fin.speed*3.6).toFixed(1)+' km/h':'')+'. Feinabgleich: an der Startlinie anhalten → «GPS-Start = Bild».',6500);
+    toast(nm+' · '+((best.run.finish_time-best.run.start_time)/1000).toFixed(2)+' s'+(fin&&fin.speed?' · Ziel '+(fin.speed*3.6).toFixed(1)+' km/h':'')+' – Tempo liegt nach Aufnahmezeit auf dem Video.',5000);
   }catch(err){ if(err.message==='login'){ toast('Anmeldung bei innove abgelaufen – bitte neu anmelden.',3500); if(await invLoginUI()) return invFetch(c); } else toast('innove: '+err.message,4500); }
   finally{ btn.classList.remove('busy'); lab.textContent=lab0; } }
 $('#gpsInv').addEventListener('click',()=>invFetch(GD.clip));
+// Angemeldet: beim Wählen eines Videos in der GPS-Ansicht gleich bei innove nachsehen (nur einmal pro Video)
+function invAuto(){ const c=GD.clip; if(!c||c.demo||mode!=='gps'||!invAuth()||c.gpsId||c._invTried) return; c._invTried=true; setTimeout(()=>{ if(GD.clip===c&&!c.gpsId) invFetch(c); },300); }
 // Schnittstelle für den späteren externen Datenfluss
 window.VideoLab={
   loadGps(data,opt={}){ const list=typeof data==='string'?parseGps(data,opt.name):(Array.isArray(data)&&data.length&&(data[0].samples||data[0].points)?data:[data]).map(o=>({name:o.name||opt.name,athlete:o.athlete,run:o.run,source:o.source,samples:normSamples(o.samples||o.points||o)}));
@@ -4962,6 +5005,7 @@ function parseName(n){
     if(!m.sex&&/^(M|W|F|H|D|MEN|WOMEN|HERREN|DAMEN)$/.test(u)){ m.sex=/^(M|H|MEN|HERREN)$/.test(u)?'M':'W'; continue; }
     if(!m.run&&/^(L|R|RUN|LAUF|T|TR)\d{1,2}$/.test(u)){ m.run=(u.startsWith('T')?'Training ':'Lauf ')+u.match(/\d+/)[0]; continue; }
     if(/^(WC|EC|COC|FIS|NJR|NC)$/.test(u)){ m.level=u==='WC'?'Weltcup':u==='EC'?'Europacup':u; continue; }
+    if(!m.cam&&/^V\d{1,2}$/.test(u)){ m.cam='Kamera '+u.slice(1); continue; }
     if(!m.cam&&/^(VGH|GH|CAMGH|GEGENHANG|VZ|VS|VST|VZI|VPI|PISTE|CAM\d*|CAM[A-Z]{1,3}|POS\d+)$/.test(u)){ m.cam=/^(VGH|GH|CAMGH|GEGENHANG)$/.test(u)?'Gegenhang':/^(VZ|VZI)$/.test(u)?'Ziel':/^(VS|VST)$/.test(u)?'Start':/^(VPI|PISTE)$/.test(u)?'Piste':u; continue; }
     if(/^(BEISPIEL|GHOST|VIDEO|CLIP|KAMERA|FIX|FPS|LAUF)$/.test(u)) continue;
     if(/^[A-Za-zÄÖÜäöüéèàçñ]{2,}(-[A-Za-zÄÖÜäöüéèàçñ]{2,})*$/.test(t)) rest.push(t);
@@ -5956,7 +6000,7 @@ if(false&&!LS.get('hint1',0)){ setTimeout(()=>{ toast(matchMedia('(pointer:coars
 
 /* Update-Hinweis: prüft version.json auf GitHub Pages; «Aktualisieren» lädt die Seite ohne Cache neu */
 (()=>{
-  const BUILD='20261030131828'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
+  const BUILD='20261030135357'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
   // nach einem Update die ?v=… aus der Adresse entfernen
   try{ const u=new URL(location.href); if(u.searchParams.has('v')){ u.searchParams.delete('v'); history.replaceState(null,'',u.pathname+(u.search||'')+u.hash); } }catch(e){}
   const el=$('#upd'); let latest=null, snoozed=null, busy=false;

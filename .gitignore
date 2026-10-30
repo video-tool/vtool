@@ -17,3 +17,6 @@ demo/ming_camGH_251218.mp4
 
 # Entwicklungsdateien (Quellen, Tests) – nicht veröffentlichen
 _dev/
+
+# Stelvio 29.10.2026 – Originale mit Zeitcode im Ton (100–130 MB, zu gross für GitHub)
+demo/*stelvio*.MP4
