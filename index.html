@@ -4383,12 +4383,13 @@ function ovTrailPts(k,e){ const T=OVT.trk&&OVT.trk[k], AL=OVT.al&&OVT.al[k], S=G
   if(pts.length<3) return null;
   return pts.map((p,i)=>{ if(i===0) return p; let sx=0,sy=0,w=0; for(let d=-2;d<=2;d++){ const q=pts[i+d]; if(!q) continue; const ww=3-Math.abs(d); sx+=q[0]*ww; sy+=q[1]*ww; w+=ww; } return [sx/w,sy/w]; }); }
 function ovTrailDraw(x,ox,oy,w,h){ if(!OVT.on||!OVT.trk||OVT.key!==GH.key||!ovFollowOK()) return; const e=ovE(), sx=w/GH.W0, sy=h/GH.hA, lw=Math.max(2,w/320);
-  const runs=[['a','#3e8bff']]; if(!OV.hideB) runs.push(['b','#f08a3c']);
+  const runs=[['a','#7fb0ff']]; if(!OV.hideB) runs.push(['b','#f5ad78']);
   x.save(); x.lineCap='round'; x.lineJoin='round';
   for(const [k,col] of runs){ const P=ovTrailPts(k,e); if(!P) continue; const Q=P.map(p=>[ox+p[0]*sx,oy+p[1]*sy]), N=Q.length;
     const curve=(A0,B0)=>{ const P2=Q.slice(A0,B0+1); if(P2.length<2) return; x.beginPath(); x.moveTo(P2[0][0],P2[0][1]); for(let i=1;i<P2.length-1;i++) x.quadraticCurveTo(P2[i][0],P2[i][1],(P2[i][0]+P2[i+1][0])/2,(P2[i][1]+P2[i+1][1])/2); const l=P2[P2.length-1]; x.lineTo(l[0],l[1]); x.stroke(); };
-    x.globalAlpha=0.3; x.strokeStyle='#000'; x.lineWidth=lw*2.4; curve(0,N-1);
-    const parts=4; for(let q=0;q<parts;q++){ const a0=Math.floor(q*(N-1)/parts), b0=Math.floor((q+1)*(N-1)/parts); x.globalAlpha=0.95*(1-q/parts*0.8); x.strokeStyle=col; x.lineWidth=lw; x.shadowColor=col; x.shadowBlur=lw*1.5; curve(a0,b0); } x.shadowBlur=0; }
+    /* blass in den Farben A/B, ohne Leuchten – soll das Bild nicht dominieren */
+    x.globalAlpha=0.12; x.strokeStyle='#000'; x.lineWidth=lw*1.8; curve(0,N-1);
+    const parts=4; for(let q=0;q<parts;q++){ const a0=Math.floor(q*(N-1)/parts), b0=Math.floor((q+1)*(N-1)/parts); x.globalAlpha=0.5*(1-q/parts*0.75); x.strokeStyle=col; x.lineWidth=lw; curve(a0,b0); } }
   x.restore(); }
 function ovTrailCanvas(){ let c=$('canvas.ovtrail',A.stage); if(!c){ c=document.createElement('canvas'); c.className='ovtrail'; $('canvas.ovb',A.stage).after(c); } return c; }
 function ovTrailRender(){ const c=ovTrailCanvas(), on=OVT.on&&!!OVT.trk&&OVT.key===GH.key&&ovActive()&&ovFollowOK()&&!OV.fix; c.hidden=!on; if(!on) return;
@@ -6544,7 +6545,7 @@ if(false&&!LS.get('hint1',0)){ setTimeout(()=>{ toast(matchMedia('(pointer:coars
 
 /* Update-Hinweis: prüft version.json auf GitHub Pages; «Aktualisieren» lädt die Seite ohne Cache neu */
 (()=>{
-  const BUILD='20261031153822'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
+  const BUILD='20261031155856'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
   // nach einem Update die ?v=… aus der Adresse entfernen
   try{ const u=new URL(location.href); if(u.searchParams.has('v')){ u.searchParams.delete('v'); history.replaceState(null,'',u.pathname+(u.search||'')+u.hash); } }catch(e){}
   const el=$('#upd'); let latest=null, snoozed=null, busy=false;
