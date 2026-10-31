@@ -2172,7 +2172,7 @@ button.lg-it:hover{background:rgba(12,15,20,.8);border-color:rgba(255,255,255,.3
   #viewGps.no-trk .gps-foot,#viewGps.no-trk canvas.gchart{display:none!important}
   #viewGps #gpsInfo,#viewGps .gv-lab{display:none!important}
   #viewGps .gps-foot{margin-top:6px}
-  #viewGps .gps-viewopts{display:grid!important;grid-template-columns:repeat(3,1fr);gap:4px;width:100%}
+  #viewGps .gps-viewopts{display:grid!important;grid-template-columns:repeat(2,1fr);gap:4px;width:100%}
   #viewGps .gps-viewopts>.chips,#viewGps .gps-viewopts>.seg{display:contents!important}
   #viewGps .gps-viewopts::-webkit-scrollbar{display:none}
   #viewGps .gps-viewopts .chip,#viewGps .gps-viewopts .seg button{height:32px!important;padding:0 4px!important;font-size:12px!important;white-space:nowrap;min-width:0;border-radius:9px!important;justify-content:center;display:flex;align-items:center}
@@ -2473,7 +2473,7 @@ body.pfs .gps-sel,body.pfs .gps-foot,body.pfs #gpsChart,body.pfs #viewGps .ctl-l
         <button class="ctl" data-act="fs" title="Vollbild (f)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3M21 8V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3M16 21h3a2 2 0 0 0 2-2v-3"/></svg></button>
       </div></div>
     </div>
-    <div class="gps-foot"><span id="gpsInfo"></span><span class="gps-viewopts"><span class="gv-lab">Anzeige</span><div class="chips gpsv" id="gpsView"><button class="chip on" data-v="band" title="Tacho im Bild">Tacho</button><button class="chip on" data-v="snake" title="Fahrlinie im Bild">Linie</button><button class="chip on" data-v="time" title="Laufzeit im Bild">Zeit</button></div></span><span class="gleg"><i style="background:#3b8bff"></i>nur GPS · mit Referenz: <b style="color:var(--good)">grün</b> = gewinnt, <b style="color:var(--red)">rot</b> = verliert <i class="dash"></i>Referenz</span></div>
+    <div class="gps-foot"><span id="gpsInfo"></span><span class="gps-viewopts"><span class="gv-lab">Anzeige</span><div class="chips gpsv" id="gpsView"><button class="chip on" data-v="band" title="Tacho im Bild">Tacho</button><button class="chip on" data-v="snake" title="Fahrlinie im Bild">Linie</button></div></span><span class="gleg"><i style="background:#3b8bff"></i>nur GPS · mit Referenz: <b style="color:var(--good)">grün</b> = gewinnt, <b style="color:var(--red)">rot</b> = verliert <i class="dash"></i>Referenz</span></div>
     <canvas class="gchart" id="gpsChart" title="Tempo (rot = dieser Lauf, gestrichelt = Referenz) und Zeitdifferenz über die Distanz · klicken = hinspringen"></canvas>
   </section>
 
@@ -4906,7 +4906,7 @@ function ghostUI(){ // Ghost-Ansicht gibt es nicht mehr – die Leiste dient nur
    Datenformat (CSV, GPX oder JSON): Zeit + lat + lon (+ alt, + speed). Siehe Hilfe.
    Externe Anbindung später: window.VideoLab.loadGps({...}) oder postMessage {type:'vlab:gps', payload}.
    ========================================================= */
-const GPS={tracks:[],origin:null,view:{band:true,snake:false,time:true},snakeUser:false,color:'speed',dirty:true};
+const GPS={tracks:[],origin:null,view:{band:true,snake:false,time:false},snakeUser:false,color:'speed',dirty:true};
 let gpsUid=0;
 const KMH=v=>v*3.6;
 function gpsKey(o,names){ const ks=Object.keys(o); for(const n of names){ const k=ks.find(k=>k.toLowerCase().replace(/[^a-z]/g,'')===n); if(k!=null) return k; } for(const n of names){ const k=ks.find(k=>k.toLowerCase().includes(n)); if(k!=null) return k; } return null; }
@@ -5031,7 +5031,7 @@ function drawGpsOverlay(T){ /* T={x,R}: direkt in den Export zeichnen (volle Auf
     if(cv.width!==Math.round(W*d)||cv.height!==Math.round(H*d)){ cv.width=Math.round(W*d); cv.height=Math.round(H*d); }
     x=cv.getContext('2d'); x.setTransform(d,0,0,d,0,0); x.clearRect(0,0,W,H); R=GD.rect(); }
   const {tr,cur}=N, ff=getComputedStyle(document.body).fontFamily, ref=GPS.tracks.find(t=>t.id===tr.ref);
-  const P=tr.P, iS=tr.iS, iE=tr.iE, k=T?R.h/430:clamp(R.w/760,0.85,1.5), small=!T&&R.w<520;
+  const P=tr.P, iS=tr.iS, iE=tr.iE, k=T?R.h/430:clamp(R.w/900,0.8,1.1), small=!T&&R.w<520;
   const txt=(s,X,Y,size,col,al='left',w=800)=>{ x.save(); x.font=`${w} ${size*k}px ${ff}`; x.textAlign=al; x.textBaseline='middle'; x.shadowColor='rgba(0,0,0,.45)'; x.shadowBlur=3*k; x.shadowOffsetY=0.5*k; x.fillStyle=col; x.fillText(s,X,Y); x.restore(); };
   const rr=(X,Y,w,h,r)=>{ x.beginPath(); if(x.roundRect) x.roundRect(X,Y,w,h,r); else x.rect(X,Y,w,h); };
   const box=(X,Y,w,h,r,a=.62)=>{ x.save(); x.shadowColor='rgba(0,0,0,.28)'; x.shadowBlur=10*k; x.shadowOffsetY=2*k; rr(X,Y,w,h,r); x.fillStyle=`rgba(12,16,22,${a})`; x.fill(); x.restore(); rr(X+.5,Y+.5,w-1,h-1,r); x.strokeStyle='rgba(255,255,255,.10)'; x.lineWidth=1; x.stroke(); };
@@ -5039,7 +5039,7 @@ function drawGpsOverlay(T){ /* T={x,R}: direkt in den Export zeichnen (volle Auf
   const path=(ps)=>{ x.beginPath(); if(!ps.length) return; x.moveTo(ps[0][0],ps[0][1]); for(let i=1;i<ps.length-1;i++){ const mx=(ps[i][0]+ps[i+1][0])/2, my=(ps[i][1]+ps[i+1][1])/2; x.quadraticCurveTo(ps[i][0],ps[i][1],mx,my); } const l=ps[ps.length-1]; x.lineTo(l[0],l[1]); };
   const inRun=N.tg>=tr.tStart-0.3&&N.tg<=tr.tEnd+0.3;
   /* 1) Tacho unten rechts: Bogen füllt sich mit dem Tempo, Spitze und Referenz als Marken */
-  const TD=T?R.h*0.36:small?clamp(Math.min(R.w*0.2,R.h*0.3),64,88):clamp(Math.min(R.w*0.26,R.h*0.42),112,230), TX=R.x+R.w-TD/2-(small?6:12)*k, TY=R.y+R.h-TD/2-(small?6:10)*k;
+  const TD=T?R.h*0.27:small?clamp(Math.min(R.w*0.2,R.h*0.3),64,88):clamp(Math.min(R.w*0.17,R.h*0.3),96,165), TX=R.x+R.w-TD/2-(small?6:12)*k, TY=R.y+R.h-TD/2-(small?6:10)*k;
   if(GPS.view.band){
     const have=N.tg>=P[0].t-0.3&&N.tg<=P[P.length-1].t+0.3, rad=TD/2, f=TD/200;
     const vhiK=Math.max(40,Math.ceil(KMH(Math.max(tr.vmax,ref?ref.vmax:0))*1.04/10)*10), A0=Math.PI*0.75, A1=Math.PI*2.25, AV=v=>A0+(A1-A0)*clamp(KMH(v)/vhiK,0,1), AK=kmh=>A0+(A1-A0)*clamp(kmh/vhiK,0,1);
@@ -5062,9 +5062,8 @@ function drawGpsOverlay(T){ /* T={x,R}: direkt in den Export zeichnen (volle Auf
       x.fillStyle='#fff'; x.beginPath(); x.arc(TX+Math.cos(ae)*ar,TY+Math.sin(ae)*ar,aw*0.32,0,7); x.fill(); }
     /* Mitte: Tempo gross, darunter Einheit und Beschleunigung, unten Differenz zur Referenz */
     x.textAlign='center'; x.textBaseline='middle';
-    x.font=`800 ${(small?44:36)*f}px ${ff}`; x.fillStyle='#fff'; x.fillText(have?(vS?(small?KMH(vS).toFixed(0):KMH(vS).toFixed(1)):'0'):'—',TX,TY-2*f);
+    x.font=`800 ${(small?44:31)*f}px ${ff}`; x.fillStyle='#fff'; x.fillText(have?(vS?(small?KMH(vS).toFixed(0):KMH(vS).toFixed(1)):'0'):'—',TX,TY-2*f);
     x.font=`700 ${(small?17:11)*f}px ${ff}`; x.fillStyle='rgba(255,255,255,.6)'; x.fillText('km/h',TX,TY+(small?30:22)*f);
-    if(have&&!small&&vS>0){ x.font=`700 ${12*f}px ${ff}`; x.fillStyle=cur.a>=0?'#5ee38a':'#ff7b72'; x.fillText((cur.a>=0?'+':'−')+Math.abs(cur.a).toFixed(2)+' g',TX,TY+38*f); }
   }
   // 2) Fahrlinie («Schlange») rechts
   if(GPS.view.snake){
@@ -6357,7 +6356,7 @@ if(false&&!LS.get('hint1',0)){ setTimeout(()=>{ toast(matchMedia('(pointer:coars
 
 /* Update-Hinweis: prüft version.json auf GitHub Pages; «Aktualisieren» lädt die Seite ohne Cache neu */
 (()=>{
-  const BUILD='20261030232727'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
+  const BUILD='20261031094958'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
   // nach einem Update die ?v=… aus der Adresse entfernen
   try{ const u=new URL(location.href); if(u.searchParams.has('v')){ u.searchParams.delete('v'); history.replaceState(null,'',u.pathname+(u.search||'')+u.hash); } }catch(e){}
   const el=$('#upd'); let latest=null, snoozed=null, busy=false;
