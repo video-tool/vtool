@@ -2419,7 +2419,7 @@ header .btn-cam svg circle:last-child{animation:camDot 2s ease-in-out infinite}
 .trail-hint button{display:inline-flex;align-items:center;gap:5px}
 .trail-hint button.on{background:#fff;color:#0f1216}
 .trail-hint button.pri{background:#DA291C}
-@media (max-width:760px){ .toast{top:auto!important;bottom:calc(var(--tabsH,64px) + 10px)!important;z-index:140!important} body.pfs .toast{bottom:calc(12px + env(safe-area-inset-bottom,0px))!important} } /* Hinweise immer über der unteren Leiste, nie abgeschnitten */
+@media (max-width:760px){ .modal{z-index:160!important} .exp-foot{flex-wrap:wrap!important;gap:10px!important} .exp-foot .exp-hint{order:-1;flex:1 0 100%!important;text-align:center!important} .exp-foot .exp-advbtn{height:44px} .exp-foot .btn-pri{flex:1;min-width:0!important} .toast{top:auto!important;bottom:calc(var(--tabsH,64px) + 10px)!important;z-index:170!important} body.pfs .toast{bottom:calc(12px + env(safe-area-inset-bottom,0px))!important} } /* Hinweise immer über der unteren Leiste, nie abgeschnitten */
 </style>
 </head>
 <body class="m-single">
@@ -2619,7 +2619,6 @@ header .btn-cam svg circle:last-child{animation:camDot 2s ease-in-out infinite}
     <div class="str-bar">
       <span class="exp-l">Bereich</span><div class="seg" id="strR"><button data-r="0.5">±0.5 s</button><button data-r="1" class="on">±1 s</button><button data-r="2">±2 s</button><button data-r="cut">Start–Ende</button></div>
       <span class="exp-l">Positionen</span><div class="seg" id="strN"><button data-n="6">6</button><button data-n="8">8</button><button data-n="10">10</button><button data-n="12">12</button><button data-n="16">16</button></div>
-      <label class="str-tg"><input type="checkbox" id="strTrail" checked> Spur</label>
       <label class="str-tg"><input type="checkbox" id="strNum" checked> Nummern</label>
       <span class="str-info" id="strInfo"></span>
       <button class="btn-pri ghost" id="strVid" disabled>Video</button><button class="btn-pri" id="strSave" disabled>PNG speichern</button>
@@ -3474,8 +3473,13 @@ $('#sFps').addEventListener('change',e=>{ const c=S.clip; const f=parseFloat(Str
 
 /* Vergleich */
 const G={linked:false,off:0,syncA:0,playing:false};
+/* Auswahl übersichtlich: nach Ort · Jahr · Disziplin gruppiert, je Zeile «Name – Lauf – Kamera» */
+function clipOptions(first){ const gk=c=>{ const m=c.meta; return m&&m.ok&&(m.place||m.disc)?[[m.place,m.date?m.date.slice(-4):''].filter(Boolean).join(' '),DISC_LONG[m.disc]||m.disc].filter(Boolean).join(' · '):'Weitere Videos'; };
+  const G=new Map(); clips.forEach(c=>{ const k=gk(c); if(!G.has(k)) G.set(k,[]); G.get(k).push(c); });
+  const line=(c,cams)=>{ const m=c.meta; if(!(m&&m.ok)) return dispName(c); return [m.athlete,m.run,cams>1?m.cam:''].filter(Boolean).join(' · '); }; /* Kamera nur, wenn es in der Gruppe mehrere gibt */
+  return `<option value="">${first}</option>`+[...G].map(([k,L])=>{ const cams=new Set(L.map(c=>c.meta&&c.meta.cam)).size; return `<optgroup label="${esc(k)}">`+L.map(c=>`<option value="${c.id}" title="${esc(dispName(c))}">${esc(line(c,cams))}</option>`).join('')+'</optgroup>'; }).join(''); }
 function syncSelects(){
-  [['#selA',A],['#selB',B]].forEach(([sel,d])=>{ const s=$(sel); s.innerHTML='<option value="">Video wählen</option>'+clips.map(c=>{ const m=c.meta; const t=m&&m.ok?metaTitle(c)+(m.run?' · '+m.run:''):dispName(c); return `<option value="${c.id}" title="${esc(dispName(c))}">${esc(t)}</option>`; }).join(''); s.value=d.clip?d.clip.id:''; });
+  [['#selA',A],['#selB',B]].forEach(([sel,d])=>{ const s=$(sel); s.innerHTML=clipOptions(sel==='#selA'?'Video A wählen':'Video B wählen'); s.value=d.clip?d.clip.id:''; });
   cmpMeta();
 }
 function cmpMeta(){ [[A,'#metaA'],[B,'#metaB']].forEach(([d,m])=>{ const c=d.clip; $(m).textContent=c&&c.dur?fmtDur(c.dur):''; }); vchipUI(); }
@@ -3844,7 +3848,7 @@ async function ghostCompute(opt){ // opt.resume: ab Bild opt.j mit fester Lage o
   if(eEnd<0.3){ GH.state='idle'; ghostUI(); toast('Zu kurz – Start/Ende prüfen.'); return; }
   // Startwert aus den Referenzpunkten (B-Videopixel → A-Videopixel) in Analyse-Koordinaten A→B umrechnen
   let refP=null; if(useOv&&OV.T){ const sA=W0/wA, sB=W0/wB, Ti=affInv(OV.T); const Mab=affMul(affMul([sB,0,0,0,sB,0],Ti),[1/sA,0,0,0,1/sA,0]); refP=affToSim(Mab,W0,hA,W0,hB); }
-  const step=clamp(eEnd/300,0.08,0.25)*(coarse?4:1); if(!bg) GH.step=step;
+  const step=clamp(eEnd/150,0.1,0.25)*(coarse?4:1); /* fein ~10 Bilder/s reicht (dazwischen wird interpoliert), Vorschau ~2.5 Bilder/s */ if(!bg) GH.step=step;
   let va,vb;
   try{ va=await loadV(A.clip.url); vb=await loadV(B.clip.url); }catch(e){ if(bg){ GH.bg=null; return; } GH.state='idle'; ghostUI(); toast('Videos konnten nicht geladen werden.'); return; }
   const ca=document.createElement('canvas'); ca.width=W0; ca.height=hA; const xa=ca.getContext('2d',{willReadFrequently:true});
@@ -3940,7 +3944,7 @@ async function ghostCompute(opt){ // opt.resume: ab Bild opt.j mit fester Lage o
     prev={p,M}; prevPA=PA; prevPB=PB;
     if(!bg){ GH.curLen=S.length; drawLive(M); }
     if(!bg&&!cutWarn&&cuts.a+cuts.b>=2){ cutWarn=true; toast('Achtung: '+(cuts.a&&cuts.b?'A und B haben':cuts.a?'Video A hat':'Video B hat')+' Kameraschnitte (TV-Bild) – Overlay braucht eine durchgehende Kamera vom gleichen Standort.',6000); }
-    if(bg){ GH.bg.p=(i+1)/n; await new Promise(r=>setTimeout(r,0)); while(EXP.live&&!stop()) await new Promise(r=>setTimeout(r,300)); } /* beim Speichern pausieren */ else { const el=(performance.now()-t0)/1000, rest=el/(i+1)*(n-i-1); ghostProgress((i+1)/n,'Bild '+(i+1)+' / '+n+' · bei '+fmtS(GH.t0+e)+' · noch ca. '+Math.ceil(rest)+' s'); await new Promise(r=>setTimeout(r,0)); }
+    if(bg){ GH.bg.p=(i+1)/n; { const nw=performance.now(); if(!GH.bgUi||nw-GH.bgUi>700){ GH.bgUi=nw; if(ovActive()) ovUI(); } } await new Promise(r=>setTimeout(r,0)); while(EXP.live&&!stop()) await new Promise(r=>setTimeout(r,300)); } /* beim Speichern pausieren */ else { const el=(performance.now()-t0)/1000, rest=el/(i+1)*(n-i-1); ghostProgress((i+1)/n,'Bild '+(i+1)+' / '+n+' · bei '+fmtS(GH.t0+e)+' · noch ca. '+Math.ceil(rest)+' s'); await new Promise(r=>setTimeout(r,0)); }
     while(!bg&&GH.paused&&!GH.abort&&GH.rewind==null){ // angehalten: Vorschau zeigen, Korrektur übernehmen
       await new Promise(r=>setTimeout(r,60));
       if(GH.fixApply){ const D=ovDMat(GH.fixApply,W0); GH.fixApply=null; M=affMul(M,affInv(D)); const p2=affToSim(M,W0,hA,W0,hB); p2[4]=p[4]; p=p2;
@@ -4247,7 +4251,7 @@ function ovAlign(){ if(!A.ready||!B.ready) return; A.pause(); B.pause(); G.playi
 function ovGo(hand){ // Schritt 2 → 3: mit der geschobenen Lage (oder ohne: automatisch) rechnen
   if(hand&&OV.fix&&OV.T){ OV.T=affMul(ovDMat(OV.fix,A.v.videoWidth),OV.T);
     const t=A.time(), fr=1/(A.fps||30); if(Math.abs(t-ovT0())>fr*0.6){ if(OV.cut.a!=null) OV.cut.a=t; else doSync(); } } // die Lage gilt für dieses Bild → hier beginnt das Overlay
-  if(!hand) OV.T=null; OV.fix=null; OV.handNew=false; OV.follow=true; OV.K=[]; ovUI(); ghostCompute({coarse:!document.body.classList.contains('touring')}); }
+  if(!hand) OV.T=null; OV.fix=null; OV.handNew=false; OV.follow=true; OV.K=[]; ovUI(); ghostCompute({}); }
 function ovAutoRun(ex){ if(AS.busy||!A.ready||!B.ready) return; A.pause(); B.pause(); G.playing=false; cmpPlayIcon(); const prev=OV.found; OV.found=null; AS.busy=true; AS.abort=false; ovUI(); const ca=A.clip, cb=B.clip;
   (async()=>{ let r=null; try{ r=await autoSyncFind(ca,cb,f=>{ const b=$('[data-ov="auto"] span')||$('[data-ov="auto"]'); if(b) b.lastChild.textContent='Sucht … '+Math.round(f*100)+' %'; },ex); }catch(e){} AS.busy=false;
     if(A.clip!==ca||B.clip!==cb){ ovUI(); return; }
@@ -4662,7 +4666,7 @@ function renderOv(){
     else if(a==='mkhand') return ovGo(true);
     else if(a==='automk') return ovGo(false);
     else if(a==='cancel') return ovStop();
-    else if(a==='make'){ OV.follow=true; OV.fix=null; if(!(GH.state==='ready'&&ghostKey()===GH.key)){ OV.K=[]; ovUI(); ghostCompute({coarse:!document.body.classList.contains('touring')}); return; } if(GH.coarse&&!GH.bg){ ghostCompute({bg:true}); } ovUI(); return; }
+    else if(a==='make'){ OV.follow=true; OV.fix=null; if(!(GH.state==='ready'&&ghostKey()===GH.key)){ OV.K=[]; ovUI(); ghostCompute({}); return; } if(GH.coarse&&!GH.bg){ ghostCompute({bg:true}); } ovUI(); return; }
     else if(a==='fix'){ A.pause(); B.pause(); G.playing=false; cmpPlayIcon(); const D=ovDAt(ovE()); OV.fix={...D}; OV.fix0={...D}; }
     else if(a==='hand') return ovAlign();
     else if(a==='ovtrail'){ OVT.on=!OVT.on; }
@@ -5358,7 +5362,7 @@ function gpsSyncBtnUI(){ if(typeof invBtnUI==='function') invBtnUI(); const b=$(
 function gpsSnakeAuto(){ if(GPS.snakeUser) return; const tr=trackOf(GD.clip), on=!!(tr&&tr.ref); if(GPS.view.snake!==on){ GPS.view.snake=on; GPS.dirty=true; } const b=$('#gpsView [data-v="snake"]'); if(b) b.classList.toggle('on',on); } /* Fahrlinie: Standard nur im Vergleich */
 function gpsSelects(){ gpsSnakeAuto(); setTimeout(()=>{ gpsSyncBtnUI(); if(typeof demoGpsFor==='function'&&mode==='gps') demoGpsFor(GD.clip); if(typeof invAuto==='function') invAuto(); },0);
   const sv=$('#gpsVideo'), st=$('#gpsTrack'), sr=$('#gpsRef'); const c=GD.clip, tr=trackOf(c);
-  sv.innerHTML='<option value="">– Video wählen –</option>'+clips.map(c=>{ const m=c.meta; const t=m&&m.ok?metaTitle(c)+(m.run?' · '+m.run:''):dispName(c); return `<option value="${c.id}" title="${esc(dispName(c))}">${esc(t)}</option>`; }).join(''); sv.value=c?c.id:'';
+  sv.innerHTML=clipOptions('Video wählen'); sv.value=c?c.id:'';
   const opts=GPS.tracks.map(t=>`<option value="${t.id}">${esc(t.name)}</option>`).join('');
   st.innerHTML='<option value="">– keine GPS-Daten –</option>'+opts; st.value=tr?tr.id:'';
   sr.innerHTML='<option value="">– keine Referenz –</option>'+opts; sr.value=tr&&tr.ref?tr.ref:'';
@@ -5843,7 +5847,7 @@ function bOnlyStep(n){ if(!B.ready) return; B.pause(); A.pause(); B.seekFrame(B.
 
 /* ---------- Strobo ---------- */
 let SD=null;
-const STR={n:8,trail:true,num:true,busy:false,res:null};
+const STR={n:8,trail:false,num:true,busy:false,res:null};
 function strobeRange(){ const c=SD.clip, L=c.loop, sp=STR.span||1; if(sp==='cut'&&L&&L.a!=null){ const b=L.b!=null&&L.b-L.a>=4?L.b:L.a+Math.round(SD.fps*2); return [L.a,Math.min(b,SD.nF-1,L.a+Math.round(SD.fps*8)),true]; } const h=Math.round(SD.fps*(sp==='cut'?1:sp)); return [Math.max(0,SD.frame-h),Math.min(SD.nF-1,SD.frame+h),false]; }
 function openStrobe(){ STR.tap=null; STR.tap0=null; STR.res=null; SD=mode==='cmp'?A:S; { const L=SD.clip&&SD.clip.loop, hasC=!!(L&&L.a!=null); STR.span=hasC?'cut':(STR.span==='cut'?1:(STR.span||1)); $$('#strR button').forEach(x=>x.classList.toggle('on',x.dataset.r===String(STR.span))); } /* Start/Ende gesetzt → Strobo genau dort */ if(!SD.ready){ toast(mode==='cmp'?'Zuerst Video A wählen.':'Zuerst ein Video öffnen.'); return; } A.pause(); B.pause(); SD.pause(); $('#strobeModal').classList.add('on'); strobeAsk(); }
 /* Schritt 1: mittleres Bild des Bereichs zeigen, Fahrer:in antippen lassen – dann wird nie Gondel oder Publikum gewählt */
@@ -5933,7 +5937,7 @@ async function strobeRun(){
       cents.push([sx/sa,sy/sa]);
       if(i%2===1){ prog(0.92+0.07*i/n,'Fahrer:in freistellen …'); await new Promise(r=>setTimeout(r,0)); } }
     const oc=$('#strCanvas'); oc.width=PW; oc.height=PH; const ox=oc.getContext('2d'); ox.putImageData(new ImageData(out,PW,PH),0,0);
-    STR.res={cents,cuts,bg,PW,PH,OW,OH:PH,base:ox.getImageData(0,0,PW,PH),fr,name:base(c.name)+'_Strobo_F'+a+'-'+b}; strobeDecor();
+    STR.res={AF,MA:MA.map(m=>{ const q=m.slice(); q[2]*=s; q[5]*=s; return q; }),x0,y0,a,b,url:c.url,fps:SD.fps,cents,cuts,bg,PW,PH,OW,OH:PH,base:ox.getImageData(0,0,PW,PH),fr,name:base(c.name)+'_Strobo_F'+a+'-'+b}; strobeDecor();
     $('#strProg').hidden=true; $('#strSave').disabled=false; $('#strVid').disabled=false;
     $('#strInfo').innerHTML='<span class="es-r"><span>Bereich</span><b>'+(a/SD.fps).toFixed(2)+' – '+(b/SD.fps).toFixed(2)+' s</b></span><span class="es-r"><span>Abstand</span><b>'+((b-a)/(n-1)/SD.fps).toFixed(2)+' s</b></span>'+(weak>n/3?'<span class="str-warn">Kamera stark bewegt – Ergebnis prüfen</span>':'');
   }catch(e){ console.error(e); toast('Strobo konnte nicht berechnet werden.'); $('#strProg').hidden=true; }
@@ -5966,27 +5970,32 @@ $('#strCanvas').addEventListener('click',e=>{ if(STR.busy) return; const c=e.cur
   if(STR.await){ STR.await=false; $('#strobeModal').classList.remove('asking'); STR.tap0=[u,v]; STR.tap=null; strobeRun(); return; }
   if(!STR.res) return; STR.tap0=null; STR.tap=[u*c.width,v*c.height]; toast('Fahrer:in wird neu gesucht …',1800); strobeRun(); });
 $('#strN').addEventListener('click',e=>{ const b=e.target.closest('[data-n]'); if(!b||STR.busy) return; STR.n=+b.dataset.n; $$('#strN button').forEach(x=>x.classList.toggle('on',x===b)); strobeRun(); });
-$('#strTrail').addEventListener('change',e=>{ STR.trail=e.target.checked; strobeDecor(); });
+
 $('#strNum').addEventListener('change',e=>{ STR.num=e.target.checked; strobeDecor(); });
 $('#strSave').addEventListener('click',strobeSave);
 /* Strobo-Video: Positionen erscheinen nacheinander, am Schluss steht das ganze Bild */
 async function strobeVideo(){ const R=STR.res; if(!R||STR.busy) return; STR.busy=true; const btn=$('#strVid'); btn.disabled=true; btn.textContent='Video …';
-  try{ const W=R.PW&~1, H=R.PH&~1, cv=document.createElement('canvas'); cv.width=W; cv.height=H; const x=cv.getContext('2d'), img=new ImageData(new Uint8ClampedArray(R.bg),R.PW,R.PH), FPS=25, HOLD=Math.round(FPS*0.45), END=FPS*2;
-    const frames=[]; const n=R.cents.length;
-    const paint=k=>{ const c=R.cuts[k]; if(c) for(let q=0;q<c.length;q+=4){ const j=c[q]*4; img.data[j]=c[q+1]; img.data[j+1]=c[q+2]; img.data[j+2]=c[q+3]; } x.putImageData(img,0,0); strobeDecor(x,k); };
-    const cfg=typeof wcConfig==='function'?await wcConfig(W,H,FPS):null;
-    if(cfg){ const mux=new Mp4Muxer.Muxer({target:new Mp4Muxer.ArrayBufferTarget(),video:{codec:'avc',width:W,height:H},fastStart:'in-memory'}); let err=null; const enc=new VideoEncoder({output:(ch,m)=>mux.addVideoChunk(ch,m),error:e=>err=e}); enc.configure(cfg);
-      let fi=0; const put=()=>{ const vf=new VideoFrame(cv,{timestamp:Math.round(fi*1e6/FPS),duration:Math.round(1e6/FPS)}); enc.encode(vf,{keyFrame:fi%50===0}); vf.close(); fi++; };
-      x.putImageData(img,0,0); for(let h=0;h<HOLD;h++) put();
-      for(let k=0;k<n;k++){ paint(k); for(let h=0;h<HOLD;h++) put(); if(k%2) await new Promise(r=>setTimeout(r,0)); }
-      for(let h=0;h<END;h++) put(); await enc.flush(); enc.close(); mux.finalize(); if(err) throw err;
-      saveOut(new Blob([mux.target.buffer],{type:'video/mp4'}),R.name+'.mp4',SD.clip,'Strobo-Video'); }
-    else { const st=cv.captureStream(FPS), mime=['video/mp4;codecs=avc1','video/mp4','video/webm'].find(t=>MediaRecorder.isTypeSupported(t))||''; const rec=new MediaRecorder(st,mime?{mimeType:mime}:{}), ch=[]; rec.ondataavailable=e=>e.data.size&&ch.push(e.data);
-      const done=new Promise(r=>rec.onstop=r); rec.start(200); const w=ms=>new Promise(r=>setTimeout(r,ms));
-      x.putImageData(img,0,0); await w(450); for(let k=0;k<n;k++){ paint(k); await w(450); } await w(2000); rec.stop(); await done;
-      const t=rec.mimeType||mime||'video/webm'; saveOut(new Blob(ch,{type:t}),R.name+(t.includes('mp4')?'.mp4':'.webm'),SD.clip,'Strobo-Video'); } }
+  /* Das Video läuft normal (Kameraschwenk ausgeglichen, wie im Strobo-Bild); sobald die Fahrer:in eine Position passiert hat, bleibt sie dort stehen */
+  let v=null;
+  try{ v=await loadV(R.url); const W=R.PW&~1, H=R.PH&~1, cv=document.createElement('canvas'); cv.width=W; cv.height=H; const x=cv.getContext('2d'), FPS=25;
+    const bgI=new ImageData(new Uint8ClampedArray(R.bg),R.PW,R.PH), stamp=document.createElement('canvas'); stamp.width=R.PW; stamp.height=R.PH; const sx=stamp.getContext('2d'), stI=sx.createImageData(R.PW,R.PH);
+    const addStamp=k=>{ const c=R.cuts[k]; if(!c) return; for(let q=0;q<c.length;q+=4){ const j=c[q]*4; stI.data[j]=c[q+1]; stI.data[j+1]=c[q+2]; stI.data[j+2]=c[q+3]; stI.data[j+3]=255; } sx.putImageData(stI,0,0); };
+    const fr0=document.createElement('canvas'); fr0.width=R.OW; fr0.height=Math.round(R.OW*v.videoHeight/v.videoWidth); const fx=fr0.getContext('2d');
+    const matAt=f=>{ const AF=R.AF; let i=0; while(i+1<AF.length&&AF[i+1]<=f) i++; const j=Math.min(AF.length-1,i+1), t=AF[j]>AF[i]?clamp((f-AF[i])/(AF[j]-AF[i]),0,1):0; return R.MA[i].map((q,k)=>q+(R.MA[j][k]-q)*t); };
+    const step=Math.max(1,Math.round(R.fps/FPS)), frames=[]; for(let f=R.a;f<=R.b;f+=step) frames.push(f);
+    const cfg=typeof wcConfig==='function'?await wcConfig(W,H,FPS):null; if(!cfg) throw new Error('Video-Kodierung fehlt in diesem Browser');
+    const mux=new Mp4Muxer.Muxer({target:new Mp4Muxer.ArrayBufferTarget(),video:{codec:'avc',width:W,height:H},fastStart:'in-memory'}); let err=null; const enc=new VideoEncoder({output:(ch,m)=>mux.addVideoChunk(ch,m),error:e=>err=e}); enc.configure(cfg);
+    let fi=0; const put=()=>{ const vf=new VideoFrame(cv,{timestamp:Math.round(fi*1e6/FPS),duration:Math.round(1e6/FPS)}); enc.encode(vf,{keyFrame:fi%50===0}); vf.close(); fi++; };
+    let nextK=0;
+    for(let q=0;q<frames.length;q++){ const f=frames[q]; await seekV(v,(f+0.5)/R.fps); fx.drawImage(v,0,0,fr0.width,fr0.height);
+      while(nextK<R.fr.length&&R.fr[nextK]<f){ addStamp(nextK); nextK++; } /* erst stempeln, wenn die Position vorbei ist */
+      x.setTransform(1,0,0,1,0,0); x.putImageData(bgI,0,0); const iv=affInv(matAt(f)); x.setTransform(1,0,0,1,-R.x0,-R.y0); x.transform(iv[0],iv[3],iv[1],iv[4],iv[2],iv[5]); x.drawImage(fr0,0,0); x.setTransform(1,0,0,1,0,0);
+      x.drawImage(stamp,0,0); if(STR.num) strobeDecor(x,nextK-1); put(); btn.textContent='Video '+Math.round(q/frames.length*100)+' %'; if(q%3===2) await new Promise(r=>setTimeout(r,0)); }
+    for(let k=nextK;k<R.fr.length;k++) addStamp(k); x.putImageData(bgI,0,0); x.drawImage(stamp,0,0); strobeDecor(x,R.fr.length-1); for(let h=0;h<FPS*2;h++) put(); /* am Schluss das ganze Strobo-Bild */
+    await enc.flush(); enc.close(); mux.finalize(); if(err) throw err;
+    saveOut(new Blob([mux.target.buffer],{type:'video/mp4'}),R.name+'.mp4',SD.clip,'Strobo-Video'); }
   catch(e){ console.error(e); toast('Strobo-Video ging nicht: '+(e&&e.message||e),4000); }
-  finally{ STR.busy=false; btn.disabled=false; btn.textContent='Video'; } }
+  finally{ try{ v&&v.remove(); }catch(e){} STR.busy=false; btn.disabled=false; btn.textContent='Video'; } }
 $('#strVid').addEventListener('click',strobeVideo);
 $$('#strN button').forEach(b=>b.classList.toggle('on',+b.dataset.n===STR.n));
 
@@ -6579,7 +6588,7 @@ if(false&&!LS.get('hint1',0)){ setTimeout(()=>{ toast(matchMedia('(pointer:coars
 
 /* Update-Hinweis: prüft version.json auf GitHub Pages; «Aktualisieren» lädt die Seite ohne Cache neu */
 (()=>{
-  const BUILD='20261031182209'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
+  const BUILD='20261031194826'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
   // nach einem Update die ?v=… aus der Adresse entfernen
   try{ const u=new URL(location.href); if(u.searchParams.has('v')){ u.searchParams.delete('v'); history.replaceState(null,'',u.pathname+(u.search||'')+u.hash); } }catch(e){}
   const el=$('#upd'); let latest=null, snoozed=null, busy=false;
