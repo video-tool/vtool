@@ -107,6 +107,7 @@ body.m-cmp .clip.on{border-color:var(--line);box-shadow:none}
 .stage{position:relative;overflow:hidden;aspect-ratio:16/9;max-width:100%;width:100%;touch-action:pan-y;user-select:none;-webkit-user-select:none}
 .stage.zoomed{touch-action:none;cursor:grab}
 .stage.tool{cursor:crosshair;touch-action:none}
+@media (pointer:coarse){ .stage{touch-action:none} .stage video{pointer-events:none} } /* Touch: Wischen selbst steuern (iOS liefert sonst nicht zuverlässig waagrechte Bewegungen); senkrecht scrollt die Seite von Hand */
 .zoomer{position:absolute;inset:0;transform-origin:0 0}
 .zoomer video{width:100%;height:100%;object-fit:contain;display:block;background:var(--stage)}
 .zoomer canvas.ann{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
@@ -1352,6 +1353,36 @@ html.vt-back::view-transition-new(mainview){animation:vtInL .45s cubic-bezier(.2
 #viewCmp .ov-namebtn.on{background:rgba(255,255,255,.22)!important;color:#fff!important;border-color:rgba(255,255,255,.3)!important}
 #viewCmp .ov-namebtn svg{width:15px;height:15px}
 /* Teilen (iPhone / iPad) */
+/* ---------- Videoauswahl als Bottom-Sheet (Handy) ---------- */
+.vp-sheet{position:fixed;inset:0;z-index:9250;display:flex;align-items:flex-end;justify-content:center;background:rgba(8,10,14,.5);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);opacity:0;transition:opacity .22s}
+.vp-sheet.on{opacity:1}
+.vp-card{width:100%;max-width:560px;max-height:86dvh;display:flex;flex-direction:column;background:#161a20;color:#eef1f5;border-radius:22px 22px 0 0;box-shadow:0 -24px 60px -20px rgba(0,0,0,.7);transform:translateY(100%);transition:transform .32s cubic-bezier(.22,1,.36,1);padding-bottom:env(safe-area-inset-bottom,0px)}
+.vp-sheet.on .vp-card{transform:none}
+.vp-grab{width:38px;height:5px;border-radius:3px;background:rgba(255,255,255,.22);margin:9px auto 0}
+.vp-hd{display:flex;align-items:center;gap:10px;padding:12px 16px 10px}
+.vp-hd .badge{width:26px;height:26px;border-radius:8px;display:grid;place-items:center;font:800 13px var(--font);color:#fff;flex:none}
+.vp-hd h4{margin:0;font:750 17px var(--font);flex:1;letter-spacing:-.01em}
+.vp-x{width:34px;height:34px;border-radius:50%;border:none;background:rgba(255,255,255,.08);color:#cfd5dd;display:grid;place-items:center;font-size:16px;cursor:pointer}
+.vp-q{margin:0 16px 8px;position:relative}
+.vp-q input{width:100%;box-sizing:border-box;height:40px;border-radius:12px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.06);color:#fff;font:500 16px var(--font);padding:0 12px 0 36px;outline:none}
+.vp-q input:focus{border-color:rgba(255,90,74,.6);background:rgba(255,255,255,.09)}
+.vp-q svg{position:absolute;left:11px;top:11px;width:18px;height:18px;color:#8a94a3}
+.vp-list{overflow:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding:0 10px 14px}
+.vp-g{position:sticky;top:0;z-index:1;background:#161a20;padding:12px 6px 6px;font:700 11px var(--font);letter-spacing:.08em;text-transform:uppercase;color:#8a94a3;display:flex;justify-content:space-between}
+.vp-g span:last-child{font-weight:600;letter-spacing:0;text-transform:none}
+.vp-row{display:flex;align-items:center;gap:12px;width:100%;border:none;background:transparent;color:inherit;text-align:left;padding:7px 8px;border-radius:14px;cursor:pointer;font:inherit}
+.vp-row:active{background:rgba(255,255,255,.07)}
+.vp-row.cur{background:rgba(255,90,74,.12);box-shadow:inset 0 0 0 1px rgba(255,90,74,.45)}
+.vp-th{width:72px;height:41px;border-radius:9px;flex:none;background:#0b0e12 center/cover no-repeat;position:relative;overflow:hidden;box-shadow:inset 0 0 0 1px rgba(255,255,255,.06)}
+.vp-th i{position:absolute;right:4px;bottom:3px;font:600 10px var(--mono);font-style:normal;color:#fff;background:rgba(5,7,10,.7);padding:0 4px;border-radius:4px}
+.vp-tx{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.vp-tx b{font:650 15.5px var(--font);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.vp-tx small{font:500 12.5px var(--font);color:#9aa4b1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.vp-ck{width:22px;height:22px;flex:none;color:#ff5a4a;display:grid;place-items:center}
+.vp-row:not(.cur) .vp-ck{visibility:hidden}
+.vp-row.other .vp-tx b::after{content:attr(data-o);margin-left:7px;font:700 10px var(--font);color:#fff;padding:1px 6px;border-radius:5px;vertical-align:2px}
+.vp-row.other.oa .vp-tx b::after{background:var(--a,#3e8bff)} .vp-row.other.ob .vp-tx b::after{background:var(--b,#f08a3c)}
+.vp-empty{padding:28px 12px;text-align:center;color:#8a94a3;font:500 14px var(--font)}
 .share-sheet{position:fixed;inset:0;z-index:9200;display:flex;align-items:flex-end;justify-content:center;background:rgba(10,12,16,.45);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);opacity:0;transition:opacity .25s;padding:12px 12px calc(12px + env(safe-area-inset-bottom,0px))}
 .share-sheet.on{opacity:1}
 .ss-card{width:min(420px,100%);background:#fff;color:#14181f;border-radius:22px;padding:20px 18px 14px;display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;box-shadow:0 30px 70px -20px rgba(0,0,0,.6);transform:translateY(30px);transition:transform .35s cubic-bezier(.22,1.2,.36,1)}
@@ -1904,9 +1935,9 @@ body.no-hdr .cmp-tools>.save-w .ctl{height:34px!important}
 @media (max-width:999px){
   .ov-zl{width:100%}
   .ov-say{white-space:normal}
-  .ov-bub{top:auto;bottom:calc(100% + 10px)}
-  .ov-bub::before{top:auto;bottom:-6px}
 }
+@media (min-width:761px) and (max-width:999px){ .ov-bub{top:auto;bottom:calc(100% + 10px)} .ov-bub::before{top:auto;bottom:-6px} }
+@media (max-width:760px){ .ov-bub{top:calc(100% + 8px);bottom:auto;z-index:200;max-width:calc(100% - 16px);font-size:13px;box-shadow:0 18px 44px -10px rgba(0,0,0,.75)} .ov-bub::before{top:-6px;bottom:auto} } /* Handy: Hinweis unter der Zeile, nicht unter die Kopfzeile */
 /* ---- A/B-Auswahl als kompakte Chips in der Kopfzeile ---- */
 #viewCmp .c-head>.cmp-head{display:none!important}
 .vc-top{position:absolute;top:10px;left:10px;z-index:7;display:flex;flex-wrap:wrap;gap:6px;max-width:calc(100% - 76px);pointer-events:none}
@@ -3265,7 +3296,7 @@ class Deck{
           this.hover=uv; this.annDirty=true; this.hint(); return; }
         drawing=true; this.draft={t:DRAW.tool,c:DRAW.color,p:DRAW.tool==='free'?[uv]:[uv,uv]}; this.annDirty=true; return; }
       tap={x:e.clientX,y:e.clientY,t:performance.now()}; if(this.z.s>1){ pan={x:e.clientX,y:e.clientY}; st.setPointerCapture(e.pointerId); }
-      else if(e.pointerType==='touch'){ swipe={x:e.clientX,y:e.clientY,f:this.frame,on:false}; } // Handy: waagrecht wischen = Bild für Bild
+      else if(e.pointerType==='touch'&&!('ontouchstart' in window)){ swipe={x:e.clientX,y:e.clientY,f:this.frame,on:false}; } // Handy ohne Touch-Ereignisse: waagrecht wischen = Bild für Bild (sonst übernimmt der Touch-Weg unten – nie beide gleichzeitig, sonst springt das Bild hin und her)
     });
     st.addEventListener('pointermove',e=>{
       if(DRAW.tool==='angle'&&this.draft&&this.ready){ const uv=this.toUV(e); const p=this.draft.p; this.draft._pv=uv; this.annDirty=true; }
@@ -3280,9 +3311,10 @@ class Deck{
     });
     /* iPhone: Wischen zusätzlich über Touch-Ereignisse (Safari bricht Zeiger-Ereignisse beim Scrollen ab) */
     let tsw=null;
-    st.addEventListener('touchstart',e=>{ if(!this.ready||e.touches.length!==1||DRAW.tool!=='none'||this.z.s>1||e.target.closest('.empty,.rail,.st-fs,.vchip,button')){ tsw=null; return; } const t=e.touches[0]; tsw={x:t.clientX,y:t.clientY,f:this.frame,on:false}; },{passive:true});
+    st.addEventListener('touchstart',e=>{ if(!this.ready||e.touches.length!==1||DRAW.tool!=='none'||this.z.s>1||(this===A&&typeof OV!=='undefined'&&(OV.fix||OV.pick||OV.nameQ&&OV.nameQ.length||(typeof OVT!=='undefined'&&OVT.edit)))||e.target.closest('.empty,.rail,.st-fs,.vchip,button,.ov-tag,.trail-hint')){ tsw=null; return; } const t=e.touches[0]; tsw={x:t.clientX,y:t.clientY,f:this.frame,on:false}; },{passive:true});
     st.addEventListener('touchmove',e=>{ if(!tsw||e.touches.length!==1) return; const t=e.touches[0], dx=t.clientX-tsw.x, dy=t.clientY-tsw.y;
-      if(!tsw.on){ if(Math.abs(dx)>10&&Math.abs(dx)>Math.abs(dy)*1.3){ tsw.on=true; tsw.x=t.clientX; this.pause(); } else if(Math.abs(dy)>14){ tsw=null; return; } }
+      if(tsw.vert){ e.preventDefault(); const sc=tsw.sc; if(sc===document.scrollingElement||!sc) window.scrollBy(0,tsw.ly-t.clientY); else sc.scrollTop+=tsw.ly-t.clientY; tsw.ly=t.clientY; return; }
+      if(!tsw.on){ if(Math.abs(dx)>10&&Math.abs(dx)>Math.abs(dy)*1.3){ tsw.on=true; tsw.x=t.clientX; this.pause(); } else if(Math.abs(dy)>12){ /* senkrecht: Seite scrollen */ let el=st.parentElement; while(el&&el!==document.body&&!(el.scrollHeight>el.clientHeight+2&&/(auto|scroll)/.test(getComputedStyle(el).overflowY))) el=el.parentElement; tsw.vert=true; tsw.sc=el&&el!==document.body?el:document.scrollingElement; tsw.ly=t.clientY; return; } }
       if(tsw.on){ e.preventDefault(); const n=clamp(tsw.f+Math.round((t.clientX-tsw.x)/9),0,this.nF-1); if(n!==this.frame) this.seekFrame(n,true); } },{passive:false});
     st.addEventListener('touchend',()=>{ tsw=null; }); st.addEventListener('touchcancel',()=>{ tsw=null; });
     const up=e=>{ pts.delete(e.pointerId); if(pts.size<2) pinch=null; if(pts.size===0) swipe=null;
@@ -3503,6 +3535,27 @@ function vchipUI(){ [['A',A],['B',B]].forEach(([K,d])=>{ const lab=$('#vc'+K); i
   const m=c&&c.meta, b=!c?'Video wählen':(m&&m.ok&&m.athlete)?m.athlete:dispName(c), sm=c&&m&&m.ok?[m.run,m.cam&&!/^cam\s*1$/i.test(m.cam)?m.cam:''].filter(Boolean).join(' · '):'', tx=c?dispName(c):'';
   if($('b',lab).textContent!==b) $('b',lab).textContent=b; if($('small',lab).textContent!==sm) $('small',lab).textContent=sm;
   lab.parentNode.classList.toggle('empty',!o); $('#vcp'+K).title=o?('Video '+K+': '+(c?dispName(c):tx)+(c&&c.dur?' · '+fmtDur(c.dur):'')+' – klicken zum Wechseln'):'Video '+K+' wählen'; }); }
+/* Videoauswahl als Bottom-Sheet auf Touch-Geräten: breiter, mit Vorschaubild, Gruppen und Dauer (die iOS-Liste ist schmal und bricht Zeilen um) */
+const VP_ON=()=>matchMedia('(pointer:coarse)').matches||matchMedia('(max-width:760px)').matches;
+function vpOpen(sel,title,badge,col){ const cur=sel.value, other=sel.id==='selA'?$('#selB').value:sel.id==='selB'?$('#selA').value:'', ok=sel.id==='selA'?'b':'a';
+  const el=document.createElement('div'); el.className='vp-sheet';
+  const gk=c=>{ const m=c.meta; return m&&m.ok&&(m.place||m.disc)?[[m.place,m.date?m.date.slice(-4):''].filter(Boolean).join(' '),DISC_LONG[m.disc]||m.disc].filter(Boolean).join(' · '):'Weitere Videos'; };
+  const ids=new Set([...sel.options].map(o=>o.value).filter(Boolean)), L=clips.filter(c=>ids.has(String(c.id))), G=new Map(); L.forEach(c=>{ const k=gk(c); if(!G.has(k)) G.set(k,[]); G.get(k).push(c); });
+  const row=c=>{ const m=c.meta, nm=m&&m.ok&&m.athlete?m.athlete:dispName(c), sub=m&&m.ok?[m.run,m.cam,m.date].filter(Boolean).join(' · '):(c.dur?fmtDur(c.dur):''), isO=String(c.id)===String(other);
+    return `<button class="vp-row${String(c.id)===String(cur)?' cur':''}${isO?' other o'+ok:''}" data-id="${c.id}" data-s="${esc((nm+' '+sub+' '+dispName(c)).toLowerCase())}"><span class="vp-th" style="${c.poster?`background-image:url(${c.poster})`:''}">${c.dur?`<i>${fmtDur(c.dur)}</i>`:''}</span><span class="vp-tx"><b${isO?` data-o="${ok.toUpperCase()}"`:''}>${esc(nm)}</b><small>${esc(sub)}</small></span><span class="vp-ck"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span></button>`; };
+  el.innerHTML=`<div class="vp-card" role="dialog" aria-label="${esc(title)}"><div class="vp-grab"></div><div class="vp-hd">${badge?`<span class="badge" style="background:${col}">${badge}</span>`:''}<h4>${esc(title)}</h4><button class="vp-x" aria-label="Schliessen">✕</button></div>`+
+    (L.length>6?`<div class="vp-q"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><input type="search" placeholder="Name, Ort, Disziplin …" enterkeyhint="search"></div>`:'')+
+    `<div class="vp-list">${[...G].map(([k,a])=>`<div class="vp-grp"><div class="vp-g"><span>${esc(k)}</span><span>${a.length}</span></div>${a.map(row).join('')}</div>`).join('')||'<div class="vp-empty">Noch keine Videos geladen.</div>'}</div></div>`;
+  document.body.appendChild(el); requestAnimationFrame(()=>el.classList.add('on'));
+  { const c=$('.vp-row.cur',el); if(c) setTimeout(()=>c.scrollIntoView({block:'center'}),40); }
+  const close=()=>{ el.classList.remove('on'); setTimeout(()=>el.remove(),260); };
+  el.addEventListener('click',e=>{ if(e.target===el||e.target.closest('.vp-x')){ close(); return; } const b=e.target.closest('.vp-row'); if(!b) return; close(); if(sel.value!==b.dataset.id){ sel.value=b.dataset.id; sel.dispatchEvent(new Event('change',{bubbles:true})); } });
+  const q=$('.vp-q input',el); if(q) q.addEventListener('input',()=>{ const t=q.value.trim().toLowerCase(); $$('.vp-row',el).forEach(r=>r.hidden=!!t&&!r.dataset.s.includes(t)); $$('.vp-grp',el).forEach(g=>g.hidden=!$$('.vp-row:not([hidden])',g).length); });
+  /* nach unten wischen schliesst */ { const card=$('.vp-card',el), list=$('.vp-list',el); let y0=null; card.addEventListener('touchstart',e=>{ y0=list.scrollTop<=0||!list.contains(e.target)?e.touches[0].clientY:null; },{passive:true}); card.addEventListener('touchmove',e=>{ if(y0==null) return; const d=e.touches[0].clientY-y0; if(d>0){ card.style.transition='none'; card.style.transform=`translateY(${d}px)`; } },{passive:true}); card.addEventListener('touchend',e=>{ if(y0==null) return; const d=e.changedTouches[0].clientY-y0; card.style.transition=''; card.style.transform=''; if(d>90) close(); y0=null; }); } }
+[['#selA','Video A wählen','A','var(--a,#3e8bff)'],['#selB','Video B wählen','B','var(--b,#f08a3c)'],['#gpsVideo','Video wählen','','']].forEach(([id,t,bd,col])=>{ const sel=$(id); if(!sel) return; const host=sel.closest('label')||sel.parentNode;
+  const go=e=>{ if(!VP_ON()||sel.disabled) return; e.preventDefault(); e.stopPropagation(); if(e.type==='click'||e.type==='touchend') vpOpen(sel,t,bd,col); };
+  sel.addEventListener('mousedown',go,true); sel.addEventListener('touchend',go,{capture:true,passive:false}); sel.addEventListener('click',go,true); host.addEventListener('click',e=>{ if(e.target===sel) return; go(e); },true);
+  sel.addEventListener('keydown',e=>{ if(VP_ON()&&(e.key===' '||e.key==='Enter')){ e.preventDefault(); vpOpen(sel,t,bd,col); } }); });
 $('#selA').addEventListener('change',e=>{ A.setClip(clips.find(c=>c.id==e.target.value)||null); unlink(); renderLib(); });
 $('#selB').addEventListener('change',e=>{ B.setClip(clips.find(c=>c.id==e.target.value)||null); unlink(); renderLib(); });
 function cmpPlayIcon(){ $('#viewCmp .ctl.play').innerHTML=(!A.v.paused||!B.v.paused)?ICON.pause:ICON.play; }
@@ -3932,14 +3985,15 @@ const MP4R={
 };
 class FrameSrc{
   static async open(src){ const f=new FrameSrc(); const url=typeof src==='string'?src:src.url; f.url=url;
-    try{ if(typeof VideoDecoder==='undefined'||typeof VideoFrame==='undefined'||typeof EncodedVideoChunk==='undefined') throw new Error('kein WebCodecs');
+    try{ if(FrameSrc.off) throw new Error('Decoder abgeschaltet'); if(typeof VideoDecoder==='undefined'||typeof VideoFrame==='undefined'||typeof EncodedVideoChunk==='undefined') throw new Error('kein WebCodecs');
       const bl=(src&&src.file)||await (await fetch(url)).blob(); const T=await MP4R.open(bl);
       const cfg={codec:T.codec,codedWidth:T.w,codedHeight:T.h}; if(T.desc) cfg.description=T.desc; const s=await VideoDecoder.isConfigSupported(cfg); if(!s||!s.supported) throw new Error('Codec '+T.codec);
       Object.assign(f,{T,bl,cfg,fast:true,w:T.w,h:T.h,dur:T.dur,fps:T.fps,cache:new Map(),pend:new Set(),pos:0,needKey:true,win:null,hold:null,err:null}); f._mk(); return f; }
     catch(e){ f.why=String(e&&e.message||e); return f._slow(); } }
-  async _slow(){ this.fast=false; try{ this.dec&&this.dec.state!=='closed'&&this.dec.close(); }catch(e){} this._drop(); this.v=await loadV(this.url); this.w=this.v.videoWidth; this.h=this.v.videoHeight; this.dur=this.v.duration; return this; }
+  async _slow(){ if(this.v) return this; this.fast=false; try{ this.dec&&this.dec.state!=='closed'&&this.dec.close(); }catch(e){} this.hold=null; this._drop(); this.v=await loadV(this.url); this.w=this.v.videoWidth; this.h=this.v.videoHeight; this.dur=this.v.duration; return this; }
   _mk(){ const me=this; this.dec=new VideoDecoder({output:fr=>me._out(fr),error:e=>{ me.err=e; me._wake(); me._wakeDq(); }}); this.dec.addEventListener('dequeue',()=>me._wakeDq()); this.dec.configure(this.cfg); this.needKey=true; }
-  _out(fr){ const c=this.cache; { const ix=this.T.byTs.get(fr.timestamp); if(ix!=null) this.pend.delete(ix); } if(c.has(fr.timestamp)){ fr.close(); return; } c.set(fr.timestamp,fr); if(c.size>14){ const k=c.keys().next().value, o=c.get(k); c.delete(k); if(o!==this.hold) o.close(); } this._wake(); }
+  _out(fr){ const c=this.cache; { const ix=this.T.byTs.get(fr.timestamp); if(ix!=null) this.pend.delete(ix); } if(this.dead||c.has(fr.timestamp)||(this.want!=null&&fr.timestamp<this.want)){ fr.close(); this._wake(); return; } /* Bilder vor dem Ziel sofort freigeben – iOS hat nur wenige Bildpuffer, sonst bleibt der Decoder stehen */
+    c.set(fr.timestamp,fr); while(c.size>3){ const k=c.keys().next().value, o=c.get(k); c.delete(k); if(o!==this.hold) o.close(); } this._wake(); }
   _wake(){ const r=this.wk; if(r){ this.wk=null; r(); } }
   _wait(ms){ return new Promise(r=>{ this.wk=r; setTimeout(r,ms||1200); }); } /* wartet auf ein ausgegebenes Bild */
   _wakeDq(){ const r=this.wkd; if(r){ this.wkd=null; r(); } }
@@ -3949,19 +4003,23 @@ class FrameSrc{
   _idx(t){ const P=this.T.P, S=this.T.S, tt=t+1e-4; let lo=0, hi=P.length-1; while(lo<hi){ const m=(lo+hi+1)>>1; if(S[P[m]].t<=tt) lo=m; else hi=m-1; } return P[lo]; }
   _hold(fr){ const h=this.hold; if(h&&h!==fr&&!this.cache.has(h.timestamp)){ try{ h.close(); }catch(e){} } this.hold=fr; return fr; }
   _near(ts){ let best=null, bd=1e18; for(const fr of this.cache.values()){ const d=Math.abs(fr.timestamp-ts); if(d<bd){ bd=d; best=fr; } } return best; }
-  at(t){ /* Aufrufe nacheinander abarbeiten (ein Decoder, eine Position) */ const run=()=>this._at(t); const p=(this.q||Promise.resolve()).then(run,run); this.q=p.catch(()=>{}); return p; }
+  at(t){ /* Aufrufe nacheinander abarbeiten (ein Decoder, eine Position) */ const run=()=>this._atSafe(t); const p=(this.q||Promise.resolve()).then(run,run); this.q=p.catch(()=>{}); return p; }
+  async _atSafe(t){ if(!this.fast) return this._at(t); let to; const lim=new Promise(r=>{ to=setTimeout(()=>r('zeit'),this.first?6000:3500); }); /* Zeitlimit: hängt der Decoder (z. B. iOS), auf <video> umschalten */
+    const r=await Promise.race([this._at(t).then(x=>({x}),e=>({e})),lim]); clearTimeout(to); this.first=true;
+    if(r==='zeit'||r.e){ console.warn('FrameSrc: Decoder → <video>',r==='zeit'?'Zeitlimit':r.e); this.dead=true; FrameSrc.off=FrameSrc.off||r==='zeit'; await this._slow(); await seekV(this.v,t); return this.v; }
+    return r.x; }
   async _at(t){ if(!this.fast){ await seekV(this.v,t); return this.v; }
-    try{ const S=this.T.S, i=this._idx(t), ts=S[i].ts; let fr=this.cache.get(ts); if(fr) return this._hold(fr);
+    try{ const S=this.T.S, i=this._idx(t), ts=S[i].ts; this.want=ts; let fr=this.cache.get(ts); if(fr) return this._hold(fr);
       const kf=S[i].kf; if(this.needKey||(i<this.pos&&!this.pend.has(i))||kf>this.pos){ if(!this.needKey){ try{ this.dec.reset(); }catch(e){} this.dec.configure(this.cfg); } this.pend.clear(); this.pos=kf; this.needKey=false; } /* Zielbild ist weder im Cache noch im Decoder → ab Schlüsselbild neu */
       const LOOK=6, MAXL=28, feed=async()=>{ if(this.dec.decodeQueueSize>16) await this._waitDq(400); const s=S[this.pos]; this.pend.add(this.pos); this.pos++; const data=await this._bytes(s.off,s.sz); this.dec.decode(new EncodedVideoChunk({type:s.key?'key':'delta',timestamp:s.ts,duration:s.dus,data})); };
-      for(let guard=0;guard<6000;guard++){ fr=this.cache.get(ts); if(fr) return this._hold(fr); if(this.err) throw this.err;
+      for(let guard=0;guard<6000;guard++){ if(this.dead) throw new Error('abgebrochen'); fr=this.cache.get(ts); if(fr) return this._hold(fr); if(this.err) throw this.err;
         const ahead=this.pos-i; /* wie weit über das Zielbild hinaus schon gefüttert */
         if(this.pos<S.length&&ahead<LOOK){ await feed(); continue; }
         if(this.dec.decodeQueueSize>0){ await this._wait(800); continue; } /* Decoder arbeitet noch – Bilder kommen */
         if(this.pos<S.length&&ahead<MAXL){ await feed(); await this._wait(300); continue; } /* Decoder hält Bilder zurück (Umsortierung) → eines mehr geben */
         await this.dec.flush(); this.needKey=true; this.pend.clear(); fr=this.cache.get(ts)||this._near(ts); if(fr) return this._hold(fr); throw new Error('Bild fehlt'); }
       throw new Error('Decoder hängt'); }
-    catch(e){ console.warn('FrameSrc → <video>',e); await this._slow(); await seekV(this.v,t); return this.v; } }
+    catch(e){ throw e; } }
   close(){ this.hold=null; this._drop(); try{ this.dec&&this.dec.state!=='closed'&&this.dec.close(); }catch(e){} if(this.v){ try{ this.v.removeAttribute('src'); this.v.load(); this.v.remove(); }catch(e){} this.v=null; } }
 }
 async function ghostCompute(opt){ // opt.resume: ab Bild opt.j mit fester Lage opt.p neu rechnen, davor bleibt · opt.coarse: Schnellvorschau (jedes 4. Bild) · opt.bg: fein im Hintergrund
@@ -3984,6 +4042,15 @@ async function ghostCompute(opt){ // opt.resume: ab Bild opt.j mit fester Lage o
   let IA=null, IB=null; /* aktuelles Bildpaar */
   const ca=document.createElement('canvas'); ca.width=W0; ca.height=hA; const xa=ca.getContext('2d',{willReadFrequently:true});
   const cb=document.createElement('canvas'); cb.width=W0; cb.height=hB; const xb=cb.getContext('2d',{willReadFrequently:true});
+  /* B wurde an einem anderen Bild von Hand übereinandergelegt als dort, wo die Berechnung beginnt → Lage über die Kamerabewegung von A und B zum Startbild mitnehmen */
+  if(refP&&!bg&&!(opt&&opt.resume)&&OV.Tt!=null&&Math.abs(OV.Tt-GH.t0)>0.6/(A.fps||30)){ try{
+    const gp=async(src,t,x,h)=>{ const im=await src.at(t); x.drawImage(im,0,0,W0,h); return pyramid(grayOf(x.getImageData(0,0,W0,h)),W0,h); };
+    const d=GH.t0-OV.Tt, ns=Math.max(1,Math.ceil(Math.abs(d)/0.1)); let M=simToAff(refP,W0,hA,W0,hB), qa0=[0,0,0,0,0], qb0=[0,0,0,0,0];
+    let pA=await gp(va,OV.Tt+0.5/A.fps,xa,hA), pB=await gp(vb,OV.Tt+GH.off+0.5/B.fps,xb,hB);
+    for(let k=1;k<=ns;k++){ const t=OV.Tt+d*k/ns, nA=await gp(va,t+0.5/A.fps,xa,hA), nB=await gp(vb,t+GH.off+0.5/B.fps,xb,hB);
+      const ra=align(pA,nA,qa0,false,1,true), rb=align(pB,nB,qb0,false,1,true); if(!ra.ok||!rb.ok||ra.inl<0.3||rb.inl<0.3) throw new Error('Kette');
+      M=affMul(affMul(simToAff(rb.p,W0,hB,W0,hB),M),affInv(simToAff(ra.p,W0,hA,W0,hA))); qa0=ra.p.slice(); qa0[4]=0; qb0=rb.p.slice(); qb0[4]=0; pA=nA; pB=nB; }
+    const r=affToSim(M,W0,hA,W0,hB); r[4]=refP[4]; refP=r; }catch(e){ console.warn('Handlage nicht übertragbar',e); } }
   const DBG=[]; if(!bg) GH.dbg=DBG; const hist=[]; let fail=0; const S=[]; let prev=null, prevPA=null, prevPB=null, pInit=[0,0,0,0,0], lastQa=[0,0,0,0,0], lastQb=[0,0,0,0,0]; const trk={a:null,b:null};
   const n=Math.max(2,Math.floor(eEnd/step)+1), t0=performance.now();
   GH.paused=false; GH.rewind=null; GH.fixApply=null;
@@ -4384,7 +4451,7 @@ function ovAlign(){ if(!A.ready||!B.ready) return; A.pause(); B.pause(); G.playi
   if(!G.linked||OV.edit){ doSync(); OV.edit=false; } OV.follow=false; OV.pick=null;
   if(!OV.T){ OV.T=[A.v.videoWidth/B.v.videoWidth,0,0,0,A.v.videoHeight/B.v.videoHeight,0]; } OV.handNew=false; OV.fix={dx:0,dy:0,s:1,r:0}; ovUI(); }
 function ovGo(hand){ // Schritt 2 → 3: mit der geschobenen Lage (oder ohne: automatisch) rechnen
-  if(hand&&OV.fix&&OV.T){ OV.T=affMul(ovDMat(OV.fix,A.v.videoWidth),OV.T);
+  if(hand&&OV.fix&&OV.T){ OV.T=affMul(ovDMat(OV.fix,A.v.videoWidth),OV.T); OV.Tt=A.time();
     const t=A.time(), fr=1/(A.fps||30); if(Math.abs(t-ovT0())>fr*0.6){ if(OV.cut.a!=null) OV.cut.a=t; else doSync(); } } // die Lage gilt für dieses Bild → hier beginnt das Overlay
   if(!hand) OV.T=null; OV.fix=null; OV.handNew=false; OV.follow=true; OV.K=[]; ovUI(); ghostCompute({}); }
 function ovAutoRun(ex){ if(AS.busy||!A.ready||!B.ready) return; A.pause(); B.pause(); G.playing=false; cmpPlayIcon(); const prev=OV.found; OV.found=null; AS.busy=true; AS.abort=false; ovUI(); const ca=A.clip, cb=B.clip;
@@ -4414,7 +4481,7 @@ function ovPoint(e){
   if(OV.pick==='a'){ OV.pa.push(pt); if(OV.pa.length===2) OV.pick='b'; }
   else { OV.pb.push(pt); if(OV.pb.length===2){ const T=ovSim(OV.pa,OV.pb); OV.pick=null;
     if(!T){ toast('Punkte liegen zu nah beieinander oder passen nicht zusammen – bitte nochmals.'); }
-    else { OV.T=T; OV.follow=false; OV.fix={dx:0,dy:0,s:1,r:0}; toast('B liegt über A – bei Bedarf noch schieben, dann «Overlay erstellen».',3600); } } }
+    else { OV.T=T; OV.Tt=A.time(); OV.follow=false; OV.fix={dx:0,dy:0,s:1,r:0}; toast('B liegt über A – bei Bedarf noch schieben, dann «Overlay erstellen».',3600); } } }
   ovUI(); }
 function ovAligned(){ return ovActive()&&!OV.pick&&(!!OV.T||ovFollowOK())&&A.ready&&B.ready; }
 function ovDrawB(x,ox,oy,w,h){ // B ausgerichtet über ein A-Bild der Grösse w×h zeichnen (Export, Standbild)
@@ -4837,7 +4904,7 @@ function renderOv(){
     else if(a==='lvback'){ GH.rewind=Math.max(1,(GH.curLen||1)-Math.max(1,Math.round(1/GH.step))); }
     else if(a==='fix'&&GH.state==='busy'){ GH.paused=true; OV.fix={dx:0,dy:0,s:1,r:0}; }
     else if(a==='fixok'&&GH.state==='busy'){ GH.fixApply={...OV.fix}; OV.fix=null; toast('Übernommen – die Berechnung läuft ab hier mit deiner Lage weiter.',2400); }
-    else if(a==='fixok'&&!ovFollowOK()){ OV.T=affMul(ovDMat(OV.fix,A.v.videoWidth),OV.T); OV.fix=null; OV.handNew=false; toast('B liegt über A – jetzt in der Zeitleiste vorklicken.',2600); }
+    else if(a==='fixok'&&!ovFollowOK()){ OV.T=affMul(ovDMat(OV.fix,A.v.videoWidth),OV.T); OV.Tt=A.time(); OV.fix=null; OV.handNew=false; toast('B liegt über A – jetzt in der Zeitleiste vorklicken.',2600); }
     else if(a==='fixok'&&ovFollowOK()){ const W0=GH.W0, j=clamp(Math.round(ovE()/GH.step),0,GH.S.length-1), p0=GH.S[j].p;
       const M=affMul(simToAff(p0,W0,GH.hA,W0,GH.hB),affInv(ovDMat(OV.fix,W0))), p2=affToSim(M,W0,GH.hA,W0,GH.hB); p2[4]=p0[4];
       const e=j*GH.step; OV.K=OV.K.filter(k=>k.e<e-OVFADE); OV.fix=null; A.pause(); B.pause(); G.playing=false; cmpPlayIcon();
@@ -6109,23 +6176,35 @@ async function strobeRun(){
     const med=have.map(sizeOf).sort((p,q)=>p-q)[have.length>>1], gapMin=med*1.15, gapWant=Math.max(gapMin,path/Math.max(1,nWant-1));
     const sel=[have[0]]; let acc=0; for(let i=1;i<have.length;i++){ acc+=dist(have[i-1],have[i]); const last=sel[sel.length-1]; if(acc>=gapWant*0.98&&dist(last,have[i])>=gapMin){ sel.push(have[i]); acc=0; } }
     { const last=have[have.length-1]; if(sel[sel.length-1]!==last&&dist(sel[sel.length-1],last)>=gapMin&&sel.length<nWant+2) sel.push(last); }
-    /* 6) Bild zusammensetzen: Rand ohne Treppen (auf den Bereich mit ≥2 Bildern zuschneiden, Löcher füllen) */
+    /* 6) Bild zusammensetzen. Figuren als ganze, weich auslaufende Ausschnitte (statt Pixelmaske → keine abgehackten Teile);
+       Hintergrund aus den echten Bildern mit weichen Rändern (keine Kanten), das Bezugsbild zuletzt. */
+    const sz=k=>Math.max(sizeOf(k),med), FEA=Math.round(Math.min(OW,OH)*0.07);
+    const fe=document.createElement('canvas'); fe.width=OW; fe.height=OH; { const fx=fe.getContext('2d'), im=fx.createImageData(OW,OH), dd=im.data; for(let y=0;y<OH;y++) for(let x=0;x<OW;x++){ const e=Math.min(x,y,OW-1-x,OH-1-y), a2=e>=FEA?255:Math.round(255*(e/FEA)*(e/FEA)*(3-2*e/FEA)); dd[(y*OW+x)*4+3]=a2; } fx.putImageData(im,0,0); }
+    const feathered=k=>{ const cv=document.createElement('canvas'); cv.width=OW; cv.height=OH; const x=cv.getContext('2d'); x.drawImage(F[k],0,0); x.globalCompositeOperation='destination-in'; x.drawImage(fe,0,0); return cv; };
+    const toPano=k=>{ const iv=affInv(MO[k]); return [iv[0],iv[3],iv[1],iv[4],iv[2]-x0,iv[5]-y0]; };
+    const full=document.createElement('canvas'); full.width=PW; full.height=PH; const fx2=full.getContext('2d');
+    { const order=[]; for(let k=0;k<nA;k+=2) if(k!==km) order.push(k); order.sort((p,q)=>Math.abs(q-km)-Math.abs(p-km)); for(const k of order){ const T=toPano(k); fx2.setTransform(...T); fx2.drawImage(feathered(k),0,0); }
+      const T=toPano(km); fx2.setTransform(...T); fx2.drawImage(F[km],0,0); fx2.setTransform(1,0,0,1,0,0); }
+    const bgc=document.createElement('canvas'); bgc.width=PW; bgc.height=PH; bgc.getContext('2d').drawImage(full,0,0);
+    /* Ausschnitt einer Figur: Ellipse um die Fahrer:in im eigenen Bild, Rand weich */
+    const stampOf=(src,cx,cy,s)=>{ const rw=s*0.52+5, rh=s*0.72+5, w=Math.ceil(rw*2), h=Math.ceil(rh*2), cv=document.createElement('canvas'); cv.width=w; cv.height=h; const x=cv.getContext('2d'); x.drawImage(src,-(cx-rw),-(cy-rh));
+      x.globalCompositeOperation='destination-in'; x.translate(rw,rh); x.scale(rw,rh); const g=x.createRadialGradient(0,0,0,0,0,1); g.addColorStop(0,'#000'); g.addColorStop(0.55,'#000'); g.addColorStop(1,'rgba(0,0,0,0)'); x.fillStyle=g; x.fillRect(-1,-1,2,2); return {cv,ox:cx-rw,oy:cy-rh}; };
+    const cents=[], sizes=[], fr=[], stamps=[];
+    sel.forEach(k=>{ const t=TR[k], cr=[t.c[0]+x0,t.c[1]+y0], cf=affApply(MO[k],cr[0],cr[1]), st=stampOf(F[k],cf[0],cf[1],sz(k)); stamps.push(Object.assign(st,{k,cr,s:sz(k)})); cents.push(t.c); sizes.push([sz(k)*0.9,sz(k)]); fr.push(AF[k]); });
+    stamps.forEach(st=>{ const T=toPano(st.k); fx2.setTransform(...T); fx2.drawImage(st.cv,st.ox,st.oy); }); fx2.setTransform(1,0,0,1,0,0);
+    /* Zuschnitt: Bereich, den mindestens zwei Bilder abdecken, plus alle Figuren */
     let bx0=PW,by0=PH,bx1=0,by1=0; for(let p=0;p<N;p++){ if(CNT[p]<Math.min(2,nb)) continue; const px=p%PW, py=(p/PW)|0; if(px<bx0) bx0=px; if(px>bx1) bx1=px; if(py<by0) by0=py; if(py>by1) by1=py; }
-    for(const k of sel){ const t=TR[k]; bx0=Math.min(bx0,Math.floor(t.c[0]-t.bw)); bx1=Math.max(bx1,Math.ceil(t.c[0]+t.bw)); by0=Math.min(by0,Math.floor(t.c[1]-t.bh*1.6)); by1=Math.max(by1,Math.ceil(t.c[1]+t.bh)); }
+    for(const k of sel){ const t=TR[k], s2=sz(k); bx0=Math.min(bx0,Math.floor(t.c[0]-s2)); bx1=Math.max(bx1,Math.ceil(t.c[0]+s2)); by0=Math.min(by0,Math.floor(t.c[1]-s2*1.6)); by1=Math.max(by1,Math.ceil(t.c[1]+s2)); }
     bx0=Math.max(0,bx0); by0=Math.max(0,by0); bx1=Math.min(PW-1,bx1); by1=Math.min(PH-1,by1);
-    const out=new Uint8ClampedArray(bg);
-    { /* Löcher: nächste gültige Farbe aus der Zeile, sonst aus der Spalte */
-      for(let y=by0;y<=by1;y++){ let lastj=-1; for(let x=bx0;x<=bx1;x++){ const j=(y*PW+x)*4; if(out[j+3]){ lastj=j; continue; } if(lastj>=0){ out[j]=out[lastj]; out[j+1]=out[lastj+1]; out[j+2]=out[lastj+2]; out[j+3]=254; } }
-        lastj=-1; for(let x=bx1;x>=bx0;x--){ const j=(y*PW+x)*4; if(out[j+3]===255){ lastj=j; continue; } if(out[j+3]===0&&lastj>=0){ out[j]=out[lastj]; out[j+1]=out[lastj+1]; out[j+2]=out[lastj+2]; out[j+3]=254; } } }
-      for(let x=bx0;x<=bx1;x++){ let lastj=-1; for(let y=by0;y<=by1;y++){ const j=(y*PW+x)*4; if(out[j+3]){ lastj=j; continue; } if(lastj>=0){ out[j]=out[lastj]; out[j+1]=out[lastj+1]; out[j+2]=out[lastj+2]; out[j+3]=254; } } }
-      for(let p=0,j=0;p<N;p++,j+=4) if(!out[j+3]){ out[j]=200; out[j+1]=204; out[j+2]=210; out[j+3]=255; } else out[j+3]=255; }
-    const cents=[], cuts=[], sizes=[], fr=[];
-    sel.forEach((k,i)=>{ const t=TR[k], cc=t.cut; for(let q=0;q<cc.length;q+=4){ const j=cc[q]*4; out[j]=cc[q+1]; out[j+1]=cc[q+2]; out[j+2]=cc[q+3]; } cents.push(t.c); cuts.push(cc); sizes.push([t.bw,t.bh]); fr.push(AF[k]); });
+    { /* noch leere Stellen (ganz am Rand) mit der nächsten Farbe füllen */ const id=fx2.getImageData(0,0,PW,PH), o=id.data;
+      for(let y=by0;y<=by1;y++){ let lj=-1; for(let x=bx0;x<=bx1;x++){ const j=(y*PW+x)*4; if(o[j+3]>200){ lj=j; continue; } if(lj>=0){ const al=o[j+3]/255; o[j]=o[j]*al+o[lj]*(1-al); o[j+1]=o[j+1]*al+o[lj+1]*(1-al); o[j+2]=o[j+2]*al+o[lj+2]*(1-al); o[j+3]=255; } }
+        lj=-1; for(let x=bx1;x>=bx0;x--){ const j=(y*PW+x)*4; if(o[j+3]===255){ lj=j; continue; } if(lj>=0){ const al=o[j+3]/255; o[j]=o[j]*al+o[lj]*(1-al); o[j+1]=o[j+1]*al+o[lj+1]*(1-al); o[j+2]=o[j+2]*al+o[lj+2]*(1-al); o[j+3]=255; } } }
+      for(let p=0,j=0;p<N;p++,j+=4) if(o[j+3]<255){ const al=o[j+3]/255; o[j]=o[j]*al+200*(1-al); o[j+1]=o[j+1]*al+204*(1-al); o[j+2]=o[j+2]*al+210*(1-al); o[j+3]=255; } fx2.putImageData(id,0,0); }
     const CW=bx1-bx0+1, CH=by1-by0+1;
-    const full=document.createElement('canvas'); full.width=PW; full.height=PH; full.getContext('2d').putImageData(new ImageData(out,PW,PH),0,0);
-    const bgc=document.createElement('canvas'); bgc.width=PW; bgc.height=PH; { const o2=new Uint8ClampedArray(out); /* Hintergrund ohne Stempel für das Video */ for(let i=0;i<cuts.length;i++){ const cc=cuts[i]; for(let q=0;q<cc.length;q+=4){ const j=cc[q]*4; o2[j]=bg[j]; o2[j+1]=bg[j+1]; o2[j+2]=bg[j+2]; } } bgc.getContext('2d').putImageData(new ImageData(o2,PW,PH),0,0); }
     const oc=$('#strCanvas'); oc.width=CW&~1; oc.height=CH&~1; const ox=oc.getContext('2d'); ox.drawImage(full,-bx0,-by0);
-    STR.res={AF,MA:MO,x0,y0,a,b,url:c.url,fps:SD.fps,cents,cuts,sizes,fr,PW,PH,OW,OH,crop:[bx0,by0,oc.width,oc.height],bgc,full,base:ox.getImageData(0,0,oc.width,oc.height),name:base(c.name)+'_Strobo_F'+a+'-'+b,found:have.length,of:nA}; strobeDecor();
+    /* Bahn der Fahrer:in (Bezugsbild-Koordinaten) fürs Video */
+    const trk=AF.map((f,k)=>TR[k]?{f,c:[TR[k].c[0]+x0,TR[k].c[1]+y0],s:sz(k)}:null).filter(Boolean);
+    STR.res={AF,MA:MO,x0,y0,a,b,url:c.url,fps:SD.fps,cents,sizes,fr,stamps,trk,med,PW,PH,OW,OH,crop:[bx0,by0,oc.width,oc.height],full,base:ox.getImageData(0,0,oc.width,oc.height),name:base(c.name)+'_Strobo_F'+a+'-'+b,found:have.length,of:nA}; strobeDecor();
     $('#strProg').hidden=true; $('#strSave').disabled=false; $('#strVid').disabled=false;
     $('#strInfo').innerHTML='<span class="es-r"><span>Bereich</span><b>'+(a/SD.fps).toFixed(2)+' – '+(b/SD.fps).toFixed(2)+' s</b></span><span class="es-r"><span>Positionen</span><b>'+sel.length+'</b></span>'+(weak>nA/3?'<span class="str-warn">Kamera stark bewegt – Ergebnis prüfen</span>':sel.length<nWant?'<span class="str-warn">Weniger Positionen, damit sich die Figuren nicht überdecken</span>':'');
   }catch(e){ console.error(e); toast(e&&e.message&&/Fahrer/.test(e.message)?e.message:'Strobo konnte nicht berechnet werden.',3500); $('#strProg').hidden=true; $('#strInfo').textContent=''; }
@@ -6163,23 +6242,28 @@ $('#strNum').addEventListener('change',e=>{ STR.num=e.target.checked; strobeDeco
 $('#strSave').addEventListener('click',strobeSave);
 /* Strobo-Video: Positionen erscheinen nacheinander, am Schluss steht das ganze Bild */
 async function strobeVideo(){ const R=STR.res; if(!R||STR.busy) return; STR.busy=true; const btn=$('#strVid'); btn.disabled=true; btn.textContent='Video …';
-  /* Das Video läuft normal (Kameraschwenk ausgeglichen, wie im Strobo-Bild); sobald die Fahrer:in eine Position passiert hat, bleibt sie dort stehen */
+  /* Das echte Kamerabild läuft normal. Jede Position, an der die Fahrer:in vorbei ist, bleibt als weich ausgeblendete Figur stehen –
+     mit der Kamerabewegung ins aktuelle Bild umgerechnet, also fest auf der Piste. Die Fahrer:in selbst liegt immer vorne. */
   let v=null;
-  try{ v=await FrameSrc.open(SD.clip&&SD.clip.url===R.url?SD.clip:R.url); const [cx0,cy0,W,H]=R.crop, cv=document.createElement('canvas'); cv.width=W; cv.height=H; const x=cv.getContext('2d'), FPS=25;
-    const stamp=document.createElement('canvas'); stamp.width=R.PW; stamp.height=R.PH; const sx=stamp.getContext('2d'), stI=sx.createImageData(R.PW,R.PH);
-    const addStamp=k=>{ const c=R.cuts[k]; if(!c) return; for(let q=0;q<c.length;q+=4){ const j=c[q]*4; stI.data[j]=c[q+1]; stI.data[j+1]=c[q+2]; stI.data[j+2]=c[q+3]; stI.data[j+3]=255; } sx.putImageData(stI,0,0); };
-    const fr0=document.createElement('canvas'); fr0.width=R.OW; fr0.height=Math.round(R.OW*v.h/v.w); const fx=fr0.getContext('2d');
+  try{ v=await FrameSrc.open(SD.clip&&SD.clip.url===R.url?SD.clip:R.url); const W=R.OW&~1, H=R.OH&~1, cv=document.createElement('canvas'); cv.width=W; cv.height=H; const x=cv.getContext('2d'), FPS=25, k9=R.OW/960;
+    const fr0=document.createElement('canvas'); fr0.width=R.OW; fr0.height=R.OH; const fx=fr0.getContext('2d');
     const matAt=f=>{ const AF=R.AF; let i=0; while(i+1<AF.length&&AF[i+1]<=f) i++; const j=Math.min(AF.length-1,i+1), t=AF[j]>AF[i]?clamp((f-AF[i])/(AF[j]-AF[i]),0,1):0; return R.MA[i].map((q,k)=>q+(R.MA[j][k]-q)*t); };
+    const posAt=f=>{ const T=R.trk; if(!T.length) return null; if(f<=T[0].f) return T[0]; if(f>=T[T.length-1].f) return T[T.length-1]; let i=0; while(i+1<T.length&&T[i+1].f<=f) i++; const a=T[i], b=T[i+1], t=(f-a.f)/Math.max(1,b.f-a.f); return {c:[a.c[0]+(b.c[0]-a.c[0])*t,a.c[1]+(b.c[1]-a.c[1])*t],s:a.s+(b.s-a.s)*t}; };
+    const soft=(src,cx,cy,s)=>{ const rw=s*0.52+5, rh=s*0.72+5, w=Math.ceil(rw*2), h=Math.ceil(rh*2), c2=document.createElement('canvas'); c2.width=w; c2.height=h; const y=c2.getContext('2d'); y.drawImage(src,-(cx-rw),-(cy-rh));
+      y.globalCompositeOperation='destination-in'; y.translate(rw,rh); y.scale(rw,rh); const g=y.createRadialGradient(0,0,0,0,0,1); g.addColorStop(0,'#000'); g.addColorStop(0.55,'#000'); g.addColorStop(1,'rgba(0,0,0,0)'); y.fillStyle=g; y.fillRect(-1,-1,2,2); return {c2,ox:cx-rw,oy:cy-rh}; };
     const step=Math.max(1,Math.round(R.fps/FPS)), frames=[]; for(let f=R.a;f<=R.b;f+=step) frames.push(f);
     const cfg=typeof wcConfig==='function'?await wcConfig(W,H,FPS):null; if(!cfg) throw new Error('Video-Kodierung fehlt in diesem Browser');
     const mux=new Mp4Muxer.Muxer({target:new Mp4Muxer.ArrayBufferTarget(),video:{codec:'avc',width:W,height:H},fastStart:'in-memory'}); let err=null; const enc=new VideoEncoder({output:(ch,m)=>mux.addVideoChunk(ch,m),error:e=>err=e}); enc.configure(cfg);
     let fi=0; const put=()=>{ const vf=new VideoFrame(cv,{timestamp:Math.round(fi*1e6/FPS),duration:Math.round(1e6/FPS)}); enc.encode(vf,{keyFrame:fi%50===0}); vf.close(); fi++; };
-    let nextK=0;
-    for(let q=0;q<frames.length;q++){ const f=frames[q], im=await v.at((f+0.5)/R.fps); fx.drawImage(im,0,0,fr0.width,fr0.height);
-      while(nextK<R.fr.length&&R.fr[nextK]<f){ addStamp(nextK); nextK++; } /* erst stempeln, wenn die Position vorbei ist */
-      x.setTransform(1,0,0,1,0,0); x.drawImage(R.bgc,-cx0,-cy0); const iv=affInv(matAt(f)); x.setTransform(1,0,0,1,-R.x0-cx0,-R.y0-cy0); x.transform(iv[0],iv[3],iv[1],iv[4],iv[2],iv[5]); x.drawImage(fr0,0,0); x.setTransform(1,0,0,1,0,0);
-      x.drawImage(stamp,-cx0,-cy0); if(STR.num) strobeDecor(x,nextK-1); put(); btn.textContent='Video '+Math.round(q/frames.length*100)+' %'; if(q%3===2) await new Promise(r=>setTimeout(r,0)); }
-    for(let k=nextK;k<R.fr.length;k++) addStamp(k); x.drawImage(R.full,-cx0,-cy0); strobeDecor(x,R.fr.length-1); for(let h=0;h<FPS*2;h++) put(); /* am Schluss das ganze Strobo-Bild */
+    const shown=R.stamps.map(()=>0); /* Deckkraft je Figur (weich einblenden) */
+    const drawFrame=(f,final)=>{ const M=matAt(f); x.setTransform(1,0,0,1,0,0); x.drawImage(fr0,0,0,W,H);
+      const P=posAt(f), live=P?affApply(M,P.c[0],P.c[1]):null;
+      R.stamps.forEach((st,i)=>{ if(!final&&R.fr[i]>=f) return; const pc=affApply(M,st.cr[0],st.cr[1]); if(!final&&live&&Math.hypot(pc[0]-live[0],pc[1]-live[1])<st.s*0.95) return; /* erst, wenn die Fahrer:in weg ist */
+        shown[i]=final?1:Math.min(1,shown[i]+0.25); const T=affMul(M,affInv(R.MA[R.AF.indexOf(R.fr[i])]||M)); x.save(); x.globalAlpha=shown[i]; x.setTransform(T[0],T[3],T[1],T[4],T[2],T[5]); x.drawImage(st.cv,st.ox,st.oy); x.restore(); });
+      if(live&&!final){ const sp=soft(fr0,live[0],live[1],P.s); x.drawImage(sp.c2,sp.ox,sp.oy); } /* Fahrer:in vorne */
+      if(STR.num) R.stamps.forEach((st,i)=>{ if(shown[i]<0.05) return; const pc=affApply(M,st.cr[0],st.cr[1]), r=clamp(st.s*0.16,7.5*k9,11*k9), px=pc[0]+st.s*0.45+r*0.6, py=pc[1]-st.s*0.5-r*0.9; x.save(); x.globalAlpha=shown[i]; x.shadowColor='rgba(0,0,0,.35)'; x.shadowBlur=3*k9; x.fillStyle='rgba(218,41,28,.95)'; x.beginPath(); x.arc(px,py,r,0,7); x.fill(); x.shadowBlur=0; x.fillStyle='#fff'; x.font=`700 ${r*1.15}px Geist,-apple-system,Segoe UI,sans-serif`; x.textAlign='center'; x.textBaseline='middle'; x.fillText(String(i+1),px,py+0.5*k9); x.restore(); }); };
+    for(let q=0;q<frames.length;q++){ const f=frames[q], im=await v.at((f+0.5)/R.fps); fx.drawImage(im,0,0,R.OW,R.OH); drawFrame(f,false); put(); btn.textContent='Video '+Math.round(q/frames.length*100)+' %'; if(q%3===2) await new Promise(r=>setTimeout(r,0)); }
+    /* am Schluss 1,5 s stehen lassen, mit allen Positionen */ drawFrame(frames[frames.length-1],true); for(let h=0;h<FPS*1.5;h++) put();
     await enc.flush(); enc.close(); mux.finalize(); if(err) throw err;
     saveOut(new Blob([mux.target.buffer],{type:'video/mp4'}),R.name+'.mp4',SD.clip,'Strobo-Video'); }
   catch(e){ console.error(e); toast('Strobo-Video ging nicht: '+(e&&e.message||e),4000); }
@@ -6689,7 +6773,7 @@ async function fieldSync(){ if(!window.indexedDB) return; let db;
     if(f.marks&&f.marks.length&&!c.markers.length){ const mk=f.marks; c.whenFps.then(()=>{ const fps=c.fps||30; c.markers=[...new Set(mk.map(t=>Math.round(t*fps)))].sort((a,b)=>a-b); c.markers.forEach(fr=>{ if(!(c.notes||{})[fr]) setNote(c,fr,'Beim Filmen'); }); saveClip(c); renderLib(); decks.forEach(d=>{ if(d.clip===c){ d.dirty=true; } }); if(typeof renderMarks==='function') renderMarks(); }); } }
   clips.filter(c=>c.field&&!seen.has(c.field)&&!decks.some(d=>d.clip===c)).forEach(c=>{ removeClip(c,true); ch=true; }); // in der Field-App gelöscht
   if(n||ch){ renderLib(); syncSelects(); }
-  if(n) toast(n===1?'1 Lauf aus «Filmen» in der Liste':n+' Läufe aus «Filmen» in der Liste',3000); }
+  } /* kein Hinweis beim Öffnen – die Läufe stehen einfach in der Liste */
 setTimeout(fieldSync,600);
 { const mq=matchMedia('(max-height:500px) and (orientation:landscape) and (pointer:coarse)'); let auto=false;
   const go=()=>{ if(mq.matches){ if(!document.body.classList.contains('pfs')&&!$('.modal.on')&&!(mode==='cmp'&&$('#viewCmp').classList.contains('overlay'))){ auto=true; pfsSet(true); } } else if(auto){ auto=false; if(document.body.classList.contains('pfs')) pfsSet(false); } };
@@ -6776,7 +6860,7 @@ if(false&&!LS.get('hint1',0)){ setTimeout(()=>{ toast(matchMedia('(pointer:coars
 
 /* Update-Hinweis: prüft version.json auf GitHub Pages; «Aktualisieren» lädt die Seite ohne Cache neu */
 (()=>{
-  const BUILD='20261031222825'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
+  const BUILD='20261031234446'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
   // nach einem Update die ?v=… aus der Adresse entfernen
   try{ const u=new URL(location.href); if(u.searchParams.has('v')){ u.searchParams.delete('v'); history.replaceState(null,'',u.pathname+(u.search||'')+u.hash); } }catch(e){}
   const el=$('#upd'); let latest=null, snoozed=null, busy=false;
