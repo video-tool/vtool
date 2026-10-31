@@ -2414,6 +2414,12 @@ header .btn-cam svg circle:last-child{animation:camDot 2s ease-in-out infinite}
   .player .dock .grp{gap:6px!important} .player .dock .dz{gap:6px!important}
   .card.player:not([hidden]){padding:8px 8px 8px!important}
 }
+.trail-hint{flex-wrap:wrap;justify-content:center;max-width:calc(100% - 20px);white-space:normal!important}
+.trail-hint .tk-say{font-weight:600;font-size:12.5px;margin-right:4px}
+.trail-hint button{display:inline-flex;align-items:center;gap:5px}
+.trail-hint button.on{background:#fff;color:#0f1216}
+.trail-hint button.pri{background:#DA291C}
+@media (max-width:760px){ .toast{top:auto!important;bottom:calc(var(--tabsH,64px) + 10px)!important;z-index:140!important} body.pfs .toast{bottom:calc(12px + env(safe-area-inset-bottom,0px))!important} } /* Hinweise immer über der unteren Leiste, nie abgeschnitten */
 </style>
 </head>
 <body class="m-single">
@@ -4193,7 +4199,7 @@ function ovUI(){ vchipPlace();
     ttl=GH.coarse?'Vorschau':'Fertig'; dot=true; say=GH.bg?'Wird verfeinert · '+Math.round((GH.bg.p||0)*100)+' %':GH.coarse?'Grob gerechnet – «…» › «Neu berechnen» rechnet fein.':'B daneben? «Korrigieren».'; chips=cut+kc;
     tip='Liegt B neben A: an der Stelle anhalten und «Korrigieren». Der Punkt links und das Band in der Zeitleiste zeigen den Zustand: grün ausgerichtet, gelb unsicher, rot Kameraschnitt. Das Auge bei den Läufen oben links blendet einen Lauf ein oder aus.';
     acts=cutBtns+ovBtn('fix','Korrigieren',OVI.fix,'ghost','B an dieser Stelle von Hand nachschieben')
-      +ovMore([OVT_READY?['ovtrail',OVT.on?'Spur ausblenden':'Spur hinter Fahrer:innen …',OVI.go]:null,OVT_READY&&OVT.trk&&OVT.key===GH.key?['ovtrailnew','Spur neu setzen (A und B antippen)',OVI.pin]:null,ovGpsPair()?['ovgps',OVG.on?'GPS-Tacho ausblenden':'GPS-Tacho einblenden',OVI.go]:null,['nameset','Namen setzen (Fahrer:innen antippen)',OVI.tag],LAY.length<3?['addrun','Weiteren Lauf dazunehmen',OVI.plus]:null,['series','Serie gegen A rechnen …',OVI.go],['make','Neu berechnen',OVI.go],['edit','Neu beginnen',OVI.back]])+ovSaveBtn(); }
+      +ovMore([OVT_READY?['ovtrailnew',OVT.keys.a.length&&OVT.key===GH.key?'Spur bearbeiten (antippen)':'Spur hinter Fahrer:innen setzen …',OVI.pin]:null,OVT_READY&&OVT.trk&&OVT.key===GH.key?['ovtrail',OVT.on?'Spur ausblenden':'Spur einblenden',OVI.go]:null,ovGpsPair()?['ovgps',OVG.on?'GPS-Tacho ausblenden':'GPS-Tacho einblenden',OVI.go]:null,['nameset','Namen setzen (Fahrer:innen antippen)',OVI.tag],LAY.length<3?['addrun','Weiteren Lauf dazunehmen',OVI.plus]:null,['series','Serie gegen A rechnen …',OVI.go],['make','Neu berechnen',OVI.go],['edit','Neu beginnen',OVI.back]])+ovSaveBtn(); }
   if(SER.on){ ttl='Serie '+(SER.i+1)+' / '+SER.list.length; dot=false; chips=''; say='<b>'+esc(lastName(SER.cur)||'')+'</b> · '+(busy?((($('#ghostBar .gprog span')||{}).textContent)||'Overlay wird erstellt'):SER.msg);
     tip='Alle gewählten Läufe werden nacheinander gegen A gerechnet und gespeichert. Tab offen lassen.'; acts=ovBtn('serstop','Serie abbrechen','','ghost','Nach dem laufenden Schritt aufhören'); }
   // drei Zonen: links Schritt (+ Zustand), Mitte kurzer Hinweis, rechts Knöpfe – nur neu zeichnen, wenn sich etwas ändert (sonst gehen Klicks verloren)
@@ -4322,67 +4328,59 @@ function ovLiveCanvas(){ let c=$('canvas.ovlive',A.stage); if(!c){ c=document.cr
    (Vorlagenvergleich NCC auf Graustufen, Suchfenster um die Vorhersage aus der letzten Bewegung, Vorlage passt sich langsam an).
    3) B-Lagen werden mit der Overlay-Ausrichtung in A-Pixel umgerechnet. 4) Ältere Punkte wandern mit der Kamerabewegung von A
    (GH.S[i].q) ins aktuelle Bild – die Spur bleibt auf dem Schnee liegen. */
-const OVT_READY=false; /* Spur-Verfolgung noch nicht zuverlässig genug → im Menü ausgeblendet (Code bleibt für die Weiterentwicklung) */
-const OVT={on:false,len:1.6,trk:null,al:null,key:'',seed:null,busy:false,pts:{}};
+const OVT_READY=true;
+/* Spur hinter den Fahrer:innen – halbautomatisch: man tippt die Fahrer:in an einigen Stellen an (Schlüsselbilder),
+   die App verfolgt nur dazwischen (vorwärts und rückwärts, Abweichung am Schlüsselbild ausgeglichen) → keine grosse Drift.
+   Verfolgung: Vorlagenvergleich (Helligkeit + Farbe), dazu Bewegung gegenüber 2 Bildern vorher (Kameraschwenk grob ausgeglichen). */
+const OVT={on:false,len:1.6,trk:null,al:null,key:'',edit:null,keys:{a:[],b:[]},seg:{a:new Map(),b:new Map()},busy:0,q:[]};
 function ovB2A(e){ const p=paramsAt(clamp(e,0,GH.eEnd)); return affMul(ovDMat(ovDAt(e),GH.W0),affInv(simToAff(p,GH.W0,GH.hA,GH.W0,GH.hB))); }
 function ovTapA(ev){ const st=A.stage, r=st.getBoundingClientRect(), R=A.rect(), z=A.z||{x:0,y:0,s:1}; const u=((ev.clientX-r.left-z.x)/z.s-R.x)/R.w, v=((ev.clientY-r.top-z.y)/z.s-R.y)/R.h; return [u*GH.W0,v*GH.W0*R.h/R.w]; }
-function trailKey(){ return GH.key+'|'+(OVT.seed&&OVT.seed.e!=null?OVT.seed.e.toFixed(2):''); }
-function ovTrailStart(){ if(!ovFollowOK()){ toast('Zuerst das Overlay erstellen.'); return; } A.pause(); B.pause(); G.playing=false; cmpPlayIcon();
-  OVT.seed={e:ovE(),a:null,b:null,step:'a'}; OVT.trk=null; OVT.on=false; ovTrailHint(); }
-function ovTrailHint(){ let h=$('#trailHint'); if(!h){ h=document.createElement('div'); h.id='trailHint'; h.className='trail-hint'; A.stage.appendChild(h); }
-  const S=OVT.seed; if(!S||!S.step){ h.hidden=true; return; } h.hidden=false;
-  h.innerHTML=S.step==='a'?'<i style="background:#3e8bff"></i>Auf Fahrer:in <b>A</b> tippen':'<i style="background:#f08a3c"></i>Auf Fahrer:in <b>B</b> tippen (durchsichtig)'+'<button data-x>Abbrechen</button>'; }
-A.stage.addEventListener('pointerdown',ev=>{ const S=OVT.seed; if(!S||!S.step||!ovActive()) return; if(ev.target.closest('button')){ if(ev.target.closest('[data-x]')){ OVT.seed=null; ovTrailHint(); } return; }
-  ev.preventDefault(); ev.stopPropagation(); const pA=ovTapA(ev);
-  if(S.step==='a'){ S.a=pA; S.step='b'; ovTrailHint(); return; }
-  const Mi=affInv(ovB2A(S.e)); S.b=affApply(Mi,pA[0],pA[1]); S.step=null; ovTrailHint(); ovTrailCompute(); },true);
-async function ovTrailCompute(){ const S=OVT.seed; if(!S||!S.a||!S.b) return; OVT.busy=true; const pr=$('#ovProg'); pr.hidden=false; const bar=$('i',pr); bar.style.width='0%';
-  let va,vb; try{ va=await loadV(A.clip.url); vb=await loadV(B.clip.url); }catch(e){ toast('Videos konnten nicht geladen werden.'); OVT.busy=false; pr.hidden=true; return; }
-  /* nur der gezeigte Teil: Start/Ende des Overlays, sonst 3 s vor bis 12 s nach dem Antippen */
-  const e0=Math.max(0,OV.cut.a!=null?OV.cut.a-GH.t0:S.e-3), e1=Math.min(GH.eEnd,OV.cut.b!=null?OV.cut.b-GH.t0:S.e+12);
-  const Wt=Math.min(640,A.v.videoWidth||640), k=Wt/GH.W0;
-  /* 1) Video abspielen und in jedem Bild dunkle/farbige Flecken (Fahrer:innen, Personen, Tore) finden – schnell, ohne Springen */
-  const scan=(v,tA,tB,hgt,onP)=>new Promise(res=>{ const cv=document.createElement('canvas'); cv.width=Wt; cv.height=hgt; const x=cv.getContext('2d',{willReadFrequently:true}); const out=[]; let fin=false, last=-1;
-    const W=Wt, H=hgt, n=W*H, m=new Uint8Array(n), lab=new Int32Array(n), stack=new Int32Array(n);
-    const proc=t=>{ x.drawImage(v,0,0,W,H); const d=x.getImageData(0,0,W,H).data;
-      for(let i=0,j=0;i<n;i++,j+=4){ const r=d[j],g=d[j+1],b=d[j+2], L=0.3*r+0.59*g+0.11*b, sat=Math.max(r,g,b)-Math.min(r,g,b); m[i]=(215-L)+0.3*sat>95?1:0; }
-      lab.fill(0); let id=0; const bl=[];
-      for(let i=0;i<n;i++){ if(!m[i]||lab[i]) continue; id++; let sp=0, a=0, sx=0, sy=0, x0=1e9,x1=-1,y0=1e9,y1=-1; stack[sp++]=i; lab[i]=id;
-        while(sp){ const q=stack[--sp], qx=q%W, qy=(q/W)|0; a++; sx+=qx; sy+=qy; if(qx<x0)x0=qx; if(qx>x1)x1=qx; if(qy<y0)y0=qy; if(qy>y1)y1=qy;
-          for(const o of [q-1,q+1,q-W,q+W]){ if(o<0||o>=n||lab[o]||!m[o]) continue; if((o===q-1&&qx===0)||(o===q+1&&qx===W-1)) continue; lab[o]=id; stack[sp++]=o; } }
-        if(a>=4&&a<n*0.01) bl.push([sx/a,sy/a,a,x1-x0+1,y1-y0+1]); }
-      out.push({t,b:bl}); };
-    const end=()=>{ if(fin) return; fin=true; v.pause(); res(out); };
-    const cb=(now,md)=>{ if(fin) return; const t=md.mediaTime; if(t>last+1e-4){ last=t; proc(t); onP(clamp((t-tA)/(tB-tA),0,1)); } if(t>=tB||v.ended){ end(); return; } v.requestVideoFrameCallback(cb); };
-    (async()=>{ for(let t=tA;t<=tB;t+=0.06){ if(!OVT.busy) break; await seekV(v,t); proc(t); onP((t-tA)/(tB-tA)); } end(); })(); }); /* Bild für Bild springen: genau und unabhängig vom Gerät */
-  const hA=Math.round(Wt*(A.v.videoHeight||9)/(A.v.videoWidth||16)), hB=Math.round(Wt*(B.v.videoHeight||9)/(B.v.videoWidth||16));
-  const pa=[0,0]; const upd=()=>{ bar.style.width=((pa[0]+pa[1])*50)+'%'; };
-  const [FA,FB]=await Promise.all([scan(va,GH.t0+e0,GH.t0+e1,hA,f=>{ pa[0]=f; upd(); }),scan(vb,GH.t0+GH.off+e0,GH.t0+GH.off+e1,hB,f=>{ pa[1]=f; upd(); })]);
-  va.remove(); vb.remove();
-  /* 2) alles in «Welt»-Lage umrechnen (Bild 0 von A): Kamerabewegung von A herausgerechnet, B über die Overlay-Ausrichtung.
-        Tore und Personen am Rand stehen dann still, die Fahrer:in bewegt sich – so lässt sie sich sicher verfolgen. */
-  const St=GH.S, st=GH.step, G=[[1,0,0,0,1,0]]; for(let i=1;i<St.length;i++) G.push(affMul(G[i-1],affInv(St[i].q||[1,0,0,0,1,0])));
-  const Gi=e=>G[clamp(Math.round(e/st),0,G.length-1)];
-  const toW=(F,isB)=>F.map(f=>{ const e=isB?f.t-GH.t0-GH.off:f.t-GH.t0, g=Gi(e), M=isB?ovB2A(e):null; return {t:f.t,e,b:f.b.map(o=>{ let q=[o[0]/k,o[1]/k]; if(M) q=affApply(M,q[0],q[1]); const w=affApply(g,q[0],q[1]); return [w[0],w[1],o[2]]; })}; });
-  const WA=toW(FA,false), WB=toW(FB,true);
-  const follow=(F,eS,seedA)=>{ const res=new Map(); if(!F.length) return res; let si=0; for(let i=1;i<F.length;i++) if(Math.abs(F[i].e-eS)<Math.abs(F[si].e-eS)) si=i;
-    const sw=affApply(Gi(eS),seedA[0],seedA[1]), U=GH.W0;
-    const isStatic=(i,o)=>{ const j=i-Math.round(0.4/0.06); const f=F[j]; if(!f) return false; for(const q of f.b) if(Math.hypot(q[0]-o[0],q[1]-o[1])<U*0.006) return true; return false; };
-    let b0=null,d0=1e9; for(const o of F[si].b){ const d=Math.hypot(o[0]-sw[0],o[1]-sw[1]); if(d<d0){ d0=d; b0=o; } } const start=b0&&d0<U*0.04?b0:[sw[0],sw[1],10]; res.set(F[si].e,[start[0],start[1],1]);
-    for(const dir of [1,-1]){ let p=[start[0],start[1]], v=[0,0], ar=start[2], lost=0, pe=F[si].e, n=0;
-      for(let i=si+dir;i>=0&&i<F.length;i+=dir){ const f=F[i], de=Math.abs(f.e-pe), pred=[p[0]+v[0]*de,p[1]+v[1]*de], R=U*0.015+Math.hypot(v[0],v[1])*de*0.5+U*0.01*lost;
-        let best=null, bs=1e9; for(const o of f.b){ const d=Math.hypot(o[0]-pred[0],o[1]-pred[1]); if(d>R) continue; let sc=d/R+Math.abs(Math.log((o[2]+1)/(ar+1)))*0.5; if(n>3&&isStatic(i,o)) sc+=0.9; if(sc<bs){ bs=sc; best=o; } }
-        if(!best||bs>1.4){ lost++; if(lost>10) break; continue; }
-        const nv=[(best[0]-p[0])/Math.max(de,1e-3),(best[1]-p[1])/Math.max(de,1e-3)], vmax=U*0.5; if(Math.hypot(nv[0],nv[1])<vmax) v=n<2?nv:[v[0]*0.7+nv[0]*0.3,v[1]*0.7+nv[1]*0.3];
-        lost=0; n++; p=[best[0],best[1]]; ar=ar*0.8+best[2]*0.2; pe=f.e; res.set(f.e,[p[0],p[1],clamp(1.2-bs,0.2,1)]); } }
-    return res; };
-  const RW={a:follow(WA,S.e,S.a),b:follow(WB,S.e,affApply(ovB2A(S.e),S.b[0],S.b[1]))};
-  pr.hidden=true; OVT.busy=false;
-  /* 3) auf die Schritte der Overlay-Rechnung bringen (A-Pixel, Breite W0); B mit der Ausrichtung nach A */
-  const N=GH.S.length, trk={a:new Array(N).fill(null),b:new Array(N).fill(null)}, al={a:new Array(N).fill(0),b:new Array(N).fill(0)};
-  const sample=(M,e)=>{ let lo=null,hi=null; for(const u of M.keys()){ if(u<=e&&(lo==null||u>lo)) lo=u; if(u>=e&&(hi==null||u<hi)) hi=u; } if(lo==null||hi==null||hi-lo>0.4) return null; const a=M.get(lo), b=M.get(hi), f=hi>lo?(e-lo)/(hi-lo):0; return [a[0]+(b[0]-a[0])*f,a[1]+(b[1]-a[1])*f,Math.min(a[2],b[2])]; };
-  for(let i=0;i<N;i++){ const e=i*st; for(const kk of ['a','b']){ const w=sample(RW[kk],e); if(!w) continue; trk[kk][i]=affApply(affInv(G[i]),w[0],w[1]); al[kk][i]=w[2]; } } /* Welt → Bild i von A */
-  OVT.trk=trk; OVT.al=al; OVT.key=GH.key; OVT.on=true; OVT.seed=null; ovTrailHint(); toast('Spur berechnet – abspielen.',2500); }
+function ovTrailReset(){ OVT.keys={a:[],b:[]}; OVT.seg={a:new Map(),b:new Map()}; OVT.trk=null; OVT.al=null; OVT.key=GH.key; }
+function ovTrailStart(){ if(!ovFollowOK()){ toast('Zuerst das Overlay erstellen.'); return; } if(OVT.key!==GH.key) ovTrailReset(); A.pause(); B.pause(); G.playing=false; cmpPlayIcon(); OVT.edit=OVT.edit||'a'; OVT.on=true; ovTrailHint(); }
+function ovTrailHint(){ let h=$('#trailHint'); if(!h){ h=document.createElement('div'); h.id='trailHint'; h.className='trail-hint'; A.stage.appendChild(h);
+    h.addEventListener('pointerdown',ev=>{ ev.stopPropagation(); const b=ev.target.closest('[data-tk]'); if(!b) return; ev.preventDefault(); const k=b.dataset.tk;
+      if(k==='done'){ OVT.edit=null; ovTrailHint(); } else if(k==='undo'){ const L=OVT.keys[OVT.edit]; if(L.length){ L.sort((x,y)=>x.t-y.t); const last=L.reduce((m,x)=>x.at>m.at?x:m,L[0]); L.splice(L.indexOf(last),1); ovTrailSeg(OVT.edit); } } else { OVT.edit=k; ovTrailHint(); } }); }
+  if(!OVT.edit){ h.hidden=true; return; } h.hidden=false; const nA=OVT.keys.a.length, nB=OVT.keys.b.length;
+  h.innerHTML=`<span class="tk-say">${OVT.busy?'Rechnet …':'Fahrer:in antippen – alle 1–2 s anhalten und wieder tippen'}</span><button data-tk="a" class="${OVT.edit==='a'?'on':''}"><i style="background:#3e8bff"></i>A ${nA}</button>${OV.hideB?'':`<button data-tk="b" class="${OVT.edit==='b'?'on':''}"><i style="background:#f08a3c"></i>B ${nB}</button>`}<button data-tk="undo" title="Letzten Punkt löschen">↶</button><button data-tk="done" class="pri">Fertig</button>`; }
+A.stage.addEventListener('pointerdown',ev=>{ if(!OVT.edit||!ovActive()||!ovFollowOK()) return; if(ev.target.closest('button,.trail-hint,.vchip,.st-fs')) return;
+  ev.preventDefault(); ev.stopPropagation(); A.pause(); B.pause(); G.playing=false; const pA=ovTapA(ev), e=ovE(), k=OVT.edit;
+  const pt=k==='a'?pA:affApply(affInv(ovB2A(e)),pA[0],pA[1]); /* B: in B-Bild-Lage */
+  const L=OVT.keys[k], near=L.findIndex(x=>Math.abs(x.e-e)<0.05); const key={e,x:pt[0],y:pt[1],at:performance.now()}; if(near>=0) L[near]=key; else L.push(key); L.sort((x,y)=>x.e-y.e);
+  ovTrailSeg(k); ovTrailHint(); },true);
+/* Segmente neu rechnen, deren Schlüsselbilder sich geändert haben */
+function ovTrailSeg(k){ const L=OVT.keys[k], need=[]; for(let i=0;i+1<L.length;i++){ const a=L[i], b=L[i+1], id=a.e.toFixed(3)+'|'+a.x.toFixed(1)+'|'+a.y.toFixed(1)+'>'+b.e.toFixed(3)+'|'+b.x.toFixed(1)+'|'+b.y.toFixed(1); need.push(id); if(!OVT.seg[k].has(id)&&!OVT.q.some(q=>q.k===k&&q.id===id)) OVT.q.push({k,id,a,b}); }
+  for(const id of [...OVT.seg[k].keys()]) if(!need.includes(id)) OVT.seg[k].delete(id); ovTrailBuild(); ovTrailRun(); }
+async function ovTrailRun(){ if(OVT.busy) return; while(OVT.q.length){ const J=OVT.q.shift(); OVT.busy=1; ovTrailHint();
+    try{ const r=await ovTrackSeg(J.k,J.a,J.b); OVT.seg[J.k].set(J.id,r); }catch(err){ console.error(err); } OVT.busy=0; ovTrailBuild(); ovTrailHint(); } }
+const TRV={};
+async function ovTrackSeg(k,ka,kb){ const isB=k==='b', clip=isB?B.clip:A.clip, d=isB?B:A; let v=TRV[k]; if(!v||v._u!==clip.url){ if(v) v.remove(); v=TRV[k]=await loadV(clip.url); v._u=clip.url; }
+  const Wt=480, sc=Wt/GH.W0, H=Math.round(Wt*(d.v.videoHeight||9)/(d.v.videoWidth||16)), tOf=e=>GH.t0+(isB?GH.off:0)+e, dt=1/15, hs=8, n=Wt*H;
+  const cv=document.createElement('canvas'); cv.width=Wt; cv.height=H; const x=cv.getContext('2d',{willReadFrequently:true});
+  const es=[]; for(let e=ka.e;e<kb.e-dt*0.3;e+=dt) es.push(e); es.push(kb.e);
+  const FR=[]; for(let i=0;i<es.length;i++){ await seekV(v,tOf(es[i])+0.01); x.drawImage(v,0,0,Wt,H); const dd=x.getImageData(0,0,Wt,H).data, F=new Float32Array(n*3), g=new Float32Array(n);
+    for(let p=0,j=0;p<n;p++,j+=4){ const L=0.3*dd[j]+0.59*dd[j+1]+0.11*dd[j+2]; F[p*3]=L; F[p*3+1]=dd[j]-L; F[p*3+2]=dd[j+2]-L; g[p]=L; } FR.push({F,g}); if(i%4===3) await new Promise(r=>setTimeout(r,0)); }
+  /* Bewegung: |Bild − Bild 2 vorher (um den Kameraschwenk verschoben)|, geglättet */
+  const small=g=>{ const w=Wt>>2, h=H>>2, o=new Float32Array(w*h); for(let y=0;y<h;y++) for(let x2=0;x2<w;x2++) o[y*w+x2]=g[(y*4)*Wt+x2*4]; return o; };
+  const shift=(g1,g0)=>{ const w=Wt>>2, h=H>>2, a=small(g1), b=small(g0); let best=1e18,bx=0,by=0; for(let sy=-6;sy<=6;sy++) for(let sx=-6;sx<=6;sx++){ let s2=0; for(let y=8;y<h-8;y+=2) for(let x2=8;x2<w-8;x2+=2){ const q=a[y*w+x2]-b[(y-sy)*w+x2-sx]; s2+=q<0?-q:q; } if(s2<best){ best=s2; bx=sx; by=sy; } } return [bx*4,by*4]; };
+  const MOT=FR.map((f,i)=>{ const j=i>=2?i-2:Math.min(FR.length-1,i+2); if(j===i) return new Float32Array(n); const [sx,sy]=shift(f.g,FR[j].g), o=FR[j].g, m=new Float32Array(n);
+    for(let y=1;y<H-1;y++) for(let x2=1;x2<Wt-1;x2++){ const yy=clamp(y-sy,0,H-1), xx=clamp(x2-sx,0,Wt-1); const q=f.g[y*Wt+x2]-o[yy*Wt+xx]; m[y*Wt+x2]=q<0?-q:q; }
+    let mx=0; for(let p=0;p<n;p+=7) if(m[p]>mx) mx=m[p]; f.mref=mx*0.6+1; return m; });
+  const patch=(F,cx,cy)=>{ const N=(2*hs+1)**2, P=new Float32Array(N*3); cx=clamp(Math.round(cx),hs,Wt-hs-1); cy=clamp(Math.round(cy),hs,H-hs-1); let q=0; for(let yy=-hs;yy<=hs;yy++) for(let xx=-hs;xx<=hs;xx++){ const o=((cy+yy)*Wt+cx+xx)*3; P[q++]=F[o]; P[q++]=F[o+1]; P[q++]=F[o+2]; }
+    for(let c=0;c<3;c++){ let m=0; for(let i=c;i<P.length;i+=3) m+=P[i]; m/=N; for(let i=c;i<P.length;i+=3) P[i]-=m; } let s2=0; for(let i=0;i<P.length;i++) s2+=P[i]*P[i]; s2=Math.sqrt(s2)||1; for(let i=0;i<P.length;i++) P[i]/=s2; return P; };
+  const mAt=(m,cx,cy)=>{ cx=clamp(Math.round(cx),3,Wt-4); cy=clamp(Math.round(cy),3,H-4); let s2=0; for(let yy=-3;yy<=3;yy++) for(let xx=-3;xx<=3;xx++) s2+=m[(cy+yy)*Wt+cx+xx]; return s2/49; };
+  const track=(i0,i1,p0)=>{ const step=i1>i0?1:-1, T0=patch(FR[i0].F,p0[0],p0[1]); let T=Float32Array.from(T0), p=p0.slice(), v=[0,0]; const out={}; out[i0]=p.slice();
+    for(let i=i0+step;step>0?i<=i1:i>=i1;i+=step){ const F=FR[i].F, m=MOT[i], mr=FR[i].mref, pr=[p[0]+v[0],p[1]+v[1]], R=Math.round(clamp(Math.hypot(v[0],v[1])*1.5+4,5,16)); let best=-9,bp=pr;
+      for(let dy=-R;dy<=R;dy++) for(let dx=-R;dx<=R;dx++){ const cx=pr[0]+dx, cy=pr[1]+dy, P=patch(F,cx,cy); let a=0,b=0; for(let q=0;q<P.length;q++){ a+=P[q]*T[q]; b+=P[q]*T0[q]; } const c=a*0.5+b*0.5-0.2*(dx*dx+dy*dy)/(R*R)+0.5*Math.min(1,mAt(m,cx,cy)/mr); if(c>best){ best=c; bp=[cx,cy]; } }
+      v=[v[0]*0.6+(bp[0]-p[0])*0.4,v[1]*0.6+(bp[1]-p[1])*0.4]; p=bp; out[i]=p.slice(); const P=patch(F,p[0],p[1]); for(let q=0;q<T.length;q++) T[q]=T[q]*0.95+P[q]*0.05; }
+    return out; };
+  const N=FR.length, A0=[ka.x*sc,ka.y*sc], B0=[kb.x*sc,kb.y*sc], fw=track(0,N-1,A0), bw=track(N-1,0,B0), ef=[B0[0]-fw[N-1][0],B0[1]-fw[N-1][1]], eb=[A0[0]-bw[0][0],A0[1]-bw[0][1]], res=[];
+  for(let i=0;i<N;i++){ const t=N>1?i/(N-1):0, f=[fw[i][0]+ef[0]*t,fw[i][1]+ef[1]*t], g=[bw[i][0]+eb[0]*(1-t),bw[i][1]+eb[1]*(1-t)]; res.push([es[i],(f[0]*(1-t)+g[0]*t)/sc,(f[1]*(1-t)+g[1]*t)/sc]); }
+  return res; }
+/* Segmente → Lagen je Overlay-Schritt (A-Pixel); B über die Ausrichtung nach A */
+function ovTrailBuild(){ const N=GH.S.length, st=GH.step; OVT.trk={a:new Array(N).fill(null),b:new Array(N).fill(null)}; OVT.al={a:new Array(N).fill(0),b:new Array(N).fill(0)}; OVT.key=GH.key;
+  for(const k of ['a','b']){ const pts=[]; for(const r of OVT.seg[k].values()) pts.push(...r); pts.sort((p,q)=>p[0]-q[0]); if(pts.length<2) continue;
+    let j=0; for(let i=0;i<N;i++){ const e=i*st; while(j+1<pts.length&&pts[j+1][0]<e) j++; const a=pts[j], b=pts[j+1]; if(!b||e<a[0]-1e-3||e>b[0]+1e-3||b[0]-a[0]>0.2) continue; const f=b[0]>a[0]?(e-a[0])/(b[0]-a[0]):0; let q=[a[1]+(b[1]-a[1])*f,a[2]+(b[2]-a[2])*f];
+      if(k==='b') q=affApply(ovB2A(e),q[0],q[1]); OVT.trk[k][i]=q; OVT.al[k][i]=1; } } }
 function ovTrailPts(k,e){ const T=OVT.trk&&OVT.trk[k], AL=OVT.al&&OVT.al[k], S=GH.S, st=GH.step; if(!T||!S||!(st>0)) return null;
   const j=Math.min(S.length-1,Math.floor(e/st)); if(j<1||!T[j]||AL[j]<0.15) return null; const head=trackAt(T,st,e)||T[j];
   const n=Math.round(OVT.len/st), pts=[head]; let M=[1,0,0,0,1,0]; const jump=GH.W0*0.06;
@@ -4399,10 +4397,11 @@ function ovTrailDraw(x,ox,oy,w,h){ if(!OVT.on||!OVT.trk||OVT.key!==GH.key||!ovFo
     const parts=4; for(let q=0;q<parts;q++){ const a0=Math.floor(q*(N-1)/parts), b0=Math.floor((q+1)*(N-1)/parts); x.globalAlpha=0.5*(1-q/parts*0.75); x.strokeStyle=col; x.lineWidth=lw; curve(a0,b0); } }
   x.restore(); }
 function ovTrailCanvas(){ let c=$('canvas.ovtrail',A.stage); if(!c){ c=document.createElement('canvas'); c.className='ovtrail'; $('canvas.ovb',A.stage).after(c); } return c; }
-function ovTrailRender(){ const c=ovTrailCanvas(), on=OVT.on&&!!OVT.trk&&OVT.key===GH.key&&ovActive()&&ovFollowOK()&&!OV.fix; c.hidden=!on; if(!on) return;
+function ovTrailRender(){ const c=ovTrailCanvas(), on=OVT.on&&!!OVT.trk&&OVT.key===GH.key&&ovActive()&&ovFollowOK()&&!OV.fix; c.hidden=!on&&!OVT.edit; if(!on&&!OVT.edit) return;
   const R=A.rect(), d=Math.min(window.devicePixelRatio||1,3), W=Math.round(R.w*d), H=Math.round(R.h*d);
   Object.assign(c.style,{left:R.x+'px',top:R.y+'px',width:R.w+'px',height:R.h+'px'}); if(c.width!==W||c.height!==H){ c.width=W; c.height=H; }
-  const x=c.getContext('2d'); x.setTransform(1,0,0,1,0,0); x.clearRect(0,0,W,H); ovTrailDraw(x,0,0,W,H); }
+  const x=c.getContext('2d'); x.setTransform(1,0,0,1,0,0); x.clearRect(0,0,W,H); if(on) ovTrailDraw(x,0,0,W,H);
+  if(OVT.edit&&OVT.key===GH.key){ const e=ovE(), sx=W/GH.W0, sy=H/GH.hA; for(const k of ['a','b']){ for(const p of OVT.keys[k]){ if(Math.abs(p.e-e)>0.08) continue; let q=[p.x,p.y]; if(k==='b') q=affApply(ovB2A(e),q[0],q[1]); x.beginPath(); x.arc(q[0]*sx,q[1]*sy,7*(W/600),0,7); x.lineWidth=2*(W/600); x.strokeStyle=k==='a'?'#3e8bff':'#f08a3c'; x.stroke(); } } } } /* gesetzte Punkte an dieser Stelle zeigen */
 /* ---------- Namens-Pillen: folgen den Fahrer:innen im Overlay, ohne Fahrer oder die andere Pille zu überdecken ---------- */
 const TAGS={el:null,st:{a:{x:0,y:0,o:0,c:0},b:{x:0,y:0,o:0,c:0}}};
 const TSIDE={}; // Seite je Pillen-Paar merken: erst wechseln, wenn die Fahrer:innen deutlich die Seite tauschen (kein Hin und Her)
@@ -4666,7 +4665,7 @@ function renderOv(){
     else if(a==='make'){ OV.follow=true; OV.fix=null; if(!(GH.state==='ready'&&ghostKey()===GH.key)){ OV.K=[]; ovUI(); ghostCompute({coarse:!document.body.classList.contains('touring')}); return; } if(GH.coarse&&!GH.bg){ ghostCompute({bg:true}); } ovUI(); return; }
     else if(a==='fix'){ A.pause(); B.pause(); G.playing=false; cmpPlayIcon(); const D=ovDAt(ovE()); OV.fix={...D}; OV.fix0={...D}; }
     else if(a==='hand') return ovAlign();
-    else if(a==='ovtrail'){ if(OVT.on){ OVT.on=false; } else if(OVT.trk&&OVT.key===GH.key){ OVT.on=true; } else ovTrailStart(); }
+    else if(a==='ovtrail'){ OVT.on=!OVT.on; }
     else if(a==='ovtrailnew'){ ovTrailStart(); }
     else if(a==='ovgps'){ OVG.on=!OVG.on; LS.set('ovGps',OVG.on?1:0); }
     else if(a==='fixreset'){ if(OV.fix){ OV.fix.dx=0; OV.fix.dy=0; OV.fix.s=1; OV.fix.r=0; A.dirty=true; } return; }
@@ -5689,7 +5688,8 @@ async function startExport(){ EXP.tw0=performance.now(); $('#expProg').hidden=fa
     let lastF=r.a-1, spd=1; // ab dem ersten Bild: fehlt der Anfang, wird zurückgesprungen
     const onF=(now,md)=>{ const E=EXP; if(!E.live||!E.wc) return;
       const fr=Math.round(md.mediaTime*D.fps);
-      if(lastF!=null&&fr>lastF+1&&fr>r.a&&(E.rew=(E.rew||0)+1)<Math.max(400,E.expN*3)){ // auch bei kleinstem Tempo weiter zurückspringen statt Bilder auszulassen // Bild verpasst (Gerät ausgelastet) → zurück zum fehlenden Bild und langsamer weiter (Zeitstempel kommen vom Video, Tempo egal)
+      if(E.rwF!==lastF){ E.rwF=lastF; E.rwN=0; } /* am selben Bild nicht endlos zurückspringen: nach 6 Versuchen das fehlende Bild auslassen */
+      if(lastF!=null&&fr>lastF+1&&fr>r.a&&(E.rwN=(E.rwN||0)+1)<=6&&(E.rew=(E.rew||0)+1)<Math.max(400,E.expN*3)){ // auch bei kleinstem Tempo weiter zurückspringen statt Bilder auszulassen // Bild verpasst (Gerät ausgelastet) → zurück zum fehlenden Bild und langsamer weiter (Zeitstempel kommen vom Video, Tempo egal)
         spd=Math.max(0.15,spd*0.6); setRate(spd); D.seekFrame(lastF+1);
         if(mode==='cmp'&&G.linked&&B.ready){ B.v.currentTime=(lastF+1)/D.fps+G.off; } D.v.requestVideoFrameCallback(onF); return; }
       if(lastF!=null&&fr<lastF-Math.max(3,D.fps*0.5)&&lastF>=r.b-2){ finishExport(); return; }
@@ -5722,8 +5722,9 @@ async function startExport(){ EXP.tw0=performance.now(); $('#expProg').hidden=fa
 }
 // Am Ende kommt kein neues Bild mehr – darum separat prüfen, ob das Video fertig ist (sonst bleibt der Export bei 100 % stehen)
 function expWatch(){ const E=EXP; clearInterval(E.wd); E.lastCb=null; E.wd=setInterval(()=>{ if(!EXP.live){ clearInterval(E.wd); return; } const D=E.D, v=D&&D.v; if(!v) return;
-    if(E.pt==null||Math.abs(v.currentTime-E.pt)>0.01){ E.pt=v.currentTime; E.ptT=performance.now(); }
-    else if(performance.now()-E.ptT>12000&&!E.cancel){ E.cancel=true; E.hang=true; finishExport(); toast('Der Export kommt auf diesem Gerät nicht weiter. Bitte am Computer speichern – Standbild und Aufnahme gehen auch hier.',6500); return; }
+    const prog=E.wc?(E.srcN||0):Math.round(v.currentTime*100); /* Fortschritt = fertige Bilder, nicht die Abspielzeit (die springt beim Nachholen hin und her) */
+    if(E.pt==null||prog!==E.pt){ E.pt=prog; E.ptT=performance.now(); }
+    else if(performance.now()-E.ptT>30000&&!E.cancel){ E.cancel=true; E.hang=true; finishExport(); toast('Der Export kommt auf diesem Gerät nicht weiter. Bitte am Computer speichern – Standbild und Aufnahme gehen auch hier.',6500); return; }
     if(E.wcErr&&!E.cancel){ E.cancel=true; finishExport(); toast('Der Export ist auf diesem Gerät fehlgeschlagen ('+String(E.wcErr.message||E.wcErr).slice(0,60)+'). Bitte am Computer speichern.',6500); return; }
     const stuck=E.lastCb!=null&&performance.now()-E.lastCb>4000, end=v.ended||(mode==='cmp'&&B.v.ended)||(E.wc?v.currentTime>=E.tEnd+1.5:v.currentTime>=E.tEnd-0.6/D.fps); // Schnell-Export schliesst selbst nach dem letzten Bild ab
     if(end||(stuck&&v.currentTime>=E.tEnd-1)) finishExport(); else if(stuck&&v.paused&&!E.cancel){ E.lastCb=performance.now(); try{ v.play(); }catch(e){} } },300); } // nur am Schluss beenden – sonst bei Stillstand weiterlaufen lassen
@@ -6462,7 +6463,7 @@ document.addEventListener('visibilitychange',async()=>{ if(SER.on&&!document.hid
 setColor(LS.get('color',COLORS[0])); setTool('none');
 restoreSession();
 /* Beispiel-Rennvideos (Sölden 2025, RS Herren) – liegen neben der App im Ordner demo/ */
-const REAL_DEMO=[["Meillard_Soelden_251026_GS_M_L1.mp4", 15594565], ["Gratz_Soelden_251026_GS_M_L1.mp4", 14564292], ["Braathen_Soelden_251026_GS_M_L1.mp4", 14949042], ["monney_v1_sg_tr9_stelvio_261029.mp4", 6591501], ["monney_v2_sg_tr9_stelvio_261029.mp4", 8210753], ["monney_v4_sg_tr9_stelvio_261029.mp4", 10912089], ["rogentin_v1_sg_tr3_stelvio_261029.mp4", 6865780], ["rogentin_v2_sg_tr3_stelvio_261029.mp4", 8499273], ["rogentin_v4_sg_tr3_stelvio_261029.mp4", 12637917], ["boisset_vgh_dh_tr1_courchevel_260311.mp4", 21193253], ["kriechmayr_vgh_dh_tr1_courchevel_260311.mp4", 20048025], ["allegre_vgh_dh_tr1_courchevel_260311.mp4", 22408170], ["moltzan_wc_gs_l2_camGH_hafjell_260325.mp4", 20632437], ["rast_wc_gs_l2_camGH_hafjell_260325.mp4", 22233687], ["holdener_wc_sl_l1_camGH_hafjell_260324.mp4", 19428840], ["shiffrin_wc_sl_l1_camGH_hafjell_260324.mp4", 19594008], ["odermatt lauf1 261025 GS soelden v1.mp4", 2676704], ["braathen lauf1 261025 GS soelden v1.mp4", 1935003], ["haechler lauf1 261025 GS soelden v1.mp4", 2524449], ["shiffrin wc gs l1 cam1 soelden 261024.mp4", 4025103], ["holdener wc gs l1 cam1 soelden 261024.mp4", 4312801], ["allenbach wc gs l1 cam1 soelden 261024.mp4", 4315846], ["brignone_wc_sg_camGH_cortina_260212.mp4", 17302153], ["blanc_wc_sg_camGH_cortina_260212.mp4", 11442032], ["schmitt_wc_sg_camGH_cortina_260212.mp4", 16428581], ["curtoni_wc_dh_tr1_camGH_valdisere_251218.mp4", 19536464], ["delago_wc_dh_tr1_camGH_valdisere_251218.mp4", 18695552], ["durrer_wc_dh_tr1_camGH_valdisere_251218.mp4", 19497247], ["ming_wc_dh_tr1_camGH_valdisere_251218.mp4", 20160965]];
+const REAL_DEMO=[["Meillard_Soelden_251026_GS_M_L1.mp4", 15594565], ["Gratz_Soelden_251026_GS_M_L1.mp4", 14564292], ["Braathen_Soelden_251026_GS_M_L1.mp4", 14949042], ["monney_v1_sg_tr9_stelvio_261029.mp4", 6591501], ["monney_v2_sg_tr9_stelvio_261029.mp4", 8210753], ["monney_v4_sg_tr9_stelvio_261029.mp4", 10912089], ["rogentin_v1_sg_tr3_stelvio_261029.mp4", 6865780], ["rogentin_v2_sg_tr3_stelvio_261029.mp4", 8499273], ["rogentin_v4_sg_tr3_stelvio_261029.mp4", 12637917], ["flatscher_sl_schnals_261018_l4_cam1_111.mp4", 9900339], ["fournier_sl_schnals_261018_l4_cam1_114.mp4", 22783033], ["phillips_sl_schnals_261018_l5_cam1_123.mp4", 9939143], ["boisset_vgh_dh_tr1_courchevel_260311.mp4", 21193253], ["kriechmayr_vgh_dh_tr1_courchevel_260311.mp4", 20048025], ["allegre_vgh_dh_tr1_courchevel_260311.mp4", 22408170], ["moltzan_wc_gs_l2_camGH_hafjell_260325.mp4", 20632437], ["rast_wc_gs_l2_camGH_hafjell_260325.mp4", 22233687], ["holdener_wc_sl_l1_camGH_hafjell_260324.mp4", 19428840], ["shiffrin_wc_sl_l1_camGH_hafjell_260324.mp4", 19594008], ["odermatt lauf1 261025 GS soelden v1.mp4", 2676704], ["braathen lauf1 261025 GS soelden v1.mp4", 1935003], ["haechler lauf1 261025 GS soelden v1.mp4", 2524449], ["shiffrin wc gs l1 cam1 soelden 261024.mp4", 4025103], ["holdener wc gs l1 cam1 soelden 261024.mp4", 4312801], ["allenbach wc gs l1 cam1 soelden 261024.mp4", 4315846], ["brignone_wc_sg_camGH_cortina_260212.mp4", 17302153], ["blanc_wc_sg_camGH_cortina_260212.mp4", 11442032], ["schmitt_wc_sg_camGH_cortina_260212.mp4", 16428581], ["curtoni_wc_dh_tr1_camGH_valdisere_251218.mp4", 19536464], ["delago_wc_dh_tr1_camGH_valdisere_251218.mp4", 18695552], ["durrer_wc_dh_tr1_camGH_valdisere_251218.mp4", 19497247], ["ming_wc_dh_tr1_camGH_valdisere_251218.mp4", 20160965]];
 // Zeitpunkt im Video, an dem alle Läufe derselben Serie am gleichen Ort sind (gemessen)
 const DEMO_OFF={'boisset_vgh_dh_tr1_courchevel_260311.mp4':0.7,'kriechmayr_vgh_dh_tr1_courchevel_260311.mp4':0.3,'allegre_vgh_dh_tr1_courchevel_260311.mp4':0,'moltzan_wc_gs_l2_camGH_hafjell_260325.mp4':0,'rast_wc_gs_l2_camGH_hafjell_260325.mp4':2.0,'holdener_wc_sl_l1_camGH_hafjell_260324.mp4':0.7,'shiffrin_wc_sl_l1_camGH_hafjell_260324.mp4':0};
 (async()=>{
@@ -6578,7 +6579,7 @@ if(false&&!LS.get('hint1',0)){ setTimeout(()=>{ toast(matchMedia('(pointer:coars
 
 /* Update-Hinweis: prüft version.json auf GitHub Pages; «Aktualisieren» lädt die Seite ohne Cache neu */
 (()=>{
-  const BUILD='20261031162657'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
+  const BUILD='20261031182209'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
   // nach einem Update die ?v=… aus der Adresse entfernen
   try{ const u=new URL(location.href); if(u.searchParams.has('v')){ u.searchParams.delete('v'); history.replaceState(null,'',u.pathname+(u.search||'')+u.hash); } }catch(e){}
   const el=$('#upd'); let latest=null, snoozed=null, busy=false;
