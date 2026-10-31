@@ -2361,6 +2361,52 @@ body.pfs .gps-sel,body.pfs .gps-foot,body.pfs #gpsChart,body.pfs #viewGps .ctl-l
   #viewCmp.cmp-linked:not(.overlay) #syncInfo{display:none!important}
   #viewCmp:not(.overlay) #syncInfo .dchip{display:none}
 }
+.stage canvas.ovtrail{position:absolute;pointer-events:none;z-index:3}
+.trail-hint{position:absolute;left:50%;top:10px;transform:translateX(-50%);z-index:8;display:flex;align-items:center;gap:8px;padding:8px 8px 8px 12px;border-radius:12px;background:rgba(12,16,22,.85);color:#fff;font:600 13px var(--font);white-space:nowrap;box-shadow:0 8px 24px rgba(0,0,0,.35)}
+.trail-hint[hidden]{display:none}
+.trail-hint i{width:10px;height:10px;border-radius:50%}
+.trail-hint button{margin-left:6px;border:0;border-radius:8px;background:rgba(255,255,255,.12);color:#fff;font:600 12px var(--font);padding:6px 10px}
+
+/* ---- 31.10. Nachmittag ---- */
+/* Filmen-Knopf pulsiert sanft */
+@keyframes camPulse{0%{box-shadow:0 0 0 0 rgba(218,41,28,.55)}70%{box-shadow:0 0 0 10px rgba(218,41,28,0)}100%{box-shadow:0 0 0 0 rgba(218,41,28,0)}}
+header .btn-cam{animation:camPulse 2s ease-out infinite}
+header .btn-cam svg circle:last-child{animation:camDot 2s ease-in-out infinite}
+@keyframes camDot{50%{opacity:.45}}
+@media (prefers-reduced-motion:reduce){ header .btn-cam,header .btn-cam svg circle:last-child{animation:none} }
+@media (max-width:600px){
+  /* Knopfleisten: mehr Luft, Trennstriche zwischen den Gruppen */
+  .player .dock .dz-c .grp{gap:6px!important}
+  .player .dock .rate-btn{margin-left:10px!important}
+  .player .dock.dock3{row-gap:10px!important}
+  .player .dock .dz-l .grp,.player .dock .dz-r .grp,#viewCmp .dock .dz-l{gap:7px!important}
+  #viewCmp:not(.overlay) .dz-l .m-sync{margin-right:6px!important;position:relative}
+  #viewCmp:not(.overlay) .dz-l .m-sync::after{content:"";position:absolute;right:-7px;top:6px;bottom:6px;width:1px;background:rgba(255,255,255,.14)}
+  #viewSingle .dz-l{position:relative;padding-right:8px!important;margin-right:4px!important;border-right:1px solid rgba(255,255,255,.14)}
+  /* Side-by-Side: Zeitleisten niedriger */
+  #viewCmp canvas.strip{height:30px!important}
+  #viewCmp .strips{gap:2px!important}
+  #viewCmp .tl{margin-top:4px!important}
+  /* Overlay: Knöpfe oben in die Schrittzeile, keine eigene Leiste unten */
+  #viewCmp.overlay #ovPanel{display:grid!important;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:6px 8px!important;padding:7px 8px!important}
+  #viewCmp.overlay #ovPanel .ov-zl{grid-column:1;grid-row:1;min-width:0}
+  #viewCmp.overlay #ovPanel .ov-row{display:contents!important}
+  #viewCmp.overlay #ovPanel #ovTxt{grid-column:1 / -1;grid-row:2;min-width:0}
+  #viewCmp.overlay #ovActs:not(:empty){position:static!important;grid-column:2;grid-row:1;background:none!important;border:0!important;padding:0!important;box-shadow:none!important;gap:4px!important;justify-content:flex-end!important}
+  #viewCmp.overlay #ovActs .ov-b{height:30px!important;min-width:30px!important;padding:0 8px!important;border-radius:9px!important;font-size:12px!important}
+  #viewCmp.overlay #ovActs .ov-b.pri{flex:0 0 auto!important;padding:0 11px!important}
+  #viewCmp.overlay #ovActs .ov-b svg{width:14px!important;height:14px!important}
+  #viewCmp.overlay #ovActs .ov-savew{flex:0 0 auto!important}
+  #viewCmp.overlay #ovActs .ov-savew>.ov-b{width:auto!important}
+  #viewCmp.overlay #ovActs .ov-menu{top:calc(100% + 6px)!important;bottom:auto!important;left:auto!important;right:0!important}
+  #viewCmp.overlay #ovSteps i{width:20px!important;height:20px!important;font-size:11px!important}
+  #viewCmp.overlay .ov-ttl,#viewCmp.overlay #ovSteps li span{font-size:12.5px!important}
+  #viewCmp.overlay #ovTxt,#viewCmp.overlay #ovTxt .ov-say{font-size:12px!important;padding:5px 8px!important;min-height:0!important}
+  body:has(#viewCmp.overlay:not([hidden])){padding-bottom:calc(var(--tabsH,55px) + 10px)!important}
+  body:has(#viewCmp.overlay:not([hidden])) .toast{bottom:calc(var(--tabsH,55px) + 12px)!important}
+}
+#viewCmp .strobo-btn{display:none!important} /* Strobo nur in «Ein Video» */
+#strCanvas{cursor:crosshair}
 </style>
 </head>
 <body class="m-single">
@@ -2505,7 +2551,7 @@ body.pfs .gps-sel,body.pfs .gps-foot,body.pfs #gpsChart,body.pfs #viewGps .ctl-l
         <button class="tut-open" id="cmpReset" title="Vergleich leeren: A und B entfernen, gleichen Moment und Overlay zurücksetzen (Videos bleiben unter «Geöffnet»)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/></svg><span>Zurücksetzen</span></button><button class="tut-open" id="tutBtn" title="Anleitung direkt im Tool – zeigt Schritt für Schritt mit den Beispiel-Läufen, wie es geht"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M10 8.5l5.5 3.5-5.5 3.5z" fill="currentColor"/></svg><span>Anleitung</span></button><div class="seg" id="layoutSeg"><button data-layout="side" class="on"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="5" width="8.5" height="14" rx="2"/><rect x="13" y="5" width="8.5" height="14" rx="2"/></svg>Side-by-Side</button><button data-layout="overlay"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="13" height="11" rx="2"/><rect x="8" y="9" width="13" height="11" rx="2" fill="currentColor" fill-opacity=".25"/></svg>Overlay</button><button data-layout="ghost"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M5 20V10a7 7 0 0 1 14 0v10l-2.4-1.8L14.3 20 12 18.2 9.7 20l-2.3-1.8z"/><circle cx="9.5" cy="10.5" r=".9" fill="currentColor"/><circle cx="14.5" cy="10.5" r=".9" fill="currentColor"/></svg>Ghost</button></div>
         <button class="ctl ov-namebtn" id="ovNames" title="Namen im Bild ein / aus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12V5a2 2 0 0 1 2-2h7l9 9-9 9-9-9z"/><circle cx="8" cy="8" r="1.6"/></svg><span>Namen</span></button><label class="ctl-lab op-wrap">Deckkraft <input type="range" class="op" id="opRange" min="0.1" max="0.9" step="0.05" value="0.5"></label>
         <button class="ctl" data-act="shot" title="Standbild A | B als PNG speichern (p)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.6"/></svg></button>
-        <button class="ctl strobo-btn" data-act="strobe" title="Strobo: mehrere Positionen von A in einem Bild (±0.7 s um das aktuelle Bild)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><circle cx="5" cy="15" r="2.2" opacity=".45"/><circle cx="10.5" cy="11" r="2.2" opacity=".7"/><circle cx="17" cy="8" r="2.6"/><path d="M3 20c5-1 10-5 15-12" opacity=".5"/></svg></button><button class="ctl rec-btn" data-act="rec" title="Aufnahme: alles, was du jetzt zeigst, zeichnest und sagst, als Video aufnehmen (r)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4" fill="currentColor" stroke="none"/></svg></button><button class="ctl" data-act="export" title="Vergleich als Video exportieren (e)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg></button>
+        <button class="ctl strobo-btn" data-act="strobe" hidden title="Strobo: mehrere Positionen von A in einem Bild (±0.7 s um das aktuelle Bild)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><circle cx="5" cy="15" r="2.2" opacity=".45"/><circle cx="10.5" cy="11" r="2.2" opacity=".7"/><circle cx="17" cy="8" r="2.6"/><path d="M3 20c5-1 10-5 15-12" opacity=".5"/></svg></button><button class="ctl rec-btn" data-act="rec" title="Aufnahme: alles, was du jetzt zeigst, zeichnest und sagst, als Video aufnehmen (r)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4" fill="currentColor" stroke="none"/></svg></button><button class="ctl" data-act="export" title="Vergleich als Video exportieren (e)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg></button>
         <button class="ctl" data-act="fs" title="Vollbild (f)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3M21 8V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3M16 21h3a2 2 0 0 0 2-2v-3"/></svg></button>
       </div>
     </div>
@@ -2558,13 +2604,14 @@ body.pfs .gps-sel,body.pfs .gps-foot,body.pfs #gpsChart,body.pfs #viewGps .ctl-l
     <h3>Strobo <button class="hdr-ico" id="strX" title="Schliessen">✕</button></h3>
     <div class="str-view"><canvas id="strCanvas" width="960" height="540"></canvas><div class="gprog str-prog" id="strProg"><div class="gprog-bar"><i></i></div><span></span></div></div>
     <div class="str-bar">
+      <span class="exp-l">Bereich</span><div class="seg" id="strR"><button data-r="0.5">±0.5 s</button><button data-r="1" class="on">±1 s</button><button data-r="2">±2 s</button><button data-r="cut">Start–Ende</button></div>
       <span class="exp-l">Positionen</span><div class="seg" id="strN"><button data-n="6">6</button><button data-n="8">8</button><button data-n="10">10</button><button data-n="12">12</button><button data-n="16">16</button></div>
       <label class="str-tg"><input type="checkbox" id="strTrail" checked> Spur</label>
       <label class="str-tg"><input type="checkbox" id="strNum" checked> Nummern</label>
       <span class="str-info" id="strInfo"></span>
       <button class="btn-pri" id="strSave" disabled>PNG speichern</button>
     </div>
-    <p class="str-hint">Tipp: Vorher auf die Mitte eines Schwungs stellen – gezeigt werden ±0.7 s. Funktioniert bei Kamera vom festen Standort (Schwenk und Zoom werden ausgeglichen).</p>
+    <p class="str-hint">Bereich: um das aktuelle Bild oder zwischen «Start» und «Ende». Schwenk und Zoom der Kamera werden ausgeglichen. <b>Falsche Person oder Gondel gewählt? Im Bild auf die Fahrer:in tippen.</b></p>
   </div>
 </div>
 <div class="modal" id="invModal">
@@ -3089,6 +3136,7 @@ class Deck{
     this.stage.classList.add('busy');
     this.v.src=c.url; this.v.playbackRate=this.rate; applyFx(this); fxUI();
     const myc=c;
+    if(/iP(hone|ad|od)|Macintosh/.test(navigator.userAgent)&&'ontouchend' in document){ const v=this.v; v.addEventListener('loadeddata',()=>{ if(this.clip!==myc||!v.paused) return; const t=v.currentTime; const pr=v.play(); if(pr) pr.then(()=>{ v.pause(); v.currentTime=t; }).catch(()=>{}); },{once:true}); } /* iPhone zeigt nach dem Springen sonst kein neues Bild */
     this.v.addEventListener('loadedmetadata',()=>{
       c.whenFps.then(()=>{ if(this.clip!==myc) return; this.stage.classList.remove('busy'); if(c.err) return;
         this.ready=true; this.fitDefault(); this.seekFrame(this.loop&&this.loop.on&&this.loop.a!=null?this.loop.a:0); this.annDirty=true; this.changed(); });
@@ -3477,7 +3525,7 @@ function linkedTick(){
   else if(tight) B.v.playbackRate=clamp(A.rate*(1-G.errS*4),A.rate*0.75,A.rate*1.25);
   else B.v.playbackRate=clamp(A.rate*(1-err*1.5),A.rate*0.85,A.rate*1.15);
 }
-function setLayout(l){ if(l==='ghost') l='side'; if(l==='overlay'&&document.body.classList.contains('pfs')&&typeof pfsSet==='function') pfsSet(false); /* Overlay einrichten braucht Schritte und Leiste */ if(l==='overlay'){ try{ if(DRAW.tool&&DRAW.tool!=='none') setTool('none'); if(TIM.on){ TIM.on=false; timUI(); } }catch(e){} } /* Werkzeuge gibt es im Übereinander-Modus nicht */ if(l!=='overlay'&&typeof OV!=='undefined'&&OV.pick) OV.pick=null; setTimeout(()=>typeof ovUI==='function'&&ovUI(),0);  $$('#layoutSeg button').forEach(x=>x.classList.toggle('on',x.dataset.layout===l)); const v=$('#viewCmp'); v.classList.toggle('overlay',l==='overlay'); v.classList.toggle('ghost',l==='ghost'); if(typeof ghostUI==='function') ghostUI();  LS.set('layout',l); decks.forEach(d=>{ d.dirty=true; d.annDirty=true; }); if(typeof splitsUI==='function') splitsUI(); if(typeof tabsUI==='function') tabsUI(); }
+function setLayout(l){ if(window.mMenuClose) mMenuClose(); if(l==='ghost') l='side'; if(l==='overlay'&&document.body.classList.contains('pfs')&&typeof pfsSet==='function') pfsSet(false); /* Overlay einrichten braucht Schritte und Leiste */ if(l==='overlay'){ try{ if(DRAW.tool&&DRAW.tool!=='none') setTool('none'); if(TIM.on){ TIM.on=false; timUI(); } }catch(e){} } /* Werkzeuge gibt es im Übereinander-Modus nicht */ if(l!=='overlay'&&typeof OV!=='undefined'&&OV.pick) OV.pick=null; setTimeout(()=>typeof ovUI==='function'&&ovUI(),0);  $$('#layoutSeg button').forEach(x=>x.classList.toggle('on',x.dataset.layout===l)); const v=$('#viewCmp'); v.classList.toggle('overlay',l==='overlay'); v.classList.toggle('ghost',l==='ghost'); if(typeof ghostUI==='function') ghostUI();  LS.set('layout',l); decks.forEach(d=>{ d.dirty=true; d.annDirty=true; }); if(typeof splitsUI==='function') splitsUI(); if(typeof tabsUI==='function') tabsUI(); }
 $('#layoutSeg').addEventListener('click',e=>{ const b=e.target.closest('[data-layout]'); if(b) setLayout(b.dataset.layout); });
 $('#opRange').addEventListener('input',e=>$('#viewCmp').style.setProperty('--ovop',e.target.value));
 
@@ -3636,6 +3684,7 @@ function tickBody(){
   if(EXP.live&&!EXP.wc) tickSafe('exp',exportFrame);
   if(mode==='cmp') tickSafe('ov',renderOv);
   if(mode==='cmp') tickSafe('ovgps',()=>drawOvGps());
+  if(mode==='cmp') tickSafe('ovtrail',ovTrailRender);
   if(mode==='cmp'&&G.linked&&!A.v.paused) tickSafe('sync',updSync);
   if(mode==='gps'&&(GPS.dirty||!GD.v.paused)){ GPS.dirty=false; tickSafe('gps',()=>drawGpsOverlay()); }
 }
@@ -4137,7 +4186,7 @@ function ovUI(){ vchipPlace();
     ttl=GH.coarse?'Vorschau':'Fertig'; dot=true; say=GH.bg?'Wird verfeinert · '+Math.round((GH.bg.p||0)*100)+' %':GH.coarse?'Grob gerechnet – «…» › «Neu berechnen» rechnet fein.':'B daneben? «Korrigieren».'; chips=cut+kc;
     tip='Liegt B neben A: an der Stelle anhalten und «Korrigieren». Der Punkt links und das Band in der Zeitleiste zeigen den Zustand: grün ausgerichtet, gelb unsicher, rot Kameraschnitt. Das Auge bei den Läufen oben links blendet einen Lauf ein oder aus.';
     acts=cutBtns+ovBtn('fix','Korrigieren',OVI.fix,'ghost','B an dieser Stelle von Hand nachschieben')
-      +ovMore([ovGpsPair()?['ovgps',OVG.on?'GPS-Tacho ausblenden':'GPS-Tacho einblenden',OVI.go]:null,['nameset','Namen setzen (Fahrer:innen antippen)',OVI.tag],LAY.length<3?['addrun','Weiteren Lauf dazunehmen',OVI.plus]:null,['series','Serie gegen A rechnen …',OVI.go],['make','Neu berechnen',OVI.go],['edit','Neu beginnen',OVI.back]])+ovSaveBtn(); }
+      +ovMore([OVT_READY?['ovtrail',OVT.on?'Spur ausblenden':'Spur hinter Fahrer:innen …',OVI.go]:null,OVT_READY&&OVT.trk&&OVT.key===GH.key?['ovtrailnew','Spur neu setzen (A und B antippen)',OVI.pin]:null,ovGpsPair()?['ovgps',OVG.on?'GPS-Tacho ausblenden':'GPS-Tacho einblenden',OVI.go]:null,['nameset','Namen setzen (Fahrer:innen antippen)',OVI.tag],LAY.length<3?['addrun','Weiteren Lauf dazunehmen',OVI.plus]:null,['series','Serie gegen A rechnen …',OVI.go],['make','Neu berechnen',OVI.go],['edit','Neu beginnen',OVI.back]])+ovSaveBtn(); }
   if(SER.on){ ttl='Serie '+(SER.i+1)+' / '+SER.list.length; dot=false; chips=''; say='<b>'+esc(lastName(SER.cur)||'')+'</b> · '+(busy?((($('#ghostBar .gprog span')||{}).textContent)||'Overlay wird erstellt'):SER.msg);
     tip='Alle gewählten Läufe werden nacheinander gegen A gerechnet und gespeichert. Tab offen lassen.'; acts=ovBtn('serstop','Serie abbrechen','','ghost','Nach dem laufenden Schritt aufhören'); }
   // drei Zonen: links Schritt (+ Zustand), Mitte kurzer Hinweis, rechts Knöpfe – nur neu zeichnen, wenn sich etwas ändert (sonst gehen Klicks verloren)
@@ -4260,6 +4309,92 @@ function tagsDrawTo(x,ox,oy,w,h){ // Namens-Pillen ins exportierte Bild zeichnen
 function ovLiveCanvas(){ let c=$('canvas.ovlive',A.stage); if(!c){ c=document.createElement('canvas'); c.className='ovlive'; $('canvas.ovb',A.stage).after(c); }
   const R=A.rect(), W=Math.max(2,Math.round(Math.min(1280,R.w*DPR()))); c.width=W; c.height=Math.round(W*A.v.videoHeight/A.v.videoWidth); c.hidden=false; return c; }
 
+
+/* ---------- Overlay: Spur hinter den Fahrer:innen (A blau, B orange) – eigene Verfolgung, unabhängig von den Namen ----------
+   1) Man tippt einmal auf A und auf B (Startpunkt). 2) Jede Person wird in ihrem eigenen Video Bild für Bild verfolgt
+   (Vorlagenvergleich NCC auf Graustufen, Suchfenster um die Vorhersage aus der letzten Bewegung, Vorlage passt sich langsam an).
+   3) B-Lagen werden mit der Overlay-Ausrichtung in A-Pixel umgerechnet. 4) Ältere Punkte wandern mit der Kamerabewegung von A
+   (GH.S[i].q) ins aktuelle Bild – die Spur bleibt auf dem Schnee liegen. */
+const OVT_READY=false; /* Spur-Verfolgung noch nicht zuverlässig genug → im Menü ausgeblendet (Code bleibt für die Weiterentwicklung) */
+const OVT={on:false,len:1.6,trk:null,al:null,key:'',seed:null,busy:false,pts:{}};
+function ovB2A(e){ const p=paramsAt(clamp(e,0,GH.eEnd)); return affMul(ovDMat(ovDAt(e),GH.W0),affInv(simToAff(p,GH.W0,GH.hA,GH.W0,GH.hB))); }
+function ovTapA(ev){ const st=A.stage, r=st.getBoundingClientRect(), R=A.rect(), z=A.z||{x:0,y:0,s:1}; const u=((ev.clientX-r.left-z.x)/z.s-R.x)/R.w, v=((ev.clientY-r.top-z.y)/z.s-R.y)/R.h; return [u*GH.W0,v*GH.W0*R.h/R.w]; }
+function trailKey(){ return GH.key+'|'+(OVT.seed&&OVT.seed.e!=null?OVT.seed.e.toFixed(2):''); }
+function ovTrailStart(){ if(!ovFollowOK()){ toast('Zuerst das Overlay erstellen.'); return; } A.pause(); B.pause(); G.playing=false; cmpPlayIcon();
+  OVT.seed={e:ovE(),a:null,b:null,step:'a'}; OVT.trk=null; OVT.on=false; ovTrailHint(); }
+function ovTrailHint(){ let h=$('#trailHint'); if(!h){ h=document.createElement('div'); h.id='trailHint'; h.className='trail-hint'; A.stage.appendChild(h); }
+  const S=OVT.seed; if(!S||!S.step){ h.hidden=true; return; } h.hidden=false;
+  h.innerHTML=S.step==='a'?'<i style="background:#3e8bff"></i>Auf Fahrer:in <b>A</b> tippen':'<i style="background:#f08a3c"></i>Auf Fahrer:in <b>B</b> tippen (durchsichtig)'+'<button data-x>Abbrechen</button>'; }
+A.stage.addEventListener('pointerdown',ev=>{ const S=OVT.seed; if(!S||!S.step||!ovActive()) return; if(ev.target.closest('button')){ if(ev.target.closest('[data-x]')){ OVT.seed=null; ovTrailHint(); } return; }
+  ev.preventDefault(); ev.stopPropagation(); const pA=ovTapA(ev);
+  if(S.step==='a'){ S.a=pA; S.step='b'; ovTrailHint(); return; }
+  const Mi=affInv(ovB2A(S.e)); S.b=affApply(Mi,pA[0],pA[1]); S.step=null; ovTrailHint(); ovTrailCompute(); },true);
+async function ovTrailCompute(){ const S=OVT.seed; if(!S||!S.a||!S.b) return; OVT.busy=true; const pr=$('#ovProg'); pr.hidden=false; const bar=$('i',pr); bar.style.width='0%';
+  let va,vb; try{ va=await loadV(A.clip.url); vb=await loadV(B.clip.url); }catch(e){ toast('Videos konnten nicht geladen werden.'); OVT.busy=false; pr.hidden=true; return; }
+  /* nur der gezeigte Teil: Start/Ende des Overlays, sonst 3 s vor bis 12 s nach dem Antippen */
+  const e0=Math.max(0,OV.cut.a!=null?OV.cut.a-GH.t0:S.e-3), e1=Math.min(GH.eEnd,OV.cut.b!=null?OV.cut.b-GH.t0:S.e+12);
+  const Wt=Math.min(640,A.v.videoWidth||640), k=Wt/GH.W0;
+  /* 1) Video abspielen und in jedem Bild dunkle/farbige Flecken (Fahrer:innen, Personen, Tore) finden – schnell, ohne Springen */
+  const scan=(v,tA,tB,hgt,onP)=>new Promise(res=>{ const cv=document.createElement('canvas'); cv.width=Wt; cv.height=hgt; const x=cv.getContext('2d',{willReadFrequently:true}); const out=[]; let fin=false, last=-1;
+    const W=Wt, H=hgt, n=W*H, m=new Uint8Array(n), lab=new Int32Array(n), stack=new Int32Array(n);
+    const proc=t=>{ x.drawImage(v,0,0,W,H); const d=x.getImageData(0,0,W,H).data;
+      for(let i=0,j=0;i<n;i++,j+=4){ const r=d[j],g=d[j+1],b=d[j+2], L=0.3*r+0.59*g+0.11*b, sat=Math.max(r,g,b)-Math.min(r,g,b); m[i]=(215-L)+0.3*sat>95?1:0; }
+      lab.fill(0); let id=0; const bl=[];
+      for(let i=0;i<n;i++){ if(!m[i]||lab[i]) continue; id++; let sp=0, a=0, sx=0, sy=0, x0=1e9,x1=-1,y0=1e9,y1=-1; stack[sp++]=i; lab[i]=id;
+        while(sp){ const q=stack[--sp], qx=q%W, qy=(q/W)|0; a++; sx+=qx; sy+=qy; if(qx<x0)x0=qx; if(qx>x1)x1=qx; if(qy<y0)y0=qy; if(qy>y1)y1=qy;
+          for(const o of [q-1,q+1,q-W,q+W]){ if(o<0||o>=n||lab[o]||!m[o]) continue; if((o===q-1&&qx===0)||(o===q+1&&qx===W-1)) continue; lab[o]=id; stack[sp++]=o; } }
+        if(a>=4&&a<n*0.01) bl.push([sx/a,sy/a,a,x1-x0+1,y1-y0+1]); }
+      out.push({t,b:bl}); };
+    const end=()=>{ if(fin) return; fin=true; v.pause(); res(out); };
+    const cb=(now,md)=>{ if(fin) return; const t=md.mediaTime; if(t>last+1e-4){ last=t; proc(t); onP(clamp((t-tA)/(tB-tA),0,1)); } if(t>=tB||v.ended){ end(); return; } v.requestVideoFrameCallback(cb); };
+    (async()=>{ for(let t=tA;t<=tB;t+=0.06){ if(!OVT.busy) break; await seekV(v,t); proc(t); onP((t-tA)/(tB-tA)); } end(); })(); }); /* Bild für Bild springen: genau und unabhängig vom Gerät */
+  const hA=Math.round(Wt*(A.v.videoHeight||9)/(A.v.videoWidth||16)), hB=Math.round(Wt*(B.v.videoHeight||9)/(B.v.videoWidth||16));
+  const pa=[0,0]; const upd=()=>{ bar.style.width=((pa[0]+pa[1])*50)+'%'; };
+  const [FA,FB]=await Promise.all([scan(va,GH.t0+e0,GH.t0+e1,hA,f=>{ pa[0]=f; upd(); }),scan(vb,GH.t0+GH.off+e0,GH.t0+GH.off+e1,hB,f=>{ pa[1]=f; upd(); })]);
+  va.remove(); vb.remove();
+  /* 2) alles in «Welt»-Lage umrechnen (Bild 0 von A): Kamerabewegung von A herausgerechnet, B über die Overlay-Ausrichtung.
+        Tore und Personen am Rand stehen dann still, die Fahrer:in bewegt sich – so lässt sie sich sicher verfolgen. */
+  const St=GH.S, st=GH.step, G=[[1,0,0,0,1,0]]; for(let i=1;i<St.length;i++) G.push(affMul(G[i-1],affInv(St[i].q||[1,0,0,0,1,0])));
+  const Gi=e=>G[clamp(Math.round(e/st),0,G.length-1)];
+  const toW=(F,isB)=>F.map(f=>{ const e=isB?f.t-GH.t0-GH.off:f.t-GH.t0, g=Gi(e), M=isB?ovB2A(e):null; return {t:f.t,e,b:f.b.map(o=>{ let q=[o[0]/k,o[1]/k]; if(M) q=affApply(M,q[0],q[1]); const w=affApply(g,q[0],q[1]); return [w[0],w[1],o[2]]; })}; });
+  const WA=toW(FA,false), WB=toW(FB,true);
+  const follow=(F,eS,seedA)=>{ const res=new Map(); if(!F.length) return res; let si=0; for(let i=1;i<F.length;i++) if(Math.abs(F[i].e-eS)<Math.abs(F[si].e-eS)) si=i;
+    const sw=affApply(Gi(eS),seedA[0],seedA[1]), U=GH.W0;
+    const isStatic=(i,o)=>{ const j=i-Math.round(0.4/0.06); const f=F[j]; if(!f) return false; for(const q of f.b) if(Math.hypot(q[0]-o[0],q[1]-o[1])<U*0.006) return true; return false; };
+    let b0=null,d0=1e9; for(const o of F[si].b){ const d=Math.hypot(o[0]-sw[0],o[1]-sw[1]); if(d<d0){ d0=d; b0=o; } } const start=b0&&d0<U*0.04?b0:[sw[0],sw[1],10]; res.set(F[si].e,[start[0],start[1],1]);
+    for(const dir of [1,-1]){ let p=[start[0],start[1]], v=[0,0], ar=start[2], lost=0, pe=F[si].e, n=0;
+      for(let i=si+dir;i>=0&&i<F.length;i+=dir){ const f=F[i], de=Math.abs(f.e-pe), pred=[p[0]+v[0]*de,p[1]+v[1]*de], R=U*0.015+Math.hypot(v[0],v[1])*de*0.5+U*0.01*lost;
+        let best=null, bs=1e9; for(const o of f.b){ const d=Math.hypot(o[0]-pred[0],o[1]-pred[1]); if(d>R) continue; let sc=d/R+Math.abs(Math.log((o[2]+1)/(ar+1)))*0.5; if(n>3&&isStatic(i,o)) sc+=0.9; if(sc<bs){ bs=sc; best=o; } }
+        if(!best||bs>1.4){ lost++; if(lost>10) break; continue; }
+        const nv=[(best[0]-p[0])/Math.max(de,1e-3),(best[1]-p[1])/Math.max(de,1e-3)], vmax=U*0.5; if(Math.hypot(nv[0],nv[1])<vmax) v=n<2?nv:[v[0]*0.7+nv[0]*0.3,v[1]*0.7+nv[1]*0.3];
+        lost=0; n++; p=[best[0],best[1]]; ar=ar*0.8+best[2]*0.2; pe=f.e; res.set(f.e,[p[0],p[1],clamp(1.2-bs,0.2,1)]); } }
+    return res; };
+  const RW={a:follow(WA,S.e,S.a),b:follow(WB,S.e,affApply(ovB2A(S.e),S.b[0],S.b[1]))};
+  pr.hidden=true; OVT.busy=false;
+  /* 3) auf die Schritte der Overlay-Rechnung bringen (A-Pixel, Breite W0); B mit der Ausrichtung nach A */
+  const N=GH.S.length, trk={a:new Array(N).fill(null),b:new Array(N).fill(null)}, al={a:new Array(N).fill(0),b:new Array(N).fill(0)};
+  const sample=(M,e)=>{ let lo=null,hi=null; for(const u of M.keys()){ if(u<=e&&(lo==null||u>lo)) lo=u; if(u>=e&&(hi==null||u<hi)) hi=u; } if(lo==null||hi==null||hi-lo>0.4) return null; const a=M.get(lo), b=M.get(hi), f=hi>lo?(e-lo)/(hi-lo):0; return [a[0]+(b[0]-a[0])*f,a[1]+(b[1]-a[1])*f,Math.min(a[2],b[2])]; };
+  for(let i=0;i<N;i++){ const e=i*st; for(const kk of ['a','b']){ const w=sample(RW[kk],e); if(!w) continue; trk[kk][i]=affApply(affInv(G[i]),w[0],w[1]); al[kk][i]=w[2]; } } /* Welt → Bild i von A */
+  OVT.trk=trk; OVT.al=al; OVT.key=GH.key; OVT.on=true; OVT.seed=null; ovTrailHint(); toast('Spur berechnet – abspielen.',2500); }
+function ovTrailPts(k,e){ const T=OVT.trk&&OVT.trk[k], AL=OVT.al&&OVT.al[k], S=GH.S, st=GH.step; if(!T||!S||!(st>0)) return null;
+  const j=Math.min(S.length-1,Math.floor(e/st)); if(j<1||!T[j]||AL[j]<0.15) return null; const head=trackAt(T,st,e)||T[j];
+  const n=Math.round(OVT.len/st), pts=[head]; let M=[1,0,0,0,1,0]; const jump=GH.W0*0.06;
+  for(let i=j;i>=Math.max(0,j-n);i--){ const p=T[i]; if(!p||AL[i]<0.15) break; const q=affApply(M,p[0],p[1]), l=pts[pts.length-1]; if(Math.hypot(q[0]-l[0],q[1]-l[1])>jump*(pts.length===1?2:1)) break; pts.push(q); if(S[i].cut) break; M=affMul(M,S[i].q||[1,0,0,0,1,0]); }
+  if(pts.length<3) return null;
+  return pts.map((p,i)=>{ if(i===0) return p; let sx=0,sy=0,w=0; for(let d=-2;d<=2;d++){ const q=pts[i+d]; if(!q) continue; const ww=3-Math.abs(d); sx+=q[0]*ww; sy+=q[1]*ww; w+=ww; } return [sx/w,sy/w]; }); }
+function ovTrailDraw(x,ox,oy,w,h){ if(!OVT.on||!OVT.trk||OVT.key!==GH.key||!ovFollowOK()) return; const e=ovE(), sx=w/GH.W0, sy=h/GH.hA, lw=Math.max(2,w/320);
+  const runs=[['a','#3e8bff']]; if(!OV.hideB) runs.push(['b','#f08a3c']);
+  x.save(); x.lineCap='round'; x.lineJoin='round';
+  for(const [k,col] of runs){ const P=ovTrailPts(k,e); if(!P) continue; const Q=P.map(p=>[ox+p[0]*sx,oy+p[1]*sy]), N=Q.length;
+    const curve=(A0,B0)=>{ const P2=Q.slice(A0,B0+1); if(P2.length<2) return; x.beginPath(); x.moveTo(P2[0][0],P2[0][1]); for(let i=1;i<P2.length-1;i++) x.quadraticCurveTo(P2[i][0],P2[i][1],(P2[i][0]+P2[i+1][0])/2,(P2[i][1]+P2[i+1][1])/2); const l=P2[P2.length-1]; x.lineTo(l[0],l[1]); x.stroke(); };
+    x.globalAlpha=0.3; x.strokeStyle='#000'; x.lineWidth=lw*2.4; curve(0,N-1);
+    const parts=4; for(let q=0;q<parts;q++){ const a0=Math.floor(q*(N-1)/parts), b0=Math.floor((q+1)*(N-1)/parts); x.globalAlpha=0.95*(1-q/parts*0.8); x.strokeStyle=col; x.lineWidth=lw; x.shadowColor=col; x.shadowBlur=lw*1.5; curve(a0,b0); } x.shadowBlur=0; }
+  x.restore(); }
+function ovTrailCanvas(){ let c=$('canvas.ovtrail',A.stage); if(!c){ c=document.createElement('canvas'); c.className='ovtrail'; $('canvas.ovb',A.stage).after(c); } return c; }
+function ovTrailRender(){ const c=ovTrailCanvas(), on=OVT.on&&!!OVT.trk&&OVT.key===GH.key&&ovActive()&&ovFollowOK()&&!OV.fix; c.hidden=!on; if(!on) return;
+  const R=A.rect(), d=Math.min(window.devicePixelRatio||1,3), W=Math.round(R.w*d), H=Math.round(R.h*d);
+  Object.assign(c.style,{left:R.x+'px',top:R.y+'px',width:R.w+'px',height:R.h+'px'}); if(c.width!==W||c.height!==H){ c.width=W; c.height=H; }
+  const x=c.getContext('2d'); x.setTransform(1,0,0,1,0,0); x.clearRect(0,0,W,H); ovTrailDraw(x,0,0,W,H); }
 /* ---------- Namens-Pillen: folgen den Fahrer:innen im Overlay, ohne Fahrer oder die andere Pille zu überdecken ---------- */
 const TAGS={el:null,st:{a:{x:0,y:0,o:0,c:0},b:{x:0,y:0,o:0,c:0}}};
 const TSIDE={}; // Seite je Pillen-Paar merken: erst wechseln, wenn die Fahrer:innen deutlich die Seite tauschen (kein Hin und Her)
@@ -4523,6 +4658,8 @@ function renderOv(){
     else if(a==='make'){ OV.follow=true; OV.fix=null; if(!(GH.state==='ready'&&ghostKey()===GH.key)){ OV.K=[]; ovUI(); ghostCompute({coarse:!document.body.classList.contains('touring')}); return; } if(GH.coarse&&!GH.bg){ ghostCompute({bg:true}); } ovUI(); return; }
     else if(a==='fix'){ A.pause(); B.pause(); G.playing=false; cmpPlayIcon(); const D=ovDAt(ovE()); OV.fix={...D}; OV.fix0={...D}; }
     else if(a==='hand') return ovAlign();
+    else if(a==='ovtrail'){ if(OVT.on){ OVT.on=false; } else if(OVT.trk&&OVT.key===GH.key){ OVT.on=true; } else ovTrailStart(); }
+    else if(a==='ovtrailnew'){ ovTrailStart(); }
     else if(a==='ovgps'){ OVG.on=!OVG.on; LS.set('ovGps',OVG.on?1:0); }
     else if(a==='fixreset'){ if(OV.fix){ OV.fix.dx=0; OV.fix.dy=0; OV.fix.s=1; OV.fix.r=0; A.dirty=true; } return; }
     else if(a==='fixno'){ if(!ovFollowOK()&&OV.handNew){ OV.T=null; } OV.handNew=false; OV.fix=null; }
@@ -5586,7 +5723,7 @@ function exportFrame(){
   const E=EXP; if(!E.live||!E.started) return; E.lastCb=performance.now(); const {x,W,H,bar,ws,gap,opt,ds,D}=E;
   x.fillStyle='#0d1116'; x.fillRect(0,0,W,H+bar);
   let ox=0;
-  (E.ovl?[A]:ds).forEach((d,i)=>{ const w=ws[i]; drawVid(x,d,ox,0,w,H); if(E.ovl){ ovDrawB(x,ox,0,w,H); if(opt.legend) legendDrawTo(x,ox,0,w,H); if(opt.gps&&!$('#expGps').hidden) drawOvGps({x,R:{x:ox,y:0,w,h:H}}); } else if(mode==='cmp'){ timDrawTo(x,d,ox,0,w,H); gateDrawTo(x,d,ox,0,w,H); } const R=d.rect();
+  (E.ovl?[A]:ds).forEach((d,i)=>{ const w=ws[i]; drawVid(x,d,ox,0,w,H); if(E.ovl){ ovDrawB(x,ox,0,w,H); ovTrailDraw(x,ox,0,w,H); if(opt.legend) legendDrawTo(x,ox,0,w,H); if(opt.gps&&!$('#expGps').hidden) drawOvGps({x,R:{x:ox,y:0,w,h:H}}); } else if(mode==='cmp'){ timDrawTo(x,d,ox,0,w,H); gateDrawTo(x,d,ox,0,w,H); } const R=d.rect();
     if(opt.ann&&d.clip.anns.length) drawAnns(x,{x:ox,y:0,w,h:H},d.clip.anns,w/Math.max(1,R.w));
     if(mode==='gps'&&opt.gps) drawGpsOverlay({x,R:{x:ox,y:0,w,h:H}});
     if(ds.length>1&&!E.ovl){ const k=H/540; x.fillStyle=i?'#e67e22':'#2f6fd0'; x.beginPath(); (x.roundRect?x.roundRect(ox+14*k,14*k,30*k,30*k,7*k):x.rect(ox+14*k,14*k,30*k,30*k)); x.fill(); x.fillStyle='#fff'; x.font=`800 ${17*k}px Geist,-apple-system,Segoe UI,Arial,sans-serif`; x.textAlign='center'; x.textBaseline='middle'; x.fillText(i?'B':'A',ox+29*k,30*k); }
@@ -5698,8 +5835,8 @@ function bOnlyStep(n){ if(!B.ready) return; B.pause(); A.pause(); B.seekFrame(B.
 /* ---------- Strobo ---------- */
 let SD=null;
 const STR={n:8,trail:true,num:true,busy:false,res:null};
-function strobeRange(){ const c=SD.clip, L=c.loop; if(L&&L.a!=null&&L.b!=null&&L.b-L.a>=4&&(L.b-L.a)/SD.fps<=3) return [L.a,L.b,true]; const h=Math.round(SD.fps*0.7); return [Math.max(0,SD.frame-h),Math.min(SD.nF-1,SD.frame+h),false]; }
-function openStrobe(){ SD=mode==='cmp'?A:S; if(!SD.ready){ toast(mode==='cmp'?'Zuerst Video A wählen.':'Zuerst ein Video öffnen.'); return; } A.pause(); B.pause(); SD.pause(); $('#strobeModal').classList.add('on'); strobeRun(); }
+function strobeRange(){ const c=SD.clip, L=c.loop, sp=STR.span||1; if(sp==='cut'&&L&&L.a!=null&&L.b!=null&&L.b-L.a>=4) return [L.a,Math.min(L.b,L.a+Math.round(SD.fps*8)),true]; const h=Math.round(SD.fps*(sp==='cut'?1:sp)); return [Math.max(0,SD.frame-h),Math.min(SD.nF-1,SD.frame+h),false]; }
+function openStrobe(){ STR.tap=null; SD=mode==='cmp'?A:S; if(!SD.ready){ toast(mode==='cmp'?'Zuerst Video A wählen.':'Zuerst ein Video öffnen.'); return; } A.pause(); B.pause(); SD.pause(); $('#strobeModal').classList.add('on'); strobeRun(); }
 function labelMap(m,w,h){ const lab=new Int32Array(m.length), st=[], info=[0]; let id=0;
   for(let i=0;i<m.length;i++){ if(!m[i]||lab[i]) continue; id++; let a=0,sx=0,sy=0; st.push(i); lab[i]=id;
     while(st.length){ const k=st.pop(); a++; sx+=k%w; sy+=(k/w)|0; const x=k%w;
@@ -5759,15 +5896,17 @@ async function strobeRun(){
       mk=morph(mk,PW,PH,false); mk=morph(morph(mk,PW,PH,true),PW,PH,true); return labelMap(mk,PW,PH); };
     // 1. Kandidaten je Bild (grösste Flecken)
     const minA=OW*OH*0.0004, CAND=[];
-    for(let i=0;i<n;i++){ const {info}=maskOf(i); const c=info.slice(1).filter(o=>o.a>=minA).sort((a,b)=>b.a-a.a).slice(0,6); CAND.push(c);
+    for(let i=0;i<n;i++){ const {info}=maskOf(i); const c=info.slice(1).filter(o=>o.a>=minA*(STR.tap?0.4:1)).sort((a,b)=>b.a-a.a).slice(0,STR.tap?40:6); CAND.push(c);
       if(i%2===1){ prog(0.86+0.06*i/n,'Fahrer:in suchen …'); await new Promise(r=>setTimeout(r,0)); } }
     // 2. Plausibelste Bahn: vom mittleren Bild aus, Vorhersage aus Position + Geschwindigkeit
-    const pick=new Array(n).fill(null), sc=OW*0.16;
-    const best0=CAND[m][0]||null; pick[m]=best0;
-    const walk=dir=>{ for(let i=m+dir;i>=0&&i<n;i+=dir){ const p1=pick[i-dir], p2=pick[i-2*dir]; if(!CAND[i].length){ continue; }
-        if(!p1){ pick[i]=CAND[i][0]; continue; }
+    const pick=new Array(n).fill(null), sc=OW*0.16; let m0=m;
+    if(STR.tap){ let bd=1e9, bi=-1, bo=null; for(let i=0;i<n;i++){ const {info}=maskOf(i); for(const o of info.slice(1)){ if(o.a<minA*0.4) continue; const dd=Math.hypot(o.x-STR.tap[0],o.y-STR.tap[1]); if(dd<bd){ bd=dd; bi=i; bo=o; } } }
+      if(bo&&bd<OW*0.12){ m0=bi; if(!CAND[bi].includes(bo)) CAND[bi].unshift(bo); } }
+    const best0=STR.tap&&m0!==m?CAND[m0][0]:(STR.tap?CAND[m].slice().sort((p,q)=>Math.hypot(p.x-STR.tap[0],p.y-STR.tap[1])-Math.hypot(q.x-STR.tap[0],q.y-STR.tap[1]))[0]:CAND[m][0])||null; pick[m0]=best0;
+    const walk=dir=>{ for(let i=m0+dir;i>=0&&i<n;i+=dir){ let p1=pick[i-dir]; if(!CAND[i].length){ continue; }
+        if(!p1&&!STR.tap){ pick[i]=CAND[i][0]; continue; } if(!p1){ for(let q=i-dir;q>=0&&q<n;q-=dir) if(pick[q]){ p1=pick[q]; break; } } if(!p1) continue;
         const pr=[p1.x,p1.y], amax=CAND[i][0].a;
-        let bb=null,bs=-1; for(const o of CAND[i]){ const dd=Math.hypot(o.x-pr[0],o.y-pr[1]); const sco=(o.a/amax)/Math.pow(1+dd/sc,2); if(sco>bs){ bs=sco; bb=o; } } pick[i]=bb; } };
+        let bb=null,bs=-1; for(const o of CAND[i]){ const dd=Math.hypot(o.x-pr[0],o.y-pr[1]); if(STR.tap&&dd>sc) continue; /* angetippt: nur in der Nähe weitersuchen */ const sco=(STR.tap?Math.min(1,o.a/(p1.a||o.a)):(o.a/amax))/Math.pow(1+dd/(STR.tap?sc*0.35:sc),2); if(sco>bs){ bs=sco; bb=o; } } pick[i]=bb||(STR.tap?null:bb); } };
     walk(1); walk(-1); window._strDbg={CAND,pick,x0,y0,PW,PH};
     // 3. Freistellen + Einsetzen
     const cents=[];
@@ -5806,6 +5945,10 @@ $('#splits').addEventListener('click',e=>{ const sb=e.target.closest('[data-sp]'
   G.off=(B.clip.markers[k]+0.5)/B.fps-(A.clip.markers[k]+0.5)/A.fps; G.syncA=(A.clip.markers[k]+0.5)/A.fps; G.linked=true; linkBtn(); updSync(); setTimeout(splitsUI,50); toast((k?'Tor '+(k+1):'Start')+': gleicher Moment von A und B gesetzt',1300); });
 $('#strX').addEventListener('click',()=>$('#strobeModal').classList.remove('on'));
 $('#strobeModal').addEventListener('click',e=>{ if(e.target.id==='strobeModal'&&!STR.busy) e.currentTarget.classList.remove('on'); });
+
+$('#strR').addEventListener('click',e=>{ const b=e.target.closest('[data-r]'); if(!b||STR.busy) return; const r=b.dataset.r; if(r==='cut'){ const L=SD.clip&&SD.clip.loop; if(!(L&&L.a!=null&&L.b!=null)){ toast('Zuerst «Start» und «Ende» setzen (Knöpfe [ und ] in der Leiste).',3500); return; } }
+  STR.span=r==='cut'?'cut':+r; STR.tap=null; $$('#strR button').forEach(x=>x.classList.toggle('on',x===b)); strobeRun(); });
+$('#strCanvas').addEventListener('click',e=>{ if(STR.busy||!STR.res) return; const c=e.currentTarget, r=c.getBoundingClientRect(); STR.tap=[(e.clientX-r.left)/r.width*c.width,(e.clientY-r.top)/r.height*c.height]; toast('Fahrer:in wird neu gesucht …',1800); strobeRun(); });
 $('#strN').addEventListener('click',e=>{ const b=e.target.closest('[data-n]'); if(!b||STR.busy) return; STR.n=+b.dataset.n; $$('#strN button').forEach(x=>x.classList.toggle('on',x===b)); strobeRun(); });
 $('#strTrail').addEventListener('change',e=>{ STR.trail=e.target.checked; strobeDecor(); });
 $('#strNum').addEventListener('change',e=>{ STR.num=e.target.checked; strobeDecor(); });
@@ -6347,7 +6490,6 @@ setTimeout(fieldSync,600);
   mb.addEventListener('click',e=>{ e.stopPropagation(); const ov=$('#viewCmp').classList.contains('overlay'); mMenu(mb,[
     ['Videos wählen',I('<rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M3 10h18"/>'),()=>libOpen(true)],
     ['Anleitung',I('<circle cx="12" cy="12" r="9"/><path d="M10 8.5l5.5 3.5-5.5 3.5z"/>'),()=>$('#tutBtn').click()],
-    ov?null:['Stroboskop',I('<circle cx="6" cy="12" r="2.4"/><circle cx="12" cy="12" r="2.4"/><circle cx="18" cy="12" r="2.4"/>'),()=>$('#viewCmp .strobo-btn').click()],
     ['Zurücksetzen',I('<path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/>'),()=>$('#cmpReset').click()]]); });
   const ph=document.createComment('save'); if(sv) sv.after(ph);
   const place=()=>{ const m=MQ.matches, tb=$('#btnTools'), host=tb?tb.parentNode:$('#viewCmp .dock .dz-l');
@@ -6402,7 +6544,7 @@ if(false&&!LS.get('hint1',0)){ setTimeout(()=>{ toast(matchMedia('(pointer:coars
 
 /* Update-Hinweis: prüft version.json auf GitHub Pages; «Aktualisieren» lädt die Seite ohne Cache neu */
 (()=>{
-  const BUILD='20261031143225'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
+  const BUILD='20261031153822'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
   // nach einem Update die ?v=… aus der Adresse entfernen
   try{ const u=new URL(location.href); if(u.searchParams.has('v')){ u.searchParams.delete('v'); history.replaceState(null,'',u.pathname+(u.search||'')+u.hash); } }catch(e){}
   const el=$('#upd'); let latest=null, snoozed=null, busy=false;
