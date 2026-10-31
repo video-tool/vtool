@@ -2342,6 +2342,25 @@ body.pfs .gps-sel,body.pfs .gps-foot,body.pfs #gpsChart,body.pfs #viewGps .ctl-l
   body.pfs #viewGps .dock.dock3>.dz{flex:none!important;margin:0!important}
 }
 .stage canvas.ovgps{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:4}
+/* Dialoge passen immer auf den Bildschirm (Handy quer) – sonst innen scrollen */
+.modal>*{max-height:calc(100dvh - 24px);overflow-y:auto;-webkit-overflow-scrolling:touch}
+@media (max-height:500px){ .modal{padding:8px!important} }
+.pill.gps-no{display:flex;flex-direction:column;align-items:center;gap:8px;padding:12px 14px!important}
+.pill.gps-no[hidden]{display:none}
+.gps-no .gn-btn{pointer-events:auto;border:0;border-radius:10px;background:#DA291C;color:#fff;font:700 13px var(--font);padding:9px 14px;cursor:pointer}
+.gps-no small{opacity:.7;font-size:11.5px}
+.gv-menu .gv-sep{height:1px;background:rgba(255,255,255,.1);margin:4px 6px}
+
+.m-sync{display:none}
+@media (max-width:760px){
+  #viewCmp:not(.overlay) .m-sync{display:inline-flex!important;align-items:center;gap:5px;width:auto!important;min-width:0!important;padding:0 10px!important;height:32px!important;border-radius:10px!important;background:#DA291C!important;color:#fff!important;border-color:transparent!important;font:700 12px var(--font)}
+  #viewCmp:not(.overlay) .m-sync svg{width:15px;height:15px}
+  #viewCmp:not(.overlay) .m-sync.on{box-shadow:none!important;background:rgba(52,199,89,.18)!important;color:#5ee38a!important;border:1px solid rgba(52,199,89,.5)!important}
+  #viewCmp:not(.overlay) .dz-l .m-sync{order:-1}
+  #viewCmp:not(.overlay) #syncInfo{display:block!important;font-size:11.5px!important;line-height:1.35;margin:6px 2px 0!important;color:#aab4c0;text-align:center}
+  #viewCmp.cmp-linked:not(.overlay) #syncInfo{display:none!important}
+  #viewCmp:not(.overlay) #syncInfo .dchip{display:none}
+}
 </style>
 </head>
 <body class="m-single">
@@ -2429,7 +2448,7 @@ body.pfs .gps-sel,body.pfs .gps-foot,body.pfs #gpsChart,body.pfs #viewGps .ctl-l
       <button class="ctl rate-btn" data-act="rate" title="Tempo: Klick wechselt 1× → ½× → ¼× → 0.1× (↑ / ↓ auch 1.5× und 2×)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 16a8 8 0 1 1 15 0"/><path d="M12 12.5l3.5-4"/><circle cx="12" cy="13" r="1.3" fill="currentColor"/></svg><span>1×</span></button></div></div>
       <div class="dz dz-r"><button class="ctl m-draw" data-act="draw" title="Zeichnen und Messen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></svg></button><button class="ctl" data-act="marker" title="Marker setzen / entfernen (m) – z. B. Torwechsel, Kantenwechsel"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><path d="M12 3l7 9-7 9-7-9z"/></svg></button><div class="ctl-sep"></div><div class="grp">
         <label class="ctl-lab fps-edit" title="Bilder pro Sekunde – wird beim Laden gemessen">fps <input class="num" id="sFps" type="number" min="1" max="1000" step="0.01"></label>
-        <button class="ctl" data-act="sound" title="Ton ein / aus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5L6 9H2v6h4l5 4z"/><path class="snd-on" d="M15.5 8.5a5 5 0 0 1 0 7" hidden/><path class="snd-off" d="M16 9l5 6M21 9l-5 6"/></svg></button>
+        <button class="ctl strobo-btn" data-act="strobe" title="Strobo: mehrere Positionen in einem Bild (±0.7 s um das aktuelle Bild)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="12" r="2.4"/><circle cx="12" cy="12" r="2.4" opacity=".75"/><circle cx="18" cy="12" r="2.4" opacity=".5"/></svg></button><button class="ctl" data-act="sound" title="Ton ein / aus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5L6 9H2v6h4l5 4z"/><path class="snd-on" d="M15.5 8.5a5 5 0 0 1 0 7" hidden/><path class="snd-off" d="M16 9l5 6M21 9l-5 6"/></svg></button>
         <button class="ctl" data-act="shot" title="Standbild mit Zeichnungen als PNG speichern (p)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.6"/></svg></button>
         <button class="ctl sbs-btn" data-act="sbs" title="Side-by-Side: dieses Video als A in die Analyse übernehmen und ein zweites danebenstellen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="5" width="8.5" height="14" rx="2"/><rect x="13" y="5" width="8.5" height="14" rx="2"/></svg><span>Side-by-Side</span></button><button class="ctl cat-btn" data-act="concat" title="Mehrere Videos aneinanderhängen und als ein Video speichern"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="6" height="10" rx="1.6"/><rect x="9" y="7" width="6" height="10" rx="1.6"/><rect x="16" y="7" width="6" height="10" rx="1.6"/></svg></button><button class="ctl rec-btn" data-act="rec" title="Aufnahme: alles, was du jetzt zeigst, zeichnest und sagst, als Video aufnehmen (r)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4" fill="currentColor" stroke="none"/></svg></button><button class="ctl" data-act="export" title="Clip exportieren – z. B. Schwung in Zeitlupe (e)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg></button>
         <button class="ctl" data-act="fs" title="Vollbild (f)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3M21 8V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3M16 21h3a2 2 0 0 0 2-2v-3"/></svg></button>
@@ -2506,7 +2525,7 @@ body.pfs .gps-sel,body.pfs .gps-foot,body.pfs #gpsChart,body.pfs #viewGps .ctl-l
     <div class="stages" id="cStages"></div><div class="ov-marks" id="ovMarks"></div>
     <div class="strips" id="cStrips"></div>
     <div class="dock dock3">
-      <div class="dz dz-l"><button class="ctl link" id="btnLink" title="A und B gemeinsam steuern (l)">
+      <div class="dz dz-l"><button class="ctl m-sync" data-act="msync" title="Gleicher Moment: A und B an diesem Bild verbinden"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/></svg><span>Gleicher Moment</span></button><button class="ctl link" id="btnLink" title="A und B gemeinsam steuern (l)">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/></svg><span>Getrennt</span></button><button class="ctl" id="btnSync" title="Aktuelle Bilder von A und B als gleichen Moment setzen und verknüpfen (Enter)"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2.2"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg>Gleicher Moment</button><span class="sync-chip" id="syncChip"></span><div class="ctl-sep"></div><button class="ctl tim-btn" id="btnTime" title="Zeitmessung: Start = gleicher Moment, Ziel für A und B setzen – Zeit wird im Bild eingeblendet"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="7.2"/><path d="M12 13V9.6M9.6 3h4.8M12 3v2.8M18.2 6.6l1.2-1.2"/></svg></button><span class="tim-acts" id="timActs" hidden><button class="ctl" data-tim="a" title="Ziel A = aktuelles Bild von A"><b class="tb-a">A</b><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 21V4"/><path d="M5 4h11l-2 4 2 4H5"/></svg></button><button class="ctl" data-tim="b" title="Ziel B = aktuelles Bild von B"><b class="tb-b">B</b><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 21V4"/><path d="M5 4h11l-2 4 2 4H5"/></svg></button><button class="ctl ico" data-tim="x" title="Ziele löschen">×</button></span><button class="ctl" id="btnSplits" title="Abschnittszeiten: Tore in A (m) und B (n) markieren"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 9-7 9-7-9z"/></svg>Tore<b class="nb" id="splitsN"></b></button></div>
       <div class="dz dz-c"><div class="grp">
         <button class="ctl" data-act="step" data-n="-10" title="10 Bilder zurück"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M11.5 17l-5-5 5-5"/><path d="M18 17l-5-5 5-5"/></svg></button>
@@ -2747,7 +2766,7 @@ function dispName(c){ return c?(c.alias||c.name):''; }
 function saveClip(c){ if(c.demo&&!c.keep) return; clearTimeout(c._st); c._st=setTimeout(()=>LS.set(clipKey(c),{markers:c.markers,notes:c.notes,anns:c.anns,loop:c.loop,fps:c.fpsAuto?null:c.fps}),300); }
 
 function addClip(o){
-  const c={id:++uid,name:o.name,size:o.size||0,url:o.url,demo:!!o.demo,dur:0,w:0,h:0,fps:null,fpsAuto:false,markers:[],notes:{},anns:[],loop:{a:null,b:null,on:false},poster:null,err:false}; c.meta=parseName(c.name); { const al=LS.get('alias:'+clipKey(c),null); if(al){ c.alias=al; c.meta=parseName(al); } }
+  const c={id:++uid,mod:o.mod||0,added:Date.now(),name:o.name,size:o.size||0,url:o.url,demo:!!o.demo,dur:0,w:0,h:0,fps:null,fpsAuto:false,markers:[],notes:{},anns:[],loop:{a:null,b:null,on:false},poster:null,err:false}; c.meta=parseName(c.name); { const al=LS.get('alias:'+clipKey(c),null); if(al){ c.alias=al; c.meta=parseName(al); } }
   const st=LS.get(clipKey(c),null);
   if(st){ c.markers=st.markers||[]; c.notes=st.notes||{}; c.anns=st.anns||[]; c.loop=Object.assign(c.loop,st.loop||{}); c.loop.on=false; if(st.fps) c.manualFps=st.fps; }
   let res; c.whenFps=new Promise(r=>res=r); c._fpsRes=res;
@@ -2766,7 +2785,7 @@ function addFiles(files){
   const gfs=[...files].filter(f=>/\.(csv|gpx|json|txt)$/i.test(f.name)); if(gfs.length){ importGpsFiles(gfs); if(gfs.length===files.length) return; files=[...files].filter(f=>!gfs.includes(f)); }
   const vids=[...files].filter(f=>/^video\//.test(f.type)||/\.(mp4|mov|m4v|mkv|webm|avi|mts)$/i.test(f.name));
   if(!vids.length){ toast('Keine Videodatei erkannt.'); return; }
-  const added=vids.map(f=>{ const c=addClip({name:f.name,size:f.size,url:URL.createObjectURL(f)}); if(f._h) rememberHandle(c,f._h); return c; });
+  const added=vids.map(f=>{ const c=addClip({name:f.name,size:f.size,mod:f.lastModified,url:URL.createObjectURL(f)}); if(f._h) rememberHandle(c,f._h); return c; });
   if(mode==='single'){ S.setClip(added[0]); }
   else{ const free=[A,B].filter(d=>!d.clip||d.clip.demo); added.slice(0,2).forEach((c,i)=>{ (free[i]||(i===0?A:B)).setClip(c); }); unlink(); }
   clips.filter(c=>c.demo).forEach(c=>{ if(!decks.some(d=>d.clip===c)) removeClip(c); });
@@ -2790,8 +2809,11 @@ function renderLib(){
   el.classList.add('list'); const NAMES=LS.get('libview','thumbs')==='names'; el.classList.toggle('names',NAMES); $$('#libView button').forEach(b=>b.classList.toggle('on',b.dataset.lv===(NAMES?'names':'thumbs')));
   // nach Rennen/Training gruppieren (Ort · Disziplin · Datum), Reihenfolge wie geöffnet
   const gk=c=>{ const m=c.meta; return m&&m.ok&&(m.place||m.date)?[m.place||'',m.disc||'',m.date||''].join('|'):'~'; };
-  const order=[]; clips.forEach(c=>{ const k=gk(c); if(!order.includes(k)) order.push(k); });
-  const list=order.flatMap(k=>clips.filter(c=>gk(c)===k)); let lastG=null;
+  /* neueste zuoberst: Aufnahmezeit (Zeitcode/Dateiname), sonst Datum der Datei, sonst wann geöffnet */
+  const tk=c=>{ let t=null; try{ const v=vidStart(c); if(v) t=v*1000; }catch(e){} if(!t&&c.meta&&c.meta.key){ const k=String(c.meta.key); t=new Date(2000+ +k.slice(0,2),+k.slice(2,4)-1,+k.slice(4,6),12).getTime(); } return t||c.mod||c.added||0; };
+  const srt=clips.slice().sort((a,b)=>tk(b)-tk(a)||b.id-a.id);
+  const order=[]; srt.forEach(c=>{ const k=gk(c); if(!order.includes(k)) order.push(k); });
+  const list=order.flatMap(k=>srt.filter(c=>gk(c)===k)); let lastG=null;
   const XI='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/></svg>';
   list.forEach(c=>{
     if(!libMatch(c)||c.demo) return; // Beispiele stehen unten bei den Beispiel-Läufen
@@ -3413,7 +3435,7 @@ A.onChange=B.onChange=()=>{ cmpPlayIcon(); cmpMeta(); updSync(); splitsUI(); fxU
 A.onUserSeek=d=>{ if(G.linked&&B.ready) B.seekTime(d.time()+G.off); updSync(); splitsUI(); };
 B.onUserSeek=d=>{ if(G.linked&&A.ready) A.seekTime(d.time()-G.off); updSync(); splitsUI(); };
 A.onTap=B.onTap=()=>{ cmpToggle(); A.flash(); };
-function linkBtn(){ $('#viewCmp').classList.toggle('cmp-linked',!!G.linked); const b=$('#btnLink'); b.classList.toggle('on',G.linked); $('span',b).textContent=G.linked?'Verknüpft':'Getrennt';
+function linkBtn(){ $('#viewCmp').classList.toggle('cmp-linked',!!G.linked); $$('.m-sync').forEach(b=>{ b.classList.toggle('on',!!G.linked); $('span',b).textContent=G.linked?'Verbunden':'Gleicher Moment'; b.title=G.linked?'A und B laufen gemeinsam – antippen zum Trennen':'A und B an diesem Bild verbinden'; }); const b=$('#btnLink'); b.classList.toggle('on',G.linked); $('span',b).textContent=G.linked?'Verknüpft':'Getrennt';
   const s=$('#btnSync'); if(s){ s.classList.toggle('on',G.linked); const t=$('.sync-lab',s)||(()=>{ const x=document.createElement('span'); x.className='sync-lab'; [...s.childNodes].forEach(n=>{ if(n.nodeType===3) n.remove(); }); s.appendChild(x); return x; })();
     t.textContent='Gleicher Moment'; s.title=G.linked?'A und B laufen gemeinsam – klicken zum Trennen (l)':'A und B am aktuellen Bild verbinden – danach laufen beide gemeinsam (Enter)'; } }
 function updSync(){
@@ -3422,7 +3444,7 @@ function updSync(){
     else if(!G.linked){ ch.textContent='nicht verbunden'; ch.className='sync-chip off'; ch.title='Gleichen Moment in A und B einstellen (z. B. Torstange), dann «Gleicher Moment». B allein bewegen: Alt+←/→'; }
     else { ch.textContent='B '+(G.off>=0?'+':'−')+Math.abs(G.off).toFixed(2)+' s'; ch.className='sync-chip on'; ch.title='Verknüpft · Versatz von B zu A. B allein nachführen: Alt+←/→'; } }
   if(!A.ready||!B.ready){ el.innerHTML='Wähle oben Video A und Video B (oder in der Liste «A» / «B»).'; return; }
-  if(!G.linked){ el.innerHTML='<span class="dchip">A F '+A.frame+'</span><span class="dchip">B F '+B.frame+'</span> Gleichen Moment in A und B einstellen (z. B. Torstange), dann <b>«Gleicher Moment»</b>.'; return; }
+  if(!G.linked){ el.innerHTML=innerWidth<=760?'<b>1</b> A und B je zum gleichen Tor (Zeitleiste ziehen oder im Bild wischen) · <b>2</b> «Gleicher Moment» drücken':'<span class="dchip">A F '+A.frame+'</span><span class="dchip">B F '+B.frame+'</span> Gleichen Moment in A und B einstellen (z. B. Torstange), dann <b>«Gleicher Moment»</b>.'; return; }
   const dA=A.time()-G.syncA, dB=B.time()-(G.syncA+G.off);
   const diff=dB-dA; // positiv: B braucht länger bis zur gleichen Position? Anzeige: Zeit seit Sync
   el.innerHTML='Verknüpft · seit gleichem Moment <span class="dchip">'+(dA>=0?'+':'−')+Math.abs(dA).toFixed(3)+' s</span> · Versatz B <span class="dchip">'+(G.off>=0?'+':'−')+Math.abs(G.off).toFixed(3)+' s</span> · B allein nachführen: <kbd>Alt</kbd>+<kbd>←</kbd><kbd>→</kbd>';
@@ -3496,6 +3518,7 @@ function act(name,btn){
   else if(name==='rate') cycleRate();
   else if(name==='strobe') openStrobe();
   else if(name==='fs') fullscreen();
+  else if(name==='msync'){ if(G.linked) unlink(); else doSync(); }
 }
 function fullscreen(){ const el=mode==='single'?$('#viewSingle'):mode==='gps'?$('#viewGps'):$('#viewCmp');
   if(document.body.classList.contains('pfs')){ pfsSet(false); return; }
@@ -3536,7 +3559,7 @@ $$('.tab').forEach(t=>t.addEventListener('click',()=>{ if(t.dataset.lay){ if(cur
 
 /* Dateien */
 $('#fileIn').addEventListener('change',e=>{ const fs=e.target.files; if(fs&&fs.length){
-  if(pickTarget&&fs.length===1){ const c=addClip({name:fs[0].name,size:fs[0].size,url:URL.createObjectURL(fs[0])}); pickTarget.setClip(c); if(pickTarget!==S) unlink(); syncSelects(); renderLib(); refreshSingleHead(); }
+  if(pickTarget&&fs.length===1){ const c=addClip({name:fs[0].name,size:fs[0].size,mod:fs[0].lastModified,url:URL.createObjectURL(fs[0])}); pickTarget.setClip(c); if(pickTarget!==S) unlink(); syncSelects(); renderLib(); refreshSingleHead(); }
   else addFiles(fs); }
   pickTarget=null; e.target.value=''; });
 let dragN=0;
@@ -4781,7 +4804,7 @@ $('#catList').addEventListener('change',e=>{ const inp=e.target.closest('input[d
 $('#catSel').addEventListener('change',e=>{ const c=clips.find(x=>String(x.id)===e.target.value); if(c){ CAT.items.push(catItem(c)); catRender(); if(!(c.dur>0)) catDur(c).then(catRender); } });
 $('#catAddOpen').addEventListener('click',()=>{ if(!CAT.live) pickVideosForCat(); });
 async function pickVideosForCat(){ const inp=document.createElement('input'); inp.type='file'; inp.accept='video/*,.mov,.mp4,.m4v'; inp.multiple=true;
-  inp.onchange=()=>{ const fs=[...inp.files].filter(f=>/^video\//.test(f.type)||/\.(mp4|mov|m4v|webm)$/i.test(f.name)); fs.forEach(f=>{ const c=addClip({name:f.name,size:f.size,url:URL.createObjectURL(f)}); CAT.items.push({c,a:0,b:null}); catDur(c).then(catRender); }); renderLib(); catRender(); };
+  inp.onchange=()=>{ const fs=[...inp.files].filter(f=>/^video\//.test(f.type)||/\.(mp4|mov|m4v|webm)$/i.test(f.name)); fs.forEach(f=>{ const c=addClip({name:f.name,size:f.size,mod:f.lastModified,url:URL.createObjectURL(f)}); CAT.items.push({c,a:0,b:null}); catDur(c).then(catRender); }); renderLib(); catRender(); };
   inp.click(); }
 $('#catRate').addEventListener('click',e=>{ const b=e.target.closest('[data-r]'); if(!b||CAT.live) return; CAT.rate=+b.dataset.r; $$('#catRate button').forEach(x=>x.classList.toggle('on',x===b)); catSummary(); });
 ['#catTitle','#catInfo','#catFade','#catAnn'].forEach(id=>$(id).addEventListener('change',catSummary));
@@ -5002,7 +5025,7 @@ async function ltcRead(c){ if(c.ltc0!==undefined) return c.ltc0; c.ltc0=null;
     let day=null; if(dd>=1&&dd<=31&&mm>=1&&mm<=12) day=Date.UTC(2000+yy,mm-1,dd)/1000; // Datum aus den User-Bits
     else if(c.meta&&c.meta.key){ const k=String(c.meta.key); day=Date.UTC(2000+ +k.slice(0,2),+k.slice(2,4)-1,+k.slice(4,6))/1000; }
     if(day==null) return null; c.ltc0=day+tod-LTC_TAI; c.ltcFps=fps; return c.ltc0; }catch(e){ return null; } }
-function vidStart(c){ if(c&&c.ltc0) return c.ltc0; // Zeitcode im Ton geht vor der Handyuhr
+function vidStart(c){ if(c&&c.ltc0) return c.ltc0; if(c&&c.fieldT0) return c.fieldT0/1000; /* Field-App: Startzeit der Aufnahme (Handyuhr) */ // Zeitcode im Ton geht vor der Handyuhr
   const m=c&&c.meta; if(!m||m.tod==null||!m.key) return null; const k=String(m.key), t=m.tod; return new Date(2000+ +k.slice(0,2),+k.slice(2,4)-1,+k.slice(4,6),Math.floor(t/3600),Math.floor(t/60)%60,Math.floor(t)%60,Math.round(t%1*1000)).getTime()/1000; } // Datum+Zeit zusammen, sonst falsch am Tag der Zeitumstellung
 function autoGpsOff(c,tr){ const v0=vidStart(c); if(v0==null||!tr||!(tr.t0abs>1e9)) return null; const dur=c.dur||60, span=tr.P[tr.P.length-1].t;
   const base=v0-tr.t0abs, ov=o=>Math.min(o+dur,span)-Math.max(o,0);
@@ -5206,7 +5229,7 @@ function gpsNudge(dt){ const c=GD.clip; if(!trackOf(c)) return; c.gpsOff+=dt; gp
 
 const GD=new Deck('g',$('#gHost'),$('#gStrip'));
 $('#gHost').insertAdjacentHTML('beforeend',railHTML(false));
-GD.stage.insertAdjacentHTML('beforeend','<span class="pill gps-no" id="gpsNo" hidden>Keine GPS-Daten zu diesem Video – oben «innove» antippen oder eine GPS-Datei mit «+» laden.</span>');
+GD.stage.insertAdjacentHTML('beforeend','<div class="pill gps-no" id="gpsNo" hidden><span>Keine GPS-Daten zu diesem Video.</span><button class="gn-btn" id="gpsChoose">GPS-Lauf von innove wählen</button><small>oder eine GPS-Datei mit «+» laden</small></div>');
 $$('#viewGps [data-rates]').forEach(seg=>{ seg.innerHTML=RATES.map(r=>`<button type="button" data-rate="${r}">${fmtRate(r)}</button>`).join(''); });
 $$('#viewGps .ctl.play').forEach(b=>b.innerHTML=ICON.play);
 GD.onChange=()=>{ $('#viewGps .ctl.play').innerHTML=GD.v.paused?ICON.play:ICON.pause; GPS.dirty=true; };
@@ -5222,10 +5245,10 @@ false&&$('#gpsColor').addEventListener('click',e=>{ const b=e.target.closest('[d
 /* Handy: Anzeigen (Tacho/Linie/Zeit) als Auswahlmenü in der Knopfleiste */
 $('#gpsViewBtn').addEventListener('click',e=>{ e.stopPropagation(); let m=$('#gvMenu'); if(m){ m.remove(); return; }
   m=document.createElement('div'); m.id='gvMenu'; m.className='gv-menu';
-  const fill=()=>{ m.innerHTML=$$('#gpsView [data-v]').map(b=>`<button data-v="${b.dataset.v}" class="${b.classList.contains('on')?'on':''}"><i>${b.classList.contains('on')?'✓':''}</i>${b.textContent}</button>`).join(''); };
+  const fill=()=>{ m.innerHTML=$$('#gpsView [data-v]').map(b=>`<button data-v="${b.dataset.v}" class="${b.classList.contains('on')?'on':''}"><i>${b.classList.contains('on')?'✓':''}</i>${b.textContent}</button>`).join('')+'<div class="gv-sep"></div><button data-gc="1"><i>↻</i>GPS-Lauf wählen …</button>'; };
   fill(); document.body.appendChild(m); const r=e.currentTarget.getBoundingClientRect(), mw=m.offsetWidth, mh=m.offsetHeight;
   m.style.left=Math.max(8,Math.min(innerWidth-mw-8,r.right-mw))+'px'; m.style.top=(r.top-mh-6>8?r.top-mh-6:r.bottom+6)+'px';
-  m.addEventListener('click',ev=>{ ev.stopPropagation(); const b=ev.target.closest('[data-v]'); if(!b) return; $('#gpsView [data-v="'+b.dataset.v+'"]').click(); fill(); });
+  m.addEventListener('click',ev=>{ ev.stopPropagation(); if(ev.target.closest('[data-gc]')){ m.remove(); invChoose(GD.clip); return; } const b=ev.target.closest('[data-v]'); if(!b) return; $('#gpsView [data-v="'+b.dataset.v+'"]').click(); fill(); });
   setTimeout(()=>document.addEventListener('click',function off(ev){ if(ev.target.closest&&ev.target.closest('#gpsView,#gvMenu')) return; const mm=$('#gvMenu'); if(mm) mm.remove(); document.removeEventListener('click',off); }),0); });
 $('#gpsChart').addEventListener('click',e=>{ const N=gpsNow(); if(!N) return; const r=e.currentTarget.getBoundingClientRect(); const {tr,c}=N, P=tr.P, s0=P[tr.iS].s, s1=P[tr.iE].s;
   const s=s0+clamp((e.clientX-r.left-64)/(r.width-74),0,1)*(s1-s0); let i=tr.iS; while(i<tr.iE&&P[i].s<s) i++; GD.pause(); GD.seekTime(P[i].t-c.gpsOff); GPS.dirty=true; });
@@ -5252,9 +5275,9 @@ async function invAthletes(force){ const c=LS.get('innove:aths',null); if(c&&!fo
   for(let p=1;p<20;p++){ const j=await invGet('/athletes/?limit=500&page='+p); const a=(j&&j.athletes)||[]; a.forEach(x=>L.push([x.id,x.first_name||'',x.last_name||''])); if(!a.length||L.length>=(j.total||0)) break; } // nur ID und Name
   LS.set('innove:aths',{at:Date.now(),L}); return L; }
 const invNorm=s=>String(s||'').toLowerCase().replace(/ä/g,'ae').replace(/ö/g,'oe').replace(/ü/g,'ue').normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z]/g,'');
-function invPick(title,L){ return new Promise(res=>{ const m=$('#invPick'), q=$('#invPickQ'), l=$('#invPickL'); $('#invPickT').textContent=title;
+function invPick(title,L,ph){ return new Promise(res=>{ const m=$('#invPick'), q=$('#invPickQ'), l=$('#invPickL'); $('#invPickT').textContent=title; q.placeholder=ph||'Name suchen …'; q.hidden=L.length<8&&!!ph;
   const draw=()=>{ const t=invNorm(q.value); const F=L.filter(x=>!t||invNorm(x[1]+x[2]).includes(t)||invNorm(x[2]+x[1]).includes(t)).slice(0,80);
-    l.innerHTML=F.map(x=>`<button data-id="${x[0]}"><span>${esc(x[2])} ${esc(x[1])}</span><small>${x[0]}</small></button>`).join('')||'<p class="inv-p">Niemand gefunden.</p>'; };
+    l.innerHTML=F.map(x=>`<button data-id="${x[0]}"><span>${esc(x[2])} ${esc(x[1])}</span><small>${x[3]!=null?esc(x[3]):x[0]}</small></button>`).join('')||'<p class="inv-p">Niemand gefunden.</p>'; };
   const done=v=>{ m.classList.remove('on'); q.oninput=null; l.onclick=null; $('#invPickX').onclick=null; res(v); };
   q.value=''; draw(); q.oninput=draw; l.onclick=e=>{ const b=e.target.closest('[data-id]'); if(b) done(L.find(x=>String(x[0])===b.dataset.id)); }; $('#invPickX').onclick=()=>done(null); m.classList.add('on'); setTimeout(()=>q.focus(),60); }); }
 async function invAthleteFor(c){ const name=(c.meta&&c.meta.athlete)||''; const key=invNorm(name), map=LS.get('innove:map',{}); const L=await invAthletes();
@@ -5289,37 +5312,60 @@ async function demoGpsFor(c){ if(!c||!/_stelvio_261029\.mp4$/.test(c.name)||c.gp
   const tr=GPS.tracks.find(t=>t._stel===v.track); if(!tr) return;
   let s0=null; try{ s0=await ltcRead(c); }catch(e){} if(s0==null) s0=v.ltc0; // Zeitcode aus dem Ton, sonst gespeicherter Wert
   linkGps(c,tr,s0-tr.t0abs); c.gpsAuto=0; GPS.dirty=true; gpsSelects(); }
-async function invFetch(c){ c=c||GD.clip;
+async function invFetch(c,auto){ c=c||GD.clip;
   if(!invAuth()){ if(!(await invLoginUI())) return; toast('Bei innove angemeldet – Videos mit Aufnahmezeit bekommen ihre GPS-Spur jetzt von selbst.',3500); if(!c||c.demo||c.gpsId) return; } // zuerst anmelden, dann suchen
   if(!c){ toast('Zuerst ein Video wählen.'); return; }
   let s0=vidStart(c); if(s0==null&&c.ltc0===undefined){ toast('Zeitcode im Ton wird gelesen …',2500); s0=await ltcRead(c); }
-  if(s0==null){ toast('Für dieses Video fehlt die Aufnahmezeit: kein Zeitcode im Ton (Time-Link) und keine Zeit im Namen (Videos aus «Filmen»).',5200); return; }
+  if(s0==null){ if(auto) return; toast('Video ohne Aufnahmezeit – Lauf bitte von Hand wählen.',3000); return invChoose(c); }
   if(!invAuth()&&!(await invLoginUI())) return;
   const btn=$('#gpsInv'); btn.classList.add('busy'); const lab=$('span',btn), lab0=lab.textContent;
   try{ lab.textContent='Sucht …';
     const ath=await invAthleteFor(c); if(!ath) return;
     const v0=Math.round(s0*1000), v1=v0+Math.round((c.dur||60)*1000);
     const {best,tfs}=await invRun(ath[0],v0,v1);
-    if(!best){ toast(tfs?'Kein Lauf von '+ath[2]+' zu diesem Video (auch nicht innert 2 Minuten). Läufe neuer Sensoren erscheinen bei innove erst nach der Berechnung – später nochmals versuchen.':'Zu dieser Zeit war '+ath[1]+' '+ath[2]+' bei innove kein Sensor zugeteilt.',6000); return; }
-    lab.textContent='Lädt GPS …';
-    const pages=await invTrack(best.tf.device,v0-INV.PAD,v1+INV.PAD);
-    const who=(c.meta&&c.meta.athlete)||ath[2], nm=who+' · Lauf '+best.run.run_number+(best.cls&&best.cls!=='OK'?' ('+best.cls+')':'');
-    const L=parseGps(JSON.stringify(pages.map(x=>x.data||x)),nm); if(!L.length||L[0].samples.length<5){ toast('innove hat zu diesem Lauf keine GPS-Punkte geliefert.',4000); return; }
-    L[0].name=nm; L[0].athlete=ath[1]+' '+ath[2]; L[0].run='Lauf '+best.run.run_number; L[0].source='innove';
-    const tr=addTracks(L,{link:false})[0]; if(!tr) return;
-    // Start und Ziel von innove statt aus der Bewegung (für Anzeige und Vergleich). Die Spur liegt allein nach der Uhrzeit auf dem Video – kein Abgleich von Hand
-    invRunApply(tr,best.run); tr.innove={activity:best.tf.activity,timeframe:best.tf.id,run:best.run,cls:best.cls||null};
-    if(GD.clip!==c) GD.setClip(c); linkGps(c,tr,s0-tr.t0abs); c.gpsAuto=0; if(mode!=='gps') setMode('gps'); gpsTabUI(); gpsSelects();
-    const sg=(best.run.segments||[]).filter(x=>!/start/i.test(x.name)), fin=sg.find(x=>/finish/i.test(x.name));
-    toast(nm+' · '+((best.run.finish_time-best.run.start_time)/1000).toFixed(2)+' s'+(fin&&fin.speed?' · Ziel '+(fin.speed*3.6).toFixed(1)+' km/h':'')+' – Tempo liegt nach Aufnahmezeit auf dem Video.',5000);
-  }catch(err){ if(err.message==='login'){ toast('Anmeldung bei innove abgelaufen – bitte neu anmelden.',3500); if(await invLoginUI()) return invFetch(c); } else toast('innove: '+err.message,4500); }
-  finally{ btn.classList.remove('busy'); lab.textContent=lab0; } }
+    if(!best){ if(auto){ lab.textContent=lab0; btn.classList.remove('busy'); return; } toast((tfs?'Kein Lauf von '+ath[2]+' genau zu dieser Aufnahmezeit.':'Zu dieser Zeit war '+ath[1]+' '+ath[2]+' bei innove kein Sensor zugeteilt.')+' Lauf von Hand wählen …',4500); lab.textContent=lab0; btn.classList.remove('busy'); return invChoose(c,ath); }
+    lab.textContent='Lädt GPS …'; await invLoad(c,ath,best,s0); }
+  catch(err){ if(err&&err.message==='login'){ toast('Anmeldung bei innove abgelaufen – bitte neu anmelden.',4000); } else { console.error(err); toast('innove: '+(err&&err.message||'Fehler'),4500); } }
+  finally{ lab.textContent=lab0; btn.classList.remove('busy'); } }
+/* GPS-Lauf laden und aufs Video legen. s0 = Aufnahmestart (s, UTC) – fehlt er, liegt der innove-Start am Videoanfang und man setzt «GPS-Start = dieses Bild» */
+async function invLoad(c,ath,best,s0){ const hand=s0==null, v0=hand?best.run.start_time-30000:Math.round(s0*1000), v1=hand?best.run.finish_time+30000:v0+Math.round((c.dur||60)*1000);
+  const pages=await invTrack(best.tf.device,v0-INV.PAD,v1+INV.PAD);
+  const who=(c.meta&&c.meta.athlete)||ath[2], nm=who+' · Lauf '+best.run.run_number+(best.cls&&best.cls!=='OK'?' ('+best.cls+')':'');
+  const L=parseGps(JSON.stringify(pages.map(x=>x.data||x)),nm); if(!L.length||L[0].samples.length<5){ toast('innove hat zu diesem Lauf keine GPS-Punkte geliefert.',4000); return; }
+  L[0].name=nm; L[0].athlete=ath[1]+' '+ath[2]; L[0].run='Lauf '+best.run.run_number; L[0].source=hand?'innove-hand':'innove';
+  const tr=addTracks(L,{link:false})[0]; if(!tr) return;
+  /* Start und Ziel von innove. Mit Aufnahmezeit liegt die Spur allein nach der Uhr auf dem Video; ohne: innove-Start = aktuelles Bild, dann von Hand nachstellen */
+  invRunApply(tr,best.run); tr.innove={activity:best.tf.activity,timeframe:best.tf.id,run:best.run,cls:best.cls||null};
+  if(GD.clip!==c) GD.setClip(c); if(hand) linkGps(c,tr,tr.tStart-(GD.frame+0.5)/GD.fps); else linkGps(c,tr,s0-tr.t0abs); c.gpsAuto=0; if(mode!=='gps') setMode('gps'); gpsTabUI(); gpsSelects();
+  const sg=(best.run.segments||[]).filter(x=>!/start/i.test(x.name)), fin=sg.find(x=>/finish/i.test(x.name));
+  toast(nm+' · '+((best.run.finish_time-best.run.start_time)/1000).toFixed(2)+' s'+(fin&&fin.speed?' · Ziel '+(fin.speed*3.6).toFixed(1)+' km/h':'')+(hand?' – Video hat keine Aufnahmezeit: zum Start im Video gehen und «GPS-Start = dieses Bild» drücken.':' – Tempo liegt nach Aufnahmezeit auf dem Video.'),hand?7000:5000); }
+/* Lauf von Hand wählen: Athlet:in → alle Läufe des Tages → Lauf. Für Videos ohne Aufnahmezeit oder wenn die automatische Suche nichts findet */
+async function invChoose(c,ath){ c=c||GD.clip; if(!c){ toast('Zuerst ein Video wählen.'); return; }
+  if(!invAuth()&&!(await invLoginUI())) return;
+  try{
+    if(!ath){ const name=(c.meta&&c.meta.athlete)||'', L=await invAthletes(), key=invNorm(name), C=key?L.filter(x=>invNorm(x[2])===key||invNorm(x[1])===key||invNorm(x[1]+x[2])===key||invNorm(x[2]+x[1])===key):[];
+      ath=await invPick('Athlet:in wählen',C.length?C.concat(L.filter(x=>!C.includes(x))):L); if(!ath) return; }
+    let s0=vidStart(c); if(s0==null&&c.ltc0===undefined){ try{ s0=await ltcRead(c); }catch(e){} }
+    const day=s0!=null?s0*1000:(c.mod||Date.now()), d0=new Date(day); d0.setHours(0,0,0,0); toast('Läufe von '+ath[2]+' werden gesucht …',2500);
+    const T=new Map(); for(const h of [8,10,12,14,16]){ const t=new Date(d0); t.setHours(h); const r=(((await invGet('/timeframes/?athlete='+ath[0]+'&timestamp_ms='+t.getTime()+'&limit=50'))||{}).timeframes)||[]; r.forEach(x=>T.set(x.id,x)); }
+    { const r=(((await invGet('/timeframes/?athlete='+ath[0]+'&timestamp_ms='+Math.round(day)+'&limit=50'))||{}).timeframes)||[]; r.forEach(x=>T.set(x.id,x)); }
+    const runs=[]; for(const t of T.values()){ const R=(await invGet('/activities/'+t.activity+'/runs?timeframe_id='+t.id))||[]; (Array.isArray(R)?R:[R]).forEach(r=>{ if(r&&r.start_time&&new Date(r.start_time).toDateString()===d0.toDateString()) runs.push({tf:t,run:r}); }); }
+    if(!runs.length){ toast('Keine Läufe von '+ath[1]+' '+ath[2]+' am '+d0.toLocaleDateString('de-CH')+' bei innove. Sensor zugeteilt? Läufe erscheinen erst nach der Berechnung.',6500); return; }
+    runs.sort((a,b)=>a.run.start_time-b.run.start_time);
+    const near=s0!=null?runs.reduce((m,x)=>Math.abs(x.run.start_time-s0*1000)<Math.abs(m.run.start_time-s0*1000)?x:m,runs[0]):null;
+    const hm=t=>new Date(t).toLocaleTimeString('de-CH',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+    const P=runs.map((x,i)=>[String(i),'Lauf '+x.run.run_number+(x===near?'  ← passt zur Aufnahmezeit':''),hm(x.run.start_time)+' ·',((x.run.finish_time-x.run.start_time)/1000).toFixed(2)+' s']);
+    const pick=await invPick(ath[2]+' · '+d0.toLocaleDateString('de-CH')+' – Lauf wählen',P,'Lauf suchen …'); if(!pick) return;
+    const best=runs[+pick[0]]; if(best.run.run_id){ try{ const k=await invGet('/timeframes/'+best.tf.id+'/runs/'+best.run.run_id+'/classification'); best.cls=(k&&k.classification)||null; }catch(e){} }
+    await invLoad(c,ath,best,s0); }
+  catch(err){ if(err&&err.message==='login'){ toast('Anmeldung bei innove abgelaufen – bitte neu anmelden.',4000); if(await invLoginUI()) return invChoose(c,ath); } else { console.error(err); toast('innove: '+(err&&err.message||'Fehler'),4500); } } }
+$('#gpsChoose').addEventListener('click',e=>{ e.stopPropagation(); invChoose(GD.clip); });
 $('#gpsInv').addEventListener('click',()=>invFetch(GD.clip));
 $('#hdrInv').addEventListener('click',e=>{ e.stopPropagation(); if(!invAuth()){ invLoginUI().then(ok=>{ if(ok){ toast('Bei innove angemeldet.',2500); invBtnUI(); } }); return; } invLoginUI(); }); // angemeldet: Fenster zeigt «Abmelden»
 setTimeout(()=>typeof invBtnUI==='function'&&invBtnUI(),0);
 function invBtnUI(){ const h=$('#hdrInv'); if(h){ h.classList.toggle('on',!!invAuth()); h.title=invAuth()?'Bei innove angemeldet ('+(invAuth().user||'')+') – antippen zum Abmelden':'Bei innove anmelden (GPS-Daten)'; } const b=$('#gpsInv span'); if(b&&!$('#gpsInv').classList.contains('busy')) b.textContent=invAuth()?'GPS von innove':'Bei innove anmelden'; }
 // Angemeldet: beim Wählen eines Videos in der GPS-Ansicht gleich bei innove nachsehen (nur einmal pro Video)
-function invAuto(){ const c=GD.clip; if(!c||c.demo||mode!=='gps'||!invAuth()||c.gpsId||c._invTried) return; c._invTried=true; setTimeout(()=>{ if(GD.clip===c&&!c.gpsId) invFetch(c); },300); }
+function invAuto(){ const c=GD.clip; if(!c||c.demo||mode!=='gps'||!invAuth()||c.gpsId||c._invTried) return; c._invTried=true; setTimeout(()=>{ if(GD.clip===c&&!c.gpsId) invFetch(c,true); },300); }
 // Schnittstelle für den späteren externen Datenfluss
 window.VideoLab={
   loadGps(data,opt={}){ const list=typeof data==='string'?parseGps(data,opt.name):(Array.isArray(data)&&data.length&&(data[0].samples||data[0].points)?data:[data]).map(o=>({name:o.name||opt.name,athlete:o.athlete,run:o.run,source:o.source,samples:normSamples(o.samples||o.points||o)}));
@@ -5373,7 +5419,7 @@ async function pickVideos(target){
   if(!FSA){ pickTarget=target||null; $('#fileIn').click(); return; }
   let hs; try{ hs=await window.showOpenFilePicker({multiple:!target,types:[{description:'Videos',accept:{'video/*':['.mp4','.mov','.m4v','.mkv','.webm','.mts','.avi']}}]}); }catch(e){ return; }
   const files=[]; for(const h of hs){ try{ const f=await h.getFile(); f._h=h; files.push(f); }catch(e){} }
-  if(target&&files[0]){ const c=addClip({name:files[0].name,size:files[0].size,url:URL.createObjectURL(files[0])}); rememberHandle(c,files[0]._h); target.setClip(c); if(target!==S&&target!==GD) unlink(); syncSelects(); renderLib(); refreshSingleHead(); gpsSelects(); return; }
+  if(target&&files[0]){ const c=addClip({name:files[0].name,size:files[0].size,mod:files[0].lastModified,url:URL.createObjectURL(files[0])}); rememberHandle(c,files[0]._h); target.setClip(c); if(target!==S&&target!==GD) unlink(); syncSelects(); renderLib(); refreshSingleHead(); gpsSelects(); return; }
   if(files.length) addFiles(files);
 }
 const PENDING=[];
@@ -5382,7 +5428,7 @@ async function restoreSession(){
   all.sort((a,b)=>(b[1].at||0)-(a[1].at||0));
   const ok=[];
   for(const [k,v] of all){ if(k.startsWith('root:')) continue; if(clips.some(c=>clipKey(c)===k)) continue; let p='prompt'; try{ p=await v.h.queryPermission({mode:'read'}); }catch(e){}
-    if(p==='granted'){ try{ const f=await v.h.getFile(); const c=addClip({name:f.name,size:f.size,url:URL.createObjectURL(f)}); c.handle=v.h; ok.push(c); }catch(e){ idbDel(k); } }
+    if(p==='granted'){ try{ const f=await v.h.getFile(); const c=addClip({name:f.name,size:f.size,mod:f.lastModified,url:URL.createObjectURL(f)}); c.handle=v.h; ok.push(c); }catch(e){ idbDel(k); } }
     else PENDING.push([k,v]); }
   if(ok.length){ if(!S.clip||S.clip.demo){ S.setClip(ok[0]); refreshSingleHead(); } renderLib(); syncSelects(); gpsSelects(); toast(ok.length===1?'Video der letzten Sitzung geöffnet':ok.length+' Videos der letzten Sitzung geöffnet'); }
   restoreUI();
@@ -5391,7 +5437,7 @@ function restoreUI(){ const b=$('#libRestore'); b.hidden=!PENDING.length; if(PEN
 async function restorePending(){
   const list=PENDING.splice(0); let n=0, first=null;
   for(const [k,v] of list){ try{ const p=await v.h.requestPermission({mode:'read'}); if(p!=='granted'){ PENDING.push([k,v]); continue; }
-      const f=await v.h.getFile(); const c=addClip({name:f.name,size:f.size,url:URL.createObjectURL(f)}); c.handle=v.h; n++; first=first||c; }
+      const f=await v.h.getFile(); const c=addClip({name:f.name,size:f.size,mod:f.lastModified,url:URL.createObjectURL(f)}); c.handle=v.h; n++; first=first||c; }
     catch(e){ idbDel(k); } }
   restoreUI(); if(first&&(!S.clip||S.clip.demo)){ S.setClip(first); refreshSingleHead(); }
   renderLib(); syncSelects(); gpsSelects(); if(n) toast(n===1?'Video wieder geöffnet':n+' Videos wieder geöffnet');
@@ -5471,10 +5517,10 @@ function expSummary(){
   const r=expRangeFrames(), D=expDecks()[0], len=(r.b-r.a)/D.fps;
   $('#expDurRow').hidden=$('#expDurL').hidden=EXP.range==='loop'||EXP.range==='all'||EXP.range==='ovcut';
   $('#expDur').value=EXP.dur;
-  const vid=len/EXP.rate, fmt=t=>t>=60?Math.floor(t/60)+':'+String(Math.floor(t%60)).padStart(2,'0')+' min':t.toFixed(1)+' s', fast=typeof VideoEncoder!=='undefined';
-  $('#expSum').innerHTML=`<span class="es-r"><span>Bereich</span><b>${(r.a/D.fps).toFixed(2)} – ${(r.b/D.fps).toFixed(2)} s</b></span><span class="es-arrow">→</span><span class="es-r"><span>Video${EXP.rate<1?' · Zeitlupe':''}</span><b>${fmt(vid)}</b></span><span class="es-r es-in"><span>Mit</span><b>${expInhalt()}</b></span><span class="es-r"><span>Dauer Export</span><b>ca. ${fmt(fast?len*1.1:vid)}</b></span>`;
+  const vid=len/EXP.rate, fmt=t=>t>=60?Math.floor(t/60)+':'+String(Math.floor(t%60)).padStart(2,'0')+' min':t.toFixed(1)+' s', fast=typeof VideoEncoder!=='undefined', ks=LS.get('expK:'+(mode==='cmp'?2:1),0), est=ks?Math.max(vid,len)*ks+1:(fast?len*1.1:vid)*(innerWidth<=760?2.2:1)+1;
+  $('#expSum').innerHTML=`<span class="es-r"><span>Bereich</span><b>${(r.a/D.fps).toFixed(2)} – ${(r.b/D.fps).toFixed(2)} s</b></span><span class="es-arrow">→</span><span class="es-r"><span>Video${EXP.rate<1?' · Zeitlupe':''}</span><b>${fmt(vid)}</b></span><span class="es-r es-in"><span>Mit</span><b>${expInhalt()}</b></span><span class="es-r"><span>Dauer Export</span><b>ca. ${fmt(est)}</b></span>`;
 }
-async function startExport(){
+async function startExport(){ EXP.tw0=performance.now(); $('#expProg').hidden=false; $('#expProg i').style.width='0%'; $('#expProg span').textContent='Export wird vorbereitet …';
   if(EXP.live) return;
   if(typeof MediaRecorder==='undefined'||!HTMLCanvasElement.prototype.captureStream){ toast('Export wird in diesem Browser nicht unterstützt (Chrome oder Edge verwenden).',4000); return; }
   const ds=expDecks(), D=ds[0], r=expRangeFrames(); if(r.b<=r.a){ toast('Zu kurz – Start/Ende prüfen.'); return; }
@@ -5566,7 +5612,7 @@ function expCheck(E){ // nach dem Speichern: sind alle Bilder drin?
   const got=Math.min(E.srcN,E.expN), miss=E.expN-got+E.drop, lim=Math.max(2,Math.round(E.expN*0.03)); EXP.last={exp:E.expN,got,drop:E.drop,ok:miss<=lim};
   if(miss>lim) setTimeout(()=>toast('Achtung: im gespeicherten Video fehlen '+miss+' von '+E.expN+' Bildern – das Gerät war ausgelastet. Bitte nochmals speichern (andere Programme schliessen) oder mit ½× speichern.',7000),1600); }
 function finishExport(){
-  const E=EXP; if(!E.live) return; E.live=false; E.started=false; clearInterval(E.wd);
+  const E=EXP; if(!E.live) return; if(!E.cancel&&E.tw0&&E.D){ const len=Math.max(0.5,(E.tEnd-E.t0)), vid=len/(EXP.rate||1), k=(performance.now()-E.tw0)/1000/Math.max(vid,len); if(k>0.2&&k<30){ const key='expK:'+(mode==='cmp'?2:1), o=LS.get(key,0); LS.set(key,o?o*0.5+k*0.5:k); } } /* Dauer lernen → nächste Schätzung stimmt */ E.live=false; E.started=false; clearInterval(E.wd);
   expDecks().forEach(d=>d.pause()); G.playing=false; S.useLoop=E.prevLoop; if(E.prevLov){ A.loopOv=E.prevLov[0]; B.loopOv=E.prevLov[1]; E.prevLov=null; } setRate(E.prevRate);
   if(E.wc){ (async()=>{ $('#expGo').textContent='Speichern'; $('#expProg').hidden=true;
       if(E.cancel){ try{ E.enc.close(); }catch(e){} if(!E.hang&&!E.wcErr) toast('Export abgebrochen.'); return; }
@@ -5868,7 +5914,7 @@ async function ftOpen(node,target){
   let c=clipOfNode(node);
   if(!c){ let f; try{ f=await node.h.getFile(); }catch(e){ toast('Datei nicht lesbar – wurde sie verschoben?'); return; }
     c=clips.find(x=>!x.demo&&x.name===f.name&&x.size===f.size);
-    if(!c){ c=addClip({name:f.name,size:f.size,url:URL.createObjectURL(f)}); if(!node.ro) rememberHandle(c,node.h); }
+    if(!c){ c=addClip({name:f.name,size:f.size,mod:f.lastModified,url:URL.createObjectURL(f)}); if(!node.ro) rememberHandle(c,node.h); }
     c._node=node; }
   if(mode==='single') { S.setClip(c); refreshSingleHead(); }
   else if(mode==='gps'){ GD.setClip(c); gpsSelects(); }
@@ -6092,7 +6138,7 @@ document.addEventListener('dragend',vdEnd);
   grp('Messen',[$('#btnTime'),$('#timActs'),$('#btnSplits')]);
   const rail=$('#cTools .rail'); if(rail) rail.classList.remove('collapsed');
   grp('Zeichnen',[$('#cTools')]);
-  L.innerHTML=''; Rz.innerHTML='';
+  const ms=$('.m-sync',L); L.innerHTML=''; Rz.innerHTML=''; if(ms) L.appendChild(ms); /* Handy: «Gleicher Moment» direkt in der Leiste */
   const tb=document.createElement('button'); tb.className='ctl tools-btn'; tb.id='btnTools'; tb.title='Werkzeuge: Gleicher Moment, Zeitmessung, Tore, Zeichnen (t)';
   tb.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.2L3.5 17.3a1.8 1.8 0 0 0 2.5 2.5l5.8-5.8a4 4 0 0 0 5.2-5.4l-2.6 2.6-2.4-.6-.6-2.4z"/></svg><span>Werkzeuge</span><i class="tb-dot"></i><svg class="tb-car" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 15l6-6 6 6"/></svg>';
   L.appendChild(tb); dock.appendChild(more);
@@ -6264,7 +6310,7 @@ async function fieldSync(){ if(!window.indexedDB) return; let db;
     const nm=f.fname||(String(f.name||'Lauf').replace(/[^\wäöüÄÖÜéèà\- ]+/g,'').trim().replace(/\s+/g,'_')+'.'+(/webm/.test(f.mime||f.blob.type)?'webm':'mp4'));
     let c=clips.find(x=>x.field===f.id);
     if(c){ if(c.name!==nm){ c.name=nm; c.meta=parseName(nm); ch=true; } continue; } // in der Field-App umbenannt
-    c=addClip({name:nm,size:f.blob.size,url:URL.createObjectURL(f.blob)}); c.field=f.id; n++;
+    c=addClip({name:nm,size:f.blob.size,mod:f.t0||f.created,url:URL.createObjectURL(f.blob)}); c.field=f.id; if(f.t0) c.fieldT0=f.t0; n++;
     if(f.marks&&f.marks.length&&!c.markers.length){ const mk=f.marks; c.whenFps.then(()=>{ const fps=c.fps||30; c.markers=[...new Set(mk.map(t=>Math.round(t*fps)))].sort((a,b)=>a-b); c.markers.forEach(fr=>{ if(!(c.notes||{})[fr]) setNote(c,fr,'Beim Filmen'); }); saveClip(c); renderLib(); decks.forEach(d=>{ if(d.clip===c){ d.dirty=true; } }); if(typeof renderMarks==='function') renderMarks(); }); } }
   clips.filter(c=>c.field&&!seen.has(c.field)&&!decks.some(d=>d.clip===c)).forEach(c=>{ removeClip(c,true); ch=true; }); // in der Field-App gelöscht
   if(n||ch){ renderLib(); syncSelects(); }
@@ -6356,7 +6402,7 @@ if(false&&!LS.get('hint1',0)){ setTimeout(()=>{ toast(matchMedia('(pointer:coars
 
 /* Update-Hinweis: prüft version.json auf GitHub Pages; «Aktualisieren» lädt die Seite ohne Cache neu */
 (()=>{
-  const BUILD='20261031094958'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
+  const BUILD='20261031143225'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
   // nach einem Update die ?v=… aus der Adresse entfernen
   try{ const u=new URL(location.href); if(u.searchParams.has('v')){ u.searchParams.delete('v'); history.replaceState(null,'',u.pathname+(u.search||'')+u.hash); } }catch(e){}
   const el=$('#upd'); let latest=null, snoozed=null, busy=false;

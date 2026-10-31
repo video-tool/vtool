@@ -449,6 +449,9 @@ const IC={
 };
 $('#pPlay').innerHTML=IC.play; $('#sPlay').innerHTML=IC.play;
 function toast(t,ms=2200){ const el=$('#toast'); el.textContent=t; el.classList.add('on'); clearTimeout(el._t); el._t=setTimeout(()=>el.classList.remove('on'),ms); }
+/* Fehler sichtbar machen (hilft beim Finden von iPhone-Problemen) */
+let ERRN=0; const errShow=m=>{ if(++ERRN>3) return; try{ toast('Fehler: '+String(m).slice(0,120)+' – bitte Bildschirmfoto schicken',6000); }catch(e){} };
+addEventListener('error',e=>errShow(e.message||e)); addEventListener('unhandledrejection',e=>errShow(e.reason&&e.reason.message||e.reason));
 function busy(on,t){ $('#busy').classList.toggle('on',on); if(t) $('#busyT').textContent=t; }
 const fmt=t=>(isFinite(t)?t:0).toFixed(2)+' s';
 const fmtDur=t=>{ t=Math.round(t||0); return Math.floor(t/60)+':'+String(t%60).padStart(2,'0'); };
@@ -493,7 +496,7 @@ async function mp4Fps(url){
     if(cnt>1&&dur>0){ const f=ts*cnt/dur; let best=f,bd=1e9; for(const c of FPS_COMMON){ const x=Math.abs(c-f); if(x<bd){ bd=x; best=c; } } return bd<=Math.max(0.05,best*0.004)?best:Math.round(f*1000)/1000; } }
   return null; }
 
-function vidFrom(url){ return new Promise((res,rej)=>{ const v=document.createElement('video'); v.muted=true; v.playsInline=true; v.preload='auto'; v.src=url; v.onloadedmetadata=()=>res(v); v.onerror=()=>rej(new Error('video')); }); }
+function vidFrom(url){ return new Promise((res,rej)=>{ const v=document.createElement('video'); v.muted=true; v.playsInline=true; v.preload='auto'; v.src=url; let ok=false; v.onloadedmetadata=()=>{ ok=true; res(v); }; v.onerror=()=>rej(new Error('video')); try{ v.load(); }catch(e){} setTimeout(()=>{ if(!ok) rej(new Error('timeout')); },6000); }); } /* iPhone: nie endlos warten */
 function seekTo(v,t){ return new Promise(res=>{ let done=false; const f=()=>{ if(done) return; done=true; v.removeEventListener('seeked',f); res(); }; v.addEventListener('seeked',f); setTimeout(f,2500); v.currentTime=Math.max(0,t); }); }
 async function fixDur(v){ if(isFinite(v.duration)&&v.duration>0) return v.duration; // aufgenommenes WebM hat keine Länge im Kopf
   await new Promise(res=>{ const f=()=>{ v.removeEventListener('durationchange',f); res(); }; v.addEventListener('durationchange',f); setTimeout(f,3000); v.currentTime=1e9; }); const d=v.duration; v.currentTime=0; return isFinite(d)?d:0; }
@@ -584,7 +587,9 @@ function pickOther(c){ const others=CLIPS.filter(x=>x!==c); if(!others.length){ 
 
 /* ---------- Sichern aufs Handy (Fotos / Dateien) ---------- */
 const extOf=c=>/mp4/.test(c.mime)?'mp4':/quicktime/.test(c.mime)?'mov':/webm/.test(c.mime)?'webm':'mp4';
-const fileNameOld=c=>(c.name.replace(/[^\wäöüÄÖÜéèà\- ]+/g,'').trim().replace(/\s+/g,'_')||'Lauf')+'_'+new Date(c.created).toISOString().slice(0,10)+'.'+extOf(c);
+const fileNameOld=c=>{ const b=(c.name.replace(/[^\wäöüÄÖÜéèà\- ]+/g,'').trim().replace(/\s+/g,'_')||'Lauf');
+  if(c.t0){ const d=new Date(c.t0), p=(n,l=2)=>String(n).padStart(l,'0'); return b+'_'+String(d.getFullYear()).slice(2)+p(d.getMonth()+1)+p(d.getDate())+'_'+p(d.getHours())+p(d.getMinutes())+p(d.getSeconds())+p(d.getMilliseconds(),3)+'.'+extOf(c); } /* Datum + Startzeit → Video-Lab findet GPS von selbst */
+  return b+'_'+new Date(c.created).toISOString().slice(0,10)+'.'+extOf(c); };
 function fileName(c){ if(!c.ath) return fileNameOld(c); const cl=t=>String(t||'').trim().replace(/\s+/g,'-').replace(/[\\/:*?"<>|_.]+/g,'-').replace(/-+/g,'-').replace(/^-|-$/g,'');
   const r=ROSTER.find(x=>x[0]===c.ath), dup=r&&ROSTER.filter(x=>x[2]===r[2]).length>1, ath=r?(dup?r[2]+'-'+r[1]:r[2]):c.ath;
   const S=c.sess||{}, d=(c.t0?isoDay(c.t0):(S.date||isoDay(c.created))).replace(/-/g,'').slice(2);
@@ -611,7 +616,7 @@ function dayMenu(k){ const L=dayClips(k), mb=L.reduce((a,c)=>a+(c.blob.size||0),
     else if(o==='del'){ if(!window.confirm(L.length+(L.length===1?' Lauf':' Läufe')+' löschen?'+(unsaved?' '+unsaved+' davon sind noch nicht gesichert.':''))) return;
       for(const c of L){ await dbDel(c.id); if(URLS.has(c.id)){ URL.revokeObjectURL(URLS.get(c.id)); URLS.delete(c.id); } } CLIPS=CLIPS.filter(c=>!L.includes(c)); render(); toast('Gelöscht – '+fmtMB(mb)+' frei'); } }); }
 const fmtMB=b=>b>=1e9?(b/1e9).toFixed(1)+' GB':Math.max(1,Math.round(b/1e6))+' MB';
-const ST={free:null,quota:null,used:0}; const REC_BPS=1.6e6; /* ~12 Mbit/s → Bytes pro Sekunde Aufnahme */
+const ST={free:null,quota:null,used:0}; const REC_BPS=1.1e6; /* ~8 Mbit/s → Bytes pro Sekunde Aufnahme */
 async function storEst(){ const used=CLIPS.reduce((a,c)=>a+(c.blob&&c.blob.size||0),0); let free=null, quota=null;
   try{ if(navigator.storage&&navigator.storage.estimate){ const e=await navigator.storage.estimate(); if(e.quota){ quota=e.quota; free=Math.max(0,e.quota-(e.usage||used)); } } }catch(e){}
   Object.assign(ST,{free,quota,used}); return ST; }
@@ -657,16 +662,23 @@ function recMime(){ const L=['video/mp4;codecs=avc1.640028','video/mp4;codecs=av
 function camGpsUI(){ const g=$('#camGps'); if(g) g.hidden=LS.get('gpsMode','gps')!=='gps'; }
 function recStart(){ if(!CAM.stream||REC.on) return; const mime=recMime(); let mr;
   const src=zwRecStream()||CAM.stream;
-  try{ mr=new MediaRecorder(src,mime?{mimeType:mime,videoBitsPerSecond:12e6}:{}); }catch(e){ try{ mr=new MediaRecorder(CAM.stream); }catch(e2){ toast('Aufnahme wird hier nicht unterstützt.'); return; } }
+  try{ mr=new MediaRecorder(src,mime?{mimeType:mime,videoBitsPerSecond:8e6}:{}); }catch(e){ try{ mr=new MediaRecorder(CAM.stream); }catch(e2){ toast('Aufnahme wird hier nicht unterstützt.'); return; } }
   REC.mr=mr; REC.chunks=[]; REC.on=true; REC.t0=performance.now(); REC.ts=Date.now(); REC.marks=[]; mr.onstart=()=>{ REC.ts=Date.now(); }; /* Startzeit (Handyuhr, ms) für die GPS-Verbindung im Video-Lab */ mr.ondataavailable=e=>{ if(e.data&&e.data.size) REC.chunks.push(e.data); };
   mr.start(500); $('span',$('#camMk')).textContent='Marker'; $('#cam').classList.add('recording'); $('#shut').setAttribute('aria-label','Aufnahme stoppen'); if(navigator.vibrate) navigator.vibrate(30);
   const pill=$('#camInfo'); pill.classList.add('live'); REC.tick=setInterval(()=>{ pill.textContent=((performance.now()-REC.t0)/1000).toFixed(1)+' s'; },100); }
-function recStop(keep=true){ if(!REC.on) return; REC.on=false; if(ZW.rec) setTimeout(()=>ZW.rec&&ZW.rec.stop(),600); clearInterval(REC.tick); $('#cam').classList.remove('recording'); const pill=$('#camInfo'); pill.classList.remove('live');
-  const mr=REC.mr, fps=CAM.fps, t0=REC.ts, marks=(REC.marks||[]).slice(); mr.onstop=async()=>{ if(!keep) return; const type=(mr.mimeType||'video/mp4').split(';')[0]; const blob=new Blob(REC.chunks,{type}); REC.chunks=[];
-    if(blob.size<2000){ toast('Aufnahme zu kurz.'); return; } busy(true,'Wird gespeichert …'); const c=await addClip(blob,{fps,t0,marks,gps:LS.get('gpsMode','gps')==='gps'}); busy(false);
+function recStop(keep=true){ if(!REC.on) return; REC.on=false; const viaZoom=!!ZW.rec; clearInterval(REC.tick); $('#cam').classList.remove('recording'); const pill=$('#camInfo'); pill.classList.remove('live');
+  const mr=REC.mr, fps=CAM.fps, t0=REC.ts, marks=(REC.marks||[]).slice(); let fired=false;
+  const fin=async()=>{ if(fired) return; fired=true; if(ZW.rec) ZW.rec.stop(); if(!keep){ REC.chunks=[]; return; } const type=(mr.mimeType||'video/mp4').split(';')[0]; const blob=new Blob(REC.chunks,{type}); REC.chunks=[];
+    if(blob.size<2000){ toast(viaZoom?'Aufnahme mit Zoom hat auf diesem Handy nicht geklappt – bitte ohne Zoom (1×) filmen.':'Aufnahme zu kurz.',4500); return; }
+    busy(true,'Wird gespeichert …'); let c=null;
+    try{ c=await Promise.race([addClip(blob,{fps,t0,marks,gps:LS.get('gpsMode','gps')==='gps'}),new Promise((_,rj)=>setTimeout(()=>rj(new Error('zeit')),14000))]); }
+    catch(err){ /* Notfall: ohne Vorschau speichern, damit die Aufnahme nicht verloren geht */
+      try{ c={sess:typeof SESS!=='undefined'&&SESS.disc?{...SESS}:null,id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),name:nextName(),created:Date.now(),blob,dur:0,w:0,h:0,thumb:'',fps,t0,marks,gps:LS.get('gpsMode','gps')==='gps'}; await dbPut(c); CLIPS.unshift(c); render(); toast('Gespeichert (ohne Vorschaubild).',3000); }catch(e2){ c=null; toast('Speichern ging nicht – Speicher voll?',4000); } }
+    busy(false);
     if(c){ $('#camLast').hidden=false; $('#camLast').style.backgroundImage=c.thumb?`url(${c.thumb})`:''; $('#camLast').dataset.id=c.id; openPlayer(c,{fresh:true}); askName(c); } };
-  try{ mr.stop(); }catch(e){} if(navigator.vibrate) navigator.vibrate([20,40,20]); if(!keep) setTimeout(()=>{ $('#camInfo').textContent='Kamera'; },0); }
-
+  mr.onstop=fin; try{ mr.stop(); }catch(e){ fin(); }
+  setTimeout(()=>{ if(!fired){ try{ mr.requestData(); }catch(e){} setTimeout(fin,900); } },3500); /* iPhone: «stop» meldet sich manchmal nicht */
+  if(navigator.vibrate) navigator.vibrate([20,40,20]); if(!keep) setTimeout(()=>{ $('#camInfo').textContent='Kamera'; },0); }
 /* ---------- Zoom-Rad ----------
    Kann die Kamera selbst zoomen (track.getCapabilities().zoom), zoomt sie echt (scharf, auch in der Aufnahme).
    Sonst digitaler Zoom: Vorschau vergrössert, Aufnahme über ein Zwischenbild (Canvas) mit gleichem Ausschnitt. */
@@ -708,7 +720,7 @@ function zwDraw(){ const cv=$('#zwC'); if(!cv) return; const W=cv.clientWidth, H
   const end=e=>{ tp.delete(e.pointerId); if(tp.size<2) pz=null; }; cv.addEventListener('pointerup',end); cv.addEventListener('pointercancel',end); cv.style.touchAction='none';
 })();
 /* digitaler Zoom in der Aufnahme: Ausschnitt in ein Canvas zeichnen und dieses aufnehmen */
-function zwRecStream(){ if(ZW.hw||ZW.z<=1.01) return null; const v=$('#camV'), s=ZW.track.getSettings(), w=s.width||v.videoWidth||1280, h=s.height||v.videoHeight||720;
+function zwRecStream(){ if(ZW.hw||ZW.z<=1.01) return null; if(!HTMLCanvasElement.prototype.captureStream){ toast('Zoom wird auf diesem Handy nicht mitgefilmt.',3000); return null; } const v=$('#camV'), s=ZW.track.getSettings(), w=s.width||v.videoWidth||1280, h=s.height||v.videoHeight||720;
   const cv=document.createElement('canvas'); cv.width=w; cv.height=h; const x=cv.getContext('2d'); let on=true;
   const loop=()=>{ if(!on) return; const z=ZW.z, sw=w/z, sh=h/z; try{ x.drawImage(v,(w-sw)/2,(h-sh)/2,sw,sh,0,0,w,h); }catch(e){} requestAnimationFrame(loop); }; loop();
   const st=cv.captureStream(Math.round(CAM.fps||30)); ZW.rec={stop:()=>{ on=false; st.getTracks().forEach(t=>t.stop()); ZW.rec=null; }}; return st; }
