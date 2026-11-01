@@ -471,6 +471,8 @@ canvas.gchart{background:rgba(255,255,255,.035);border-radius:12px}
 .exp-grid{display:grid;grid-template-columns:auto 1fr;gap:12px 16px;align-items:center;margin:4px 0 14px}
 .exp-l{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
 .exp-grid .seg{justify-self:start;flex-wrap:wrap}
+.exp-grid>*{min-width:0}
+@media (max-width:760px){ .exp-grid{grid-template-columns:1fr;gap:6px} .exp-grid>.exp-l{margin-top:8px} .exp-grid>.exp-l:first-child{margin-top:0} } /* Handy: Bezeichnung über der Auswahl, volle Breite */
 .exp-grid .seg button{font-family:var(--font)}
 .exp-num{width:76px;height:34px;border-radius:9px;border:1px solid var(--line);background:var(--field);color:var(--ink);font:600 13px var(--mono);padding:0 8px}
 #expDurRow{font-size:12.5px;color:var(--muted)}
@@ -1743,11 +1745,15 @@ body:not(.tl-slim) .tl-zoom .tl-film{background:rgba(255,255,255,.28)!important}
 canvas.strip:focus{outline:none!important;box-shadow:none}
 canvas.strip:focus-visible{outline:2px solid rgba(255,255,255,.35)!important;outline-offset:1px}
 /* Export: Ausschnitt als übersichtliches Raster */
-#expRange.rgrid{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;padding:4px;justify-self:stretch;width:100%}
-#expRange.rgrid button{height:auto!important;min-height:48px;padding:7px 12px!important;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:2px;text-align:left;border-radius:10px!important;font-family:var(--font)!important}
-#expRange.rgrid button b{font-size:13px;font-weight:700}
-#expRange.rgrid button small{font:600 11px var(--mono);color:var(--muted);opacity:.9}
-#expRange.rgrid button.on small{color:var(--ink2)}
+#expRange.rgrid{display:flex!important;flex-direction:column;gap:6px;padding:0!important;background:none!important;box-shadow:none!important;border:none!important;justify-self:stretch;width:100%;height:auto!important}
+#expRange.rgrid button{position:relative;height:auto!important;min-height:52px;width:100%;padding:9px 14px 9px 44px!important;display:flex;align-items:center;justify-content:space-between;gap:12px;text-align:left;border-radius:12px!important;font-family:var(--font)!important;background:var(--card,#fff)!important;border:1px solid var(--line,#dfe3e8)!important;color:var(--ink)!important;box-shadow:none!important;transition:border-color .15s,background .15s}
+#expRange.rgrid button::before{content:"";position:absolute;left:15px;top:50%;width:18px;height:18px;margin-top:-9px;border-radius:50%;border:2px solid #c3c9d2;box-sizing:border-box;transition:border .15s}
+#expRange.rgrid button.on{border-color:#da291c!important;background:color-mix(in srgb,#da291c 6%,var(--card,#fff))!important}
+#expRange.rgrid button.on::before{border:6px solid #da291c}
+#expRange.rgrid button b{font-size:14.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+#expRange.rgrid button small{font:600 12px var(--mono);color:var(--muted);white-space:nowrap;flex:none}
+#expRange.rgrid button.on small{color:var(--ink2,#3b4350)}
+@media (max-width:760px){ #expRange.rgrid button{flex-direction:column;align-items:flex-start;justify-content:center;gap:2px;min-height:56px} #expRange.rgrid button b{white-space:normal} }
 #expRange.rgrid .seg-ind{display:none!important}
 /* Overlay: einfacher Ablauf */
 .ov-cutg{display:inline-flex;gap:0;border-radius:11px;padding:0}
@@ -5890,7 +5896,7 @@ function openExport(){
   const ds=expDecks(); if(ds.some(d=>!d.ready)){ toast(mode==='cmp'?'Zuerst Video A und B wählen.':'Zuerst ein Video öffnen.'); return; }
   if(EXP.live) return;
   const L=mode==='single'&&S.clip.loop, hasLoop=!!(L&&(L.a!=null||L.b!=null));
-  const opts=[]; if(hasLoop) opts.push(['loop','Start/Ende']); const ovCut=mode==='cmp'&&ovActive()&&(OV.cut.a!=null||OV.cut.b!=null); if(ovCut) opts.push(['ovcut','Start/Ende']); if(mode==='cmp'&&G.linked) opts.push(['sync','Ab gleichem Moment']); opts.push(['here','Ab aktuellem Bild'],['all','Ganzes Video']);
+  const opts=[]; if(hasLoop) opts.push(['loop','Start bis Ende']); const ovCut=mode==='cmp'&&ovActive()&&(OV.cut.a!=null||OV.cut.b!=null); if(ovCut) opts.push(['ovcut','Start bis Ende']); if(mode==='cmp'&&G.linked) opts.push(['sync','Ab gleichem Moment']); opts.push(['here','Ab aktuellem Bild'],['all','Ganzes Video']);
   EXP.range=hasLoop?'loop':ovCut?'ovcut':'all'; EXP.rate=1; // Standard: Schnitt (falls gesetzt), sonst ganzes Video, Normaltempo
   const keep=EXP.range, D0=expDecks()[0], sub=k=>{ if(k==='here') return 'Dauer wählbar'; EXP.range=k; const r=expRangeFrames(); EXP.range=keep; return (r.a/D0.fps).toFixed(1)+' – '+(r.b/D0.fps).toFixed(1)+' s'; };
   $('#expRange').innerHTML=opts.map(o=>`<button data-er="${o[0]}" class="${o[0]===EXP.range?'on':''}"><b>${o[1]}</b><small>${sub(o[0])}</small></button>`).join('');
@@ -5898,9 +5904,9 @@ function openExport(){
   $$('#expRate button').forEach(b=>b.classList.toggle('on',+b.dataset.r===EXP.rate));
   $('#expNotesRow').hidden=!(mode==='single');
   $('#expAnnRow').hidden=!ds.some(d=>d.clip&&d.clip.anns&&d.clip.anns.length); // nur zeigen, wenn es Zeichnungen gibt
-  const ovN=mode==='cmp'&&$('#viewCmp').classList.contains('overlay')&&$('#viewCmp').classList.contains('ov-names'); $('#expNamesRow').hidden=!ovN; if(ovN) $('#expNames').checked=true; const ovL=mode==='cmp'&&$('#viewCmp').classList.contains('overlay'); $('#expLegRow').hidden=!ovL; $('#expLegend').checked=true;
+  const ovN=mode==='cmp'&&$('#viewCmp').classList.contains('overlay')&&$('#viewCmp').classList.contains('ov-names'); $('#expNamesRow').hidden=!ovN; if(ovN) $('#expNames').checked=false; const ovL=mode==='cmp'&&$('#viewCmp').classList.contains('overlay'); $('#expLegRow').hidden=!ovL; $('#expLegend').checked=false; /* Overlay: Standard ohne Namen und Legende – sauberes Bild */
   $('#expGps').hidden=!(mode==='gps'||(ovActive()&&typeof ovGpsShow==='function'&&ovGpsShow()));
-  $('#expProg').hidden=true; $('#expGo').disabled=false; $('#expGo').textContent='Speichern'; $('#expAdv').hidden=true; $('#expAdvBtn').classList.remove('on'); $('#expAnn').checked=true; $('#expInfo').checked=true;
+  $('#expProg').hidden=true; $('#expGo').disabled=false; $('#expGo').textContent='Speichern'; $('#expAdv').hidden=true; $('#expAdvBtn').classList.remove('on'); $('#expAnn').checked=true; $('#expInfo').checked=!ovL; /* Overlay: ohne Info-Leiste */
   expSummary(); $('#expModal').classList.add('on');
 }
 document.addEventListener('click',e=>{ const b=e.target.closest('#expAdvBtn'); if(!b) return; const a=$('#expAdv'); a.hidden=!a.hidden; b.classList.toggle('on',!a.hidden); });
@@ -6903,7 +6909,7 @@ if(false&&!LS.get('hint1',0)){ setTimeout(()=>{ toast(matchMedia('(pointer:coars
 
 /* Update-Hinweis: prüft version.json auf GitHub Pages; «Aktualisieren» lädt die Seite ohne Cache neu */
 (()=>{
-  const BUILD='20261101082856'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
+  const BUILD='20261101092133'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
   // nach einem Update die ?v=… aus der Adresse entfernen
   try{ const u=new URL(location.href); if(u.searchParams.has('v')){ u.searchParams.delete('v'); history.replaceState(null,'',u.pathname+(u.search||'')+u.hash); } }catch(e){}
   const el=$('#upd'); let latest=null, snoozed=null, busy=false;
