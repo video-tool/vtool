@@ -2478,12 +2478,13 @@ header .btn-cam svg circle:last-child{animation:camDot 2s ease-in-out infinite}
 #strCanvas{cursor:crosshair}
 #strobeModal.asking #strCanvas{cursor:crosshair;outline:3px solid #ffd24a;outline-offset:-3px}
 /* Aufforderung als Banner im Bild – auf dem Handy sonst abgeschnitten */
+.str-view.pt{height:min(62vh,640px);width:auto;max-width:100%;margin:0 auto}
 .str-ask{position:absolute;left:50%;bottom:12px;transform:translateX(-50%);display:none;align-items:center;gap:8px;padding:8px 14px;border-radius:999px;background:rgba(12,15,20,.82);color:#ffd24a;font:650 13px var(--font);white-space:nowrap;pointer-events:none;box-shadow:0 8px 24px rgba(0,0,0,.35);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
 .str-ask::before{content:"";width:14px;height:14px;border-radius:50%;border:2px solid #ffd24a;box-shadow:0 0 0 3px rgba(255,210,74,.25);animation:strPulse 1.4s ease-out infinite}
 @keyframes strPulse{0%{box-shadow:0 0 0 0 rgba(255,210,74,.5)}100%{box-shadow:0 0 0 9px rgba(255,210,74,0)}}
 #strobeModal.asking .str-ask{display:flex}
 #strobeModal.asking #strInfo{display:none}
-@media (max-width:760px){ #strInfo{white-space:normal;flex:1 0 100%;gap:12px} .str-ask{font-size:12.5px;max-width:calc(100% - 16px);white-space:normal;text-align:center} }
+@media (max-width:760px){ #strInfo{white-space:normal;flex:1 0 100%;gap:12px} .str-ask{font-size:12px;max-width:calc(100% - 16px);white-space:normal;text-align:center;padding:6px 10px;gap:6px} .str-ask::before{width:10px;height:10px;flex:none} }
 .str-bar .btn-pri.ghost{background:transparent;border:1px solid var(--line,#d7dbe0);color:inherit}
 /* Computer: Knöpfe etwas mehr Abstand, Rahmen ums Video dünner */
 @media (min-width:761px){
@@ -2495,6 +2496,7 @@ header .btn-cam svg circle:last-child{animation:camDot 2s ease-in-out infinite}
 .trail-hint button{display:inline-flex;align-items:center;gap:5px}
 .trail-hint button.on{background:#fff;color:#0f1216}
 .trail-hint button.pri{background:#DA291C}
+@media (max-width:760px) and (orientation:portrait){ #sHost .stage.portrait,#gHost .stage.portrait{aspect-ratio:var(--ar,9/16)!important;width:auto!important;max-width:100%!important;height:calc(100svh - 330px)!important;max-height:none!important;margin:0 auto!important} body.pfs #sHost .stage.portrait,body.pfs #gHost .stage.portrait{height:calc(100dvh - 150px)!important} } /* Hochformat-Video auf dem Handy: so hoch wie möglich statt klein im Querformat-Rahmen */
 @media (max-width:760px){ .modal{z-index:160!important} .exp-foot{flex-wrap:wrap!important;gap:10px!important} .exp-foot .exp-hint{order:-1;flex:1 0 100%!important;text-align:center!important} .exp-foot .exp-advbtn{height:44px} .exp-foot .btn-pri{flex:1;min-width:0!important} .toast{top:auto!important;bottom:calc(var(--tabsH,64px) + 10px)!important;z-index:170!important} body.pfs .toast{bottom:calc(12px + env(safe-area-inset-bottom,0px))!important} } /* Hinweise immer über der unteren Leiste, nie abgeschnitten */
 </style>
 </head>
@@ -3228,7 +3230,7 @@ class Deck{
     if(/iP(hone|ad|od)|Macintosh/.test(navigator.userAgent)&&'ontouchend' in document){ const v=this.v; v.addEventListener('loadeddata',()=>{ if(this.clip!==myc||!v.paused) return; const t=v.currentTime; const pr=v.play(); if(pr) pr.then(()=>{ v.pause(); v.currentTime=t; }).catch(()=>{}); },{once:true}); } /* iPhone zeigt nach dem Springen sonst kein neues Bild */
     this.v.addEventListener('loadedmetadata',()=>{
       c.whenFps.then(()=>{ if(this.clip!==myc) return; this.stage.classList.remove('busy'); if(c.err) return;
-        this.ready=true; this.fitDefault(); this.seekFrame(this.loop&&this.loop.on&&this.loop.a!=null?this.loop.a:0); this.annDirty=true; this.changed(); });
+        this.ready=true; { const vw=this.v.videoWidth, vh=this.v.videoHeight, pt=vh>vw*1.05; this.stage.classList.toggle('portrait',pt); if(vw&&vh) this.stage.style.setProperty('--ar',vw+'/'+vh); if(pt) requestAnimationFrame(()=>{ this.dirty=true; this.annDirty=true; dispatchEvent(new Event('resize')); }); } /* Hochformat: Bild grösser zeigen */ this.fitDefault(); this.seekFrame(this.loop&&this.loop.on&&this.loop.a!=null?this.loop.a:0); this.annDirty=true; this.changed(); });
     },{once:true});
     this.changed();
   }
@@ -3574,7 +3576,7 @@ function vchipUI(){ [['A',A],['B',B]].forEach(([K,d])=>{ const lab=$('#vc'+K); i
 /* Videoauswahl als Bottom-Sheet auf Touch-Geräten: breiter, mit Vorschaubild, Gruppen und Dauer (die iOS-Liste ist schmal und bricht Zeilen um) */
 const VP_ON=()=>true; /* überall die eigene Auswahl: Handy als Blatt von unten, Computer als Klapp-Fenster am Chip */
 const VP_SHEET=()=>matchMedia('(pointer:coarse)').matches||matchMedia('(max-width:760px)').matches;
-function camLbl(c){ return c?String(c).replace(/^cam\s*(\d+)$/i,'Kamera $1').replace(/^kamera\s*/i,'Kamera '):c; } /* CAM1 und Kamera 1 gleich anzeigen */
+function camLbl(c){ return c?String(c).replace(/^(cam|kamera)\s*(\d+)$/i,'Cam $2'):c; } /* einheitlich «Cam 1» */
 function vpOpen(sel,title,badge,col,anchor){ const cur=sel.value, other=sel.id==='selA'?$('#selB').value:sel.id==='selB'?$('#selA').value:'', ok=sel.id==='selA'?'b':'a', pop=!VP_SHEET();
   const el=document.createElement('div'); el.className='vp-sheet'+(pop?' pop':'');
   const gk=c=>{ const m=c.meta; return m&&m.ok&&(m.place||m.disc)?[[m.place,m.date?m.date.slice(-4):''].filter(Boolean).join(' '),DISC_LONG[m.disc]||m.disc].filter(Boolean).join(' · '):'Weitere Videos'; };
@@ -3995,6 +3997,7 @@ const MP4R={
     for(const trak of MP4R.kids(d,mv.a,mv.b)){ if(trak.ty!=='trak') continue;
       const hdlr=MP4R.path(d,trak,'mdia','hdlr'); if(!hdlr||MP4R.s4(d,hdlr.a+8)!=='vide') continue;
       const tkhd=MP4R.find(d,trak.a,trak.b,'tkhd'), id=d.getUint8(tkhd.a)===1?d.getUint32(tkhd.a+20):d.getUint32(tkhd.a+12);
+      let rot=0; { const mo=tkhd.a+(d.getUint8(tkhd.a)===1?52:40); if(mo+16<=tkhd.b){ const a=d.getInt32(mo)/65536, b=d.getInt32(mo+4)/65536; rot=((Math.round(Math.atan2(b,a)*180/Math.PI/90)*90)%360+360)%360; } } /* Drehung (Handy hochkant): steht in der Spur, nicht im Bild */
       const mdhd=MP4R.path(d,trak,'mdia','mdhd'), v=d.getUint8(mdhd.a), ts=v===1?d.getUint32(mdhd.a+20):d.getUint32(mdhd.a+12);
       const stbl=MP4R.path(d,trak,'mdia','minf','stbl'); if(!stbl) continue;
       const stsd=MP4R.find(d,stbl.a,stbl.b,'stsd'), ents=MP4R.kids(d,stsd.a+8,stsd.b); let cd=null; for(const e of ents){ cd=MP4R.codecOf(d,e); if(cd) break; } if(!cd) continue;
@@ -4027,7 +4030,7 @@ const MP4R={
       const P=S.map((_,i)=>i).sort((a,b)=>S[a].t-S[b].t);
       const dd=S.map(s=>s.d).sort((a,b)=>a-b), med=dd[dd.length>>1]||1, fps=ts/med;
       const byTs=new Map(); S.forEach((q,i)=>byTs.set(q.ts,i));
-      T={codec:cd.codec,desc:cd.desc,w:cd.w,h:cd.h,S,P,byTs,fps,dur:(S[P[P.length-1]].t+med/ts),ts}; break; }
+      T={codec:cd.codec,desc:cd.desc,w:cd.w,h:cd.h,rot,S,P,byTs,fps,dur:(S[P[P.length-1]].t+med/ts),ts}; break; }
     if(!T) throw new Error('keine Videospur');
     return T; }
 };
@@ -4036,7 +4039,7 @@ class FrameSrc{
     try{ if(FrameSrc.off) throw new Error('Decoder abgeschaltet'); if(typeof VideoDecoder==='undefined'||typeof VideoFrame==='undefined'||typeof EncodedVideoChunk==='undefined') throw new Error('kein WebCodecs');
       const bl=(src&&src.file)||await (await fetch(url)).blob(); const T=await MP4R.open(bl);
       const cfg={codec:T.codec,codedWidth:T.w,codedHeight:T.h}; if(T.desc) cfg.description=T.desc; const s=await VideoDecoder.isConfigSupported(cfg); if(!s||!s.supported) throw new Error('Codec '+T.codec);
-      Object.assign(f,{T,bl,cfg,fast:true,w:T.w,h:T.h,dur:T.dur,fps:T.fps,cache:new Map(),pend:new Set(),pos:0,needKey:true,win:null,hold:null,err:null}); f._mk(); return f; }
+      const sw=T.rot===90||T.rot===270; Object.assign(f,{T,bl,cfg,fast:true,w:sw?T.h:T.w,h:sw?T.w:T.h,rot:T.rot,rc:[null,null],rci:0,dur:T.dur,fps:T.fps,cache:new Map(),pend:new Set(),pos:0,needKey:true,win:null,hold:null,err:null}); f._mk(); return f; }
     catch(e){ f.why=String(e&&e.message||e); return f._slow(); } }
   async _slow(){ if(this.v) return this; this.fast=false; try{ this.dec&&this.dec.state!=='closed'&&this.dec.close(); }catch(e){} this.hold=null; this._drop(); this.v=await loadV(this.url); this.w=this.v.videoWidth; this.h=this.v.videoHeight; this.dur=this.v.duration; return this; }
   _mk(){ const me=this; this.dec=new VideoDecoder({output:fr=>me._out(fr),error:e=>{ me.err=e; me._wake(); me._wakeDq(); }}); this.dec.addEventListener('dequeue',()=>me._wakeDq()); this.dec.configure(this.cfg); this.needKey=true; }
@@ -4049,7 +4052,11 @@ class FrameSrc{
   _drop(){ if(this.cache){ for(const fr of this.cache.values()) if(fr!==this.hold) fr.close(); this.cache.clear(); } }
   async _bytes(off,sz){ const w=this.win; if(w&&off>=w.a&&off+sz<=w.b) return new Uint8Array(w.buf,off-w.a,sz); const n=Math.max(sz,6<<20), a=off, b=Math.min(this.bl.size,a+n); const buf=await this.bl.slice(a,b).arrayBuffer(); this.win={a,b,buf}; return new Uint8Array(buf,0,sz); }
   _idx(t){ const P=this.T.P, S=this.T.S, tt=t+1e-4; let lo=0, hi=P.length-1; while(lo<hi){ const m=(lo+hi+1)>>1; if(S[P[m]].t<=tt) lo=m; else hi=m-1; } return P[lo]; }
-  _hold(fr){ const h=this.hold; if(h&&h!==fr&&!this.cache.has(h.timestamp)){ try{ h.close(); }catch(e){} } this.hold=fr; return fr; }
+  _hold(fr){ const h=this.hold; if(h&&h!==fr&&!this.cache.has(h.timestamp)){ try{ h.close(); }catch(e){} } this.hold=fr; return this.rot?this._rot(fr):fr; }
+  _rot(fr){ /* gedrehtes Video: Bild wie im Player aufrecht zurückgeben (zwei Leinwände abwechselnd, damit das vorige Bild gültig bleibt) */ const i=this.rci=1-this.rci; let c=this.rc[i]; if(!c){ c=this.rc[i]=document.createElement('canvas'); c.width=this.w; c.height=this.h; }
+    const x=c.getContext('2d'), W=c.width, H=c.height, cw=fr.codedWidth||fr.displayWidth, ch=fr.codedHeight||fr.displayHeight; x.setTransform(1,0,0,1,0,0);
+    if(this.rot===90){ x.translate(W,0); x.rotate(Math.PI/2); } else if(this.rot===270){ x.translate(0,H); x.rotate(-Math.PI/2); } else if(this.rot===180){ x.translate(W,H); x.rotate(Math.PI); }
+    x.drawImage(fr,0,0,this.T.w,this.T.h); x.setTransform(1,0,0,1,0,0); return c; }
   _near(ts){ let best=null, bd=1e18; for(const fr of this.cache.values()){ const d=Math.abs(fr.timestamp-ts); if(d<bd){ bd=d; best=fr; } } return best; }
   at(t){ /* Aufrufe nacheinander abarbeiten (ein Decoder, eine Position) */ const run=()=>this._atSafe(t); const p=(this.q||Promise.resolve()).then(run,run); this.q=p.catch(()=>{}); return p; }
   async _atSafe(t){ if(!this.fast) return this._at(t); let to; const lim=new Promise(r=>{ to=setTimeout(()=>r('zeit'),this.first?6000:3500); }); /* Zeitlimit: hängt der Decoder (z. B. iOS), auf <video> umschalten */
@@ -5841,8 +5848,8 @@ function parseName(n){
     if(!m.sex&&/^(M|W|F|H|D|MEN|WOMEN|HERREN|DAMEN)$/.test(u)){ m.sex=/^(M|H|MEN|HERREN)$/.test(u)?'M':'W'; continue; }
     if(!m.run&&/^(L|R|RUN|LAUF|T|TR)\d{1,2}$/.test(u)){ m.run=(u.startsWith('T')?'Training ':'Lauf ')+u.match(/\d+/)[0]; continue; }
     if(/^(WC|EC|COC|FIS|NJR|NC)$/.test(u)){ m.level=u==='WC'?'Weltcup':u==='EC'?'Europacup':u; continue; }
-    if(!m.cam&&/^V\d{1,2}$/.test(u)){ m.cam='Kamera '+u.slice(1); continue; }
-    if(!m.cam&&/^(VGH|GH|CAMGH|GEGENHANG|VZ|VS|VST|VZI|VPI|PISTE|CAM\d*|CAM[A-Z]{1,3}|POS\d+)$/.test(u)){ m.cam=/^(VGH|GH|CAMGH|GEGENHANG)$/.test(u)?'Gegenhang':/^(VZ|VZI)$/.test(u)?'Ziel':/^(VS|VST)$/.test(u)?'Start':/^(VPI|PISTE)$/.test(u)?'Piste':/^CAM\d+$/.test(u)?'Kamera '+(+u.slice(3)):u; continue; } /* CAM1 → Kamera 1 (einheitlich) */
+    if(!m.cam&&/^V\d{1,2}$/.test(u)){ m.cam='Cam '+(+u.slice(1)); continue; }
+    if(!m.cam&&/^(VGH|GH|CAMGH|GEGENHANG|VZ|VS|VST|VZI|VPI|PISTE|CAM\d*|CAM[A-Z]{1,3}|POS\d+)$/.test(u)){ m.cam=/^(VGH|GH|CAMGH|GEGENHANG)$/.test(u)?'Gegenhang':/^(VZ|VZI)$/.test(u)?'Ziel':/^(VS|VST)$/.test(u)?'Start':/^(VPI|PISTE)$/.test(u)?'Piste':/^CAM\d+$/.test(u)?'Cam '+(+u.slice(3)):u; continue; } /* CAM1 → Cam 1 (einheitlich) */
     if(/^(BEISPIEL|GHOST|VIDEO|CLIP|KAMERA|FIX|FPS|LAUF)$/.test(u)) continue;
     if(/^[A-Za-zÄÖÜäöüéèàçñ]{2,}(-[A-Za-zÄÖÜäöüéèàçñ]{2,})*$/.test(t)) rest.push(t);
   }
@@ -6174,9 +6181,10 @@ const STR={n:8,trail:false,num:true,busy:false,res:null};
 function strobeRange(){ const c=SD.clip, L=c.loop, sp=STR.span||1; if(sp==='cut'&&L&&L.a!=null){ const b=L.b!=null&&L.b-L.a>=4?L.b:L.a+Math.round(SD.fps*2); return [L.a,Math.min(b,SD.nF-1,L.a+Math.round(SD.fps*8)),true]; } const h=Math.round(SD.fps*(sp==='cut'?1:sp)); return [Math.max(0,SD.frame-h),Math.min(SD.nF-1,SD.frame+h),false]; }
 function openStrobe(){ STR.tap=null; STR.tap0=null; STR.res=null; SD=mode==='cmp'?A:S; { const L=SD.clip&&SD.clip.loop, hasC=!!(L&&L.a!=null); STR.span=hasC?'cut':(STR.span==='cut'?1:(STR.span||1)); $$('#strR button').forEach(x=>x.classList.toggle('on',x.dataset.r===String(STR.span))); } /* Start/Ende gesetzt → Strobo genau dort */ if(!SD.ready){ toast(mode==='cmp'?'Zuerst Video A wählen.':'Zuerst ein Video öffnen.'); return; } A.pause(); B.pause(); SD.pause(); $('#strobeModal').classList.add('on'); strobeAsk(); }
 /* Schritt 1: mittleres Bild des Bereichs zeigen, Fahrer:in antippen lassen – dann wird nie Gondel oder Publikum gewählt */
+function strView(w,h){ const v=$('.str-view'); if(!v) return; v.style.aspectRatio=w+'/'+h; v.classList.toggle('pt',h>w*1.05); } /* Vorschau im Format des Videos (auch hochkant) */
 async function strobeAsk(){ const [a,b]=strobeRange(), f=Math.round((a+b)/2); STR.midF=f; SD.seekFrame(f);
   await new Promise(r=>{ const h=()=>{ SD.v.removeEventListener('seeked',h); r(); }; SD.v.addEventListener('seeked',h); setTimeout(h,1500); });
-  const oc=$('#strCanvas'), vw=SD.v.videoWidth, vh=SD.v.videoHeight, OW=Math.min(960,vw), OH=Math.round(OW*vh/vw)&~1; oc.width=OW; oc.height=OH; oc.getContext('2d').drawImage(SD.v,0,0,OW,OH);
+  const oc=$('#strCanvas'), vw=SD.v.videoWidth, vh=SD.v.videoHeight, OW=Math.min(960,vw), OH=Math.round(OW*vh/vw)&~1; oc.width=OW; oc.height=OH; oc.getContext('2d').drawImage(SD.v,0,0,OW,OH); strView(OW,OH);
   STR.await=true; $('#strProg').hidden=true; $('#strSave').disabled=true; $('#strVid').disabled=true; $('#strInfo').innerHTML=''; $('#strobeModal').classList.add('asking'); }
 function labelMap(m,w,h){ const lab=new Int32Array(m.length), st=[], info=[0]; let id=0;
   for(let i=0;i<m.length;i++){ if(!m[i]||lab[i]) continue; id++; let a=0,sx=0,sy=0; st.push(i); lab[i]=id;
@@ -6281,7 +6289,7 @@ async function strobeRun(){
         lj=-1; for(let x=bx1;x>=bx0;x--){ const j=(y*PW+x)*4; if(o[j+3]===255){ lj=j; continue; } if(lj>=0){ const al=o[j+3]/255; o[j]=o[j]*al+o[lj]*(1-al); o[j+1]=o[j+1]*al+o[lj+1]*(1-al); o[j+2]=o[j+2]*al+o[lj+2]*(1-al); o[j+3]=255; } } }
       for(let p=0,j=0;p<N;p++,j+=4) if(o[j+3]<255){ const al=o[j+3]/255; o[j]=o[j]*al+200*(1-al); o[j+1]=o[j+1]*al+204*(1-al); o[j+2]=o[j+2]*al+210*(1-al); o[j+3]=255; } fx2.putImageData(id,0,0); }
     const CW=bx1-bx0+1, CH=by1-by0+1;
-    const oc=$('#strCanvas'); oc.width=CW&~1; oc.height=CH&~1; const ox=oc.getContext('2d'); ox.drawImage(full,-bx0,-by0);
+    const oc=$('#strCanvas'); oc.width=CW&~1; oc.height=CH&~1; strView(oc.width,oc.height); const ox=oc.getContext('2d'); ox.drawImage(full,-bx0,-by0);
     /* Bahn der Fahrer:in (Bezugsbild-Koordinaten) fürs Video */
     const trk=AF.map((f,k)=>TR[k]?{f,c:[TR[k].c[0]+x0,TR[k].c[1]+y0],s:sz(k)}:null).filter(Boolean);
     STR.res={AF,MA:MO,x0,y0,a,b,url:c.url,fps:SD.fps,cents,sizes,fr,stamps,trk,med,PW,PH,OW,OH,crop:[bx0,by0,oc.width,oc.height],full,base:ox.getImageData(0,0,oc.width,oc.height),name:base(c.name)+'_Strobo_F'+a+'-'+b,found:have.length,of:nA}; strobeDecor();
@@ -6563,7 +6571,7 @@ function labelDialog(node){
       <label>Disziplin<select id="lbDis">${DISC_OPTS.map(o=>`<option value="${o}"${o===(m.disc||'')?' selected':''}>${o||'–'}</option>`).join('')}</select></label>
       <label>Geschlecht<select id="lbSex"><option value="">–</option><option value="M"${m.sex==='M'?' selected':''}>M</option><option value="W"${m.sex==='W'?' selected':''}>W</option></select></label>
       <label>Lauf<input id="lbRun" value="${esc(m.run?(m.run.startsWith('Training')?'T':'L')+m.run.replace(/\D/g,''):'')}" placeholder="L1, L2, T1 …"></label>
-      <label class="wide">Zusatz (optional)<input id="lbAdd" placeholder="z. B. Kamera2"></label>
+      <label class="wide">Zusatz (optional)<input id="lbAdd" placeholder="z. B. Cam2"></label>
     </div>
     <div class="lb-prev"><span>Neuer Name</span><b id="lbOut"></b></div>
     <details class="lb-free"><summary>Frei umbenennen</summary><input id="lbFree" value="${esc(node.name)}"></details>`,
@@ -6940,7 +6948,7 @@ if(false&&!LS.get('hint1',0)){ setTimeout(()=>{ toast(matchMedia('(pointer:coars
 
 /* Update-Hinweis: prüft version.json auf GitHub Pages; «Aktualisieren» lädt die Seite ohne Cache neu */
 (()=>{
-  const BUILD='20261101094000'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
+  const BUILD='20261101142212'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
   // nach einem Update die ?v=… aus der Adresse entfernen
   try{ const u=new URL(location.href); if(u.searchParams.has('v')){ u.searchParams.delete('v'); history.replaceState(null,'',u.pathname+(u.search||'')+u.hash); } }catch(e){}
   const el=$('#upd'); let latest=null, snoozed=null, busy=false;
