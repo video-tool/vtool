@@ -2269,6 +2269,24 @@ button.lg-it:hover{background:rgba(12,15,20,.8);border-color:rgba(255,255,255,.3
 /* Eine Zeitleiste, sobald A und B gemeinsam laufen */
 #viewCmp.overlay.ov-one .strips>.tl:nth-child(2){display:none}
 @media (max-width:600px){ #btnOut{display:none!important} } /* Handy: Abmelden im «…»-Menü */
+.local-chip{display:none!important}
+.vl-user{display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;padding:0;margin-left:2px;border:0;background:none;border-radius:50%;cursor:pointer;flex:none}
+.vl-av{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;font:650 10.5px/1 var(--font);letter-spacing:.03em;color:#fff;background:linear-gradient(140deg,#ef5a4f,#B11E14);box-shadow:0 0 0 2px var(--card),0 0 0 3.5px var(--line2);transition:box-shadow .2s,transform .3s var(--ease-spring)}
+.vl-user:hover .vl-av,.vl-user.on .vl-av{box-shadow:0 0 0 2px var(--card),0 0 0 3.5px var(--red);transform:scale(1.06)}
+.vl-user:focus-visible{outline:none}.vl-user:focus-visible .vl-av{box-shadow:0 0 0 2px var(--card),0 0 0 4px rgba(255,90,74,.6)}
+.vl-pop{position:fixed;z-index:420;width:248px;padding:6px;border-radius:16px;background:#ffffff;border:1px solid var(--line);box-shadow:0 1px 2px rgba(13,16,20,.06),0 22px 50px -18px rgba(13,16,20,.35);animation:vlPop .18s var(--ease-out,ease) both}
+.vl-pop .vp-h{display:flex;gap:10px;align-items:center;padding:8px 8px 10px}
+.vl-pop .vp-h .vl-av{width:36px;height:36px;font-size:13px;box-shadow:none;flex:none}
+.vl-pop .vp-t{min-width:0;display:flex;flex-direction:column;gap:2px}
+.vl-pop .vp-n{font-weight:650;font-size:13.5px;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.vl-pop .vp-e{font-size:11.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.vl-pop .vp-r{align-self:flex-start;margin-top:3px;font-size:10px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);background:var(--hover);border-radius:999px;padding:2px 7px}
+.vl-pop .vp-sep{height:1px;background:var(--line);margin:0 4px 4px}
+.vl-pop .vp-out{display:flex;align-items:center;gap:10px;width:100%;height:38px;padding:0 10px;border:0;border-radius:10px;background:none;color:var(--ink2);font:600 13px var(--font);cursor:pointer;text-align:left}
+.vl-pop .vp-out:hover{background:color-mix(in srgb,var(--red) 9%,transparent);color:var(--red)}
+.vl-pop .vp-out svg{width:16px;height:16px}
+:root[data-theme="dark"] .vl-pop{background:#1b2027;border-color:#2a313b}
+@keyframes vlPop{from{opacity:0;transform:translateY(4px) scale(.98)}}
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
   .aurora{display:none}
@@ -2882,7 +2900,7 @@ setTimeout(function(){ if(de.classList.contains('vgate')&&matchMedia('(min-width
     <button class="hdr-ico hdr-inv" id="hdrInv" aria-label="innove-Anmeldung" title="innove: GPS-Daten (anmelden)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.2 7-11.5A7 7 0 0 0 5 9.5C5 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.4"/></svg><i></i></button>
     <button class="hdr-ico hdr-more" id="hdrMore" aria-label="Mehr" title="Mehr"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg></button>
     <button class="hdr-ico" id="btnHelp" title="Anleitung &amp; Tastenkürzel (?)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9.5"/><path d="M9.3 9.2a2.8 2.8 0 0 1 5.4 1c0 1.9-2.7 2.4-2.7 4"/><path d="M12 17.3h.01"/></svg></button>
-    <button class="hdr-ico" id="btnOut" title="Abmelden" aria-label="Abmelden"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3"/><path d="M10 17l5-5-5-5"/><path d="M15 12H3"/></svg></button>
+    <button class="vl-user" id="btnOut" aria-label="Konto" aria-haspopup="true"><span class="vl-av" id="btnOutAv"></span></button>
   </div>
 </header>
 
@@ -7207,8 +7225,20 @@ function serSummary(stopped){ const m=serModal(), ok=SER.res.filter(r=>r[1]==='o
   m.querySelector('.ser-foot').innerHTML='<span></span><span class="ser-btns"><button class="btn-pri" data-ser="x">Schliessen</button></span>'; m.classList.add('on');
   toast('Serie '+(stopped?'abgebrochen':'fertig')+': '+ok+' von '+SER.res.length+' Overlays gespeichert.',4000); }
 document.addEventListener('visibilitychange',async()=>{ if(SER.on&&!document.hidden&&navigator.wakeLock&&!SER.lock) try{ SER.lock=await navigator.wakeLock.request('screen'); }catch(e){} });
-window.vlabUserUI=()=>{ const s=window.vlabAuth&&vlabAuth.get(), b=$('#btnOut'); if(b) b.title=s?'Abmelden ('+(s.n||s.e)+')':'Abmelden'; };
-$('#btnOut').addEventListener('click',()=>{ if(window.vlabAuth) vlabAuth.logout(); }); vlabUserUI();
+{ const ROLE={coach:'Coach',admin:'Admin',athlete:'Athlet:in',team_director:'Team Director'};
+  const ini=s=>{ const w=String(s&&s.n||'').trim().split(/\s+/).filter(Boolean); return (w.length?(w[0][0]+(w.length>1?w[w.length-1][0]:'')):String(s&&s.e||'?')[0]).toUpperCase(); };
+  let pop=null; const close=()=>{ if(pop){ pop.remove(); pop=null; $('#btnOut').classList.remove('on'); } };
+  window.vlabUserUI=()=>{ const s=window.vlabAuth&&vlabAuth.get(), b=$('#btnOut'); if(!b) return; $('#btnOutAv').textContent=s?ini(s):'?'; b.title=s?(s.n||s.e):'Konto'; };
+  $('#btnOut').addEventListener('click',e=>{ e.stopPropagation(); if(pop){ close(); return; } const s=window.vlabAuth&&vlabAuth.get()||{}, b=e.currentTarget;
+    pop=document.createElement('div'); pop.className='vl-pop'; pop.setAttribute('role','menu');
+    pop.innerHTML='<div class="vp-h"><span class="vl-av"></span><div class="vp-t"><span class="vp-n"></span><span class="vp-e"></span>'+(ROLE[s.r]?'<span class="vp-r"></span>':'')+'</div></div><div class="vp-sep"></div><button class="vp-out" role="menuitem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3"/><path d="M10 17l5-5-5-5"/><path d="M15 12H3"/></svg>Abmelden</button>';
+    $('.vl-av',pop).textContent=ini(s); $('.vp-n',pop).textContent=s.n||s.e||''; $('.vp-e',pop).textContent=s.n?s.e:''; if(ROLE[s.r]) $('.vp-r',pop).textContent=ROLE[s.r];
+    $('.vp-out',pop).addEventListener('click',()=>{ close(); if(window.vlabAuth) vlabAuth.logout(); });
+    document.body.appendChild(pop); b.classList.add('on'); const r=b.getBoundingClientRect(), h=pop.offsetHeight, w=pop.offsetWidth;
+    pop.style.left=Math.max(8,Math.min(innerWidth-w-8,r.right-w))+'px'; pop.style.top=(r.top-h-8>8?r.top-h-8:r.bottom+8)+'px'; });
+  document.addEventListener('pointerdown',e=>{ if(pop&&!e.target.closest('.vl-pop,#btnOut')) close(); },true);
+  document.addEventListener('keydown',e=>{ if(pop&&e.key==='Escape') close(); }); addEventListener('resize',close);
+  vlabUserUI(); }
 setColor(LS.get('color',COLORS[0])); setTool('none');
 restoreSession();
 /* Beispiel-Rennvideos (Sölden 2025, RS Herren) – liegen neben der App im Ordner demo/ */
@@ -7329,7 +7359,7 @@ if(false&&!LS.get('hint1',0)){ setTimeout(()=>{ toast(matchMedia('(pointer:coars
 
 /* Update-Hinweis: prüft version.json auf GitHub Pages; «Aktualisieren» lädt die Seite ohne Cache neu */
 (()=>{
-  const BUILD='20261101155531'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
+  const BUILD='20261101160632'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
   // nach einem Update die ?v=… aus der Adresse entfernen
   try{ const u=new URL(location.href); if(u.searchParams.has('v')){ u.searchParams.delete('v'); history.replaceState(null,'',u.pathname+(u.search||'')+u.hash); } }catch(e){}
   const el=$('#upd'); let latest=null, snoozed=null, busy=false;
