@@ -3381,14 +3381,14 @@ function renderLib(){
 function coverDraw(ctx,img,dx,dy,dw,dh){ const sw=img.width,sh=img.height,ca=dw/dh; let cw=sw,ch=sh,sx=0,sy=0; if(ca<sw/sh){cw=sh*ca;sx=(sw-cw)/2;}else{ch=sw/ca;sy=(sh-ch)/2;} ctx.drawImage(img,sx,sy,cw,ch,dx,dy,dw,dh); }
 
 /* ---------- Thumbnails & fps über ein verstecktes Zweit-Video ---------- */
-const TH_H=90, CACHE_MAX=1400;
+const TH_H=90, CACHE_MAX=1400, TG={n:0};
 class ThumbGen{
   constructor(c){
     this.c=c; this.want=[]; this.bg=[]; this.busy=true; this.map=new Map(); this.keys=[]; this.bgSet=new Set(); this.center=0; this.dead=false;
-    const v=document.createElement('video'); v.muted=true; v.playsInline=true; v.preload='auto'; v.className='gen-vid'; v.setAttribute('aria-hidden','true');
+    const v=document.createElement('video'); v.muted=true; v.playsInline=true; v.preload='metadata'; v.className='gen-vid'; v.setAttribute('aria-hidden','true'); /* nur Kopfdaten – ganze Videos lädt erst, wer geöffnet ist */
     document.body.appendChild(v); this.v=v;
     v.addEventListener('loadedmetadata',()=>{ c.dur=v.duration; c.w=v.videoWidth; c.h=v.videoHeight; renderLib(); emit('meta',c); this.detect(); },{once:true});
-    v.addEventListener('error',()=>{ if(this.dead) return; c.err=true; renderLib(); c._fpsRes(); toast('«'+c.name+'» lässt sich in diesem Browser nicht abspielen (Codec). Tipp: als H.264-MP4 exportieren.',5000); });
+    v.addEventListener('error',()=>{ if(this.dead||this.idle||!v.getAttribute('src')) return; c.err=true; renderLib(); c._fpsRes(); toast('«'+c.name+'» lässt sich in diesem Browser nicht abspielen (Codec). Tipp: als H.264-MP4 exportieren.',5000); });
     v.src=c.url;
   }
   destroy(){ this.dead=true; try{ this.v.removeAttribute('src'); this.v.load(); this.v.remove(); }catch(e){} this.map.clear(); }
@@ -3424,16 +3424,26 @@ class ThumbGen{
   }
   get(f,tol){ const n=this.nearest(f); if(n==null) return null; return {img:this.map.get(n),exact:Math.abs(n-f)<=tol}; }
   request(list,center){ this.want=list; this.center=center; this.pump(); }
+  later(ms){ if(this._lt) return; this._lt=setTimeout(()=>{ this._lt=null; this.pump(); },ms); }
   pump(){
     if(this.busy||this.dead||!this.c.fps) return;
-    let job=null;
-    while(this.want.length){ const w=this.want.shift(); const n=this.nearest(w.f); if(n==null||Math.abs(n-w.f)>w.tol){ job=w.f; break; } }
-    if(job==null) while(this.bg.length){ const f=this.bg.shift(); if(!this.map.has(f)){ job=f; break; } }
-    if(job==null) return;
-    this.busy=true; const v=this.v, c=this.c;
+    /* Vorschaubilder dürfen das offene Video nie ausbremsen (gemeldet: Bild bleibt stehen, wenn die App länger offen ist – 30+ versteckte Videos luden und spulten im Hintergrund):
+       nur geöffnete Videos bekommen alle Vorschaubilder, die übrigen nur ihr Titelbild; Pause, solange ein Video läuft oder lädt; höchstens zwei gleichzeitig */
+    const c=this.c, act=decks.some(d=>d.clip===c), live=decks.some(d=>d.clip&&d.v&&(!d.v.paused||d.v.seeking||(d.v.readyState>0&&d.v.readyState<3)));
+    let job=null, bgJob=false;
+    while(this.want.length){ const w=this.want[0]; const n=this.nearest(w.f); if(n==null||Math.abs(n-w.f)>w.tol){ job=w.f; break; } this.want.shift(); }
+    if(job==null){ while(this.bg.length){ const f=this.bg[0]; if(this.map.has(f)){ this.bg.shift(); continue; } if(act||(f===this.posterF&&!c.poster)){ job=f; bgJob=true; } break; } }
+    if(job==null){ if(!act&&c.poster&&!this.idle&&!this.want.length){ this.idle=true; try{ this.v.removeAttribute('src'); this.v.load(); }catch(e){} } return; } /* fertig und nicht offen: Video freigeben */
+    if(live&&(bgJob||!act)){ this.later(600); return; }
+    if((TG.n||0)>=2){ this.later(120); return; }
+    if(this.idle){ this.idle=false; const v0=this.v; v0.preload='auto'; v0.src=c.url; v0.addEventListener('loadeddata',()=>this.pump(),{once:true}); setTimeout(()=>this.pump(),1500); return; } /* wieder gebraucht: neu laden */
+    if(act&&this.v.preload!=='auto') this.v.preload='auto';
+    if(!bgJob) this.want.shift(); else this.bg.shift();
+    TG.n=(TG.n||0)+1; let tgDone=false; const tgEnd=()=>{ if(!tgDone){ tgDone=true; TG.n--; } };
+    this.busy=true; const v=this.v;
     const t=Math.min((job+0.5)/c.fps,Math.max(0,c.dur-0.0005));
     let fired=false;
-    const done=()=>{ if(fired) return; fired=true; v.removeEventListener('seeked',done);
+    const done=()=>{ if(fired) return; fired=true; v.removeEventListener('seeked',done); tgEnd();
       if(this.dead) return;
       try{
         const w=Math.round(TH_H*(c.w&&c.h?c.w/c.h:16/9)); const cv=document.createElement('canvas'); cv.width=w; cv.height=TH_H;
@@ -7399,7 +7409,7 @@ if(false&&!LS.get('hint1',0)){ setTimeout(()=>{ toast(matchMedia('(pointer:coars
 
 /* Update-Hinweis: prüft version.json auf GitHub Pages; «Aktualisieren» lädt die Seite ohne Cache neu */
 (()=>{
-  const BUILD='20261101201706'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
+  const BUILD='20261101203644'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
   // nach einem Update die ?v=… aus der Adresse entfernen
   try{ const u=new URL(location.href); if(u.searchParams.has('v')){ u.searchParams.delete('v'); history.replaceState(null,'',u.pathname+(u.search||'')+u.hash); } }catch(e){}
   const el=$('#upd'); let latest=null, snoozed=null, busy=false;
