@@ -1386,6 +1386,22 @@ html.vt-back::view-transition-new(mainview){animation:vtInL .45s cubic-bezier(.2
 .vp-row.other .vp-tx b::after{content:attr(data-o);margin-left:7px;font:700 10px var(--font);color:#fff;padding:1px 6px;border-radius:5px;vertical-align:2px}
 .vp-row.other.oa .vp-tx b::after{background:var(--a,#3e8bff)} .vp-row.other.ob .vp-tx b::after{background:var(--b,#f08a3c)}
 .vp-empty{padding:28px 12px;text-align:center;color:#8a94a3;font:500 14px var(--font)}
+.vp-sheet.pop{display:block;background:transparent;-webkit-backdrop-filter:none;backdrop-filter:none}
+.vp-sheet.pop .vp-card{position:fixed;max-width:none;border-radius:16px;border:1px solid rgba(255,255,255,.1);box-shadow:0 24px 60px -16px rgba(0,0,0,.6),0 0 0 1px rgba(0,0,0,.2);transform:translateY(-4px) scale(.98);opacity:0;transition:transform .14s ease-out,opacity .14s;padding-bottom:0;transform-origin:top left}
+.vp-sheet.pop.on .vp-card{transform:none;opacity:1}
+.vp-sheet.pop .vp-grab{display:none}
+.vp-sheet.pop .vp-hd{padding:12px 14px 8px}
+.vp-sheet.pop .vp-hd h4{font-size:15px}
+.vp-sheet.pop .vp-x{width:28px;height:28px;font-size:13px}
+.vp-sheet.pop .vp-q{margin:0 12px 6px}
+.vp-sheet.pop .vp-q input{height:36px;font-size:14px}
+.vp-sheet.pop .vp-list{padding:0 8px 10px}
+.vp-sheet.pop .vp-row{padding:5px 8px;gap:10px;border-radius:10px}
+.vp-sheet.pop .vp-row:hover,.vp-sheet.pop .vp-row:focus-visible{background:rgba(255,255,255,.07);outline:none}
+.vp-sheet.pop .vp-th{width:58px;height:33px;border-radius:7px}
+.vp-sheet.pop .vp-tx b{font-size:14px}
+.vp-sheet.pop .vp-tx small{font-size:12px}
+.vp-sheet.pop .vp-g{padding:10px 6px 4px;font-size:10.5px}
 .share-sheet{position:fixed;inset:0;z-index:9200;display:flex;align-items:flex-end;justify-content:center;background:rgba(10,12,16,.45);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);opacity:0;transition:opacity .25s;padding:12px 12px calc(12px + env(safe-area-inset-bottom,0px))}
 .share-sheet.on{opacity:1}
 .ss-card{width:min(420px,100%);background:#fff;color:#14181f;border-radius:22px;padding:20px 18px 14px;display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;box-shadow:0 30px 70px -20px rgba(0,0,0,.6);transform:translateY(30px);transition:transform .35s cubic-bezier(.22,1.2,.36,1)}
@@ -2118,7 +2134,8 @@ button.lg-it:hover{background:rgba(12,15,20,.8);border-color:rgba(255,255,255,.3
   header .btn-add,header .hdr-ico,header .ham-btn{width:34px!important;height:34px!important;min-width:34px;flex:none}
   header .btn-add{padding:0!important;justify-content:center}
   /* Overlay-Schritte: nur der aktuelle mit Namen, sonst wird die Seite breiter als der Bildschirm */
-  .ov-zl{min-width:0;max-width:100%;overflow:hidden}
+  .ov-zl{min-width:0;max-width:100%;overflow:hidden;flex:1 1 auto!important;padding:4px 0 4px 5px;margin:-4px 0 -4px -5px}
+  #viewCmp #ovSteps li.on{min-width:0;max-width:100%} #viewCmp #ovSteps li.on>span{overflow:hidden;text-overflow:ellipsis;min-width:0} #viewCmp #ovSteps{min-width:0;max-width:100%} #viewCmp #ovSteps li.on::before{display:none!important} /* Handy: Schritt-Titel kürzen statt Kreis abschneiden */
   #viewCmp #ovSteps li:not(.on){display:none!important} /* auf dem Handy nur der aktuelle Schritt – abgeschnittene Kreise sehen unsauber aus */
   #ovTxt .ov-say{white-space:nowrap!important;overflow:hidden;text-overflow:ellipsis} /* Hinweis einzeilig, Rest im «i» */
   #viewCmp.overlay:not([hidden]){z-index:116} /* die Karte ist eine eigene Ebene (isolation) – sonst liegt die Knopfleiste unten unter der Videoliste */
@@ -2449,6 +2466,8 @@ header .btn-cam svg circle:last-child{animation:camDot 2s ease-in-out infinite}
   #viewCmp.overlay #ovActs .ov-savew{flex:0 0 auto!important}
   #viewCmp.overlay #ovActs .ov-savew>.ov-b{width:auto!important}
   #viewCmp.overlay #ovActs .ov-menu{top:calc(100% + 6px)!important;bottom:auto!important;left:auto!important;right:0!important}
+  #viewCmp.overlay #ovActs .ov-menu{max-width:calc(100vw - 24px);min-width:0;width:max-content} #viewCmp.overlay #ovActs .ov-menu button{height:40px;font-size:14px} /* Handy: Menü bleibt im Bild */
+  #ovSt>span{display:none} #ovSt{padding:0 7px!important} /* Handy: Zustand nur als Punkt (Text im «i») */
   #viewCmp.overlay #ovSteps i{width:20px!important;height:20px!important;font-size:11px!important}
   #viewCmp.overlay .ov-ttl,#viewCmp.overlay #ovSteps li span{font-size:12.5px!important}
   #viewCmp.overlay #ovTxt,#viewCmp.overlay #ovTxt .ov-say{font-size:12px!important;padding:5px 8px!important;min-height:0!important}
@@ -2761,7 +2780,7 @@ header .btn-cam svg circle:last-child{animation:camDot 2s ease-in-out infinite}
       <dt>Zeitleiste</dt><dd>Eine Leiste für das ganze Video – antippen oder ziehen springt dorthin · + / − (oder Ctrl + Mausrad) zoomt bis auf einzelne Bilder, oben zeigt dann ein feiner Balken, wo du bist · Film-Knopf: Vorschaubilder ein/aus</dd>
       <dt>Marker</dt><dd>Raute-Knopf oder <kbd>m</kbd> setzt einen Marker mit Notiz · <kbd>,</kbd> <kbd>.</kbd> springt zum vorherigen / nächsten</dd>
       <dt>Lupe</dt><dd><kbd>z</kbd>, Pinch oder Ctrl + Mausrad · ziehen = schwenken · Doppelklick = zurück</dd>
-      <dt>Vergleichen</dt><dd>Knopf «Side-by-Side» übernimmt das Video als A in «Side-by-Side» – dann B wählen</dd>
+      <dt>Vergleichen</dt><dd>Oben «Side-by-Side» wählen – das offene Video ist A, dann B wählen</dd>
     </dl></section>
     <section class="hp" data-hp="analyse" hidden><dl>
       <dt>Side-by-Side</dt><dd>A und B wählen, beide zum gleichen Tor ziehen und unter «Werkzeuge» «Gleicher Moment» drücken (<kbd>t</kbd> öffnet die Werkzeuge)</dd>
@@ -3549,28 +3568,38 @@ function vchipPlace(){ // A/B-Chips oben links im Bild: nebeneinander je im eige
   if(ca.parentNode!==ta) ta.appendChild(ca); if(cb.parentNode!==tb||(merged&&ca.nextSibling!==cb)) tb.appendChild(cb); }
 $$('.vchip').forEach(c=>['pointerdown','pointerup','dblclick','wheel','contextmenu','click'].forEach(t=>c.addEventListener(t,e=>e.stopPropagation())));
 function vchipUI(){ [['A',A],['B',B]].forEach(([K,d])=>{ const lab=$('#vc'+K); if(!lab) return; const c=d.clip, o=!!c; /* Beschriftung direkt aus dem Video (nicht aus der Auswahlliste – die kann hinterherhinken) */
-  const m=c&&c.meta, b=!c?'Video wählen':(m&&m.ok&&m.athlete)?m.athlete:dispName(c), sm=c&&m&&m.ok?[m.run,m.cam&&!/^cam\s*1$/i.test(m.cam)?m.cam:''].filter(Boolean).join(' · '):'', tx=c?dispName(c):'';
+  const m=c&&c.meta, b=!c?'Video wählen':(m&&m.ok&&m.athlete)?m.athlete:dispName(c), oc=(d===A?B:A).clip, om=oc&&oc.meta, sm=c&&m&&m.ok?[m.run,m.cam&&om&&om.cam&&om.cam!==m.cam?camLbl(m.cam):''].filter(Boolean).join(' · '):'' /* Kamera nur, wenn A und B verschiedene haben */, tx=c?dispName(c):'';
   if($('b',lab).textContent!==b) $('b',lab).textContent=b; if($('small',lab).textContent!==sm) $('small',lab).textContent=sm;
   lab.parentNode.classList.toggle('empty',!o); $('#vcp'+K).title=o?('Video '+K+': '+(c?dispName(c):tx)+(c&&c.dur?' · '+fmtDur(c.dur):'')+' – klicken zum Wechseln'):'Video '+K+' wählen'; }); }
 /* Videoauswahl als Bottom-Sheet auf Touch-Geräten: breiter, mit Vorschaubild, Gruppen und Dauer (die iOS-Liste ist schmal und bricht Zeilen um) */
-const VP_ON=()=>matchMedia('(pointer:coarse)').matches||matchMedia('(max-width:760px)').matches;
-function vpOpen(sel,title,badge,col){ const cur=sel.value, other=sel.id==='selA'?$('#selB').value:sel.id==='selB'?$('#selA').value:'', ok=sel.id==='selA'?'b':'a';
-  const el=document.createElement('div'); el.className='vp-sheet';
+const VP_ON=()=>true; /* überall die eigene Auswahl: Handy als Blatt von unten, Computer als Klapp-Fenster am Chip */
+const VP_SHEET=()=>matchMedia('(pointer:coarse)').matches||matchMedia('(max-width:760px)').matches;
+function camLbl(c){ return c?String(c).replace(/^cam\s*(\d+)$/i,'Kamera $1').replace(/^kamera\s*/i,'Kamera '):c; } /* CAM1 und Kamera 1 gleich anzeigen */
+function vpOpen(sel,title,badge,col,anchor){ const cur=sel.value, other=sel.id==='selA'?$('#selB').value:sel.id==='selB'?$('#selA').value:'', ok=sel.id==='selA'?'b':'a', pop=!VP_SHEET();
+  const el=document.createElement('div'); el.className='vp-sheet'+(pop?' pop':'');
   const gk=c=>{ const m=c.meta; return m&&m.ok&&(m.place||m.disc)?[[m.place,m.date?m.date.slice(-4):''].filter(Boolean).join(' '),DISC_LONG[m.disc]||m.disc].filter(Boolean).join(' · '):'Weitere Videos'; };
   const ids=new Set([...sel.options].map(o=>o.value).filter(Boolean)), L=clips.filter(c=>ids.has(String(c.id))), G=new Map(); L.forEach(c=>{ const k=gk(c); if(!G.has(k)) G.set(k,[]); G.get(k).push(c); });
-  const row=c=>{ const m=c.meta, nm=m&&m.ok&&m.athlete?m.athlete:dispName(c), sub=m&&m.ok?[m.run,m.cam,m.date].filter(Boolean).join(' · '):(c.dur?fmtDur(c.dur):''), isO=String(c.id)===String(other);
+  const row=c=>{ const m=c.meta, nm=m&&m.ok&&m.athlete?m.athlete:dispName(c), sub=m&&m.ok?[m.run,camLbl(m.cam),m.date].filter(Boolean).join(' · '):(c.dur?fmtDur(c.dur):''), isO=String(c.id)===String(other);
     return `<button class="vp-row${String(c.id)===String(cur)?' cur':''}${isO?' other o'+ok:''}" data-id="${c.id}" data-s="${esc((nm+' '+sub+' '+dispName(c)).toLowerCase())}"><span class="vp-th" style="${c.poster?`background-image:url(${c.poster})`:''}">${c.dur?`<i>${fmtDur(c.dur)}</i>`:''}</span><span class="vp-tx"><b${isO?` data-o="${ok.toUpperCase()}"`:''}>${esc(nm)}</b><small>${esc(sub)}</small></span><span class="vp-ck"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span></button>`; };
   el.innerHTML=`<div class="vp-card" role="dialog" aria-label="${esc(title)}"><div class="vp-grab"></div><div class="vp-hd">${badge?`<span class="badge" style="background:${col}">${badge}</span>`:''}<h4>${esc(title)}</h4><button class="vp-x" aria-label="Schliessen">✕</button></div>`+
     (L.length>6?`<div class="vp-q"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><input type="search" placeholder="Name, Ort, Disziplin …" enterkeyhint="search"></div>`:'')+
     `<div class="vp-list">${[...G].map(([k,a])=>`<div class="vp-grp"><div class="vp-g"><span>${esc(k)}</span><span>${a.length}</span></div>${a.map(row).join('')}</div>`).join('')||'<div class="vp-empty">Noch keine Videos geladen.</div>'}</div></div>`;
-  document.body.appendChild(el); requestAnimationFrame(()=>el.classList.add('on'));
+  document.body.appendChild(el);
+  if(pop){ const card=$('.vp-card',el), r=(anchor||sel.closest('label')||sel).getBoundingClientRect(), w=Math.min(440,innerWidth-24), top=r.bottom+6, room=innerHeight-top-12, up=room<360&&r.top>room;
+    Object.assign(card.style,{left:clamp(r.left,12,innerWidth-w-12)+'px',width:w+'px',maxHeight:(up?r.top-18:room)+'px'}); if(up) card.style.bottom=(innerHeight-r.top+6)+'px'; else card.style.top=top+'px'; }
+  requestAnimationFrame(()=>el.classList.add('on'));
   { const c=$('.vp-row.cur',el); if(c) setTimeout(()=>c.scrollIntoView({block:'center'}),40); }
-  const close=()=>{ el.classList.remove('on'); setTimeout(()=>el.remove(),260); };
+  const close=()=>{ el.classList.remove('on'); document.removeEventListener('keydown',kd,true); setTimeout(()=>el.remove(),pop?120:260); };
+  const kd=e=>{ if(e.key==='Escape'){ e.preventDefault(); e.stopPropagation(); close(); return; } const vis=$$('.vp-row:not([hidden])',el); if(!vis.length) return; let i=vis.indexOf(document.activeElement);
+    if(e.key==='ArrowDown'||e.key==='ArrowUp'){ e.preventDefault(); e.stopPropagation(); i=e.key==='ArrowDown'?Math.min(vis.length-1,i+1):Math.max(0,i<0?0:i-1); vis[i].focus(); vis[i].scrollIntoView({block:'nearest'}); }
+    else if(e.key==='Enter'&&document.activeElement&&document.activeElement.classList.contains('vp-row')){ e.preventDefault(); document.activeElement.click(); }
+    else if(e.key==='Enter'&&document.activeElement&&document.activeElement.matches('.vp-q input')){ e.preventDefault(); vis[0].click(); } };
+  document.addEventListener('keydown',kd,true);
   el.addEventListener('click',e=>{ if(e.target===el||e.target.closest('.vp-x')){ close(); return; } const b=e.target.closest('.vp-row'); if(!b) return; close(); if(sel.value!==b.dataset.id){ sel.value=b.dataset.id; sel.dispatchEvent(new Event('change',{bubbles:true})); } });
-  const q=$('.vp-q input',el); if(q) q.addEventListener('input',()=>{ const t=q.value.trim().toLowerCase(); $$('.vp-row',el).forEach(r=>r.hidden=!!t&&!r.dataset.s.includes(t)); $$('.vp-grp',el).forEach(g=>g.hidden=!$$('.vp-row:not([hidden])',g).length); });
+  const q=$('.vp-q input',el); if(q&&pop) setTimeout(()=>q.focus(),30); if(q) q.addEventListener('input',()=>{ const t=q.value.trim().toLowerCase(); $$('.vp-row',el).forEach(r=>r.hidden=!!t&&!r.dataset.s.includes(t)); $$('.vp-grp',el).forEach(g=>g.hidden=!$$('.vp-row:not([hidden])',g).length); });
   /* nach unten wischen schliesst */ { const card=$('.vp-card',el), list=$('.vp-list',el); let y0=null; card.addEventListener('touchstart',e=>{ y0=list.scrollTop<=0||!list.contains(e.target)?e.touches[0].clientY:null; },{passive:true}); card.addEventListener('touchmove',e=>{ if(y0==null) return; const d=e.touches[0].clientY-y0; if(d>0){ card.style.transition='none'; card.style.transform=`translateY(${d}px)`; } },{passive:true}); card.addEventListener('touchend',e=>{ if(y0==null) return; const d=e.changedTouches[0].clientY-y0; card.style.transition=''; card.style.transform=''; if(d>90) close(); y0=null; }); } }
 [['#selA','Video A wählen','A','var(--a,#3e8bff)'],['#selB','Video B wählen','B','var(--b,#f08a3c)'],['#gpsVideo','Video wählen','','']].forEach(([id,t,bd,col])=>{ const sel=$(id); if(!sel) return; const host=sel.closest('label')||sel.parentNode;
-  const go=e=>{ if(!VP_ON()||sel.disabled) return; e.preventDefault(); e.stopPropagation(); if(e.type==='click'||e.type==='touchend') vpOpen(sel,t,bd,col); };
+  const go=e=>{ if(!VP_ON()||sel.disabled) return; e.preventDefault(); e.stopPropagation(); if((e.type==='click'||e.type==='touchend')&&!$('.vp-sheet')) vpOpen(sel,t,bd,col,sel.closest('.vchip')||host); };
   sel.addEventListener('mousedown',go,true); sel.addEventListener('touchend',go,{capture:true,passive:false}); sel.addEventListener('click',go,true); host.addEventListener('click',e=>{ if(e.target===sel) return; go(e); },true);
   sel.addEventListener('keydown',e=>{ if(VP_ON()&&(e.key===' '||e.key==='Enter')){ e.preventDefault(); vpOpen(sel,t,bd,col); } }); });
 $('#selA').addEventListener('change',e=>{ A.setClip(clips.find(c=>c.id==e.target.value)||null); unlink(); renderLib(); });
@@ -3594,7 +3623,7 @@ function updSync(){
   const diff=dB-dA; // positiv: B braucht länger bis zur gleichen Position? Anzeige: Zeit seit Sync
   el.innerHTML='Verknüpft · seit gleichem Moment <span class="dchip">'+(dA>=0?'+':'−')+Math.abs(dA).toFixed(3)+' s</span> · Versatz B <span class="dchip">'+(G.off>=0?'+':'−')+Math.abs(G.off).toFixed(3)+' s</span> · B allein nachführen: <kbd>Alt</kbd>+<kbd>←</kbd><kbd>→</kbd>';
 }
-function doSync(){ if(!A.ready||!B.ready){ toast('Zuerst Video A und B wählen.'); return; } A.pause(); B.pause(); G.off=B.time()-A.time(); G.syncA=A.time(); G.linked=true; linkBtn(); updSync(); toast('Gleicher Moment gesetzt: A F '+A.frame+' ↔ B F '+B.frame); ghostUI(); }
+function doSync(){ if(!A.ready||!B.ready){ toast('Zuerst Video A und B wählen.'); return; } A.pause(); B.pause(); G.off=B.time()-A.time(); G.syncA=A.time(); G.linked=true; linkBtn(); updSync(); toast('Gleicher Moment gesetzt – A '+A.time().toFixed(2)+' s ↔ B '+B.time().toFixed(2)+' s',1800); ghostUI(); }
 function unlink(){ G.linked=false; G.playing=false; linkBtn(); updSync(); if(typeof ghostUI==='function') ghostUI(); }
 $('#btnSync').addEventListener('click',()=>{ if(G.linked) unlink(); else doSync(); });
 $('#btnLink').addEventListener('click',()=>{ if(G.linked) unlink(); else doSync(); });
@@ -3680,6 +3709,7 @@ $$('.dock [data-act], .cmp-tools [data-act]').forEach(b=>b.addEventListener('cli
 /* Modus */
 function setMode(m){
   if(window.mMenuClose) mMenuClose(); const gm=$('#gvMenu'); if(gm) gm.remove(); setTimeout(()=>window.pfsAutoCheck&&pfsAutoCheck(),50); /* quer: neue Ansicht wieder im Vollbild */
+  if(m==='cmp'&&mode==='single'&&S.clip&&!A.clip&&typeof A!=='undefined'){ const c=S.clip, t=S.time(); A.setClip(c); let n=0; const w=setInterval(()=>{ if(A.clip!==c||++n>50){ clearInterval(w); return; } if(A.ready){ clearInterval(w); A.seekTime(t); } },100); } /* vom Einzelvideo: das offene Video wird A */
   mode=m; document.body.classList.toggle('m-cmp',m==='cmp'); document.body.classList.toggle('m-single',m==='single');
   tabsUI();
   $('#viewSingle').hidden=m!=='single'; $('#viewCmp').hidden=m!=='cmp'; $('#viewGps').hidden=m!=='gps';
@@ -4414,7 +4444,7 @@ function ovUI(){ vchipPlace();
     acts=ovBtn('cancel','Abbrechen'); }
   else if(OV.nameQ&&OV.nameQ.length){ const it=OV.nameQ[0]; ttl='Namen'; say=`Im Bild auf <b>${it.n}</b> tippen`; acts=ovBtn('nameskip','Überspringen','','ghost')+ovBtn('namedone','Fertig',OVI.ok,'pri'); }
   else if(OV.fix&&!done){ ttl='Übereinanderlegen'; say='B auf A schieben '+FI; tip='Im Bild ziehen = verschieben. '+HT+' Das Overlay beginnt an diesem Bild. Ohne Schieben: «Automatisch» – die App legt B selbst über A.';
-    acts=ovBtn('edit','Zurück',OVI.back,'ghost','Gleichen Moment neu wählen')+ovMore([['pick','Referenzpunkte antippen',OVI.pin],['fixreset','Auf 0 setzen',OVI.reset]])+ovBtn('automk','Automatisch','','ghost','Ohne Schieben – B selbst über A legen und rechnen')+ovBtn('mkhand','Overlay erstellen',OVI.go,'pri','Mit dieser Lage rechnen – B folgt danach der Kamera'); }
+    acts=ovBtn('edit','Zurück',OVI.back,'ghost','Gleichen Moment neu wählen')+ovMore([matchMedia('(max-width:760px)').matches?['automk','Automatisch übereinanderlegen',OVI.go]:null,['pick','Referenzpunkte antippen',OVI.pin],['fixreset','Auf 0 setzen',OVI.reset]])+(matchMedia('(max-width:760px)').matches?'':ovBtn('automk','Automatisch','','ghost','Ohne Schieben – B selbst über A legen und rechnen'))+ovBtn('mkhand','Overlay erstellen',OVI.go,'pri','Mit dieser Lage rechnen – B folgt danach der Kamera'); }
   else if(OV.fix){ const near=OV.K.some(k=>Math.abs(k.e-ovE())<0.15); ttl='Korrigieren'; say='B auf die Tore ziehen '+FI; tip='Ab diesem Bild wird mit deiner Lage neu gerechnet – davor bleibt alles. '+HT;
     acts=(near?ovBtn('fixdel','Korrektur löschen',OVI.trash,'ghost'):'')+ovBtn('fixreset','Auf 0',OVI.reset,'ghost','Handkorrektur zurücksetzen')+ovBtn('fixno','Abbrechen','','ghost')+ovBtn('fixok','Übernehmen & ab hier neu rechnen',OVI.ok,'pri','Ab diesem Bild wird mit deiner Lage neu berechnet – davor bleibt alles'); }
   else if(st===1&&OV.found&&!AS.busy){ const F=OV.found, o=F.r.off; ttl='Gleicher Moment';
@@ -4443,6 +4473,7 @@ function ovUI(){ vchipPlace();
   OV.bubH=`<b>${ttl}</b> · ${say.replace(FI,'')}`+(tip?`<span class="ob-tip">${tip}</span>`:'');
   const tx=$('#ovTxt'), ac=$('#ovActs'); let ch=false; if(tx._h!==t){ tx.innerHTML=t; tx._h=t; tx.removeAttribute('title'); tx.classList.toggle('has-tip',!!tip); ch=true; } if(ac._h!==acts){ ac.innerHTML=acts; ac._h=acts; ch=true; }
   if(ch){ ovFit(); if(!$('#ovBub').hidden) ovBub(true); }
+  requestAnimationFrame(()=>{ $$('#ovActs .ov-menu').forEach(m=>{ m.style.transform=''; const r=m.getBoundingClientRect(); if(r.left<8) m.style.transform=`translateX(${Math.round(8-r.left)}px)`; else if(r.right>innerWidth-8) m.style.transform=`translateX(${Math.round(innerWidth-8-r.right)}px)`; }); }); /* Menüs nie über den Rand */
   const pr=$('#ovProg'); pr.hidden=!busy; if(busy){ const w=($('#ghostBar .gprog i')||{style:{}}).style.width||'0%'; $('i',pr).style.width=w; }
   ovApplyCut(); ovMarks();
 }
@@ -5811,7 +5842,7 @@ function parseName(n){
     if(!m.run&&/^(L|R|RUN|LAUF|T|TR)\d{1,2}$/.test(u)){ m.run=(u.startsWith('T')?'Training ':'Lauf ')+u.match(/\d+/)[0]; continue; }
     if(/^(WC|EC|COC|FIS|NJR|NC)$/.test(u)){ m.level=u==='WC'?'Weltcup':u==='EC'?'Europacup':u; continue; }
     if(!m.cam&&/^V\d{1,2}$/.test(u)){ m.cam='Kamera '+u.slice(1); continue; }
-    if(!m.cam&&/^(VGH|GH|CAMGH|GEGENHANG|VZ|VS|VST|VZI|VPI|PISTE|CAM\d*|CAM[A-Z]{1,3}|POS\d+)$/.test(u)){ m.cam=/^(VGH|GH|CAMGH|GEGENHANG)$/.test(u)?'Gegenhang':/^(VZ|VZI)$/.test(u)?'Ziel':/^(VS|VST)$/.test(u)?'Start':/^(VPI|PISTE)$/.test(u)?'Piste':u; continue; }
+    if(!m.cam&&/^(VGH|GH|CAMGH|GEGENHANG|VZ|VS|VST|VZI|VPI|PISTE|CAM\d*|CAM[A-Z]{1,3}|POS\d+)$/.test(u)){ m.cam=/^(VGH|GH|CAMGH|GEGENHANG)$/.test(u)?'Gegenhang':/^(VZ|VZI)$/.test(u)?'Ziel':/^(VS|VST)$/.test(u)?'Start':/^(VPI|PISTE)$/.test(u)?'Piste':/^CAM\d+$/.test(u)?'Kamera '+(+u.slice(3)):u; continue; } /* CAM1 → Kamera 1 (einheitlich) */
     if(/^(BEISPIEL|GHOST|VIDEO|CLIP|KAMERA|FIX|FPS|LAUF)$/.test(u)) continue;
     if(/^[A-Za-zÄÖÜäöüéèàçñ]{2,}(-[A-Za-zÄÖÜäöüéèàçñ]{2,})*$/.test(t)) rest.push(t);
   }
@@ -6909,7 +6940,7 @@ if(false&&!LS.get('hint1',0)){ setTimeout(()=>{ toast(matchMedia('(pointer:coars
 
 /* Update-Hinweis: prüft version.json auf GitHub Pages; «Aktualisieren» lädt die Seite ohne Cache neu */
 (()=>{
-  const BUILD='20261101092133'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
+  const BUILD='20261101094000'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
   // nach einem Update die ?v=… aus der Adresse entfernen
   try{ const u=new URL(location.href); if(u.searchParams.has('v')){ u.searchParams.delete('v'); history.replaceState(null,'',u.pathname+(u.search||'')+u.hash); } }catch(e){}
   const el=$('#upd'); let latest=null, snoozed=null, busy=false;
