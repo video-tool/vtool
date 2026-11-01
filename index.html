@@ -4483,7 +4483,7 @@ class FrameSrc{
   at(t){ /* Aufrufe nacheinander abarbeiten (ein Decoder, eine Position) */ const run=()=>this._atSafe(t); const p=(this.q||Promise.resolve()).then(run,run); this.q=p.catch(()=>{}); return p; }
   async _atSafe(t){ if(!this.fast) return this._at(t); let to; const lim=new Promise(r=>{ to=setTimeout(()=>r('zeit'),this.first?6000:3500); }); /* Zeitlimit: hängt der Decoder (z. B. iOS), auf <video> umschalten */
     const r=await Promise.race([this._at(t).then(x=>({x}),e=>({e})),lim]); clearTimeout(to); this.first=true;
-    if(r==='zeit'||r.e){ console.warn('FrameSrc: Decoder → <video>',r==='zeit'?'Zeitlimit':r.e); this.dead=true; FrameSrc.off=FrameSrc.off||r==='zeit'; await this._slow(); await seekV(this.v,t); return this.v; }
+    if(r==='zeit'||r.e){ console.warn('FrameSrc: Decoder → <video>',r==='zeit'?'Zeitlimit':r.e); this.dead=true; if(r==='zeit') FrameSrc.offN=(FrameSrc.offN||0)+1; FrameSrc.off=FrameSrc.off||FrameSrc.offN>=2; /* erst nach zwei Hängern ganz abschalten (am Mac reicht ein kurzer Stau sonst für die ganze Sitzung) */ await this._slow(); await seekV(this.v,t); return this.v; }
     return r.x; }
   async _at(t){ if(!this.fast){ await seekV(this.v,t); return this.v; }
     try{ const S=this.T.S, i=this._idx(t), ts=S[i].ts; this.want=ts; let fr=this.cache.get(ts); if(fr) return this._hold(fr);
@@ -6466,7 +6466,7 @@ async function startExport(){ EXP.tw0=performance.now(); $('#expProg').hidden=fa
 /* Export über den Decoder: jedes Bild wird direkt aus der Datei gelesen (FrameSrc) – kein Abspielen, kein verpasstes Bild, schneller als Echtzeit */
 async function startExportDec(o){ const {ds,D,r,opt,cv,x,wcCfg,ovl,W,H,bar,ws,gap}=o;
   let srcs; try{ srcs=await Promise.all(ds.map(d=>FrameSrc.open(d.clip))); }catch(e){ return false; }
-  if(srcs.some(s=>!s.fast)){ srcs.forEach(s=>s.close()); return false; }
+  /* auch ohne schnellen Decoder Bild für Bild (dann wird pro Bild gespult) – langsamer, aber nie ausgelassene Bilder wie beim Abspiel-Export */
   ds.forEach(d=>d.pause()); G.playing=false; const prevRate=D.rate, prevLoop=S.useLoop; S.useLoop=false; EXP.prevLov=[A.loopOv,B.loopOv]; A.loopOv=null; B.loopOv=null;
   const muxer=new Mp4Muxer.Muxer({target:new Mp4Muxer.ArrayBufferTarget(),video:{codec:'avc',width:cv.width,height:cv.height},fastStart:'in-memory',firstTimestampBehavior:'offset'});
   const enc=new VideoEncoder({output:(ch,meta)=>{ try{ muxer.addVideoChunk(ch,meta); }catch(e){ EXP.wcErr=e; } },error:e=>{ EXP.wcErr=e; }}); enc.configure(wcCfg);
@@ -7399,7 +7399,7 @@ if(false&&!LS.get('hint1',0)){ setTimeout(()=>{ toast(matchMedia('(pointer:coars
 
 /* Update-Hinweis: prüft version.json auf GitHub Pages; «Aktualisieren» lädt die Seite ohne Cache neu */
 (()=>{
-  const BUILD='20261101191854'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
+  const BUILD='20261101201706'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
   // nach einem Update die ?v=… aus der Adresse entfernen
   try{ const u=new URL(location.href); if(u.searchParams.has('v')){ u.searchParams.delete('v'); history.replaceState(null,'',u.pathname+(u.search||'')+u.hash); } }catch(e){}
   const el=$('#upd'); let latest=null, snoozed=null, busy=false;
