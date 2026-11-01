@@ -4,6 +4,170 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
 <title>Video-Lab Field</title>
+<!--GATE_HEAD-->
+<script>(function(){var d=document.documentElement;try{if(JSON.parse(localStorage.getItem('vlab:theme')||'"light"')==='dark')d.dataset.theme='dark';var s=JSON.parse(localStorage.getItem('vlab:auth')||'null');if(!(s&&s.e&&s.exp>Date.now()))d.classList.add('vgate');}catch(e){d.classList.add('vgate');}})();</script>
+<style id="gateCss">
+#gate{display:none;position:fixed;inset:0;z-index:2147483000;overflow:hidden;text-align:left}
+html.vgate #gate{display:block}
+html.vgate,html.vgate body{overflow:hidden!important}
+html.vgate-out #gate{opacity:0;transform:scale(1.015);transition:opacity .4s var(--ease),transform .4s var(--ease)}
+#gate .g-go[disabled]{cursor:progress;opacity:.92}
+#gate .g-go .g-spin{display:none;width:18px;height:18px;border-radius:50%;border:2.4px solid rgba(255,255,255,.35);border-top-color:#fff;animation:gspin .8s linear infinite}
+#gate .g-go.busy .g-spin{display:block}
+#gate .g-go.busy svg{display:none}
+#gate .g-go.ok{background:var(--good)}
+@keyframes gspin{to{transform:rotate(360deg)}}
+@media (max-width:900px){ html.vgate #gate{overflow:auto} }
+#gate{--red:#DA291C;--red-d:#B11E14;--red-soft:rgba(218,41,28,.10);--a:#2f6fd0;--b:#e67e22;--good:#1f9d6b;
+--font:"Geist",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;--mono:"Geist Mono",ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+--bg:#eef1f6;--card:#ffffff;--ink:#0d1014;--ink2:#3b424d;--muted:#6c737f;--line:#e3e6eb;--line2:#cfd4db;--field:#f6f7f9;--hover:#eef0f3;
+--stage:#0f1216;--stage2:#171b21;--tile:rgba(255,255,255,.7);--tile-line:rgba(13,16,20,.06);
+--shadow:0 1px 2px rgba(13,16,20,.05),0 24px 60px -24px rgba(25,35,60,.28);--ease:cubic-bezier(.22,1,.36,1);--spring:cubic-bezier(.34,1.56,.64,1);color-scheme:light}
+:root[data-theme="dark"] #gate{--red-soft:rgba(218,41,28,.22);--a:#3ea6dc;--b:#f08a3c;--good:#3cc48a;--bg:#0b0e12;--card:#13161b;--ink:#eef1f5;--ink2:#c7cdd6;--muted:#8b929d;--line:#232831;--line2:#323944;--field:#1a1e24;--hover:#20252d;
+--tile:rgba(255,255,255,.035);--tile-line:rgba(255,255,255,.06);--shadow:0 1px 2px rgba(0,0,0,.4),0 24px 60px -20px rgba(0,0,0,.75);color-scheme:dark}
+#gate *{box-sizing:border-box;margin:0}
+#gate,
+#gate{font-family:var(--font);background:var(--bg);color:var(--ink);font-size:14px;letter-spacing:-.005em;-webkit-font-smoothing:antialiased;overflow:hidden;
+padding:env(safe-area-inset-top,0px) env(safe-area-inset-right,0px) env(safe-area-inset-bottom,0px) env(safe-area-inset-left,0px)}
+#gate button,#gate input{font:inherit;color:inherit}
+#gate svg{display:block}
+#gate .g-bgfx{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:0}
+#gate .g-bgfx i{position:absolute;border-radius:50%;filter:blur(80px);opacity:.5}
+#gate .g-bgfx i:nth-child(1){width:520px;height:520px;background:#ff5a4a;top:-220px;right:-120px;opacity:.28}
+#gate .g-bgfx i:nth-child(2){width:460px;height:460px;background:#5b8def;bottom:-240px;left:-140px;opacity:.22}
+:root[data-theme="dark"] #gate .g-bgfx i{opacity:.16}
+#gate .g-page{position:relative;z-index:1;height:100%;max-width:1240px;margin:0 auto;padding:0 28px 22px;display:grid;grid-template-rows:auto 1fr auto}
+#gate .g-top{display:flex;align-items:center;gap:12px;height:68px}
+#gate .g-brand{display:flex;align-items:center;gap:10px}
+#gate .g-logo{width:34px;height:34px;border-radius:10px;box-shadow:0 6px 16px -6px rgba(218,41,28,.6)}
+#gate .g-brand-txt{display:flex;flex-direction:column;gap:4px;line-height:1}
+#gate .ss-word{height:15px;width:auto}
+#gate .g-brand-sub{font-size:8.5px;letter-spacing:.14em;color:var(--muted);font-weight:700;text-transform:uppercase}
+#gate .g-sp{flex:1}
+#gate .g-chip{display:inline-flex;align-items:center;gap:6px;height:28px;padding:0 11px;border-radius:999px;font-size:12px;font-weight:550;color:var(--muted);border:1px solid var(--line)}
+#gate .g-chip svg{width:13px;height:13px}
+#gate .g-ico{width:36px;height:36px;border-radius:10px;border:1px solid var(--line);background:var(--card);display:grid;place-items:center;cursor:pointer;color:var(--ink2);transition:.15s}
+#gate .g-ico:hover{background:var(--hover)}
+#gate .g-ico svg{width:17px;height:17px}
+#gate .g-main{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(360px,420px);gap:56px;align-items:center;min-height:0}
+#gate .g-eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--red)}
+#gate .g-eyebrow::before{content:"";width:18px;height:2px;border-radius:2px;background:var(--red)}
+#gate h1{font-size:clamp(34px,4.1vw,52px);line-height:1.02;font-weight:700;letter-spacing:-.035em;margin:14px 0 14px}
+#gate h1 em{font-style:normal;color:var(--red)}
+#gate .g-lead{font-size:16px;line-height:1.5;color:var(--ink2);max-width:520px}
+#gate .g-feats{list-style:none;padding:0;margin-top:28px;display:grid;grid-template-columns:1fr 1fr;gap:10px}
+#gate .g-feat{display:flex;gap:12px;align-items:flex-start;padding:12px 14px;border-radius:14px;background:var(--tile);border:1px solid var(--tile-line);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+#gate .g-fi{flex:none;width:34px;height:34px;border-radius:10px;display:grid;place-items:center;background:var(--red-soft);color:var(--red)}
+#gate .g-fi svg{width:18px;height:18px}
+#gate .g-feat b{display:block;font-size:13.5px;font-weight:650;letter-spacing:-.01em}
+#gate .g-feat span{display:block;font-size:12.5px;color:var(--muted);line-height:1.35;margin-top:2px}
+#gate .g-feat.g-loc{grid-column:1/-1}
+#gate .g-feat.g-loc .g-fi{background:color-mix(in srgb,var(--good) 14%,transparent);color:var(--good)}
+#gate .g-card{background:var(--card);border:1px solid var(--line);border-radius:24px;box-shadow:var(--shadow);overflow:hidden}
+#gate .g-stage{position:relative;height:224px;background:#0f1216;overflow:hidden}
+#gate .g-stage svg.g-run{position:absolute;left:0;top:0;width:100%;height:calc(100% - 44px)}
+#gate .g-pill{display:inline-flex;align-items:center;gap:6px;height:22px;padding:0 8px;border-radius:999px;background:rgba(13,17,22,.62);border:1px solid rgba(255,255,255,.14);color:#fff;font-size:11px;font-weight:600;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+#gate .g-pill i{width:8px;height:8px;border-radius:50%}
+#gate .g-st-top{position:absolute;left:12px;top:10px;display:flex;gap:5px}
+#gate .g-st-rec{position:absolute;right:12px;top:10px;display:inline-flex;align-items:center;gap:6px;height:22px;padding:0 9px;border-radius:999px;background:rgba(13,17,22,.62);color:#fff;font-family:var(--mono);font-size:10.5px;font-weight:600}
+#gate .g-ctl{position:absolute;left:0;right:0;bottom:0;height:44px;display:flex;align-items:center;gap:10px;padding:0 14px;background:#11151b;border-top:1px solid rgba(255,255,255,.06);color:#e9edf2}
+#gate .g-ctl .g-pp{width:16px;height:16px;flex:none}
+#gate .g-spd{font-family:var(--mono);font-size:10.5px;font-weight:600;padding:2px 7px;border-radius:6px;background:rgba(255,255,255,.08)}
+#gate .g-tl{position:relative;flex:1;height:22px}
+#gate .g-tk{position:absolute;left:0;right:0;top:7px;height:8px;background:repeating-linear-gradient(90deg,rgba(255,255,255,.28) 0 1px,transparent 1px 6px);border-radius:2px;-webkit-mask:linear-gradient(90deg,#000,#000);}
+#gate .g-tl::before{content:"";position:absolute;left:0;right:0;top:10px;height:2px;background:rgba(255,255,255,.12);border-radius:2px}
+#gate .g-mk{position:absolute;top:2px;width:4px;height:4px;border-radius:50%;transform:translateX(-50%)}
+#gate .g-ph{position:absolute;top:0;bottom:0;left:64%;width:2px;margin-left:-1px;background:var(--red);border-radius:2px;box-shadow:0 0 0 3px rgba(218,41,28,.2);animation:gscrub 3.4s var(--ease) .2s both}
+#gate .g-ph::before{content:"";position:absolute;left:-4px;top:-3px;width:10px;height:6px;border-radius:2px;background:var(--red)}
+#gate .g-tcd{font-family:var(--mono);font-size:11px;color:rgba(233,237,242,.75)}
+#gate .g-sf{animation:gpop .5s var(--spring) var(--d,0s) both}
+#gate use.g-sf{animation-name:gfadein}
+@keyframes gfadein{from{opacity:0}}
+@keyframes gscrub{from{left:8%}to{left:64%}}
+@keyframes gblink{50%{opacity:.25}}
+#gate .g-form{padding:22px 24px 22px}
+#gate .g-form h2{font-size:20px;font-weight:650;letter-spacing:-.02em}
+#gate .g-form p.g-sub{font-size:13px;color:var(--muted);margin-top:4px}
+#gate .g-fld{position:relative;margin-top:14px}
+#gate .g-fld input{width:100%;height:48px;border-radius:12px;border:1px solid var(--line2);background:var(--field);padding:16px 44px 0 42px;font-size:16px;outline:none;transition:border-color .15s,box-shadow .15s}
+#gate .g-fld label{position:absolute;left:42px;top:15px;font-size:15px;color:var(--muted);pointer-events:none;transition:.15s var(--ease)}
+#gate .g-fld input:focus{border-color:var(--red);box-shadow:0 0 0 4px var(--red-soft);background:var(--card)}
+#gate .g-fld input:focus+label,#gate .g-fld input:not(:placeholder-shown)+label{top:7px;font-size:11px;font-weight:550}
+#gate .g-fld>svg{position:absolute;left:14px;top:15px;width:18px;height:18px;color:var(--muted)}
+#gate .g-eye{position:absolute;right:6px;top:6px;width:36px;height:36px;border:0;background:none;border-radius:9px;display:grid;place-items:center;color:var(--muted);cursor:pointer}
+#gate .g-eye:hover{background:var(--hover)}
+#gate .g-eye svg{width:18px;height:18px}
+#gate .g-go{margin-top:16px;width:100%;height:50px;border:0;border-radius:13px;background:var(--red);color:#fff;font-size:15px;font-weight:650;display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;box-shadow:0 10px 24px -10px rgba(218,41,28,.75);transition:transform .2s var(--spring),background .15s}
+#gate .g-go:hover{background:var(--red-d)}
+#gate .g-go:active{transform:scale(.98)}
+#gate .g-go svg{width:18px;height:18px;transition:transform .2s var(--ease)}
+#gate .g-go:hover svg{transform:translateX(3px)}
+#gate .g-err{display:none;margin-top:12px;font-size:13px;color:var(--red);font-weight:550}
+#gate .g-err.on{display:block}
+#gate .g-hint{display:flex;gap:8px;align-items:flex-start;margin-top:14px;font-size:12px;line-height:1.4;color:var(--muted)}
+#gate .g-hint svg{flex:none;width:14px;height:14px;margin-top:1px}
+#gate .g-foot{display:flex;justify-content:space-between;align-items:center;font-size:11.5px;color:var(--muted);padding-top:10px}
+#gate .g-foot b{font-weight:600;color:var(--ink2)}
+@media (min-width:901px) and (max-height:760px){#gate .g-top{height:58px}
+#gate h1{font-size:40px;margin:10px 0}
+#gate .g-lead{font-size:15px}
+#gate .g-feats{margin-top:18px;gap:8px}
+#gate .g-feat{padding:10px 12px}
+#gate .g-form{padding:18px 22px}
+#gate .g-fld{margin-top:10px}
+#gate .g-go{margin-top:12px}
+
+}
+@media (max-width:900px){#gate{overflow:auto}
+#gate .g-page{padding:0 16px 12px;height:100%;min-height:100%;grid-template-rows:auto auto 1fr auto}
+#gate .g-top{height:56px}
+#gate .g-chip{display:none}
+#gate .g-main{grid-template-columns:1fr;gap:16px;align-content:start;padding-top:2px}
+#gate .g-eyebrow{font-size:10.5px}
+#gate h1{font-size:28px;margin:8px 0 6px}
+#gate .g-lead{display:none}
+#gate .g-feats{margin-top:12px;display:flex;flex-wrap:wrap;gap:6px}
+#gate .g-feat{padding:0 10px 0 4px;height:32px;align-items:center;gap:6px;border-radius:999px;backdrop-filter:none;-webkit-backdrop-filter:none}
+#gate .g-feat.g-loc{grid-column:auto}
+#gate .g-fi{width:24px;height:24px;border-radius:50%;background:none}
+#gate .g-fi svg{width:15px;height:15px}
+#gate .g-feat b{font-size:12.5px;font-weight:600;white-space:nowrap}
+#gate .g-feat span{display:none}
+#gate .g-card{border-radius:22px}
+#gate .g-stage{height:92px}
+#gate .g-stage{height:128px}
+#gate .g-st-rec,#gate .g-spd{display:none}
+#gate .g-form{padding:16px 16px 16px}
+#gate .g-form h2{font-size:18px}
+#gate .g-fld{margin-top:10px}
+#gate .g-go{margin-top:14px}
+#gate .g-hint{margin-top:10px}
+#gate .g-foot{padding-top:12px;font-size:11px}
+#gate .g-foot .g-fr{display:none}
+
+}
+@media (max-width:900px){#gate .g-feat.g-loc .g-fi{background:none}
+ }
+@media (max-width:900px) and (max-height:700px){#gate .g-stage{display:none}
+#gate h1{font-size:25px}
+ }
+@media (max-width:900px) and (max-height:600px){#gate .g-top{height:50px}
+#gate .g-eyebrow{display:none}
+#gate h1{margin-top:0}
+#gate .g-feats{margin-top:8px;gap:5px}
+#gate .g-feat{height:28px}
+#gate .g-form p.g-sub{display:none}
+#gate .g-main{gap:12px}
+#gate .g-hint{display:none}
+ }
+@media (prefers-reduced-motion:reduce){#gate *{transition:none!important;animation:none!important}}
+@keyframes gpop{from{opacity:0;transform:translateY(4px)}}
+#gate .g-ln{stroke-dasharray:var(--l);stroke-dashoffset:var(--l);animation:gdraw 2s var(--ease) var(--dl,.3s) forwards}
+@keyframes gdraw{to{stroke-dashoffset:0}}
+
+
+</style>
+
 <meta name="description" content="Filmen, Zeitlupe, Side-by-Side – direkt am Hang. Videos bleiben auf dem Handy.">
 <meta name="theme-color" content="#0b0e13">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -336,6 +500,166 @@ svg{display:block}
 </style>
 </head>
 <body>
+<!--GATE_BODY-->
+<div id="gate" role="dialog" aria-modal="true" aria-label="Video-Lab Anmeldung">
+<div class="g-bgfx" aria-hidden="true"><i></i><i></i></div>
+<div class="g-page">
+  <div class="g-top">
+    <div class="g-brand">
+      <svg class="g-logo" viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="15" fill="#DA291C"/><rect x="11" y="13" width="30" height="21" rx="4" fill="#fff" opacity=".28"/><rect x="16" y="19" width="30" height="21" rx="4" fill="#fff" opacity=".55"/><rect x="22" y="26" width="31" height="23" rx="4.5" fill="#fff"/><path d="M33 31v14" stroke="#DA291C" stroke-width="2.6" stroke-linecap="round"/><path d="M34.3 31.6l9 4-9 4z" fill="#DA291C"/></svg>
+      <div class="g-brand-txt"><svg class="ss-word" viewBox="-0.9 -0.9 136.7 31.7" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Swiss-Ski"><g fill="#e3001b" fill-rule="nonzero"><path d="M 45.167373,4.5035962 44.854261,4.3440205 44.541148,4.2644718 44.306373,4.0253475 44.071676,3.7863028 43.915237,3.4673906 43.758563,3.1484785 l 0,-0.3984609 0.07834,-0.4782488 0.07834,-0.5579568 0.234775,-0.4782487 0.313034,-0.39870004 0.391215,-0.31867306 0.469551,-0.23912436 0.469551,-0.15957566 0.547809,-0.0795487 0.313112,0 0.391215,0.0795487 0.313112,0.15957566 0.234775,0.23912436 0.234776,0.23912436 0.15636,0.31891214 0.07841,0.3186731 0,0.3189122 0,0.5579568 -0.156751,0.5580366 -0.234698,0.4782487 -0.312877,0.3984609 -0.391449,0.3188325 -0.391214,0.2391243 -0.54781,0.1593366 -0.469551,0.079788 -0.391214,0 z"/><path d="m 38.515322,29.531786 4.304139,-20.5645355 3.443374,0 -4.304139,20.5645355 -3.443374,0 z"/><path d="m 28.106824,29.531786 -0.782428,-13.390884 -0.156674,-2.311616 0,-1.753578 -0.782585,1.833366 -1.095541,2.311615 -6.495534,13.311097 -2.347676,0 -0.313112,-20.5645355 2.347911,0 -0.07834,12.8328475 -0.07834,4.463655 0.860922,-1.992703 1.173878,-2.391164 6.260601,-12.9126355 2.504272,0 0.704327,12.9126355 0.07834,2.470952 0.07834,1.833366 0.704326,-1.833366 1.017361,-2.55074 5.477938,-12.8328475 2.347912,0 -8.999885,20.5645355 -2.426013,0 z"/><path d="m 5.4119377,29.850699 -0.7826633,0 L 3.8469242,29.770911 3.1423629,29.611575 2.4381147,29.37245 1.7337882,28.974069 1.1077985,28.575369 0.5599107,28.017333 0.0903597,27.379747 0.0121012,27.22049 l 1.0956973,-1.036285 0.1564387,0.239125 0.3131123,0.558036 0.3912142,0.478169 0.469551,0.318673 0.5478095,0.318912 0.5478878,0.239125 0.6259897,0.07979 0.5478095,0.07979 0.7043265,0.07955 0.8609218,-0.07955 0.8607652,-0.239363 0.8609218,-0.318673 0.7043265,-0.558037 0.5476529,-0.557957 0.3131123,-0.39846 0.1565953,-0.3987 0.1564387,-0.398461 0.1565168,-0.398382 0.07826,-0.478248 0,-0.558037 -0.07826,-0.797081 L 9.8726722,22.677048 9.5596382,22.039224 9.168424,21.481506 8.6205362,20.923469 7.9945465,20.365433 6.6640737,19.329227 5.3336009,18.292942 4.785948,17.655357 4.2380602,17.0974 3.7685875,16.380027 3.3771384,15.662654 3.2206997,14.865572 3.064261,13.909075 3.142363,13.351118 3.2207,12.793321 3.3771387,12.235284 3.6119142,11.677248 3.8469245,11.199079 4.159802,10.800618 4.5511728,10.401918 4.942387,10.003457 5.3336012,9.6845446 5.803387,9.3657122 6.2728598,9.1265878 6.7424108,8.9672513 7.8379515,8.6483391 l 1.0956973,-0.079788 0.7042482,0 0.704326,0.079788 0.62599,0.1595756 0.704483,0.2391244 0.62599,0.3186731 0.547887,0.3987 0.469551,0.5577178 0.469473,0.558036 0.07834,0.159576 -1.095697,0.956418 -0.07834,-0.239045 -0.312878,-0.478249 -0.39137,-0.3987 -0.469551,-0.318912 -0.469551,-0.318673 -0.469551,-0.159575 -0.54781,-0.159337 -0.5478873,-0.079788 -0.5476529,0 -0.8609218,0.079788 -0.7826633,0.159337 -0.7824284,0.318912 -0.6261463,0.478248 -0.5478878,0.558037 -0.3912142,0.717293 -0.2347755,0.717373 -0.078337,0.478249 0,0.478169 0,0.637825 0.1566736,0.637585 0.2347755,0.557957 0.3912142,0.478248 0.391449,0.478249 0.547653,0.478249 1.1737992,1.036205 1.4869115,1.116073 0.7044831,0.637506 0.6259894,0.717373 0.547888,0.717373 0.391214,0.797081 0.156674,0.478249 0.15636,0.478249 0.07834,0.478169 0,0.558036 -0.07834,0.637825 -0.07826,0.637505 -0.156439,0.558037 -0.234776,0.558036 -0.313112,0.557798 -0.313112,0.478169 -0.391214,0.3987 -0.3912144,0.398461 -0.4697076,0.318912 -0.469551,0.318912 -0.5476529,0.318593 -0.5478878,0.159576 -0.5478095,0.239124 -0.5478878,0.07955 -0.6259897,0.07979 -0.5478095,0 z"/><path d="m 52.366999,29.850699 -1.64335,0 -1.565249,-0.239124 -0.782428,-0.239125 -0.782663,-0.239044 -0.704248,-0.239125 -0.704327,-0.398461 1.799789,-3.905857 0.939102,0.558037 1.01736,0.398381 1.095698,0.318912 0.625989,0.07979 0.547888,0 0.547888,0 0.547653,-0.07979 0.469473,-0.159337 0.469786,-0.239044 0.391214,-0.239125 0.313034,-0.3987 0.156438,-0.478248 0.07834,-0.558037 0,-0.398381 -0.156595,-0.318912 -0.156517,-0.398461 -0.313034,-0.318912 -0.312877,-0.398461 -0.469786,-0.3987 -1.251901,-0.796842 -1.252215,-0.956737 -0.626146,-0.557718 -0.547653,-0.558036 -0.469707,-0.637824 -0.391293,-0.796843 -0.234776,-0.876948 -0.07826,-0.956418 0,-0.717373 0.156674,-0.717373 0.15636,-0.717294 0.234775,-0.637824 0.234776,-0.558036 0.391449,-0.637506 0.391214,-0.478249 0.469473,-0.478248 0.469551,-0.3987 0.626225,-0.3984614 0.625989,-0.3188324 0.704249,-0.3186731 0.704326,-0.2391244 0.782585,-0.1595756 0.861,-0.079788 0.860765,0 1.565249,0.079788 1.408574,0.2391243 0.704327,0.1595757 0.625989,0.2391244 0.704484,0.2391243 0.625989,0.3185934 -1.721687,3.7462818 -0.860765,-0.478169 -0.939259,-0.398461 -1.09554,-0.239124 -1.095698,-0.07979 -0.704326,0.07979 -0.62599,0.07955 -0.469472,0.239364 -0.39145,0.239124 -0.234775,0.318673 -0.234776,0.318833 -0.07834,0.318912 -0.0781,0.398461 0.0781,0.478248 0.23501,0.3987 0.234776,0.398382 0.312877,0.398461 0.860922,0.637824 0.782663,0.558036 1.408575,0.956418 0.704326,0.558037 0.54781,0.637585 0.547731,0.717293 0.391371,0.797161 0.156438,0.398461 0.156674,0.478169 0.0781,0.558037 0,0.558036 0,0.797081 -0.156439,0.797161 -0.234775,0.717373 -0.313112,0.637506 -0.313035,0.637824 -0.469551,0.557798 -0.46955,0.557957 -0.469552,0.478248 -0.625989,0.3987 -0.626147,0.398461 -0.625989,0.318912 -0.704327,0.239045 -0.626146,0.159337 -0.782663,0.159336 -0.704249,0.07979 -0.704326,0 z"/><path d="m 68.175372,29.850699 -1.643585,0 -1.64335,-0.239124 -0.860766,-0.159337 -0.782585,-0.159576 -0.782663,-0.239044 -0.704326,-0.318673 1.878125,-5.021692 0.861,0.478249 1.017361,0.398461 1.017204,0.318912 1.01736,0.07979 0.547888,-0.07979 0.469551,0 0.469551,-0.159336 0.313034,-0.159576 0.313112,-0.159336 0.234776,-0.318913 0.156439,-0.318912 0,-0.398381 0,-0.239124 -0.07834,-0.318913 -0.234776,-0.239124 -0.234775,-0.239124 -0.704248,-0.558037 -1.095541,-0.717293 -1.174034,-0.87671 -0.62599,-0.558036 -0.469551,-0.557957 -0.469472,-0.637585 -0.39145,-0.717374 -0.234775,-0.797081 -0.0781,-0.956497 0.0781,-0.876869 0.07834,-0.797161 0.234775,-0.796842 0.234776,-0.717373 0.391136,-0.637825 0.391449,-0.637505 0.469551,-0.558037 0.547887,-0.478248 0.547575,-0.478249 0.704561,-0.3987002 0.704327,-0.3185933 0.704248,-0.2391244 0.782663,-0.2391244 0.860766,-0.1595756 0.860921,-0.079788 0.860766,0 1.721687,0.079788 1.565248,0.1595756 1.565013,0.3984609 1.486912,0.478169 -1.878126,4.8621154 -0.860765,-0.478248 -0.939259,-0.398461 -1.095462,-0.318833 -1.095776,-0.07955 -0.547809,0.07955 -0.469551,0.07979 -0.391214,0.159257 -0.313113,0.159575 -0.156438,0.239125 -0.234697,0.239124 -0.07834,0.239125 0,0.239124 0.07834,0.398461 0.07826,0.318912 0.234775,0.239045 0.312878,0.318912 0.782663,0.557797 0.860922,0.558037 1.330316,0.876869 0.626146,0.558036 0.547653,0.637586 0.469708,0.637505 0.391292,0.797161 0.234776,0.876949 0.07826,0.478169 0.0781,0.478249 -0.0781,0.956497 -0.156595,0.87663 -0.234775,0.797161 -0.312956,0.797081 -0.391371,0.637824 -0.547888,0.637586 -0.469472,0.557956 -0.62599,0.478249 -0.626225,0.398461 -0.704248,0.3987 -0.782663,0.239124 -0.704327,0.239045 -0.782585,0.239124 -0.860765,0.07955 -0.782585,0.07979 -0.860765,0 z"/><path d="m 112.70442,29.531786 -2.66079,-7.332988 -1.1738,1.673791 0,5.659197 -8.37374,0 0,-28.6949232 8.37374,0 0,14.9055782 3.99103,-7.1738906 9.93898,0 -6.02606,8.5288486 6.1825,12.434387 -10.25186,0 z"/><path d="m 87.505182,29.850699 -1.721687,0 -1.721687,-0.159337 -1.721687,-0.239124 -1.64335,-0.39862 1.017125,-5.659197 1.017361,0.398381 1.174112,0.239125 1.095463,0.239124 1.173877,0.07979 0.469473,-0.07979 0.391449,0 0.312877,-0.159337 0.313113,-0.159336 0.234775,-0.159576 0.156674,-0.159336 0.0781,-0.239045 0.07834,-0.318912 -0.07834,-0.318673 -0.0781,-0.239125 -0.156674,-0.239363 -0.234775,-0.159337 -0.547888,-0.318912 -0.547575,-0.159336 -1.486989,-0.478169 -0.782585,-0.318913 -0.782664,-0.39846 -0.782663,-0.558037 -0.625912,-0.637506 -0.547887,-0.717373 -0.391214,-0.876948 -0.156674,-0.478169 -0.156439,-0.478249 -0.07834,-0.558037 0,-0.558036 0,-0.796842 0.156752,-0.717612 0.156361,-0.717294 0.313112,-0.717373 0.312877,-0.637585 0.469786,-0.637745 0.469551,-0.557797 0.547575,-0.558037 0.704561,-0.4781688 0.704327,-0.3987 0.78235,-0.3186731 0.861,-0.3189122 0.939024,-0.2391244 0.939102,-0.1595756 1.095697,-0.1593365 1.095541,0 1.565248,0.079788 1.64335,0.1593365 1.64335,0.2391244 1.721687,0.3189122 -0.939023,5.2607355 -1.095541,-0.318912 -1.173799,-0.239124 -1.095776,-0.159257 -1.252136,-0.07979 -0.704326,0.07979 -0.313034,0.159257 -0.234776,0.07979 -0.156439,0.159337 -0.156438,0.239124 0,0.159337 -0.07834,0.239124 0.07834,0.239364 0.0781,0.239124 0.234775,0.318673 0.469473,0.239045 0.469551,0.239124 1.330551,0.3987 1.017361,0.398461 1.017438,0.3987 0.860687,0.557718 0.782663,0.558036 0.391136,0.3987 0.313113,0.318673 0.234775,0.478249 0.234776,0.39862 0.156673,0.478249 0.156439,0.558037 0.07834,0.557797 0,0.637745 0,0.956497 -0.156674,0.87663 -0.234775,0.876949 -0.313113,0.717293 -0.469551,0.717373 -0.469472,0.637825 -0.547653,0.637505 -0.626225,0.478249 -0.704248,0.478249 -0.782663,0.3987 -0.860687,0.398461 -0.861,0.239044 -0.939102,0.239125 -1.017361,0.159336 -1.017439,0.07979 -1.095462,0 z"/><path d="m 129.1387,7.2136723 -0.93902,-0.2391244 -0.78267,-0.2391243 -0.70425,-0.4782487 -0.54788,-0.4781691 -0.39145,-0.6378243 -0.23478,-0.7173731 -0.0781,-0.7172934 0,-0.7173731 0.23478,-0.6378243 0.39121,-0.6375056 0.46955,-0.5580365 0.70425,-0.47824875 0.78266,-0.31891219 1.01736,-0.23912436 1.09578,-0.0795487 1.09546,0.0795487 0.9391,0.15957566 0.78259,0.31867306 0.70432,0.47848788 0.46956,0.4782487 0.39144,0.6375055 0.23478,0.7173731 0.078,0.7971609 -0.078,0.7970812 -0.23478,0.7173731 -0.39144,0.5580365 -0.54789,0.5577178 -0.70433,0.3987 -0.78235,0.3189122 -0.93934,0.1593365 -1.01712,0.079788 -1.01744,-0.079788 z"/><path d="m 125.625,8.5625077 0,20.9687503 9.0625,0 0,-20.9687503 z"/><path d="m 125.625,8.5625077 0,20.9687503 9.0625,0 0,-7 -1.09375,0 0,2.6875 -2.34375,0 0,-2.6875 -2.65625,0 0,-2.3125 2.65625,0 0,-2.71875 2.34375,0 0,2.71875 1.09375,0 0,-11.6562503 -9.0625,0 z"/></g></svg><span class="g-brand-sub">Video-Lab</span></div>
+    </div>
+    <div class="g-sp"></div>
+    <span class="g-chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v5c0 4.5-3 8.3-7 10-4-1.7-7-5.5-7-10V6z"/></svg>Intern · Swiss-Ski und Nachwuchs</span>
+    <button class="g-ico" id="gTheme" title="Hell / Dunkel" aria-label="Hell / Dunkel"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg></button>
+  </div>
+
+  <div class="g-main">
+    <div>
+      <div class="g-eyebrow">Videoanalyse für Coaches</div>
+      <h1>Bild für Bild.<br><em>Jede Bewegung im Blick.</em></h1>
+      <p class="g-lead">Ski-Videos verlangsamen, übereinanderlegen und vermessen – direkt im Browser, am Laptop und am Handy.</p>
+      <ul class="g-feats">
+        <li class="g-feat"><div class="g-fi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="13" height="11" rx="2"/><rect x="8" y="9" width="13" height="11" rx="2" fill="currentColor" fill-opacity=".18"/></svg></div><div><b>Overlay mit Rückstand</b><span>Zwei Läufe in einem Bild, Zeit an jedem Tor</span></div></li>
+        <li class="g-feat"><div class="g-fi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="9" height="12" rx="2"/><rect x="13" y="6" width="9" height="12" rx="2"/></svg></div><div><b>Side-by-Side</b><span>Synchron abspielen, Bild für Bild</span></div></li>
+        <li class="g-feat"><div class="g-fi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="5" cy="16" r="2"/><circle cx="10" cy="11.5" r="2" opacity=".75"/><circle cx="15" cy="9" r="2" opacity=".55"/><circle cx="20" cy="8" r="2" opacity=".35"/></svg></div><div><b>Strobo</b><span>Bewegungsfolge als ein Bild</span></div></li>
+        <li class="g-feat"><div class="g-fi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20l5-5"/><path d="M14.5 4.5l5 5L10 19H5v-5z"/><path d="M4 4h4M4 4v4"/></svg></div><div><b>Zeichnen und Messen</b><span>Linien, Winkel und Zeiten im Video</span></div></li>
+        <li class="g-feat"><div class="g-fi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.2 7-11.5A7 7 0 0 0 5 9.5C5 14.8 12 21 12 21z"/><path d="M8.5 10.5l2.2-2 1.8 2.6 3-3.6"/></svg></div><div><b>GPS mit innove</b><span>Tempo und Zeitverlust zum Video</span></div></li>
+        <li class="g-feat"><div class="g-fi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="3.6" fill="currentColor" stroke="none"/></svg></div><div><b>Feld-App</b><span>Am Hang filmen, sauber benannt</span></div></li>
+        <li class="g-feat g-loc"><div class="g-fi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></div><div><b>Videos bleiben auf dem Gerät</b><span>Kein Upload, keine Cloud – geöffnet wird nur lokal im Browser</span></div></li>
+      </ul>
+    </div>
+
+    <div class="g-card" aria-label="Anmelden">
+      <div class="g-stage" aria-hidden="true">
+        <svg class="g-run" viewBox="0 0 420 170" preserveAspectRatio="xMidYMid slice">
+          <defs>
+            <linearGradient id="gSn" x1="0" y1="0" x2=".35" y2="1"><stop offset="0" stop-color="#d7dee6"/><stop offset=".45" stop-color="#eef2f5"/><stop offset="1" stop-color="#dfe5eb"/></linearGradient>
+            <linearGradient id="gSh" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#8d9bab" stop-opacity=".35"/><stop offset=".5" stop-color="#8d9bab" stop-opacity="0"/><stop offset="1" stop-color="#8d9bab" stop-opacity=".25"/></linearGradient>
+            <radialGradient id="gVig" cx=".5" cy=".5" r=".8"><stop offset=".55" stop-color="#0b0e12" stop-opacity="0"/><stop offset="1" stop-color="#0b0e12" stop-opacity=".45"/></radialGradient>
+            <filter id="gGr"><feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="2" stitchTiles="stitch"/><feColorMatrix values="0 0 0 0 .5 0 0 0 0 .5 0 0 0 0 .5 0 0 0 .07 0"/></filter>
+            <filter id="gMb" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation=".9 .5"/></filter>
+          </defs>
+          <rect width="420" height="170" fill="url(#gSn)"/>
+          <rect width="420" height="170" fill="url(#gSh)"/>
+          <path d="M-10 150 C80 118 150 96 230 92 S350 70 430 40" fill="none" stroke="#b9c4cf" stroke-width="16" stroke-linecap="round" opacity=".35"/>
+          <path d="M-10 150 C80 118 150 96 230 92 S350 70 430 40" fill="none" stroke="#a9b5c2" stroke-width="1" opacity=".5" stroke-dasharray="1 5"/>
+          <g stroke-linecap="round">
+            <g transform="translate(96 104)"><path d="M0 0v-26" stroke="#c43a35" stroke-width="1.6"/><path d="M0 -26 l7 2 v8 l-7 -2z" fill="#d6453f" opacity=".9"/><path d="M0 1 l-1 2" stroke="#6b7785" stroke-width="1"/></g>
+            <g transform="translate(232 84)"><path d="M0 0v-24" stroke="#2d6fc0" stroke-width="1.6"/><path d="M0 -24 l7 2 v8 l-7 -2z" fill="#3a7fd0" opacity=".9"/></g>
+            <g transform="translate(356 60)"><path d="M0 0v-22" stroke="#c43a35" stroke-width="1.5"/><path d="M0 -22 l6 2 v7 l-6 -2z" fill="#d6453f" opacity=".9"/></g>
+          </g>
+          <rect width="420" height="170" filter="url(#gGr)"/>
+          <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+            <path class="g-ln" style="--l:300" d="M20 138 C70 116 110 100 150 98 S220 100 262 90" stroke="#3ea6dc" stroke-width="2"/>
+            <path class="g-ln" style="--l:300;--dl:.5s" d="M20 146 C72 124 112 108 152 106 S218 104 252 98" stroke="#f08a3c" stroke-width="2" stroke-dasharray="5 4"/>
+          </g>
+          <g fill="#3ea6dc" class="g-sf" style="--d:1.2s"><circle cx="58" cy="121" r="1.8"/><circle cx="96" cy="106" r="1.8"/><circle cx="136" cy="99" r="1.8"/><circle cx="178" cy="99" r="1.8"/><circle cx="220" cy="98" r="1.8"/></g>
+          <g class="g-sf" style="--d:1.6s">
+            <ellipse cx="266" cy="80" rx="3.2" ry="8" fill="#1d232b" filter="url(#gMb)" transform="rotate(14 266 80)"/>
+            <circle cx="268" cy="70" r="2.6" fill="#1d232b" filter="url(#gMb)"/>
+            <path d="M257 89 L277 86" stroke="#1d232b" stroke-width="1.6" filter="url(#gMb)"/>
+            <ellipse cx="249" cy="88" rx="3" ry="7.5" fill="#c4682a" opacity=".55" filter="url(#gMb)" transform="rotate(10 249 88)"/>
+            <circle cx="250.5" cy="79" r="2.4" fill="#c4682a" opacity=".55" filter="url(#gMb)"/>
+            <g fill="none" stroke="#3ea6dc" stroke-width="1.4"><path d="M253 62h-4v5M279 62h4v5M253 96h-4v-5M279 96h4v-5"/></g>
+            <rect x="249" y="48" width="64" height="12" rx="2" fill="#3ea6dc"/>
+            <text x="253" y="57" font-family="Geist Mono,ui-monospace,monospace" font-size="8" font-weight="600" fill="#0b0e12">A · 71.4 km/h</text>
+          </g>
+          <g class="g-sf" style="--d:2s" stroke="#ffd23f" stroke-width="1.1" fill="none" stroke-linecap="round">
+            <path d="M266 89 L272 66"/><path d="M266 89 L294 89" stroke-dasharray="2 2.5"/><path d="M276 89 A10 10 0 0 0 268.5 79.3"/>
+          </g>
+          <g class="g-sf" style="--d:2s"><text x="279" y="84" font-family="Geist Mono,ui-monospace,monospace" font-size="8.5" font-weight="600" fill="#b8860b">76°</text></g>
+          <g font-family="Geist Mono,ui-monospace,monospace" font-size="8" font-weight="600">
+            <g class="g-sf" style="--d:1.3s"><rect x="80" y="64" width="34" height="13" rx="2" fill="rgba(11,14,18,.82)"/><text x="97" y="73.5" fill="#f5a35f" text-anchor="middle">+0.06</text></g>
+            <g class="g-sf" style="--d:1.5s"><rect x="215" y="46" width="34" height="13" rx="2" fill="rgba(11,14,18,.82)"/><text x="232" y="55.5" fill="#f5a35f" text-anchor="middle">+0.17</text></g>
+          </g>
+          <rect width="420" height="170" fill="url(#gVig)"/>
+          <g class="g-sf" style="--d:2.3s" font-family="Geist Mono,ui-monospace,monospace">
+            <rect x="316" y="128" width="92" height="30" rx="4" fill="rgba(11,14,18,.78)" stroke="rgba(255,255,255,.1)"/>
+            <text x="324" y="140" font-size="7" fill="rgba(255,255,255,.55)" letter-spacing=".08em">RÜCKSTAND B · T2</text>
+            <text x="324" y="153" font-size="11" font-weight="600" fill="#f5a35f">+0.17 s</text>
+          </g>
+        </svg>
+        <div class="g-st-top"><span class="g-pill"><i style="background:#2f6fd0"></i>A</span><span class="g-pill"><i style="background:#f08a3c"></i>B</span><span class="g-pill g-pl-m">Overlay</span></div>
+        <div class="g-st-rec">Bild 1032 · 50 fps</div>
+        <div class="g-ctl">
+          <svg class="g-pp" viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.5v15l12.5-7.5z"/></svg>
+          <span class="g-spd">0.25×</span>
+          <div class="g-tl"><div class="g-tk"></div><div class="g-mk" style="left:22%;background:#e5484d"></div><div class="g-mk" style="left:47%;background:#3e8be0"></div><div class="g-mk" style="left:76%;background:#e5484d"></div><div class="g-ph"></div></div>
+          <span class="g-tcd">00:41.27</span>
+        </div>
+      </div>
+      <form class="g-form" id="gLf" novalidate autocomplete="on">
+        <h2>Anmelden</h2>
+        <p class="g-sub">Mit deinem Protern-Zugang.</p>
+        <div class="g-fld">
+          <input id="gEm" type="email" name="email" autocomplete="username" inputmode="email" autocapitalize="off" spellcheck="false" placeholder=" " required>
+          <label for="gEm">E-Mail</label>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M3.5 7l8.5 6 8.5-6"/></svg>
+        </div>
+        <div class="g-fld">
+          <input id="gPw" type="password" name="password" autocomplete="current-password" placeholder=" " required>
+          <label for="gPw">Passwort</label>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+          <button type="button" class="g-eye" id="gEye" aria-label="Passwort anzeigen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg></button>
+        </div>
+        <div class="g-err" id="gErr" role="alert"></div>
+        <button class="g-go" type="submit" id="gGo"><span>Anmelden</span><i class="g-spin"></i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+        <div class="g-hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9.5"/><path d="M12 11v6M12 7.5h.01"/></svg><span>Du bleibst auf diesem Gerät angemeldet. Kein Zugang? Melde dich bei FEA.</span></div>
+      </form>
+    </div>
+  </div>
+
+  <div class="g-foot"><span><b>Swiss-Ski</b> · Forschung, Entwicklung &amp; Ausbildung</span><span class="g-fr">Videos werden nie hochgeladen</span></div>
+</div>
+</div>
+<script>
+(function(){
+var K='vlab:auth', SB='https://sswtnkwqkmokozrcqrxf.supabase.co', PK='sb_publishable_g1FMMtPfyO0QNWAFtMXdsw_TUOOgQtB', DAYS=30;
+var de=document.documentElement, $=function(s){return document.getElementById(s)};
+function sess(){ try{ var s=JSON.parse(localStorage.getItem(K)||'null'); if(s&&s.e&&s.exp>Date.now()) return s; }catch(e){} return null; }
+window.vlabAuth={ get:sess, logout:function(){ try{ localStorage.removeItem(K); }catch(e){} location.reload(); } };
+window.addEventListener('keydown',function(e){ if(de.classList.contains('vgate')) e.stopImmediatePropagation(); },true);
+if(sess()){ de.classList.remove('vgate'); return; }
+de.classList.add('vgate');
+$('gTheme').addEventListener('click',function(){ var d=de.dataset.theme==='dark'?'light':'dark'; if(d==='dark') de.dataset.theme='dark'; else delete de.dataset.theme; try{ localStorage.setItem('vlab:theme',JSON.stringify(d)); }catch(e){} });
+$('gEye').addEventListener('click',function(){ var p=$('gPw'); p.type=p.type==='password'?'text':'password'; p.focus(); });
+try{ var le=JSON.parse(localStorage.getItem('vlab:lastEmail')||'""'); if(le) $('gEm').value=le; }catch(e){}
+function hex(b){ var a=new Uint8Array(b), s=''; for(var i=0;i<a.length;i++) s+=(a[i]<16?'0':'')+a[i].toString(16); return s; }
+async function hash(e,p){ var enc=new TextEncoder(), x='g2g_v1_7Kx9:'+e.toLowerCase().trim()+':'+p; for(var i=0;i<30000;i++) x=hex(await crypto.subtle.digest('SHA-256',enc.encode(x))); return x; }
+function err(t){ var el=$('gErr'); el.textContent=t||''; el.className='g-err'+(t?' on':''); }
+var busy=false;
+$('gLf').addEventListener('submit',async function(ev){
+  ev.preventDefault(); if(busy) return;
+  var e=$('gEm').value.trim().toLowerCase(), p=$('gPw').value, go=$('gGo');
+  if(!e||e.indexOf('@')<1){ err('Bitte E-Mail eingeben.'); $('gEm').focus(); return; }
+  if(!p){ err('Bitte Passwort eingeben.'); $('gPw').focus(); return; }
+  if(!window.crypto||!crypto.subtle){ err('Dieser Browser unterstützt die Anmeldung nicht (nur über https).'); return; }
+  busy=true; err(''); go.disabled=true; go.classList.add('busy');
+  try{
+    var h=await hash(e,p);
+    var r=await fetch(SB+'/rest/v1/rpc/vlab_login',{method:'POST',headers:{'apikey':PK,'Content-Type':'application/json'},body:JSON.stringify({p_e:e,p_h:h})});
+    var j=null; try{ j=await r.json(); }catch(x){}
+    if(r.ok&&j&&j.ok&&j.me){
+      var m=j.me, s={e:m.e||e,n:m.n||'',r:m.r||'',g:m.g||[],src:m.src||'',t:Date.now(),exp:Date.now()+DAYS*864e5};
+      try{ localStorage.setItem(K,JSON.stringify(s)); localStorage.setItem('vlab:lastEmail',JSON.stringify(e)); }catch(x){}
+      $('gPw').value=''; go.classList.remove('busy'); go.classList.add('ok');
+      de.classList.add('vgate-out');
+      setTimeout(function(){ de.classList.remove('vgate','vgate-out'); window.dispatchEvent(new Event('resize')); if(window.vlabUserUI) window.vlabUserUI(); },420);
+      return;
+    }
+    if(j&&j.err==='locked') err('Zu viele Fehlversuche. Bitte in 15 Minuten nochmals versuchen.');
+    else if(r.ok) err('E-Mail oder Passwort stimmt nicht.');
+    else err('Anmeldung im Moment nicht möglich ('+r.status+'). Bitte später nochmals versuchen.');
+  }catch(x){ err('Keine Verbindung. Für die Anmeldung braucht es Internet.'); }
+  busy=false; go.disabled=false; go.classList.remove('busy');
+  $('gPw').select();
+});
+setTimeout(function(){ if(de.classList.contains('vgate')&&matchMedia('(min-width:901px)').matches) ($('gEm').value?$('gPw'):$('gEm')).focus(); },60);
+})();
+</script>
+<!--GATE_END-->
+
 
 <!-- Startseite -->
 <section class="scr on" id="home">
