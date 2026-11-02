@@ -2460,6 +2460,7 @@ canvas.gap-row[hidden]{display:none}
 #useModal .use-pw .err{color:var(--red);font-size:12.5px;min-height:16px}
 #useModal .use-empty{padding:28px;text-align:center;color:var(--muted);font-size:13px}
 @media (max-width:760px){ #useModal .use{padding:16px 14px 14px;border-radius:16px} #useModal .use-kpi{grid-template-columns:1fr 1fr} #useModal .use-ch{grid-template-columns:1fr} #useModal .use-seg{order:3;width:100%} #useModal .use-seg button{flex:1} }
+#viewCmp:not(.overlay) .m-sync{display:none!important} /* Side-by-Side: kein «Gleicher Moment»-Knopf mehr (auch Handy) */
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
   .aurora{display:none}
@@ -3346,7 +3347,7 @@ setTimeout(function(){ if(de.classList.contains('vgate')&&matchMedia('(min-width
       <dt>Vergleichen</dt><dd>Oben «Side-by-Side» wählen – das offene Video ist A, dann B wählen</dd>
     </dl></section>
     <section class="hp" data-hp="analyse" hidden><dl>
-      <dt>Side-by-Side</dt><dd>A und B wählen, beide zum gleichen Tor ziehen und unter «Werkzeuge» «Gleicher Moment» drücken (<kbd>t</kbd> öffnet die Werkzeuge)</dd>
+      <dt>Side-by-Side</dt><dd>A und B wählen – beide laufen gemeinsam. Ins Video klicken, um nur dieses zum gleichen Tor zu ziehen; nochmals klicken = wieder beide, neu verbunden</dd>
       <dt>Zeitmessung</dt><dd>Stoppuhr-Knopf: Start = gleicher Moment · Fahne A / B setzt das Ziel · Zeit und Differenz stehen im Bild</dd>
       <dt>Tore</dt><dd><kbd>m</kbd> Tor in A · <kbd>n</kbd> Tor in B → Abschnittszeiten · <kbd>Alt</kbd> + ← → bewegt nur B</dd>
       <dt>Overlay</dt><dd>1 A und B zum gleichen Tor ziehen (oder «Automatisch suchen»), dann «Weiter» · 2 B über A schieben, bis die Tore übereinanderliegen (oder «Automatisch»), dann «Overlay erstellen» – zuerst als Vorschau, dann fein · 3 Abspielen läuft von Start bis Ende; liegt B daneben: anhalten, «Korrigieren» · «…» › «Serie gegen A rechnen» rechnet alle Läufe derselben Serie</dd>
@@ -7742,16 +7743,20 @@ document.addEventListener('dragend',vdEnd);
     renderLib(); if(typeof renderDemoList==='function') renderDemoList(); ftRender(); });
 });
 
+/* Side-by-Side: A und B automatisch verbinden, sobald beide geladen sind (einmal je Paarung, an den aktuellen Bildern).
+   Feinabstimmung: ins Video klicken → nur dieses verschieben → nochmals klicken → wieder beide, neu verbunden. */
+function cmpAutoLink(){ if(mode!=='cmp'||$('#viewCmp').classList.contains('overlay')||!A.ready||!B.ready||!A.clip||!B.clip||G.linked||(typeof CF!=='undefined'&&CF.k)) return;
+  const k=(A.clip.name||'')+'|'+(B.clip.name||''); if(G.autoKey===k) return; G.autoKey=k; G.off=B.time()-A.time(); G.syncA=A.time(); G.linked=true; linkBtn(); updSync(); }
 /* ---------- Vergleich: Werkzeuge hinter einem Knopf ---------- */
 (function(){ const dock=$('#viewCmp .dock3'); if(!dock) return; const L=$('.dz-l',dock), Rz=$('.dz-r',dock);
   const more=document.createElement('div'); more.className='dz-more'; more.id='cmpMore';
   const grp=(lab,nodes)=>{ const g=document.createElement('div'); g.className='dm-grp'; g.innerHTML=`<span class="dm-lab">${lab}</span>`; nodes.filter(Boolean).forEach(n=>g.appendChild(n)); more.appendChild(g); };
-  grp('Verbinden',[$('#btnLink'),$('#btnSync'),$('#syncChip')]);
+  { const hold=document.createElement('div'); hold.hidden=true; hold.id='syncHold'; [$('#btnLink'),$('#btnSync'),$('#syncChip')].filter(Boolean).forEach(n=>hold.appendChild(n)); dock.appendChild(hold); } /* «Gleicher Moment» nicht mehr als Werkzeug: A und B sind automatisch verbunden, einzeln verschieben über Klick ins Video */
   grp('Messen',[$('#btnTime'),$('#timActs'),$('#btnSplits')]);
   const rail=$('#cTools .rail'); if(rail) rail.classList.remove('collapsed');
   grp('Zeichnen',[$('#cTools')]);
   const ms=$('.m-sync',L); L.innerHTML=''; Rz.innerHTML=''; if(ms) L.appendChild(ms); /* Handy: «Gleicher Moment» direkt in der Leiste */
-  const tb=document.createElement('button'); tb.className='ctl tools-btn'; tb.id='btnTools'; tb.title='Werkzeuge: Gleicher Moment, Zeitmessung, Tore, Zeichnen (t)';
+  const tb=document.createElement('button'); tb.className='ctl tools-btn'; tb.id='btnTools'; tb.title='Werkzeuge: Zeitmessung, Abschnitte, Zeichnen (t)';
   tb.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.2L3.5 17.3a1.8 1.8 0 0 0 2.5 2.5l5.8-5.8a4 4 0 0 0 5.2-5.4l-2.6 2.6-2.4-.6-.6-2.4z"/></svg><span>Werkzeuge</span><i class="tb-dot"></i><svg class="tb-car" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 15l6-6 6 6"/></svg>';
   L.appendChild(tb); dock.appendChild(more);
   const set=on=>{ dock.classList.toggle('tools-open',on); tb.classList.toggle('on',on); LS.set('cmpTools',on); requestAnimationFrame(()=>{ dispatchEvent(new Event('resize')); decks.forEach(d=>{ d.dirty=true; d.annDirty=true; }); }); };
@@ -7759,7 +7764,7 @@ document.addEventListener('dragend',vdEnd);
   set(!!LS.get('cmpTools',false));
   document.addEventListener('keydown',e=>{ if((e.key==='t'||e.key==='T')&&!e.metaKey&&!e.ctrlKey&&!e.altKey&&mode==='cmp'&&!/INPUT|SELECT|TEXTAREA/.test((e.target.tagName||''))&&!e.target.isContentEditable){ e.preventDefault(); set(!dock.classList.contains('tools-open')); } });
   // Punkt am Knopf, wenn ein Werkzeug aktiv ist (bei geschlossener Leiste)
-  setInterval(()=>{ if(mode!=='cmp') return; const act=(typeof TIM!=='undefined'&&TIM.on)||(DRAW.tool&&DRAW.tool!=='none')||!!(($('#splitsN')||{}).textContent||'').trim();
+  setInterval(()=>{ if(mode!=='cmp') return; cmpAutoLink(); const act=(typeof TIM!=='undefined'&&TIM.on)||(DRAW.tool&&DRAW.tool!=='none')||!!(($('#splitsN')||{}).textContent||'').trim();
     tb.classList.toggle('act',act); },500);
 })();
 
@@ -7808,7 +7813,7 @@ const COACHES=[
   {id:'inout',sel:'#viewSingle [data-act="in"]',when:()=>mode==='single'&&S.ready&&COACH.played&&!!LS.get('coach:rate',0),t:'«Start» und «Ende» legen fest, welcher Teil abgespielt und gespeichert wird.'},
   {id:'save',sel:'.player:not([hidden]) .save-btn',when:()=>(mode==='single'&&S.ready&&!!S.clip.loop&&(S.clip.loop.a!=null||S.clip.loop.b!=null))||(mode==='cmp'&&!$('#viewCmp').classList.contains('overlay')&&G.linked),t:'Video, Standbild oder Aufnahme mit Ton – alles unter «Speichern».'},
   {id:'ovtab',sel:'#tabOv',when:()=>mode==='cmp'&&!$('#viewCmp').classList.contains('overlay'),t:'«Overlay» legt beide Läufe in ein Bild.'},
-  {id:'tools',sel:'#btnTools',when:()=>mode==='cmp'&&!$('#viewCmp').classList.contains('overlay'),t:'Gleicher Moment, Zeitmessung, Tore und Zeichnen findest du hier.'},
+  {id:'tools',sel:'#btnTools',when:()=>mode==='cmp'&&!$('#viewCmp').classList.contains('overlay'),t:'Zeitmessung, Abschnitte und Zeichnen findest du hier. A und B einzeln verschieben: ins Video klicken.'},
   {id:'ovnext',sel:'[data-ov="sync"]',when:()=>mode==='cmp',t:'A und B einzeln zum selben Tor ziehen, dann «Weiter».'},
   {id:'ovmake',sel:'[data-ov="make"]',when:()=>mode==='cmp'&&!(OV.follow&&GH.state==='busy'),t:'Ein Klick – B wird über A gelegt und folgt der Kamera.'},
   {id:'ovprev',sel:'#viewCmp .ctl.play',when:()=>mode==='cmp'&&ovFollowOK(),t:'Abspielen läuft von Start bis Ende. Liegt B daneben: anhalten und «Korrigieren».'},
@@ -8047,7 +8052,7 @@ if(false&&!LS.get('hint1',0)){ setTimeout(()=>{ toast(matchMedia('(pointer:coars
 
 /* Update-Hinweis: prüft version.json auf GitHub Pages; «Aktualisieren» lädt die Seite ohne Cache neu */
 (()=>{
-  const BUILD='20261102132743'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
+  const BUILD='20261102134709'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
   // nach einem Update die ?v=… aus der Adresse entfernen
   try{ const u=new URL(location.href); if(u.searchParams.has('v')){ u.searchParams.delete('v'); history.replaceState(null,'',u.pathname+(u.search||'')+u.hash); } }catch(e){}
   const el=$('#upd'); let latest=null, snoozed=null, busy=false;
@@ -8123,12 +8128,12 @@ async function preOvLoad(){ if(PRE_OV) return PRE_OV; try{ const r=await fetch('
     side:[
       {t:'Zwei Läufe wählen',p:'Oben wählst du Lauf A und Lauf B – hier Meillard und Gratz in Sölden. Alternativ links in der Liste auf «A» / «B» tippen.',f:rectOf('.vchip[data-k="a"]','.vchip[data-k="b"]'),
        run:async()=>{ setLayout('side'); A.setClip(demo(M)); B.setClip(demo(Gz)); unlink(); syncSelects(); renderLib(); await waitReady(); A.seekTime(0); B.seekTime(0); await sleep(600); }},
-      {t:'A zum ersten Tor schieben',p:'Zeitleiste A ziehen, bis Meillard am ersten gut sichtbaren Tor ist. Feinschliff: ← / → für ein Bild.',f:()=>A.tl,
-       run:async()=>{ await scrub(A,4.0); }},
-      {t:'B zum gleichen Tor schieben',p:'Dasselbe mit Zeitleiste B: Gratz an genau dieselbe Stelle bringen.',f:()=>B.tl,
-       run:async()=>{ await scrub(B,4.0); }},
-      {t:'«Gleicher Moment» drücken',p:'«Gleicher Moment» verbindet A und B an diesem Moment. Ab jetzt bewegen sich beide gemeinsam.',f:'#btnSync',
-       run:async()=>{ await clickEl('#btnSync'); }},
+      {t:'Ins Video A klicken',p:'Ein Klick ins Video A: gelber Rahmen – jetzt bewegt sich nur A. Zeitleiste ziehen, bis Meillard am ersten gut sichtbaren Tor ist. Feinschliff: ← / → für ein Bild.',f:()=>A.stage,
+       run:async()=>{ cfSet('a',true); await scrub(A,4.0); }},
+      {t:'Ins Video B klicken',p:'Dasselbe mit B (violetter Rahmen): Gratz an genau dieselbe Stelle bringen.',f:()=>B.stage,
+       run:async()=>{ cfSet('b',true); await scrub(B,4.0); }},
+      {t:'Nochmals klicken = beide',p:'Nochmals ins Video klicken: Rahmen um beide – A und B sind an diesem Moment verbunden und bewegen sich ab jetzt gemeinsam.',f:rectOf('#cStages'),
+       run:async()=>{ cfSet(null); await sleep(400); }},
       {t:'Gemeinsam abspielen',p:'Abspielen – beide laufen gemeinsam. So siehst du direkt, wer wo Zeit gewinnt. Mit «1×» auf Zeitlupe schalten.',f:'#viewCmp .ctl.play',
        run:async()=>{ await clickEl('#viewCmp .ctl.play'); await sleep(3600); if(!A.v.paused) cmpToggle(); }},
     ],
