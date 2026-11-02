@@ -2292,6 +2292,9 @@ button.lg-it:hover{background:rgba(12,15,20,.8);border-color:rgba(255,255,255,.3
 .vl-pop .vp-out svg{width:16px;height:16px}
 :root[data-theme="dark"] .vl-pop{background:#1b2027;border-color:#2a313b}
 @keyframes vlPop{from{opacity:0;transform:translateY(4px) scale(.98)}}
+.str-bar .btn-pri:disabled{opacity:.4;cursor:default} .str-acts{display:flex;align-items:center;gap:10px;margin-left:auto} #strEv{width:52px;height:32px;border-radius:9px;border:1px solid var(--line2,#cfd4db);background:var(--field,#f6f7f9);color:inherit;font:600 14px var(--mono);text-align:center;padding:0 4px} #strEv.on{border-color:var(--red);box-shadow:0 0 0 2px var(--red-soft)} .str-ev{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--muted)}
+#strReset{display:inline-flex;align-items:center;justify-content:center;width:44px;min-width:44px!important;padding:0!important} #strReset svg{width:18px;height:18px}
+@media (min-width:761px){ body:not(.pfs):not(.rfs) #viewCmp .st-fs{display:none!important} } /* Vergleich am Computer: Vollbild nur oben rechts in der Kopfleiste */
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
   .aurora{display:none}
@@ -3076,13 +3079,12 @@ setTimeout(function(){ if(de.classList.contains('vgate')&&matchMedia('(min-width
     <div class="str-view"><canvas id="strCanvas" width="960" height="540"></canvas><div class="str-ask">Im Bild auf die Fahrerin / den Fahrer tippen</div><div class="gprog str-prog" id="strProg"><div class="gprog-bar"><i></i></div><span></span></div></div>
     <div class="str-bar">
       <span class="exp-l">Bereich</span><div class="seg" id="strR"><button data-r="0.5">±0.5 s</button><button data-r="1" class="on">±1 s</button><button data-r="2">±2 s</button><button data-r="cut">Start–Ende</button></div>
-      <span class="exp-l">Bilder</span><div class="seg" id="strN"><button data-n="6">6</button><button data-n="8">8</button><button data-n="10">10</button><button data-n="12">12</button><button data-n="16">16</button></div>
-      <label class="str-tg"><input type="checkbox" id="strNum" checked> Nummern</label>
-      <span class="str-sp"></span>
-      <button class="btn-pri ghost" id="strVid" disabled>Video</button><button class="btn-pri" id="strSave" disabled>PNG speichern</button>
+      <span class="exp-l" title="Abstand zwischen den Positionen in Bildern">Alle … Bilder</span><div class="seg" id="strE"><button data-e="0" class="on" title="Automatisch: Positionen so verteilt, dass sich die Figuren nicht überdecken">Auto</button><button data-e="5">5</button><button data-e="10">10</button><button data-e="15">15</button><button data-e="25">25</button><button data-e="50">50</button></div><input type="number" id="strEv" min="2" max="500" step="1" inputmode="numeric" placeholder="…" title="Eigener Abstand in Bildern" aria-label="Eigener Abstand in Bildern">
+      <label class="str-tg"><input type="checkbox" id="strNum"> Nummern</label>
+      <span class="str-acts"><button class="btn-pri ghost str-reset" id="strReset" aria-label="Zurücksetzen" title="Bereich, Bilder und Fahrer:in zurücksetzen und neu wählen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/></svg></button><button class="btn-pri ghost" id="strVid" disabled>Video</button><button class="btn-pri" id="strSave" disabled>PNG speichern</button></span>
     </div>
     <div class="str-foot"><span class="str-info" id="strInfo"></span></div>
-    <p class="str-hint">Bereich: um das aktuelle Bild oder zwischen «Start» und «Ende». Schwenk und Zoom der Kamera werden ausgeglichen; die Bilder werden so gesetzt, dass sich die Figuren nicht überdecken. <b>Falsche Person gewählt? Im Bild auf die Fahrer:in tippen.</b></p>
+    <p class="str-hint">Bereich: um das aktuelle Bild oder zwischen «Start» und «Ende» (bis 60 s). «Alle»: Abstand in Bildern zwischen den Positionen – «Auto» verteilt sie so, dass sich nichts überdeckt. Schwenk und Zoom der Kamera werden ausgeglichen; die Bilder werden so gesetzt, dass sich die Figuren nicht überdecken. <b>Falsche Person gewählt? Im Bild auf die Fahrer:in tippen.</b></p>
   </div>
 </div>
 <div class="modal" id="invModal">
@@ -6620,8 +6622,8 @@ function bOnlyStep(n){ if(!B.ready) return; B.pause(); A.pause(); B.seekFrame(B.
 
 /* ---------- Strobo ---------- */
 let SD=null;
-const STR={n:8,trail:false,num:true,busy:false,res:null};
-function strobeRange(){ const c=SD.clip, L=c.loop, sp=STR.span||1; if(sp==='cut'&&L&&L.a!=null){ const b=L.b!=null&&L.b-L.a>=4?L.b:L.a+Math.round(SD.fps*2); return [L.a,Math.min(b,SD.nF-1,L.a+Math.round(SD.fps*8)),true]; } const h=Math.round(SD.fps*(sp==='cut'?1:sp)); return [Math.max(0,SD.frame-h),Math.min(SD.nF-1,SD.frame+h),false]; }
+const STR={n:8,every:0,trail:false,num:false,busy:false,res:null}; /* Nummern standardmässig aus – wer will, schaltet sie ein */
+function strobeRange(){ const c=SD.clip, L=c.loop, sp=STR.span||1; if(sp==='cut'&&L&&L.a!=null){ const b=L.b!=null&&L.b-L.a>=4?L.b:L.a+Math.round(SD.fps*2); return [L.a,Math.min(b,SD.nF-1,L.a+Math.round(SD.fps*60)),true]; } const h=Math.round(SD.fps*(sp==='cut'?1:sp)); return [Math.max(0,SD.frame-h),Math.min(SD.nF-1,SD.frame+h),false]; }
 function openStrobe(){ STR.tap=null; STR.tap0=null; STR.res=null; SD=mode==='cmp'?A:S; { const L=SD.clip&&SD.clip.loop, hasC=!!(L&&L.a!=null); STR.span=hasC?'cut':(STR.span==='cut'?1:(STR.span||1)); $$('#strR button').forEach(x=>x.classList.toggle('on',x.dataset.r===String(STR.span))); } /* Start/Ende gesetzt → Strobo genau dort */ if(!SD.ready){ toast(mode==='cmp'?'Zuerst Video A wählen.':'Zuerst ein Video öffnen.'); return; } A.pause(); B.pause(); SD.pause(); $('#strobeModal').classList.add('on'); strobeAsk(); }
 /* Schritt 1: mittleres Bild des Bereichs zeigen, Fahrer:in antippen lassen – dann wird nie Gondel oder Publikum gewählt */
 function strView(w,h){ const v=$('.str-view'); if(!v) return; v.style.aspectRatio=w+'/'+h; v.classList.toggle('pt',h>w*1.05); } /* Vorschau im Format des Videos (auch hochkant) */
@@ -6637,7 +6639,13 @@ function labelMap(m,w,h){ const lab=new Int32Array(m.length), st=[], info=[0]; l
     info.push({id,a,x:sx/a,y:sy/a}); }
   return {lab,info}; }
 async function strobeRun(){
-  if(STR.busy) return; STR.busy=true; const c=SD.clip, [a,b,isLoop]=strobeRange(), nWant=STR.n;
+  if(STR.busy) return; const [la,lb]=strobeRange(), longN=STR.every>0?STR.every:(lb-la>SD.fps*8.5?Math.max(2,Math.round((lb-la)/10)):0);
+  if(longN){ STR.busy=true; $('#strProg').hidden=false; $('#strSave').disabled=true; $('#strVid').disabled=true; $('#strInfo').textContent=(la/SD.fps).toFixed(2)+' – '+(lb/SD.fps).toFixed(2)+' s · alle '+longN+' Bilder · wird berechnet …';
+    try{ const r=await strobeRunLong(la,lb,longN); $('#strProg').hidden=true; $('#strSave').disabled=false; $('#strVid').disabled=true; $('#strVid').title='Video gibt es nur für kurze Bereiche (bis 8 s, Abstand «Auto»)';
+      $('#strInfo').innerHTML='<span class="es-r"><span>Bereich</span><b>'+(la/SD.fps).toFixed(2)+' – '+(lb/SD.fps).toFixed(2)+' s</b></span><span class="es-r"><span>Abstand</span><b>'+longN+' Bilder</b></span><span class="es-r"><span>Positionen</span><b>'+r.n+(r.n<r.of?' / '+r.of:'')+'</b></span>'+(r.weak?'<span class="str-warn">Kamera stark bewegt – Ergebnis prüfen</span>':r.n<r.of?'<span class="str-warn">Fahrer:in nicht in allen Bildern gefunden</span>':''); }
+    catch(e){ console.error(e); toast(e&&e.message?e.message:'Strobo konnte nicht berechnet werden.',3800); $('#strProg').hidden=true; $('#strInfo').textContent=''; }
+    finally{ STR.busy=false; } return; }
+  $('#strVid').title=''; STR.busy=true; const c=SD.clip, [a,b,isLoop]=strobeRange(), nWant=STR.n;
   const prog=(f,t)=>{ $('#strProg i').style.width=(f*100)+'%'; $('#strProg span').textContent=t; }; const tick=()=>new Promise(r=>setTimeout(r,0));
   $('#strProg').hidden=false; $('#strSave').disabled=true; $('#strVid').disabled=true; $('#strInfo').textContent=(a/SD.fps).toFixed(2)+' – '+(b/SD.fps).toFixed(2)+' s · wird berechnet …';
   let v; try{ v=await FrameSrc.open(c); }catch(e){ STR.busy=false; toast('Video konnte nicht geladen werden.'); return; }
@@ -6741,6 +6749,83 @@ async function strobeRun(){
   }catch(e){ console.error(e); toast(e&&e.message&&/Fahrer/.test(e.message)?e.message:'Strobo konnte nicht berechnet werden.',3500); $('#strProg').hidden=true; $('#strInfo').textContent=''; }
   finally{ try{ v.close(); }catch(e){} STR.busy=false; }
 }
+/* Langes Strobo (bis 60 s, z. B. Start–Ende über die ganze Fahrt): alle N Bilder eine Position. Speichersparend: Kamerakette auf kleinen Bildern,
+   Fahrer:in im eigenen Bild gegen den Hintergrund aus Nachbarbildern (±0.4/0.8 s) verfolgt, Panorama erst am Schluss mit neu gelesenen Bildern zusammengesetzt. */
+async function strobeRunLong(a,b,N){
+  const c=SD.clip, fps=SD.fps, prog=(f,t)=>{ $('#strProg i').style.width=(f*100)+'%'; $('#strProg span').textContent=t; }, tick=()=>new Promise(r=>setTimeout(r,0));
+  let v; try{ v=await FrameSrc.open(c); }catch(e){ throw new Error('Video konnte nicht geladen werden.'); }
+  try{
+    const vw=v.w, vh=v.h, W0=400, h0=Math.round(W0*vh/vw)&~1, TW=256, TH=Math.round(TW*vh/vw)&~1, ts=TW/W0;
+    let stepF=Math.max(1,Math.round(fps*0.08)); while((b-a)/stepF>380) stepF++;
+    const midF=clamp(STR.midF!=null?STR.midF:Math.round((a+b)/2),a,b), set=new Set(); for(let f=a;f<=b;f+=stepF) set.add(f); for(let f=a;f<=b;f+=N) set.add(f); set.add(b); set.add(midF);
+    const AF=[...set].sort((p,q)=>p-q), nA=AF.length, onGrid=k=>(AF[k]-a)%N===0;
+    /* 1) Bilder lesen: kleine Pyramide für die Kamerakette, Kleinbild für die Suche */
+    const cs=document.createElement('canvas'); cs.width=W0; cs.height=h0; const xs=cs.getContext('2d',{willReadFrequently:true});
+    const TB=[], M0=[[1,0,0,0,1,0]]; let prevP=null, weak=0;
+    for(let k=0;k<nA;k++){ const im=await v.at((AF[k]+0.5)/fps); xs.drawImage(im,0,0,W0,h0); const P=pyramid(grayOf(xs.getImageData(0,0,W0,h0)),W0,h0);
+      const t=document.createElement('canvas'); t.width=TW; t.height=TH; const tx=t.getContext('2d'); if(fxCss(c)) tx.filter=fxCss(c); tx.drawImage(im,0,0,TW,TH); TB.push(t);
+      if(prevP){ const r=align(prevP,P,[0,0,0,0,0],{R:0.25,scales:[0.95,0.975,1,1.025,1.05]}); if(!r.ok||r.inl<0.35) weak++; M0.push(affMul(simToAff(r.p,W0,h0,W0,h0),M0[k-1])); }
+      prevP=P; if(k%4===3){ prog((k+1)/nA*0.4,'Bilder lesen und Kamera ausgleichen … '+Math.round((AF[k]-a)/fps)+' / '+Math.round((b-a)/fps)+' s'); await tick(); } }
+    let km=0; for(let k=1;k<nA;k++) if(Math.abs(AF[k]-midF)<Math.abs(AF[km]-midF)) km=k;
+    const iRef=affInv(M0[km]), MA=M0.map(m=>affMul(m,iRef)); /* Bezug → Bild k (W0) */
+    /* 2) Fahrer:in verfolgen – Hintergrund aus Nachbarbildern ins Bild k geholt (Median), dort dunkler/farbiger = Figur */
+    const wc=document.createElement('canvas'); wc.width=TW; wc.height=TH; const wx=wc.getContext('2d',{willReadFrequently:true}); const NT=TW*TH;
+    const dK=Math.max(1,Math.round(0.4*fps/((b-a)/Math.max(1,nA-1)||1)));
+    const inK=(j,k)=>{ const H=affMul(MA[k],affInv(MA[j])); return [H[0],H[1],H[2]*ts,H[3],H[4],H[5]*ts]; }; /* Bild j → Bild k (Kleinbild-Pixel) */
+    const maskK=k=>{ wx.setTransform(1,0,0,1,0,0); wx.clearRect(0,0,TW,TH); wx.drawImage(TB[k],0,0); const cur=wx.getImageData(0,0,TW,TH).data; const NB=[];
+      for(const o of [-2,-1,1,2]){ const j=k+o*dK; if(j<0||j>=nA) continue; const H=inK(j,k); wx.setTransform(1,0,0,1,0,0); wx.clearRect(0,0,TW,TH); wx.setTransform(H[0],H[3],H[1],H[4],H[2],H[5]); wx.drawImage(TB[j],0,0); NB.push(wx.getImageData(0,0,TW,TH).data); }
+      wx.setTransform(1,0,0,1,0,0); let mk=new Uint8Array(NT); if(NB.length<2) return {lab:new Int32Array(NT),info:[0]}; const L=new Float32Array(4), S2=new Float32Array(4);
+      for(let p=0,j=0;p<NT;p++,j+=4){ let n=0; for(const d of NB){ if(d[j+3]<200) continue; L[n]=0.299*d[j]+0.587*d[j+1]+0.114*d[j+2]; S2[n]=Math.max(d[j],d[j+1],d[j+2])-Math.min(d[j],d[j+1],d[j+2]); n++; } if(n<2) continue;
+        const ls=Array.from(L.subarray(0,n)).sort((x,y)=>x-y), ss=Array.from(S2.subarray(0,n)).sort((x,y)=>x-y), lb=n&1?ls[n>>1]:(ls[n/2-1]+ls[n/2])/2, sb=n&1?ss[n>>1]:(ss[n/2-1]+ss[n/2])/2;
+        const lf=0.299*cur[j]+0.587*cur[j+1]+0.114*cur[j+2], sf=Math.max(cur[j],cur[j+1],cur[j+2])-Math.min(cur[j],cur[j+1],cur[j+2]); if(lb-lf>30||sf-sb>40) mk[p]=1; }
+      mk=morph(morph(mk,TW,TH,true),TW,TH,false); return labelMap(mk,TW,TH); };
+    const minA=NT*0.00012, toRef=(k,x,y)=>{ const q=affApply(affInv(MA[k]),x/ts,y/ts); return q; }, toK=(k,X,Y)=>{ const q=affApply(MA[k],X,Y); return [q[0]*ts,q[1]*ts]; };
+    const TR=new Array(nA).fill(null);
+    { const {info}=maskK(km); const tp=STR.tap0?[STR.tap0[0]*TW,STR.tap0[1]*TH]:null; let hit=null,bd=1e9;
+      for(const o of info.slice(1)){ if(o.a<minA) continue; const d=tp?Math.hypot(o.x-tp[0],o.y-tp[1]):-o.a; if(d<bd){ bd=d; hit=o; } }
+      if(!hit||(tp&&bd>TW*0.3)) throw new Error('Fahrer:in nicht gefunden – bitte im Bild genau auf die Fahrer:in tippen.');
+      if(tp&&bd>TW*0.1) toast('An der angetippten Stelle keine Fahrer:in erkannt – nächste bewegte Figur genommen.',3500);
+      TR[km]={c:toRef(km,hit.x,hit.y),a:hit.a}; }
+    const walk=async dir=>{ let prev=TR[km], vel=[0,0], miss=0, done=0;
+      for(let k=km+dir;k>=0&&k<nA;k+=dir){ const {info}=maskK(k), pr=[prev.c[0]+vel[0]*(miss+1),prev.c[1]+vel[1]*(miss+1)], pk=toK(k,pr[0],pr[1]), lim=Math.max(TW*0.06,Math.sqrt(prev.a)*3)*(1+miss*0.5);
+        let bb=null,bs=-1; for(const o of info.slice(1)){ if(o.a<minA*0.5) continue; const dd=Math.hypot(o.x-pk[0],o.y-pk[1]); if(dd>lim) continue; const sc=Math.min(1,o.a/prev.a,prev.a/o.a)/Math.pow(1+dd/(lim*0.5),2); if(sc>bs){ bs=sc; bb=o; } }
+        if(!bb){ if(++miss>8) break; continue; } const cR=toRef(k,bb.x,bb.y), st=miss+1; vel=[(cR[0]-prev.c[0])/st*0.7+vel[0]*0.3,(cR[1]-prev.c[1])/st*0.7+vel[1]*0.3]; miss=0; TR[k]={c:cR,a:bb.a}; prev=TR[k];
+        if(++done%6===0){ prog(0.4+0.3*(dir>0?(k-km)/(nA-km):(km-k)/(km+1))*0.5+(dir<0?0.15:0),'Fahrer:in verfolgen …'); await tick(); } } };
+    await walk(1); await walk(-1);
+    const sel=[]; for(let k=0;k<nA;k++) if(onGrid(k)&&TR[k]) sel.push(k); if(sel.length<2) throw new Error('Fahrer:in zu selten gefunden – Bereich oder Abstand ändern.');
+    const gridN=AF.filter((f,k)=>onGrid(k)).length;
+    /* 3) Panorama: Ausmass aller Bilder in Bezugskoordinaten, Massstab so, dass es in den Speicher passt */
+    let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9; for(let k=0;k<nA;k++){ const iv=affInv(MA[k]); for(const [cx,cy] of [[0,0],[W0,0],[0,h0],[W0,h0]]){ const [X,Y]=affApply(iv,cx,cy); x0=Math.min(x0,X); y0=Math.min(y0,Y); x1=Math.max(x1,X); y1=Math.max(y1,Y); } }
+    x0=Math.max(x0,W0/2-W0*5); x1=Math.min(x1,W0/2+W0*5); y0=Math.max(y0,h0/2-h0*3); y1=Math.min(y1,h0/2+h0*3);
+    let s=Math.min(960,vw)/W0; const area=(x1-x0)*(y1-y0)*s*s; if(area>9e6) s*=Math.sqrt(9e6/area);
+    const PW=Math.ceil((x1-x0)*s)&~1, PH=Math.ceil((y1-y0)*s)&~1, FW=Math.round(W0*s), FH=Math.round(h0*s);
+    const full=document.createElement('canvas'); full.width=PW; full.height=PH; const fx2=full.getContext('2d');
+    const toPano=k=>{ const iv=affInv(MA[k]); /* Bild k (FW-Pixel) → Panorama */ return [iv[0],iv[3],iv[1],iv[4],(iv[2]-x0)*s,(iv[5]-y0)*s]; };
+    const FEA=Math.round(Math.min(FW,FH)*0.08), fe=document.createElement('canvas'); fe.width=FW; fe.height=FH; { const fx=fe.getContext('2d'), im=fx.createImageData(FW,FH), dd=im.data; for(let y=0;y<FH;y++) for(let x=0;x<FW;x++){ const e=Math.min(x,y,FW-1-x,FH-1-y); dd[(y*FW+x)*4+3]=e>=FEA?255:Math.round(255*(e/FEA)*(e/FEA)*(3-2*e/FEA)); } fx.putImageData(im,0,0); }
+    const tmp=document.createElement('canvas'); tmp.width=FW; tmp.height=FH; const tq=tmp.getContext('2d');
+    const szK=k=>{ const r=TR[k]; return Math.max(18,Math.sqrt(r?r.a:200)/ts*s*1.9); };
+    const frameAt=async k=>{ const im=await v.at((AF[k]+0.5)/fps); tq.globalCompositeOperation='source-over'; tq.clearRect(0,0,FW,FH); if(fxCss(c)) tq.filter=fxCss(c); tq.drawImage(im,0,0,FW,FH); tq.filter='none'; return tmp; };
+    /* Hintergrund: Bilder mit weichem Rand und einem Loch dort, wo die Fahrer:in ist – andere Bilder füllen es ohne Figur */
+    const bgK=[]; { const want=Math.min(70,nA), st=Math.max(1,Math.floor(nA/want)); for(let k=0;k<nA;k+=st) bgK.push(k); }
+    for(let i=0;i<bgK.length;i++){ const k=bgK[i]; await frameAt(k); tq.globalCompositeOperation='destination-in'; tq.drawImage(fe,0,0);
+      if(TR[k]){ const ck=affApply(MA[k],TR[k].c[0],TR[k].c[1]), r=szK(k); tq.globalCompositeOperation='destination-out'; tq.beginPath(); tq.ellipse(ck[0]*s,ck[1]*s,r*0.9,r*1.25,0,0,7); tq.fill(); }
+      tq.globalCompositeOperation='source-over'; fx2.setTransform(...toPano(k)); fx2.drawImage(tmp,0,0); fx2.setTransform(1,0,0,1,0,0);
+      if(i%3===2){ prog(0.7+0.2*i/bgK.length,'Hintergrund zusammensetzen …'); await tick(); } }
+    /* Figuren: Ellipse um die Fahrer:in aus dem eigenen Bild, weich auslaufend */
+    const cents=[], sizes=[], fr=[];
+    for(let i=0;i<sel.length;i++){ const k=sel[i], ck=affApply(MA[k],TR[k].c[0],TR[k].c[1]), cx=ck[0]*s, cy=ck[1]*s, r=szK(k), rw=r*0.6+4, rh=r*0.85+4; await frameAt(k);
+      const st=document.createElement('canvas'); st.width=Math.ceil(rw*2); st.height=Math.ceil(rh*2); const sx=st.getContext('2d'); sx.drawImage(tmp,-(cx-rw),-(cy-rh));
+      sx.globalCompositeOperation='destination-in'; sx.translate(rw,rh); sx.scale(rw,rh); const g=sx.createRadialGradient(0,0,0,0,0,1); g.addColorStop(0,'#000'); g.addColorStop(0.6,'#000'); g.addColorStop(1,'rgba(0,0,0,0)'); sx.fillStyle=g; sx.fillRect(-1,-1,2,2);
+      fx2.setTransform(...toPano(k)); fx2.drawImage(st,cx-rw,cy-rh); fx2.setTransform(1,0,0,1,0,0);
+      const P=[(TR[k].c[0]-x0)*s,(TR[k].c[1]-y0)*s]; cents.push(P); sizes.push([r*0.9,r]); fr.push(AF[k]);
+      if(i%4===3){ prog(0.9+0.09*i/sel.length,'Positionen setzen …'); await tick(); } }
+    /* Zuschnitt auf den belegten Bereich, Lücken neutral füllen */
+    const id=fx2.getImageData(0,0,PW,PH), o=id.data; let bx0=PW,by0=PH,bx1=0,by1=0; for(let y=0;y<PH;y+=2) for(let x=0;x<PW;x+=2){ if(o[(y*PW+x)*4+3]>250){ if(x<bx0) bx0=x; if(x>bx1) bx1=x; if(y<by0) by0=y; if(y>by1) by1=y; } }
+    for(let j=0;j<o.length;j+=4) if(o[j+3]<255){ const al=o[j+3]/255; o[j]=o[j]*al+200*(1-al); o[j+1]=o[j+1]*al+204*(1-al); o[j+2]=o[j+2]*al+210*(1-al); o[j+3]=255; } fx2.putImageData(id,0,0);
+    const oc=$('#strCanvas'); oc.width=(bx1-bx0+1)&~1; oc.height=(by1-by0+1)&~1; strView(oc.width,oc.height); const ox=oc.getContext('2d'); ox.drawImage(full,-bx0,-by0);
+    STR.res={long:true,a,b,fps,cents,sizes,fr,OW:960,OH:540,crop:[bx0,by0,oc.width,oc.height],base:ox.getImageData(0,0,oc.width,oc.height),name:base(c.name)+'_Strobo_F'+a+'-'+b+'_alle'+N,found:TR.filter(Boolean).length,of:nA}; strobeDecor();
+    return {n:sel.length,of:gridN,weak:weak>nA/3}; }
+  finally{ try{ v.close(); }catch(e){} } }
 function strobeDecor(x,upto){ const R=STR.res; if(!R) return; const [cx0,cy0]=R.crop||[0,0]; if(!x){ const oc=$('#strCanvas'); x=oc.getContext('2d'); x.putImageData(R.base,0,0); }
   if(!STR.num) return; const k=R.OW/960, placed=[];
   R.cents.forEach((c,i)=>{ if(!c||(upto!=null&&i>upto)) return; const [bw,bh]=R.sizes?R.sizes[i]:[40,60], sz=Math.max(bw,bh), r=clamp(sz*0.16,7.5*k,11*k), fs=r*1.15; let px=c[0]-cx0+bw*0.5+r*0.6, py=c[1]-cy0-bh*0.55-r*0.9;
@@ -6767,9 +6852,16 @@ $('#strR').addEventListener('click',e=>{ const b=e.target.closest('[data-r]'); i
 $('#strCanvas').addEventListener('click',e=>{ if(STR.busy) return; const c=e.currentTarget, r=c.getBoundingClientRect(), u=(e.clientX-r.left)/r.width, v=(e.clientY-r.top)/r.height;
   if(STR.await){ STR.await=false; $('#strobeModal').classList.remove('asking'); STR.tap0=[u,v]; STR.tap=null; strobeRun(); return; }
   if(!STR.res) return; STR.tap0=null; STR.tap=[u*c.width,v*c.height]; toast('Fahrer:in wird neu gesucht …',1800); strobeRun(); });
-$('#strN').addEventListener('click',e=>{ const b=e.target.closest('[data-n]'); if(!b||STR.busy) return; STR.n=+b.dataset.n; $$('#strN button').forEach(x=>x.classList.toggle('on',x===b)); strobeRun(); });
+const strEUI=()=>{ $$('#strE button').forEach(x=>x.classList.toggle('on',+x.dataset.e===STR.every)); const iv=$('#strEv'); const pre=[0,5,10,15,25,50].includes(STR.every); iv.value=pre?'':String(STR.every); iv.classList.toggle('on',!pre); };
+const strERun=()=>{ strEUI(); if(STR.res||STR.tap0) strobeRun(); };
+$('#strE').addEventListener('click',e=>{ const b=e.target.closest('[data-e]'); if(!b||STR.busy) return; STR.every=+b.dataset.e; strERun(); });
+$('#strEv').addEventListener('change',e=>{ if(STR.busy) return; const n=Math.round(+e.target.value); if(!(n>=2)){ STR.every=0; } else STR.every=Math.min(500,n); strERun(); });
+$('#strEv').addEventListener('keydown',e=>{ e.stopPropagation(); if(e.key==='Enter') e.target.blur(); });
 
 $('#strNum').addEventListener('change',e=>{ STR.num=e.target.checked; strobeDecor(); });
+$('#strReset').addEventListener('click',()=>{ if(STR.busy) return; const L=SD&&SD.clip&&SD.clip.loop; /* alles auf Anfang: Bereich (Start–Ende, falls gesetzt), Abstand Auto, Nummern aus, Fahrer:in neu antippen */
+  STR.span=L&&L.a!=null?'cut':1; STR.n=8; STR.every=0; strEUI(); STR.num=false; STR.tap=null; STR.tap0=null; STR.res=null; $('#strNum').checked=false;
+  $$('#strR button').forEach(x=>x.classList.toggle('on',x.dataset.r===String(STR.span))); strobeAsk(); });
 $('#strSave').addEventListener('click',strobeSave);
 /* Strobo-Video: Positionen erscheinen nacheinander, am Schluss steht das ganze Bild */
 async function strobeVideo(){ const R=STR.res; if(!R||STR.busy) return; STR.busy=true; const btn=$('#strVid'); btn.disabled=true; btn.textContent='Video …';
@@ -6800,7 +6892,7 @@ async function strobeVideo(){ const R=STR.res; if(!R||STR.busy) return; STR.busy
   catch(e){ console.error(e); toast('Strobo-Video ging nicht: '+(e&&e.message||e),4000); }
   finally{ try{ v&&v.close(); }catch(e){} STR.busy=false; btn.disabled=false; btn.textContent='Video'; } }
 $('#strVid').addEventListener('click',strobeVideo);
-$$('#strN button').forEach(b=>b.classList.toggle('on',+b.dataset.n===STR.n));
+
 
 /* =========================================================
    DATEI-BROWSER (Ordner vom eigenen Gerät, Chrome/Edge)
@@ -7409,7 +7501,7 @@ if(false&&!LS.get('hint1',0)){ setTimeout(()=>{ toast(matchMedia('(pointer:coars
 
 /* Update-Hinweis: prüft version.json auf GitHub Pages; «Aktualisieren» lädt die Seite ohne Cache neu */
 (()=>{
-  const BUILD='20261101203644'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
+  const BUILD='20261101205908'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
   // nach einem Update die ?v=… aus der Adresse entfernen
   try{ const u=new URL(location.href); if(u.searchParams.has('v')){ u.searchParams.delete('v'); history.replaceState(null,'',u.pathname+(u.search||'')+u.hash); } }catch(e){}
   const el=$('#upd'); let latest=null, snoozed=null, busy=false;
@@ -7446,7 +7538,7 @@ async function preOvLoad(){ if(PRE_OV) return PRE_OV; try{ const r=await fetch('
   // Spotlight
   function focus(target,pad=8,depth=0){
     let r=null; try{ if(typeof target==='function') r=target(); else if(target){ const e=typeof target==='string'?$(target):target; r=e?e.getBoundingClientRect():null; } }catch(err){ r=null; }
-    if(!r||!r.width){ spot.style.opacity='0'; placeCard(null); return; }
+    if(!r||!r.width){ spot.style.opacity='0'; if(!target||!card.style.top) placeCard(null); return; } /* Ziel ist nach dem Klick weg (z. B. «Weiter»): Karte bleibt stehen statt quer übers Bild zu springen */
     // Handy: Ziel in den sichtbaren Bereich über der Karte scrollen
     if(innerWidth<700&&depth<2){ const room=innerHeight-(card.offsetHeight||190)-110; if(r.top<60||r.bottom>room){ window.scrollBy(0,r.top-Math.max(60,(room-r.height)/2)); return requestAnimationFrame(()=>focus(target,pad,depth+1)); } }
     spot.style.opacity='1'; Object.assign(spot.style,{left:(r.left-pad)+'px',top:(r.top-pad)+'px',width:(r.width+2*pad)+'px',height:(r.height+2*pad)+'px'});
