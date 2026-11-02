@@ -5036,11 +5036,11 @@ async function ghostCompute(opt){ // opt.resume: ab Bild opt.j mit fester Lage o
     const k0=GH.bg.k0; GH.bg=null;
     if(stop()||OV.K.length!==k0||S.length<2){ if(!stop()&&OV.K.length!==k0) toast('Feinberechnung verworfen – du hast inzwischen korrigiert. «Neu berechnen» rechnet fein.',3800); if(ovActive()) ovUI(); return; }
     const r=GH.step/step; if(GH.seeds) for(const k in GH.seeds){ const L=GH.seeds[k]; (Array.isArray(L)?L:[L]).forEach(q=>{ if(q&&q.i!=null) q.i=Math.round(q.i*r); }); }
-    GH.step=step; GH.cuts=cuts; GH.dbg=DBG; GH.S=S; GH.coarse=false; ghostGap(); tracksBuild(); GH.dirty=true; ghostUI(); resSave(); toast('Overlay verfeinert – jetzt mit allen Bildern.',2200); if(ovActive()) ovUI(); return; }
+    GH.step=step; GH.cuts=cuts; GH.dbg=DBG; GH.S=S; GH.coarse=false; tracksBuild(); ghostGap(); /* erst die Spuren, dann der Rückstand (braucht die Spuren) */ GH.dirty=true; ghostUI(); resSave(); toast('Overlay verfeinert – jetzt mit allen Bildern.',2200); if(ovActive()) ovUI(); return; }
   if(resume&&GH.abort&&ghostKey()===key){ GH.S=old; GH.state='ready'; GH.dirty=true; ghostUI(); if(ovActive()) ovUI(); toast('Neuberechnung abgebrochen – das bisherige Overlay bleibt.'); return; }
   if(GH.abort||ghostKey()!==key){ GH.state='idle'; ghostUI(); toast('Berechnung abgebrochen.'); return; }
   GH.timing={seek:Math.round(GH.tSeek||0),total:Math.round(performance.now()-t0)}; GH.tSeek=0;
-  GH.S=S; ghostGap(); tracksBuild(); GH.state='ready'; GH.dirty=true; ghostUI(); if(!coarse) resSave(); if(ovActive()) setTimeout(ovAutoKeys,50);
+  GH.S=S; tracksBuild(); ghostGap(); /* erst die Spuren, dann der Rückstand (braucht die Spuren) */ GH.state='ready'; GH.dirty=true; ghostUI(); if(!coarse) resSave(); if(ovActive()) setTimeout(ovAutoKeys,50);
   { GH._cnt=GH._cnt||new Set(); if(!GH._cnt.has(key)){ GH._cnt.add(key); if(window.vlabTrack) vlabTrack('overlay'); } } /* Nutzung: jedes neu berechnete Overlay (gleiche Paarung nur einmal je Sitzung) */
   if(coarse){ toast('Vorschau fertig – wird im Hintergrund verfeinert.',3000); if(ovActive()) ovUI(); setTimeout(()=>{ if(GH.state==='ready'&&GH.key===key) ghostCompute({bg:true}); },400); return; }
   const bad=S.filter(s=>!s.ok).length/S.length;
@@ -5163,6 +5163,9 @@ function autoGates(){ GH.autoGates=null; const S=GH.S, N=S?S.length:0; if(N<8||!
   /* Ausreisser weg: wo der laufende Rückstand bekannt ist, muss das Tor dazu passen; sonst nah am Median der übrigen Tore */
   const ok2=[]; const md=out.length?out.map(r=>r.gap).sort((p,q)=>p-q)[out.length>>1]:0;
   for(const r of out){ const c=typeof gapAt==='function'&&GH.gapE&&GH.gapE.length?gapAt(r.tA):null; if(c!=null?Math.abs(r.gap-c)<=0.25:(out.length>=3&&Math.abs(r.gap-md)<=0.4)){ if(r.pole&&c!=null) r.gap=(r.gap+c)/2; /* Slalom-Stange: Durchfahrt und laufender Rückstand gemittelt – halbiert das Zittern */ ok2.push(r); } /* ohne Bestätigung nur, wenn mehrere Tore übereinstimmen */ }
+  for(let guard=0;guard<20&&ok2.length>1;guard++){ let bad=-1; for(let i=1;i<ok2.length;i++){ const a=ok2[i-1], b=ok2[i]; if(Math.abs(b.gap-a.gap)>0.15+0.12*Math.abs(b.tA-a.tA)){ bad=i; break; } } if(bad<0) break;
+    const ref=g=>{ const c=typeof gapAt==='function'&&GH.gapE&&GH.gapE.length?gapAt(g.tA):null; if(c!=null) return c; const o=ok2.filter(x=>x!==g).map(x=>x.gap).sort((p,q)=>p-q); return o.length?o[o.length>>1]:g.gap; };
+    const a=ok2[bad-1], b=ok2[bad]; ok2.splice(Math.abs(a.gap-ref(a))>Math.abs(b.gap-ref(b))?bad-1:bad,1); } /* unmöglicher Sprung zwischen zwei Toren → das schlechter passende Tor weg */
   GH.autoGates=ok2.length?ok2:null; }
 // Deckkraft je Bild: bei Sprüngen und am Rand von Lücken sanft aus- und wieder einblenden, statt quer übers Bild zu gleiten
 function trkAlpha(T,S,W){ const N=T?T.length:0, al=new Float32Array(N); if(!N) return al; const bad=new Uint8Array(N);
@@ -5207,9 +5210,18 @@ function ghostGap(){
   const H2=Math.max(2,Math.round(0.5/st)), v=raw.map((x,i)=>x==null?null:med(raw,i,H2,3));
   /* glätten (gleitender Mittelwert über ±0,3 s) */ const H3=Math.max(1,Math.round(0.3/st)), sm=v.map((x,i)=>{ if(x==null) return null; let s2=0,n=0; for(let q=i-H3;q<=i+H3;q++) if(v[q]!=null){ s2+=v[q]; n++; } return s2/n; });
   for(let i=0;i<sm.length;){ if(sm[i]==null){ i++; continue; } let j=i; while(j<sm.length&&sm[j]!=null) j++; if(E[j-1]-E[i]<0.8) for(let q=i;q<j;q++) sm[q]=null; i=j; }
-  GH.raw=raw; GH.gapE=E; GH.gapV=sm; GH.PA=CA; GH.PB=CB; GH.tau=tau;
+  GH.raw=raw; GH.gapE=E; GH.gapV=gapRobust(E,raw,sm,st); GH.PA=CA; GH.PB=CB; GH.tau=tau;
   if(GH.trk&&!GH._agIn){ GH._agIn=true; try{ autoGates(); } finally{ GH._agIn=false; } } /* Tore mit dem neuen laufenden Rückstand bestätigen */
 }
+/* Laufender Rückstand robust: ein Rückstand ändert sich physikalisch langsam (selten mehr als ~0.15 s pro Sekunde).
+   Einzelwerte, die nicht zu ihrer Umgebung (±2.5 s) passen, fallen weg; was bleibt, wird lokal linear geglättet.
+   Nur wo genug übereinstimmende Werte sind, gibt es eine Anzeige – lieber keine Zahl als eine springende. */
+function gapRobust(E,raw,sm,st){ const N=E.length, out=new Array(N).fill(null), hw=Math.max(4,Math.round(2.5/st)), idx=[]; for(let i=0;i<N;i++) if(raw[i]!=null) idx.push(i); if(idx.length<4) return out;
+  const keep=new Uint8Array(N); for(const i of idx){ const w=[]; for(const j of idx){ if(Math.abs(j-i)<=hw) w.push(raw[j]); } if(w.length<4) continue; w.sort((a,b)=>a-b); const md=w[w.length>>1]; if(Math.abs(raw[i]-md)<=0.3) keep[i]=1; }
+  for(let i=0;i<N;i++){ let sw=0,sx=0,sy=0,sxx=0,sxy=0,n=0,nl=0,nr=0; for(let j=Math.max(0,i-hw);j<=Math.min(N-1,i+hw);j++){ if(!keep[j]) continue; const u=(j-i)/(hw+1), w=Math.pow(1-Math.abs(u)**3,3), x=E[j]-E[i]; sw+=w; sx+=w*x; sy+=w*raw[j]; sxx+=w*x*x; sxy+=w*x*raw[j]; n++; if(j<i) nl++; if(j>i) nr++; }
+    if(n<Math.max(5,Math.round(hw*0.5))) continue; const den=sw*sxx-sx*sx, two=nl>=2&&nr>=2, b=two&&den>1e-9?(sw*sxy-sx*sy)/den:0, a=two?(sy-b*sx)/sw:sy/sw; /* am Rand nicht hinausschiessen: nur Mittelwert */ if(Math.abs(b)>0.25) continue; out[i]=a; }
+  for(let i=0;i<N;){ if(out[i]==null){ i++; continue; } let j=i; while(j<N&&out[j]!=null) j++; if(E[j-1]-E[i]<1.0) for(let q=i;q<j;q++) out[q]=null; i=j; } /* zu kurze Stücke weg */
+  return out; }
 function gapAt(e,L){ const E=L?L.gapE:GH.gapE, V=L?L.gapV:GH.gapV; if(!E||!E.length) return null; const i=clamp(Math.floor(e/(L?L.step:GH.step)),0,E.length-1);
   let a=i; while(a>=0&&V[a]==null) a--; let b=i+1; while(b<E.length&&V[b]==null) b++;
   if(a>=0&&e-E[a]>0.6) a=-1; if(b<E.length&&E[b]-e>0.6) b=E.length;
@@ -5617,12 +5629,14 @@ const OVT_READY=true;
 const OVGAP={on:LS.get('ovGap',1)!==0,v:null};
 /* Quelle 1: Tore (Marken) in A und B, paarweise nach Reihenfolge – wie eine Zwischenzeit im Fernsehen: gilt ab dem Tor, bis zum nächsten */
 function ovGapGates(t){ if(!A.clip||!B.clip||!G.linked) return null; const mA=[], mB=[], /* Marker entfernt: nur erkannte Tore */ n=Math.min(mA.length,mB.length);
-  if(!n){ const AG=GH.autoGates; if(!AG||!ovFollowOK()) return null; let last=null; AG.forEach((g,k)=>{ if(GH.t0+g.tA<=t+1e-3) last={g:g.gap,k:k+1,auto:true}; }); return last; } /* ohne Marker: automatisch erkannte Tore */
+  if(!n){ const AG=GH.autoGates; if(!AG||!ovFollowOK()) return null; let last=null; AG.forEach((g,k)=>{ if(GH.t0+g.tA<=t+1e-3) last={g:g.gap,k:k+1,auto:true,t:GH.t0+g.tA}; }); return last; } /* ohne Marker: automatisch erkannte Tore */
   const fa=A.fps||A.clip.fps||50, fb=B.fps||B.clip.fps||50; let last=null, k0=0;
   for(let k=0;k<n;k++){ const ta=(mA[k]+0.5)/fa, tb=(mB[k]+0.5)/fb; if(ta<G.syncA-0.02) continue; k0++; if(ta<=t+1e-3) last={g:(tb-G.off)-ta,k:k0}; else break; }
   return last; }
 function ovGapVal(){ OVGAP.src=null; if(!OVGAP.on||(typeof OVG!=='undefined'&&OVG.on&&typeof ovGpsPair==='function'&&ovGpsPair())||!ovFollowOK()||OV.hideB) return null;
-  const t=ovTA(), gg=ovGapGates(t); if(gg){ OVGAP.src='Tor '+gg.k+(gg.auto?' (auto)':''); return gg.g; }
+  const t=ovTA(), gg=ovGapGates(t), run=(()=>{ if(!GH.gapE||!GH.gapE.length) return null; const e=t-(GH.t0||0); if(e<0||e>GH.eEnd) return null; let s=0,w=0; for(let k=-3;k<=3;k++){ const g=gapAt(e+k*0.06); if(g==null) continue; const ww=4-Math.abs(k); s+=g*ww; w+=ww; } return w?s/w:null; })();
+  if(gg&&(run==null||t-gg.t<4)){ OVGAP.src='Tor '+gg.k+(gg.auto?' (auto)':''); return gg.g; } /* Torwert 4 s zeigen, danach den laufenden Rückstand */
+  if(run!=null){ OVGAP.src='ca.'; return run; }
   if(!GH.gapE||!GH.gapE.length) return null; const e=t-(GH.t0||0); if(e<0||e>GH.eEnd) return null; let s=0,w=0; for(let k=-3;k<=3;k++){ const g=gapAt(e+k*0.06); if(g==null) continue; const ww=4-Math.abs(k); s+=g*ww; w+=ww; } if(w) OVGAP.src='ca.'; return w?s/w:null; }
 function ovGapDraw(x,ox,oy,w,h){ ovGapDraw1(x,ox,oy,w,h,ovGapVal(),lastName(B.clip)||'B',OVGAP.src,'#8B5CF6',0); let row=ovGapVal()==null?0:1;
   if(OVGAP.on) LAY.forEach(L=>{ if(L.hide||L.aClip!==A.clip) return; const r=layGap(L); if(!r) return; ovGapDraw1(x,ox,oy,w,h,r.g,L.name,r.src,L.col,row++); }); }
@@ -8263,7 +8277,7 @@ if(false&&!LS.get('hint1',0)){ setTimeout(()=>{ toast(matchMedia('(pointer:coars
 
 /* Update-Hinweis: prüft version.json auf GitHub Pages; «Aktualisieren» lädt die Seite ohne Cache neu */
 (()=>{
-  const BUILD='20261102152327'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
+  const BUILD='20261102154200'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
   // nach einem Update die ?v=… aus der Adresse entfernen
   try{ const u=new URL(location.href); if(u.searchParams.has('v')){ u.searchParams.delete('v'); history.replaceState(null,'',u.pathname+(u.search||'')+u.hash); } }catch(e){}
   const el=$('#upd'); let latest=null, snoozed=null, busy=false;
