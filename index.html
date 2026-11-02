@@ -6083,6 +6083,7 @@ function at(tr,tg){ const P=tr.P; if(tg<=P[0].t) return {...P[0],i:0,f:0}; if(tg
   const o={i:lo,f}; for(const k of ['t','x','y','v','a','s']) o[k]=a[k]+(b[k]-a[k])*f;
   const dta=tr.dt&&tr.dt[lo], dtb=tr.dt&&tr.dt[hi]; o.dt=dta!=null&&dtb!=null?dta+(dtb-dta)*f:(dta!=null?dta:dtb);
   const dva=tr.dv&&tr.dv[lo], dvb=tr.dv&&tr.dv[hi]; o.dv=dva!=null&&dvb!=null?dva+(dvb-dva)*f:(dva!=null?dva:dvb); return o; }
+function vSm(tr,tg){ /* ruhige Tempo-Anzeige: ±0.12 s dreieckig gemittelt */ let sv=0,sw=0; for(let k=-2;k<=2;k++){ const w=3-Math.abs(k); sv+=at(tr,tg+k*0.06).v*w; sw+=w; } return sv/sw; }
 function gpsNow(){ const c=GD.clip, tr=trackOf(c); if(!tr||!GD.ready) return null; const vt=GD.v.paused?(GD.frame+0.5)/GD.fps:GD.v.currentTime; return {tr,c,tg:vt+c.gpsOff,cur:at(tr,vt+c.gpsOff)}; }
 
 /* ---------- Farben ---------- */
@@ -6113,13 +6114,13 @@ function drawGpsOverlay(T){ /* T={x,R}: direkt in den Export zeichnen (volle Auf
     const vhiK=Math.max(40,Math.ceil(KMH(Math.max(tr.vmax,ref?ref.vmax:0))*1.04/10)*10), A0=Math.PI*0.75, A1=Math.PI*2.25, AV=v=>A0+(A1-A0)*clamp(KMH(v)/vhiK,0,1), AK=kmh=>A0+(A1-A0)*clamp(kmh/vhiK,0,1);
     const g=x.createRadialGradient(TX,TY-rad*0.3,rad*0.1,TX,TY,rad); g.addColorStop(0,'rgba(28,34,44,.64)'); g.addColorStop(1,'rgba(8,11,16,.72)');
     x.fillStyle=g; x.beginPath(); x.arc(TX,TY,rad,0,7); x.fill(); x.strokeStyle='rgba(255,255,255,.14)'; x.lineWidth=1.2; x.stroke();
-    const ar=rad*(small?0.84:0.8), aw=(small?14:11)*f;
+    const ar=rad*(small?0.84:0.8), aw=(small?14:9)*f;
     x.lineCap='round'; x.strokeStyle='rgba(255,255,255,.1)'; x.lineWidth=aw; x.beginPath(); x.arc(TX,TY,ar,A0,A1); x.stroke();
     /* Skala: kurze Striche alle 10 km/h, Zahlen alle 20 */
     for(let v=0;v<=vhiK;v+=small?20:10){ const an=AK(v), maj=v%20===0, r1=ar-aw*0.5-3*f, r2=r1-(maj?9:5)*f;
       x.strokeStyle=maj?'rgba(255,255,255,.6)':'rgba(255,255,255,.3)'; x.lineWidth=(maj?2:1.2)*f; x.lineCap='butt'; x.beginPath(); x.moveTo(TX+Math.cos(an)*r1,TY+Math.sin(an)*r1); x.lineTo(TX+Math.cos(an)*r2,TY+Math.sin(an)*r2); x.stroke();
-      if(maj&&TD>=130){ const rl=r2-9*f; x.font=`700 ${10*f}px ${ff}`; x.fillStyle='rgba(255,255,255,.55)'; x.textAlign='center'; x.textBaseline='middle'; x.fillText(String(v),TX+Math.cos(an)*rl,TY+Math.sin(an)*rl); } }
-    const vS=have&&KMH(cur.v)>=3?cur.v:0; /* unter 3 km/h = Stand (GPS-Rauschen) */
+      }
+    const vSmo=have?vSm(tr,N.tg):0, vS=have&&KMH(vSmo)>=3?vSmo:0; /* unter 3 km/h = Stand (GPS-Rauschen) */
     if(have&&vS>0){ const ae=AV(vS);
       let col='#1f5aa6'; /* Farbkonzept wie Karte: langsam hellblau → schnell dunkelblau */ if(x.createConicGradient){ col=x.createConicGradient(A0-0.05,TX,TY); col.addColorStop(0,'#a9d2ee'); col.addColorStop(0.3,'#6aaedd'); col.addColorStop(0.55,'#2f78bf'); col.addColorStop(0.8,'#1a4f96'); col.addColorStop(1,'#0e2f66'); }
       x.lineCap='round'; x.strokeStyle='rgba(255,255,255,.88)'; x.lineWidth=aw+3*f; x.beginPath(); x.arc(TX,TY,ar,A0,Math.max(A0+0.001,ae)); x.stroke(); /* heller Rand, damit Dunkelblau auf dem dunklen Tacho sichtbar bleibt */
@@ -6133,6 +6134,7 @@ function drawGpsOverlay(T){ /* T={x,R}: direkt in den Export zeichnen (volle Auf
     x.textAlign='center'; x.textBaseline='middle';
     x.font=`800 ${(small?44:31)*f}px ${ff}`; x.fillStyle='#fff'; x.fillText(have?(vS?(small?KMH(vS).toFixed(0):KMH(vS).toFixed(1)):'0'):'—',TX,TY-2*f);
     x.font=`700 ${(small?17:11)*f}px ${ff}`; x.fillStyle='rgba(255,255,255,.6)'; x.fillText('km/h',TX,TY+(small?30:22)*f);
+    if(!small&&tr.vmax) { x.font=`700 ${11*f}px ${ff}`; x.fillStyle='rgba(255,255,255,.78)'; x.fillText('▲ '+KMH(tr.vmax).toFixed(0)+' max',TX,TY+44*f); } /* Spitze des Laufs */
   }
   // 2) Fahrlinie («Schlange») rechts
   if(GPS.view.snake){
@@ -6233,18 +6235,21 @@ function drawOvGps(T){ let x,R; const cv=$('canvas.ovgps',A.stage);
   const inA=tgA>=ta.tStart-0.3&&tgA<=ta.tEnd+0.3, inB=tgB>=tb.tStart-0.3&&tgB<=tb.tEnd+0.3;
   const vhiK=Math.max(40,Math.ceil(KMH(Math.max(ta.vmax,tb.vmax))*1.04/10)*10);
   const TD=T?R.h*0.24:small?clamp(Math.min(R.w*0.17,R.h*0.25),52,72):clamp(Math.min(R.w*0.115,R.h*0.23),72,140), gap=8*k, mY=R.y+R.h-TD/2-(small?6:10)*k;
-  const gauge=(cx,cy,v,col,lab,nm)=>{ const rad=TD/2, f=TD/200, A0=Math.PI*0.75, A1=Math.PI*2.25, vS=KMH(v)>=3?v:0, ae=A0+(A1-A0)*clamp(KMH(vS)/vhiK,0,1);
+  const gauge=(cx,cy,v,col,lab,nm,lead)=>{ const rad=TD/2, f=TD/200, A0=Math.PI*0.75, A1=Math.PI*2.25, vS=KMH(v)>=3?v:0, ae=A0+(A1-A0)*clamp(KMH(vS)/vhiK,0,1);
     x.save(); x.shadowColor='rgba(0,0,0,.35)'; x.shadowBlur=10*f; const g=x.createRadialGradient(cx,cy-rad*0.3,rad*0.1,cx,cy,rad); g.addColorStop(0,'rgba(28,34,44,.66)'); g.addColorStop(1,'rgba(8,11,16,.74)'); x.fillStyle=g; x.beginPath(); x.arc(cx,cy,rad,0,7); x.fill(); x.restore();
     x.strokeStyle='rgba(255,255,255,.12)'; x.lineWidth=1; x.beginPath(); x.arc(cx,cy,rad-.5,0,7); x.stroke();
-    const ar=rad*0.8, aw=(small?14:12)*f; x.lineCap='round'; x.strokeStyle='rgba(255,255,255,.1)'; x.lineWidth=aw; x.beginPath(); x.arc(cx,cy,ar,A0,A1); x.stroke();
+    if(lead){ x.save(); x.shadowColor=col; x.shadowBlur=16*f; x.strokeStyle=col; x.lineWidth=2.2*f; x.beginPath(); x.arc(cx,cy,rad+1.5*f,0,7); x.stroke(); x.restore(); } /* wer gerade schneller ist, leuchtet */
+    const ar=rad*0.8, aw=(small?12:10)*f; x.lineCap='round'; x.strokeStyle='rgba(255,255,255,.1)'; x.lineWidth=aw; x.beginPath(); x.arc(cx,cy,ar,A0,A1); x.stroke();
+    if(!small) for(let q=0;q<=vhiK;q+=10){ const an=A0+(A1-A0)*q/vhiK, mj=q%20===0, r1=ar-aw*0.5-3*f, r2=r1-(mj?9:5)*f; x.strokeStyle=mj?'rgba(255,255,255,.55)':'rgba(255,255,255,.25)'; x.lineWidth=(mj?2:1.2)*f; x.lineCap='butt'; x.beginPath(); x.moveTo(cx+Math.cos(an)*r1,cy+Math.sin(an)*r1); x.lineTo(cx+Math.cos(an)*r2,cy+Math.sin(an)*r2); x.stroke(); } x.lineCap='round';
     if(vS>0){ x.save(); x.strokeStyle=col; x.lineWidth=aw; x.shadowColor=col; x.shadowBlur=8*f; x.beginPath(); x.arc(cx,cy,ar,A0,ae); x.stroke(); x.restore(); x.fillStyle='#fff'; x.beginPath(); x.arc(cx+Math.cos(ae)*ar,cy+Math.sin(ae)*ar,aw*0.32,0,7); x.fill(); }
     x.textAlign='center'; x.textBaseline='middle'; x.fillStyle='#fff'; x.font=`800 ${(small?46:40)*f}px ${ff}`; x.fillText(vS?(small||T?KMH(vS).toFixed(0):KMH(vS).toFixed(1)):'0',cx,cy-2*f);
     x.font=`700 ${(small?18:13)*f}px ${ff}`; x.fillStyle='rgba(255,255,255,.6)'; x.fillText('km/h',cx,cy+(small?30:24)*f);
     /* Schild unten: Buchstabe + Name */
     const t=lab+(nm&&!small?'  '+nm:''); x.font=`800 ${(small?11:11.5)*k}px ${ff}`; const tw=x.measureText(t).width+14*k, th=18*k, ty=cy+rad-th*0.55;
-    x.fillStyle=col; x.beginPath(); if(x.roundRect) x.roundRect(cx-tw/2,ty,tw,th,6*k); else x.rect(cx-tw/2,ty,tw,th); x.fill(); x.fillStyle='#fff'; x.fillText(t,cx,ty+th/2+0.5*k); };
+    x.fillStyle=col; x.beginPath(); if(x.roundRect) x.roundRect(cx-tw/2,ty,tw,th,6*k); else x.rect(cx-tw/2,ty,tw,th); x.fill(); x.fillStyle=lab==='A'?'#1d1600':'#fff'; x.fillText(t,cx,ty+th/2+0.5*k); };
   const xB=R.x+R.w-TD/2-(small?6:10)*k, xA=xB-TD-gap;
-  gauge(xA,mY,inA||tgA<ta.tStart?ca.v:ca.v,'#FFC21A','A',lastName(A.clip)); gauge(xB,mY,cb.v,'#8B5CF6','B',lastName(B.clip));
+  const vA=vSm(ta,tgA), vB=vSm(tb,tgB), dk=KMH(vA)-KMH(vB), both=inA&&inB&&KMH(vA)>=3&&KMH(vB)>=3; /* gleiche Skala vhiK für beide */
+  gauge(xA,mY,vA,'#FFC21A','A',lastName(A.clip),both&&dk>0.3); gauge(xB,mY,vB,'#8B5CF6','B',lastName(B.clip),both&&dk<-0.3);
   /* Vorsprung: wer liegt am gleichen Ort vorne */
   if(inA&&inB&&ca.dt!=null){ const lead=ca.dt<=0, col=lead?'#FFC21A':'#8B5CF6', who=lead?'A':'B', t=(small?'≈ ':who+' vorne ≈ ')+Math.abs(ca.dt).toFixed(2)+' s', dk=ca.dv!=null?KMH(ca.dv)*(lead?1:-1):null;
     x.font=`800 ${(small?12:14)*k}px ${ff}`; const t2=''; /* Tempo-Unterschied nicht mehr anzeigen (stehen in den beiden Tachos) */ const w1=x.measureText(t).width; x.font=`700 ${12*k}px ${ff}`; const w2=t2?x.measureText(t2).width:0;
@@ -7683,7 +7688,7 @@ if(false&&!LS.get('hint1',0)){ setTimeout(()=>{ toast(matchMedia('(pointer:coars
 
 /* Update-Hinweis: prüft version.json auf GitHub Pages; «Aktualisieren» lädt die Seite ohne Cache neu */
 (()=>{
-  const BUILD='20261102090735'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
+  const BUILD='20261102091508'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
   // nach einem Update die ?v=… aus der Adresse entfernen
   try{ const u=new URL(location.href); if(u.searchParams.has('v')){ u.searchParams.delete('v'); history.replaceState(null,'',u.pathname+(u.search||'')+u.hash); } }catch(e){}
   const el=$('#upd'); let latest=null, snoozed=null, busy=false;
