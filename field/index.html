@@ -620,7 +620,10 @@ svg{display:block}
 var K='vlab:auth', SB='https://sswtnkwqkmokozrcqrxf.supabase.co', PK='sb_publishable_g1FMMtPfyO0QNWAFtMXdsw_TUOOgQtB', DAYS=30;
 var de=document.documentElement, $=function(s){return document.getElementById(s)};
 function sess(){ try{ var s=JSON.parse(localStorage.getItem(K)||'null'); if(s&&s.e&&s.exp>Date.now()) return s; }catch(e){} return null; }
-window.vlabAuth={ get:sess, logout:function(){ try{ localStorage.removeItem(K); }catch(e){} location.reload(); } };
+window.vlabAuth={ get:sess, logout:function(){ try{ localStorage.removeItem(K); }catch(e){} location.reload(); },
+  hash:function(e,p){ return hash(e,p); }, /* für Funktionen, die das Passwort nochmals prüfen (Nutzungsanalyse) – Hash bleibt nur im Speicher */
+  rpc:function(fn,body){ return fetch(SB+'/rest/v1/rpc/'+fn,{method:'POST',headers:{'apikey':PK,'Content-Type':'application/json'},body:JSON.stringify(body)}); },
+  admin:function(){ var s=sess(); return !!(s&&/siebenthal|franzen|bruhin/i.test(s.e)); } }; /* nur Anzeige des Knopfs – die Zahlen gibt der Server nur Admins (vlab_admins) */
 /* Nutzung zählen: nur wer (E-Mail), was (Start, Overlay, Export), wann, wo (Lab/Field, prod/staging) – keine Videos, keine Namen.
    Warteschlange im Browser, gesendet sobald online (auch offline erstellte Overlays zählen). Lokal (Tests, eigener Rechner) wird nichts gesendet. */
 var QK='vlab:q', APP=location.pathname.indexOf('/field/')>=0?'field':'lab', ENV=window.VLAB_ENV||(location.protocol==='file:'||/^(localhost|127\.|0\.0\.0\.0|192\.168\.|10\.)/.test(location.hostname)?'local':'prod');

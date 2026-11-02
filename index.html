@@ -2402,6 +2402,64 @@ canvas.gap-row[hidden]{display:none}
 /* Marker-Funktion entfernt */
 [data-act="marker"],#btnSplits,#splits,.notepill,#expNotesRow,.mk-count,#sMarks{display:none!important}
 #viewSingle .dz-r>.ctl-sep{display:none!important}
+
+/* Nutzungsanalyse (nur Admins) */
+.vl-pop .vp-use{display:flex;align-items:center;gap:10px;width:100%;height:38px;padding:0 10px;border:0;border-radius:10px;background:none;color:var(--ink);font:600 13px var(--font);cursor:pointer;text-align:left}
+.vl-pop .vp-use:hover{background:var(--hover)}
+.vl-pop .vp-use svg{width:16px;height:16px}
+#useModal .use{width:min(1040px,100%);background:var(--card);color:var(--ink);border-radius:18px;box-shadow:var(--shadow);padding:20px 22px 18px;display:flex;flex-direction:column;gap:16px;font-family:var(--font)}
+#useModal .use-hd{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+#useModal .use-ic{width:36px;height:36px;border-radius:10px;background:var(--red-soft);color:var(--red);display:grid;place-items:center;flex:none}
+#useModal .use-ic svg{width:19px;height:19px}
+#useModal .use-tt{flex:1;min-width:150px}
+#useModal .use-tt h3{margin:0;font:700 17px/1.2 var(--font)}
+#useModal .use-tt span{font-size:12px;color:var(--muted)}
+#useModal .use-x{width:34px;height:34px;border:0;border-radius:10px;background:var(--field);color:var(--ink2);cursor:pointer;display:grid;place-items:center}
+#useModal .use-x:hover{background:var(--hover)}
+#useModal .use-seg{display:flex;background:var(--field);border:1px solid var(--line);border-radius:10px;padding:2px}
+#useModal .use-seg button{border:0;background:none;color:var(--muted);font:600 12px var(--font);padding:6px 10px;border-radius:8px;cursor:pointer}
+#useModal .use-seg button.on{background:var(--card);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.12)}
+#useModal .use-kpi{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+#useModal .use-k{border:1px solid var(--line);border-radius:14px;padding:12px 14px;background:var(--field)}
+#useModal .use-k b{display:block;font:700 26px/1.1 var(--font);font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+#useModal .use-k span{font-size:12px;color:var(--muted)}
+#useModal .use-k em{font-style:normal;font-size:11.5px;color:var(--ink2);display:block;margin-top:2px}
+#useModal .use-ch{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+#useModal .use-c{border:1px solid var(--line);border-radius:14px;padding:12px 14px 8px;position:relative}
+#useModal .use-c h4{margin:0 0 6px;font:650 13px var(--font);display:flex;justify-content:space-between;gap:8px}
+#useModal .use-c h4 span{color:var(--muted);font-weight:500}
+#useModal .use-c svg{display:block;width:100%;height:130px;overflow:visible}
+#useModal .use-c .ax{fill:var(--muted);font:500 10px var(--mono)}
+#useModal .use-c .gl{stroke:var(--line);stroke-width:1}
+#useModal .use-c .bar{fill:var(--red);pointer-events:none}
+#useModal .use-c .bar.z{fill:var(--ink2)}
+#useModal .use-c .hit{fill:transparent;cursor:default}
+#useModal .use-c .bar.hl{opacity:.7}
+#useModal .use-tip{position:absolute;pointer-events:none;background:var(--tip);color:var(--tip-txt);font:600 11.5px/1.35 var(--font);padding:6px 9px;border-radius:8px;white-space:nowrap;transform:translate(-50%,-100%);display:none;z-index:2}
+#useModal .use-tip em{font-style:normal;font-weight:500;opacity:.75;display:block}
+#useModal .use-tw{border:1px solid var(--line);border-radius:14px;overflow:auto}
+#useModal table{width:100%;border-collapse:collapse;font-size:13px;min-width:720px}
+#useModal th{position:sticky;top:0;background:var(--card);text-align:right;font:600 11.5px var(--font);color:var(--muted);padding:10px 12px;border-bottom:1px solid var(--line);cursor:pointer;white-space:nowrap;user-select:none}
+#useModal th:first-child,#useModal td:first-child{text-align:left}
+#useModal th.on{color:var(--ink)}
+#useModal th.on::after{content:' ↓'}
+#useModal td{padding:9px 12px;border-bottom:1px solid var(--line);text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+#useModal tr:last-child td{border-bottom:0}
+#useModal td .pn{font-weight:650;display:block}
+#useModal td .pe{font-size:11.5px;color:var(--muted)}
+#useModal td .q{display:inline-flex;align-items:center;gap:8px}
+#useModal td .q i{width:70px;height:6px;border-radius:3px;background:var(--line);position:relative;overflow:hidden;display:inline-block}
+#useModal td .q i s{position:absolute;inset:0 auto 0 0;border-radius:3px;background:var(--good)}
+#useModal td .q i s.w{background:#d98a00}
+#useModal td .q i s.c{background:var(--red)}
+#useModal td .muted{color:var(--muted)}
+#useModal .use-ft{font-size:11.5px;color:var(--muted);display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+#useModal .use-pw{display:flex;flex-direction:column;gap:10px;max-width:360px;margin:8px auto 14px;text-align:center}
+#useModal .use-pw p{margin:0;color:var(--ink2);font-size:13px}
+#useModal .use-pw input{height:42px;border:1px solid var(--line2);border-radius:10px;background:var(--field);color:var(--ink);padding:0 12px;font:500 14px var(--font)}
+#useModal .use-pw .err{color:var(--red);font-size:12.5px;min-height:16px}
+#useModal .use-empty{padding:28px;text-align:center;color:var(--muted);font-size:13px}
+@media (max-width:760px){ #useModal .use{padding:16px 14px 14px;border-radius:16px} #useModal .use-kpi{grid-template-columns:1fr 1fr} #useModal .use-ch{grid-template-columns:1fr} #useModal .use-seg{order:3;width:100%} #useModal .use-seg button{flex:1} }
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
   .aurora{display:none}
@@ -2947,7 +3005,10 @@ header .btn-cam svg circle:last-child{animation:camDot 2s ease-in-out infinite}
 var K='vlab:auth', SB='https://sswtnkwqkmokozrcqrxf.supabase.co', PK='sb_publishable_g1FMMtPfyO0QNWAFtMXdsw_TUOOgQtB', DAYS=30;
 var de=document.documentElement, $=function(s){return document.getElementById(s)};
 function sess(){ try{ var s=JSON.parse(localStorage.getItem(K)||'null'); if(s&&s.e&&s.exp>Date.now()) return s; }catch(e){} return null; }
-window.vlabAuth={ get:sess, logout:function(){ try{ localStorage.removeItem(K); }catch(e){} location.reload(); } };
+window.vlabAuth={ get:sess, logout:function(){ try{ localStorage.removeItem(K); }catch(e){} location.reload(); },
+  hash:function(e,p){ return hash(e,p); }, /* für Funktionen, die das Passwort nochmals prüfen (Nutzungsanalyse) – Hash bleibt nur im Speicher */
+  rpc:function(fn,body){ return fetch(SB+'/rest/v1/rpc/'+fn,{method:'POST',headers:{'apikey':PK,'Content-Type':'application/json'},body:JSON.stringify(body)}); },
+  admin:function(){ var s=sess(); return !!(s&&/siebenthal|franzen|bruhin/i.test(s.e)); } }; /* nur Anzeige des Knopfs – die Zahlen gibt der Server nur Admins (vlab_admins) */
 /* Nutzung zählen: nur wer (E-Mail), was (Start, Overlay, Export), wann, wo (Lab/Field, prod/staging) – keine Videos, keine Namen.
    Warteschlange im Browser, gesendet sobald online (auch offline erstellte Overlays zählen). Lokal (Tests, eigener Rechner) wird nichts gesendet. */
 var QK='vlab:q', APP=location.pathname.indexOf('/field/')>=0?'field':'lab', ENV=window.VLAB_ENV||(location.protocol==='file:'||/^(localhost|127\.|0\.0\.0\.0|192\.168\.|10\.)/.test(location.hostname)?'local':'prod');
@@ -5257,6 +5318,57 @@ function ovDrawB(x,ox,oy,w,h){ // B ausgerichtet über ein A-Bild der Grösse w�
     x.setTransform(sc*M[0],sc*M[3],sc*M[1],sc*M[4],sc*M[2]+ox,sc*M[5]+oy); x.drawImage(B.xImg||B.v,0,0,GH.W0,GH.hB); }
   else { const k=w/A.v.videoWidth, M=OV.T; x.setTransform(k*M[0],k*M[3],k*M[1],k*M[4],k*M[2]+ox,k*M[5]+oy); x.drawImage(B.xImg||B.v,0,0,B.v.videoWidth,B.v.videoHeight); }
   x.restore(); x.save(); x.beginPath(); x.rect(ox,oy,w,h); x.clip(); layerDraw(x,ox,oy,w); x.restore(); tagsDrawTo(x,ox,oy,w,h); }
+/* Nutzungsanalyse (nur Admins): Passwort wird nochmals geprüft (Server: vlab_login + vlab_admins), Hash nur im Speicher dieser Seite */
+const USE={h:null,days:30,data:null,sort:'o'};
+function stgGo(){ location.href=window.VLAB_ENV==='staging'?'../':'staging/'; } /* Admins: zwischen Live- und Staging-Seite wechseln */
+function useOpen(){ let m=$('#useModal'); if(!m){ m=document.createElement('div'); m.className='modal'; m.id='useModal'; document.body.appendChild(m);
+    m.addEventListener('pointerdown',e=>{ if(e.target===m) m.classList.remove('on'); }); document.addEventListener('keydown',e=>{ if(e.key==='Escape'&&m.classList.contains('on')) m.classList.remove('on'); }); }
+  m.classList.add('on'); if(USE.h) useLoad(); else usePw(); }
+function useShell(body){ const m=$('#useModal'); const seg=[[7,'7 Tage'],[30,'30 Tage'],[90,'90 Tage'],[3650,'Alles']].map(([d,l])=>'<button data-d="'+d+'"'+(USE.days===d?' class="on"':'')+'>'+l+'</button>').join('');
+  m.innerHTML='<div class="use" role="dialog" aria-label="Nutzungsanalyse"><div class="use-hd"><span class="use-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg></span><div class="use-tt"><h3>Nutzungsanalyse</h3><span>Video-Lab und Field · nur die öffentliche Version</span></div>'+(USE.h?'<div class="use-seg">'+seg+'</div>':'')+'<button class="use-x" aria-label="Schliessen"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>'+body+'</div>';
+  $('.use-x',m).onclick=()=>m.classList.remove('on');
+  m.querySelectorAll('.use-seg button').forEach(b=>b.onclick=()=>{ USE.days=+b.dataset.d; useLoad(); }); return m; }
+function usePw(msg){ const s=window.vlabAuth&&vlabAuth.get()||{};
+  const m=useShell('<form class="use-pw"><p>Zum Schutz der Zahlen bitte das Passwort für <b></b> nochmals eingeben.</p><input type="password" autocomplete="current-password" placeholder="Passwort"><span class="err"></span><button class="btn-pri" type="submit">Analyse anzeigen</button></form>');
+  $('.use-pw b',m).textContent=s.e||''; const f=$('.use-pw',m), inp=$('input',f), er=$('.err',f), go=$('button',f); er.textContent=msg||''; setTimeout(()=>inp.focus(),60);
+  f.onsubmit=async ev=>{ ev.preventDefault(); if(!inp.value) return; go.disabled=true; go.textContent='Prüfen …'; try{ USE.h=await vlabAuth.hash(s.e,inp.value); inp.value=''; await useLoad(); }catch(e){ USE.h=null; er.textContent='Keine Verbindung.'; go.disabled=false; go.textContent='Analyse anzeigen'; } }; }
+async function useLoad(){ const s=window.vlabAuth&&vlabAuth.get(); if(!s||!USE.h){ usePw(); return; }
+  if(!USE.data) useShell('<div class="use-empty">Zahlen werden geladen …</div>'); else { const k=$('#useModal .use-seg'); if(k) k.querySelectorAll('button').forEach(b=>b.classList.toggle('on',+b.dataset.d===USE.days)); }
+  let j=null; try{ const r=await vlabAuth.rpc('vlab_stats',{p_e:s.e,p_h:USE.h,p_days:USE.days}); j=await r.json(); if(!r.ok&&!(j&&j.err)) j={ok:false,err:'http'}; }catch(e){ j={ok:false,err:'net'}; }
+  if(!j||!j.ok){ const er=j&&j.err; USE.data=null; if(er==='bad'){ USE.h=null; usePw('Passwort stimmt nicht.'); return; } if(er==='locked'){ USE.h=null; usePw('Zu viele Fehlversuche. Bitte in 15 Minuten nochmals.'); return; }
+    useShell('<div class="use-empty">'+(er==='denied'?'Dieses Konto hat keinen Zugriff auf die Nutzungsanalyse.':er==='net'?'Keine Verbindung – bitte später nochmals.':'Analyse im Moment nicht verfügbar.')+'</div>'); return; }
+  USE.data=j; useRender(); }
+function useRender(){ const D=USE.data, U=D.users||[], S=D.series||[], esc=t=>String(t==null?'':t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  const sum=k=>U.reduce((a,u)=>a+(+u[k]||0),0), act=U.filter(u=>(+u.z||0)+(+u.o||0)+(+u.x||0)>0).length, fmt=n=>Number(n||0).toLocaleString('de-CH'), per=USE.days>=3650?'seit Beginn':'letzte '+USE.days+' Tage';
+  const rel=t=>{ if(!t) return '–'; const d=(Date.now()-new Date(t))/864e5; return d<1/24?'gerade eben':d<1?'heute':d<2?'gestern':d<14?Math.floor(d)+' Tage':new Date(t).toLocaleDateString('de-CH',{day:'2-digit',month:'2-digit',year:'2-digit'}); };
+  const kpi=(v,l,e)=>'<div class="use-k"><span>'+l+'</span><b>'+fmt(v)+'</b>'+(e?'<em>'+e+'</em>':'')+'</div>';
+  const oPer=sum('o'), zPer=sum('z');
+  const html='<div class="use-kpi">'+kpi(act,'Aktive Personen',per)+kpi(zPer,'Zugriffe',act?'Ø '+(zPer/act).toFixed(1)+' pro Person':'')+kpi(oPer,'Overlays',sum('om')+' diesen Monat')+kpi(sum('x'),'Exporte',act?'Ø '+(sum('x')/act).toFixed(1)+' pro Person':'')+'</div>'
+   +'<div class="use-ch"><div class="use-c" data-k="z"><h4>Zugriffe pro Tag<span></span></h4><svg></svg><div class="use-tip"></div></div><div class="use-c" data-k="o"><h4>Overlays pro Tag<span></span></h4><svg></svg><div class="use-tip"></div></div></div>'
+   +'<div class="use-tw"><table><thead><tr><th data-s="n">Person</th><th data-s="z">Zugriffe</th><th data-s="o">Overlays</th><th data-s="om">Diesen Monat (Basic 100)</th><th data-s="x">Exporte</th><th data-s="dv">Geräte</th><th data-s="last">Zuletzt</th></tr></thead><tbody></tbody></table></div>'
+   +'<div class="use-ft"><span>Zählt App-Starts, Anmeldungen, neu berechnete Overlays und Exporte. Keine Videos, keine Dateinamen.</span><span>Geräte = verschiedene Browser (Video-Lab / Field)</span></div>';
+  const m=useShell(html); if(!U.length) $('.use-tw',m).outerHTML='<div class="use-empty">Noch keine Nutzung erfasst.</div>';
+  m.querySelectorAll('.use-c').forEach(c=>useChart(c,S,c.dataset.k));
+  const tb=$('tbody',m); if(tb){ const draw=()=>{ const k=USE.sort, L=U.slice().sort((a,b)=>k==='n'?String(a.n||a.e).localeCompare(String(b.n||b.e),'de'):k==='last'?String(b.last||'').localeCompare(String(a.last||'')):(+b[k]||0)-(+a[k]||0));
+      m.querySelectorAll('th').forEach(th=>th.classList.toggle('on',th.dataset.s===k));
+      tb.innerHTML=L.map(u=>{ const om=+u.om||0, pc=Math.min(100,om), cl=om>=100?'c':om>=80?'w':''; return '<tr><td><span class="pn">'+esc(u.n||u.e)+'</span>'+(u.n?'<span class="pe">'+esc(u.e)+'</span>':'')+'</td><td>'+fmt(u.z)+'</td><td>'+fmt(u.o)+'</td><td><span class="q"><i><s class="'+cl+'" style="width:'+pc+'%"></s></i>'+om+' / 100</span></td><td>'+fmt(u.x)+'</td><td>'+fmt(u.dv)+(u.dv?' <span class="muted">('+(+u.dl||0)+' / '+(+u.df||0)+')</span>':'')+'</td><td>'+rel(u.last)+'</td></tr>'; }).join(''); };
+    m.querySelectorAll('th').forEach(th=>th.onclick=()=>{ USE.sort=th.dataset.s; draw(); }); draw(); } }
+function useChart(c,S,k){ const sv=$('svg',c), tip=$('.use-tip',c), W=Math.max(240,c.clientWidth-28), H=130, pl=26, pb=18, pt=6, n=Math.max(1,S.length), vals=S.map(r=>+r[k]||0), mx=Math.max(1,...vals);
+  const nice=v=>{ const p=Math.pow(10,Math.floor(Math.log10(v))), f=v/p; return (f<=1?1:f<=2?2:f<=5?5:10)*p; }, top=Math.max(2,nice(mx)), y=v=>pt+(H-pt-pb)*(1-v/top), bw=(W-pl)/n, gap=n>45?1:2, w=Math.max(1,bw-gap);
+  $('h4 span',c).textContent='Total '+vals.reduce((a,b)=>a+b,0).toLocaleString('de-CH');
+  sv.setAttribute('viewBox','0 0 '+W+' '+H); let g='';
+  [0,top/2,top].forEach(v=>{ g+='<line class="gl" x1="'+pl+'" x2="'+W+'" y1="'+y(v)+'" y2="'+y(v)+'"/><text class="ax" x="'+(pl-6)+'" y="'+(y(v)+3)+'" text-anchor="end">'+(v%1?v.toFixed(1):v)+'</text>'; });
+  const dl=d=>new Date(d+'T12:00:00').toLocaleDateString('de-CH',{day:'2-digit',month:'2-digit'}), every=Math.ceil(n/6);
+  S.forEach((r,i)=>{ const v=vals[i], x=pl+i*bw+gap/2, h=Math.max(0,H-pb-y(v)), rr=Math.min(4,w/2,h);
+    g+='<rect class="hit" data-i="'+i+'" x="'+(pl+i*bw)+'" y="'+pt+'" width="'+bw+'" height="'+(H-pt-pb)+'"/>';
+    if(v>0) g+='<path class="bar'+(k==='z'?' z':'')+'" d="M'+x+','+(H-pb)+'V'+(H-pb-h+rr)+'Q'+x+','+(H-pb-h)+' '+(x+rr)+','+(H-pb-h)+'H'+(x+w-rr)+'Q'+(x+w)+','+(H-pb-h)+' '+(x+w)+','+(H-pb-h+rr)+'V'+(H-pb)+'Z"/>';
+    if(i%every===0||i===n-1&&n<=8) g+='<text class="ax" x="'+(x+w/2)+'" y="'+(H-4)+'" text-anchor="middle">'+dl(r.d)+'</text>'; });
+  sv.innerHTML=g; const lab={z:'Zugriffe',o:'Overlays'}[k];
+  sv.querySelectorAll('.hit').forEach(h=>{ h.onpointerenter=()=>{ const i=+h.dataset.i, r=S[i], bx=sv.getBoundingClientRect(), cr=c.getBoundingClientRect(), sc=bx.width/W;
+      tip.innerHTML=(+r[k]||0)+' '+lab+'<em>'+new Date(r.d+'T12:00:00').toLocaleDateString('de-CH',{weekday:'short',day:'2-digit',month:'2-digit'})+' · '+(+r.u||0)+' Person'+((+r.u||0)===1?'':'en')+'</em>';
+      const nb=h.nextElementSibling; if(nb&&nb.classList.contains('bar')) nb.classList.add('hl'); tip.style.display='block'; tip.style.left=(bx.left-cr.left+(pl+(i+0.5)*bw)*sc)+'px'; tip.style.top=(bx.top-cr.top+y(+r[k]||0)*sc-6)+'px'; };
+    h.onpointerleave=()=>{ tip.style.display='none'; sv.querySelectorAll('.bar.hl').forEach(b=>b.classList.remove('hl')); }; }); }
+addEventListener('resize',()=>{ const m=$('#useModal'); if(m&&m.classList.contains('on')&&USE.data) m.querySelectorAll('.use-c').forEach(c=>useChart(c,USE.data.series||[],c.dataset.k)); });
 /* Namen: gleiche Regeln für Live-Bild und Export – nur wenn die Fahrer:innen klar auseinander sind, immer weich ein- und ausblenden */
 function tagTrack(k){ /* angetippte Spur (genau) vor automatischer Verfolgung */ if(typeof OVT!=='undefined'&&OVT.trk&&OVT.key===GH.key&&OVT.keys[k]&&OVT.keys[k].length) return {T:OVT.trk[k],AL:OVT.al[k],prec:true}; const f=tagFused(k); return f?{T:f.T,AL:f.AL,prec:false}:{T:GH.trk&&GH.trk[k],AL:GH.trkAl&&GH.trkAl[k],prec:false}; }
 /* Namen von Anfang an und nie in den Bäumen: die Kamera folgt der Person, also liegt sie nahe der Bildmitte.
@@ -7789,9 +7901,10 @@ document.addEventListener('visibilitychange',async()=>{ if(SER.on&&!document.hid
   window.vlabUserUI=()=>{ const s=window.vlabAuth&&vlabAuth.get(), b=$('#btnOut'); if(!b) return; $('#btnOutAv').textContent=s?ini(s):'?'; b.title=s?(s.n||s.e):'Konto'; };
   $('#btnOut').addEventListener('click',e=>{ e.stopPropagation(); if(pop){ close(); return; } const s=window.vlabAuth&&vlabAuth.get()||{}, b=e.currentTarget;
     pop=document.createElement('div'); pop.className='vl-pop'; pop.setAttribute('role','menu');
-    pop.innerHTML='<div class="vp-h"><span class="vl-av"></span><div class="vp-t"><span class="vp-n"></span><span class="vp-e"></span>'+(ROLE[s.r]?'<span class="vp-r"></span>':'')+'</div></div><div class="vp-sep"></div><button class="vp-out" role="menuitem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3"/><path d="M10 17l5-5-5-5"/><path d="M15 12H3"/></svg>Abmelden</button>';
+    pop.innerHTML='<div class="vp-h"><span class="vl-av"></span><div class="vp-t"><span class="vp-n"></span><span class="vp-e"></span>'+(ROLE[s.r]?'<span class="vp-r"></span>':'')+'</div></div><div class="vp-sep"></div>'+(window.vlabAuth&&vlabAuth.admin&&vlabAuth.admin()?'<button class="vp-use" role="menuitem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>Nutzungsanalyse</button><button class="vp-use vp-stg" role="menuitem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6M10 3v6L4.5 18.5A1.7 1.7 0 0 0 6 21h12a1.7 1.7 0 0 0 1.5-2.5L14 9V3"/><path d="M7 15h10"/></svg>'+(window.VLAB_ENV==='staging'?'Zur Live-Seite':'Zur Staging-Seite')+'</button><div class="vp-sep"></div>':'')+'<button class="vp-out" role="menuitem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3"/><path d="M10 17l5-5-5-5"/><path d="M15 12H3"/></svg>Abmelden</button>';
     $('.vl-av',pop).textContent=ini(s); $('.vp-n',pop).textContent=s.n||s.e||''; $('.vp-e',pop).textContent=s.n?s.e:''; if(ROLE[s.r]) $('.vp-r',pop).textContent=ROLE[s.r];
     $('.vp-out',pop).addEventListener('click',()=>{ close(); if(window.vlabAuth) vlabAuth.logout(); });
+    { const u=$('.vp-use:not(.vp-stg)',pop); if(u) u.addEventListener('click',()=>{ close(); useOpen(); }); const g=$('.vp-stg',pop); if(g) g.addEventListener('click',()=>{ close(); stgGo(); }); }
     document.body.appendChild(pop); b.classList.add('on'); const r=b.getBoundingClientRect(), h=pop.offsetHeight, w=pop.offsetWidth;
     pop.style.left=Math.max(8,Math.min(innerWidth-w-8,r.right-w))+'px'; pop.style.top=(r.top-h-8>8?r.top-h-8:r.bottom+8)+'px'; });
   document.addEventListener('pointerdown',e=>{ if(pop&&!e.target.closest('.vl-pop,#btnOut')) close(); },true);
@@ -7865,6 +7978,8 @@ setTimeout(fieldSync,600);
     ['Videos',I('<rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M3 10h18"/>'),()=>libOpen(true)],
     [invAuth()?'Von innove abmelden':'Bei innove anmelden',I('<path d="M12 21s7-6.2 7-11.5A7 7 0 0 0 5 9.5C5 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.4"/>'),()=>{ if(invAuth()){ LS.set('innove',null); invBtnUI(); toast('Von innove abgemeldet.'); } else invLoginUI().then(ok=>{ if(ok) toast('Bei innove angemeldet.',2500); }); }],
     ['Hell / Dunkel',I('<path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/>'),()=>$('#btnTheme').click()],
+    window.vlabAuth&&vlabAuth.admin&&vlabAuth.admin()?['Nutzungsanalyse',I('<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>'),()=>useOpen()]:null,
+    window.vlabAuth&&vlabAuth.admin&&vlabAuth.admin()?[window.VLAB_ENV==='staging'?'Zur Live-Seite':'Zur Staging-Seite',I('<path d="M9 3h6M10 3v6L4.5 18.5A1.7 1.7 0 0 0 6 21h12a1.7 1.7 0 0 0 1.5-2.5L14 9V3"/><path d="M7 15h10"/>'),()=>stgGo()]:null,
     ['Abmelden',I('<path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3"/><path d="M10 17l5-5-5-5"/><path d="M15 12H3"/>'),()=>window.vlabAuth&&vlabAuth.logout()]]); });
   // Videoliste als Blatt
   const lc=$('.libcard'), bk=document.createElement('div'); bk.className='lib-back'; document.body.appendChild(bk);
@@ -7932,7 +8047,7 @@ if(false&&!LS.get('hint1',0)){ setTimeout(()=>{ toast(matchMedia('(pointer:coars
 
 /* Update-Hinweis: prüft version.json auf GitHub Pages; «Aktualisieren» lädt die Seite ohne Cache neu */
 (()=>{
-  const BUILD='20261102130651'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
+  const BUILD='20261102132743'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
   // nach einem Update die ?v=… aus der Adresse entfernen
   try{ const u=new URL(location.href); if(u.searchParams.has('v')){ u.searchParams.delete('v'); history.replaceState(null,'',u.pathname+(u.search||'')+u.hash); } }catch(e){}
   const el=$('#upd'); let latest=null, snoozed=null, busy=false;
