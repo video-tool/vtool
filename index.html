@@ -18,6 +18,7 @@ html.vgate-out #gate{opacity:0;transform:scale(1.015);transition:opacity .4s var
 #gate .g-go.ok{background:var(--good)}
 @keyframes gspin{to{transform:rotate(360deg)}}
 @media (max-width:900px){ html.vgate #gate{overflow:auto} }
+@media (max-width:600px){ #gate .g-feats{display:none!important} } /* Handy: keine Funktions-Pillen */
 #gate{--red:#DA291C;--red-d:#B11E14;--red-soft:rgba(218,41,28,.10);--a:#2f6fd0;--b:#e67e22;--good:#1f9d6b;
 --font:"Geist",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;--mono:"Geist Mono",ui-monospace,"SF Mono",Menlo,Consolas,monospace;
 --bg:#eef1f6;--card:#ffffff;--ink:#0d1014;--ink2:#3b424d;--muted:#6c737f;--line:#e3e6eb;--line2:#cfd4db;--field:#f6f7f9;--hover:#eef0f3;
@@ -2357,6 +2358,50 @@ canvas.gap-row[hidden]{display:none}
 #cStages>.stage.cf-off{opacity:.78}
 #cStages.cf-both{border-radius:16px;box-shadow:0 0 0 2px rgba(255,255,255,.55)}
 #btnHelp{display:none!important} /* Anleitung-Knopf entfernt (auf Wunsch) */
+/* Speichern-Fenster neu */
+.help.exp{max-width:600px;padding:20px 22px 18px}
+.help.exp>h3{display:none}
+.exp-hd{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.exp-ic{flex:none;width:40px;height:40px;border-radius:12px;display:grid;place-items:center;background:#DA291C;color:#fff;box-shadow:0 8px 18px -8px rgba(218,41,28,.7)}
+.exp-ic svg{width:21px;height:21px}
+.exp-tt{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
+.exp-tt h3{margin:0;font:750 18px var(--font);letter-spacing:-.01em;color:var(--ink)}
+.exp-tt span{font-size:12.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.exp-x{flex:none;width:34px;height:34px;border-radius:10px;display:grid;place-items:center}
+.exp-x svg{width:16px;height:16px}
+.exp-top{display:grid;grid-template-columns:200px 1fr;gap:14px;align-items:stretch;margin-bottom:12px}
+.exp-pv{position:relative;border-radius:12px;overflow:hidden;background:#0d1116;box-shadow:inset 0 0 0 1px rgba(255,255,255,.06)}
+.exp-pv canvas{display:block;width:100%;height:100%;object-fit:cover;aspect-ratio:16/9}
+.exp-pvb{position:absolute;left:8px;bottom:8px;padding:2px 7px;border-radius:6px;background:rgba(13,17,22,.78);color:#fff;font:700 11px var(--mono)}
+.exp-pvb:empty{display:none}
+.exp-sum{display:flex;flex-direction:column;justify-content:center;gap:7px;background:var(--field);border-radius:12px;padding:12px 14px;font-size:12.5px;color:var(--ink2)}
+#expSum{flex-direction:column!important;align-items:stretch!important;gap:7px!important;flex-wrap:nowrap!important}
+.es-row{width:100%;display:grid;grid-template-columns:18px 92px 1fr;align-items:center;gap:8px;min-width:0}
+.es-row svg{width:16px;height:16px;color:var(--muted)}
+.es-row>span{font-size:11.5px;font-weight:600;color:var(--muted)}
+.es-row>b{font:700 13px var(--mono);color:var(--ink);min-width:0;display:flex;flex-wrap:wrap;gap:4px;align-items:center}
+.es-row>b em{font:600 11px var(--font);font-style:normal;color:#DA291C;background:color-mix(in srgb,#DA291C 12%,transparent);padding:1px 7px;border-radius:99px}
+.es-chip{font:600 11px var(--font);font-style:normal;padding:2px 8px;border-radius:99px;background:var(--card);border:1px solid var(--line);color:var(--ink)}
+.es-t>b{color:var(--ink)}
+.exp-adv{border:1px solid var(--line);background:none!important;padding:14px 14px 6px!important}
+.exp-checks{display:grid!important;grid-template-columns:1fr 1fr;gap:8px 14px!important}
+.exp-checks label{position:relative;padding:8px 10px 8px 46px;border-radius:10px;background:var(--field);font-size:12.5px;font-weight:600;min-height:36px;line-height:1.25}
+.exp-checks label[hidden]{display:none!important}
+.exp-checks input{appearance:none;-webkit-appearance:none;position:absolute;left:10px;top:50%;transform:translateY(-50%);width:28px!important;height:16px!important;margin:0;border-radius:99px;background:var(--line2,#c3cad4);cursor:pointer;transition:background .15s}
+.exp-checks input::after{content:"";position:absolute;left:2px;top:2px;width:12px;height:12px;border-radius:50%;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.3);transition:transform .15s}
+.exp-checks input:checked{background:#DA291C}
+.exp-checks input:checked::after{transform:translateX(12px)}
+.exp-foot .exp-hint{display:inline-flex;align-items:center;gap:6px;justify-content:flex-end}
+.exp-hint svg{width:14px;height:14px;flex:none}
+.btn-pri.exp-go{background:#DA291C!important;color:#fff!important;border-radius:12px!important;box-shadow:0 10px 22px -10px rgba(218,41,28,.8)}
+.btn-pri.exp-go:hover{background:#c22217!important}
+.exp-prog{padding:10px 12px;border-radius:12px;background:var(--field)}
+.exp-prog .gprog-bar{height:8px;background:color-mix(in srgb,var(--ink) 10%,transparent)!important}
+.exp-prog .gprog-bar i{background:linear-gradient(90deg,#DA291C,#ff6b5c)!important}
+@media (max-width:760px){ .exp-top{grid-template-columns:1fr} .exp-pv canvas{aspect-ratio:16/9} .exp-checks{grid-template-columns:1fr!important} .es-row{grid-template-columns:18px 84px 1fr} .help.exp{padding:18px 16px 16px} }
+/* Marker-Funktion entfernt */
+[data-act="marker"],#btnSplits,#splits,.notepill,#expNotesRow,.mk-count,#sMarks{display:none!important}
+#viewSingle .dz-r>.ctl-sep{display:none!important}
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
   .aurora{display:none}
@@ -3166,7 +3211,8 @@ setTimeout(function(){ if(de.classList.contains('vgate')&&matchMedia('(min-width
 </div>
 <div class="modal" id="expModal">
   <div class="help exp" role="dialog" aria-label="Clip exportieren">
-    <h3>Video speichern <button class="hdr-ico" id="expX" title="Schliessen">✕</button></h3>
+    <div class="exp-hd"><span class="exp-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11M7 10.5l5 5 5-5"/><path d="M5 19.5h14"/></svg></span><div class="exp-tt"><h3>Video speichern</h3><span id="expSub"></span></div><button class="hdr-ico exp-x" id="expX" title="Schliessen" aria-label="Schliessen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+    <div class="exp-top"><div class="exp-pv"><canvas id="expPv" width="320" height="180"></canvas><span class="exp-pvb" id="expPvB"></span></div><div class="exp-sum" id="expSum"></div></div>
     <div class="exp-adv" id="expAdv" hidden><div class="exp-grid">
       <span class="exp-l">Bereich</span><div class="seg" id="expRange"></div>
       <span class="exp-l" id="expDurL">Dauer</span><div id="expDurRow"><input class="exp-num" id="expDur" type="number" min="0.5" max="120" step="0.5" value="3"> s</div>
@@ -3181,9 +3227,8 @@ setTimeout(function(){ if(de.classList.contains('vgate')&&matchMedia('(min-width
         <label id="expSecRow" hidden><input type="checkbox" id="expSec" checked> Abschnitte am Schluss (3 s)</label>
       </div>
     </div></div>
-    <div class="exp-sum" id="expSum"></div>
     <div class="gprog exp-prog" id="expProg" hidden><div class="gprog-bar"><i></i></div><span></span></div>
-    <div class="exp-foot"><button class="exp-advbtn" id="expAdvBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg><span>Anpassen</span></button><span class="exp-hint" id="expHint">Läuft im Browser · Fenster offen lassen</span><button class="btn-pri exp-go" id="expGo">Speichern</button></div>
+    <div class="exp-foot"><button class="exp-advbtn" id="expAdvBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg><span>Anpassen</span></button><span class="exp-hint" id="expHint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>Läuft im Browser · Fenster offen lassen</span><button class="btn-pri exp-go" id="expGo">Speichern</button></div>
   </div>
 </div>
 <div class="modal" id="catModal">
@@ -3223,7 +3268,6 @@ setTimeout(function(){ if(de.classList.contains('vgate')&&matchMedia('(min-width
       <dt>Abspielen</dt><dd>Leertaste oder Klick ins Video · Tempo-Knopf wechselt 1× → ½× → ¼× → 0.1×</dd>
       <dt>Bild für Bild</dt><dd>← → oder Mausrad über Video bzw. Zeitleiste · Shift = 10 Bilder</dd>
       <dt>Zeitleiste</dt><dd>Eine Leiste für das ganze Video – antippen oder ziehen springt dorthin · + / − (oder Ctrl + Mausrad) zoomt bis auf einzelne Bilder, oben zeigt dann ein feiner Balken, wo du bist · Film-Knopf: Vorschaubilder ein/aus</dd>
-      <dt>Marker</dt><dd>Raute-Knopf oder <kbd>m</kbd> setzt einen Marker mit Notiz · <kbd>,</kbd> <kbd>.</kbd> springt zum vorherigen / nächsten</dd>
       <dt>Lupe</dt><dd><kbd>z</kbd>, Pinch oder Ctrl + Mausrad · ziehen = schwenken · Doppelklick = zurück</dd>
       <dt>Vergleichen</dt><dd>Oben «Side-by-Side» wählen – das offene Video ist A, dann B wählen</dd>
     </dl></section>
@@ -3257,7 +3301,6 @@ setTimeout(function(){ if(de.classList.contains('vgate')&&matchMedia('(min-width
       <dt><kbd>Shift</kbd> + <kbd>←</kbd> <kbd>→</kbd></dt><dd>10 Bilder zurück / vor</dd>
       <dt><kbd>Home</kbd> <kbd>End</kbd></dt><dd>Anfang / Ende</dd>
       <dt><kbd>+</kbd> <kbd>−</kbd></dt><dd>Zeitleiste zoomen</dd>
-      <dt><kbd>m</kbd> <kbd>,</kbd> <kbd>.</kbd></dt><dd>Marker · vorheriger · nächster</dd>
     </dl><dl>
       <dt><kbd>Enter</kbd></dt><dd>Gleichen Moment von A und B setzen</dd>
       <dt><kbd>z</kbd></dt><dd>Lupe</dd>
@@ -3419,7 +3462,7 @@ function renderLib(){
     const mm=c.meta, grouped=!NAMES&&order.length>1&&g!=='~'&&mm&&mm.ok;
     $('.nm',card).textContent=NAMES?dispName(c):grouped?mm.athlete:metaTitle(c); card.title=dispName(c)+(c.alias?' (Datei: '+c.name+')':'');
     $('.mt',card).textContent=grouped?[mm.run,mm.date].filter(Boolean).join(' · '):(c.demo?'Beispiel · ':'')+(metaLine(c)||[c.dur?fmtDur(c.dur):null,c.size?fmtMB(c.size):null].filter(Boolean).join(' · ')||'—');
-    if(c.markers.length){ const mk=document.createElement('span'); mk.className='mk-count'; mk.innerHTML='<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 9-7 9-7-9z"/></svg>'+c.markers.length; $('.thumb',card).appendChild(mk); }
+    if(false&&c.markers.length){ const mk=document.createElement('span'); mk.className='mk-count'; mk.innerHTML='<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 9-7 9-7-9z"/></svg>'+c.markers.length; $('.thumb',card).appendChild(mk); }
     const open=()=>{ if(mode==='single'){ S.setClip(c); refreshSingleHead(); } else if(mode==='gps'){ GD.setClip(c); if(typeof gpsSelects==='function') gpsSelects(); } else if(A.clip!==c&&B.clip!==c){ B.setClip(c); unlink(); syncSelects(); } renderLib(); };
     card.addEventListener('click',e=>{ if(e.target.closest('.x,.ab')) return; open(); });
     card.addEventListener('keydown',e=>{ if(e.key==='Enter') open(); });
@@ -3754,7 +3797,7 @@ class Deck{
     rt.textContent=fmtRate(this.rate); rt.classList.toggle('slow',this.rate<1);
     const L=this.loop; lp.hidden=!(L&&L.on);
     const np=$('.notepill',this.stage); let nt='';
-    if(this.clip&&this.ready&&this.clip.markers.length){ const win=Math.max(2,Math.round(this.fps*0.25)); const mm=this.clip.markers.find(f=>Math.abs(f-this.frame)<=win&&markerNote(this.clip,f)); if(mm!=null) nt=markerNote(this.clip,mm); }
+    if(false&&this.clip&&this.ready&&this.clip.markers.length){ const win=Math.max(2,Math.round(this.fps*0.25)); const mm=this.clip.markers.find(f=>Math.abs(f-this.frame)<=win&&markerNote(this.clip,f)); if(mm!=null) nt=markerNote(this.clip,mm); }
     if(np.textContent!==nt) np.textContent=nt; np.hidden=!nt;
   }
   hint(){ const h=$('.hintpill',this.stage); const t=DRAW.tool;
@@ -3929,8 +3972,8 @@ class Deck{
     // Loop-Klammern
     if(L&&L.a!=null){ const x=X(L.a-0.5); ctx.fillStyle='#ffd24a'; ctx.fillRect(x-1.5,0,4,TH); ctx.fillRect(x-1.5,0,10,4); ctx.fillRect(x-1.5,TH-4,10,4); }
     if(L&&L.b!=null){ const x=X(L.b+0.5); ctx.fillStyle='#ffd24a'; ctx.fillRect(x-2.5,0,4,TH); ctx.fillRect(x-8.5,0,10,4); ctx.fillRect(x-8.5,TH-4,10,4); }
-    // Marker
-    for(const m of c.markers){ const x=X(m); if(x<-10||x>W+10) continue;
+    // Marker (Funktion entfernt)
+    for(const m of []){ const x=X(m); if(x<-10||x>W+10) continue;
       ctx.fillStyle='rgba(255,90,78,.95)'; ctx.fillRect(Math.round(x)-1,0,2,TH);
       ctx.beginPath(); ctx.moveTo(x,TH-1); ctx.lineTo(x-5,TH-8); ctx.lineTo(x,TH-15); ctx.lineTo(x+5,TH-8); ctx.closePath(); ctx.fill();
       const nt=markerNote(c,m); if(nt){ ctx.font='600 10px Geist,-apple-system,Segoe UI,sans-serif'; const tx=nt.length>22?nt.slice(0,21)+'…':nt, tw=ctx.measureText(tx).width+10; ctx.fillStyle='rgba(218,41,28,.92)'; ctx.beginPath(); if(ctx.roundRect) ctx.roundRect(x+3,3,tw,16,4); else ctx.rect(x+3,3,tw,16); ctx.fill(); ctx.fillStyle='#fff'; ctx.textAlign='left'; ctx.textBaseline='middle'; ctx.fillText(tx,x+8,11.5); ctx.textAlign='center'; ctx.textBaseline='alphabetic'; } }
@@ -3938,7 +3981,7 @@ class Deck{
     { const vis=(W-16)/ppf; if(nF>vis*1.02){ // hineingezoomt: Mini-Übersicht über das ganze Video oben in der Leiste
       const ux=f=>8+f/Math.max(1,nF-1)*(W-16), a0=ux(f0-vis/2), a1=ux(f0+vis/2); ctx.fillStyle='rgba(255,255,255,.10)'; ctx.fillRect(8,1,W-16,3); ctx.fillStyle='rgba(255,255,255,.55)'; ctx.fillRect(a0,1,Math.max(3,a1-a0),3);
       if(L&&L.a!=null&&L.b!=null){ ctx.fillStyle='#ffd24a'; ctx.fillRect(ux(L.a),4,Math.max(2,ux(L.b)-ux(L.a)),1.5); }
-      ctx.fillStyle='#ff5a4e'; for(const m of c.markers) ctx.fillRect(ux(m)-0.5,1,1.5,3); ctx.fillStyle='#DA291C'; ctx.fillRect(ux(this.fpos)-1,0,2,5); } }
+       ctx.fillStyle='#DA291C'; ctx.fillRect(ux(this.fpos)-1,0,2,5); } }
     const px=X(this.fpos); ctx.fillStyle='#DA291C'; ctx.fillRect(Math.round(px)-1,0,2,TH);
     ctx.beginPath(); ctx.moveTo(px-6,0); ctx.lineTo(px+6,0); ctx.lineTo(px,7); ctx.closePath(); ctx.fill();
     const sm=innerWidth<=600||innerHeight<=500, lab=(this.frame/this.fps).toFixed(2)+(sm?'':' s'); ctx.font=sm?'800 9px ui-monospace,Menlo,Consolas,monospace':'800 10.5px ui-monospace,Menlo,Consolas,monospace';
@@ -3958,7 +4001,7 @@ class Deck{
     const a=clamp((this.fpos-half)/(nF-1),0,1)*W, b=clamp((this.fpos+half)/(nF-1),0,1)*W;
     ctx.fillStyle='rgba(255,255,255,.2)'; ctx.fillRect(a,0,Math.max(2,b-a),H); ctx.strokeStyle='#fff'; ctx.lineWidth=1.5; ctx.strokeRect(a+0.75,0.75,Math.max(3,b-a)-1.5,H-1.5);
     if(this===A&&typeof ovStrip==='function') ovStrip(ctx,f=>fx(f),H,W,this.fps,true);
-    ctx.fillStyle='#ff5a4e'; for(const m of this.clip.markers){ const x=fx(m); ctx.beginPath(); ctx.moveTo(x,2); ctx.lineTo(x+4,6); ctx.lineTo(x,10); ctx.lineTo(x-4,6); ctx.closePath(); ctx.fill(); }
+    ctx.fillStyle='#ff5a4e'; for(const m of []){ const x=fx(m); ctx.beginPath(); ctx.moveTo(x,2); ctx.lineTo(x+4,6); ctx.lineTo(x,10); ctx.lineTo(x-4,6); ctx.closePath(); ctx.fill(); }
     const px=fx(this.fpos); ctx.fillStyle='#DA291C'; ctx.fillRect(px-1.5,0,3,H);
     ctx.font='700 9.5px ui-monospace,Menlo,Consolas,monospace'; ctx.textBaseline='middle'; ctx.fillStyle='rgba(255,255,255,.85)';
     ctx.textAlign='right'; ctx.fillText(fmtDur(this.dur||nF/this.fps),W-6,H/2+0.5);
@@ -4016,7 +4059,7 @@ function refreshSingleHead(){
 }
 function renderMarks(){
   const el=$('#sMarks'), c=S.clip; el.innerHTML='';
-  el.hidden=!c||!c.markers.length; if(el.hidden) return;
+  el.hidden=true; return; /* Marker entfernt */
   const lab=document.createElement('span'); lab.className='mk-lab'; lab.textContent='Marker'; el.appendChild(lab);
   c.markers.forEach(m=>{ const b=document.createElement('span'); b.className='mchip'+(m===S.frame?' cur':''); b.tabIndex=0; b.dataset.f=m; const note=markerNote(c,m);
     b.innerHTML='<b>'+(m/c.fps).toFixed(2)+' s</b>'+(note?'<em></em>':'<em class="ph">Notiz …</em>')+'<i class="ed" title="Notiz bearbeiten"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16z"/></svg></i><i class="rm" title="Marker entfernen">✕</i>';
@@ -4189,7 +4232,6 @@ function act(name,btn){
   if(name==='play'){ single?D.toggle():(cmpToggle(),A.flash()); }
   else if(name==='step'){ const n=+btn.dataset.n; single?D.step(n):cmpStep(n); }
   else if(name==='draw'){ const tg=$('#sHost .rail-tg'); if(tg) tg.click(); setTimeout(()=>{ const on=!!$('#sHost .rail:not(.collapsed)'); $$('.m-draw').forEach(b=>b.classList.toggle('on',on)); },30); } // Handy: Stift in der Knopfleiste statt im Bild
-  else if(name==='marker'){ S.toggleMarker(); renderMarks(); }
   else if(name==='in') setIn(); else if(name==='out') setOut(); else if(name==='loop') toggleLoop();
   else if(name==='sound'){ S.v.muted=!S.v.muted; const sv=btn.querySelector('svg'); $('.snd-on',sv).hidden=S.v.muted; $('.snd-off',sv).hidden=!S.v.muted; btn.classList.toggle('on',!S.v.muted); }
   else if(name==='shot') snapshot();
@@ -4259,7 +4301,7 @@ document.addEventListener('keydown',e=>{
   if((e.metaKey||e.ctrlKey)&&(k==='z'||k==='Z')&&!e.shiftKey){ e.preventDefault(); undoAnn(); return; }
   if(e.altKey&&mode==='cmp'&&(k==='ArrowLeft'||k==='ArrowRight')){ e.preventDefault(); bOnlyStep((k==='ArrowRight'?1:-1)*(e.shiftKey?10:1)); return; }
   if(e.metaKey||e.ctrlKey||e.altKey) return;
-  if(mode==='cmp'&&(k==='m'||k==='M'||k==='n'||k==='N')){ splitMark(k.toLowerCase()==='m'?A:B); return; }
+
   const step=n=>single?D.step(n):cmpStep(n);
   if(k===' '){ e.preventDefault(); single?D.toggle():(cmpToggle(),A.flash()); }
   else if(k==='ArrowRight'){ e.preventDefault(); step(e.shiftKey?10:1); }
@@ -4273,7 +4315,6 @@ document.addEventListener('keydown',e=>{
   else if(k==='End'){ e.preventDefault(); single?D.seekFrame(D.nF-1,true):A.seekFrame(A.nF-1,true); updSync(); }
   else if(k==='+'||k==='='){ (single?[D]:[A,B]).forEach(d=>d.setPpf(d.ppf*1.7)); }
   else if(k==='-'||k==='_'){ (single?[D]:[A,B]).forEach(d=>d.setPpf(d.ppf/1.7)); }
-  else if(k==='m'||k==='M'){ if(single){ D.toggleMarker(); if(!gps) renderMarks(); } }
   else if(k==='i'||k==='I'){ if(mode==='single') (e.shiftKey?cutClear():setIn()); }
   else if(k==='o'||k==='O'){ if(mode==='single') (e.shiftKey?cutClear():setOut()); }
   else if(k==='l'||k==='L'){ if(mode==='single') toggleLoop(); else if(!gps) (G.linked?unlink():doSync()); }
@@ -4282,7 +4323,6 @@ document.addEventListener('keydown',e=>{
   else if(k==='p'||k==='P') snapshot();
   else if(k==='e'||k==='E') openExport();
   else if(k==='g'||k==='G') toggleGrid();
-  else if(k===','||k==='.'){ jumpMarker(mode==='cmp'?A:D,k==='.'?1:-1); if(mode==='cmp'&&G.linked) updSync(); }
   else if(/^[1-6]$/.test(k)) setTool(TOOLS[+k-1].id);
   else if(k==='Enter'&&!single){ e.preventDefault(); doSync(); }
   else if(k==='?') $('#helpModal').classList.toggle('on');
@@ -5231,7 +5271,7 @@ const OVT_READY=true;
 /* ---------- Rückstand im Overlay: wie viel später B an der Stelle ist, wo A gerade ist ---------- */
 const OVGAP={on:LS.get('ovGap',1)!==0,v:null};
 /* Quelle 1: Tore (Marken) in A und B, paarweise nach Reihenfolge – wie eine Zwischenzeit im Fernsehen: gilt ab dem Tor, bis zum nächsten */
-function ovGapGates(t){ if(!A.clip||!B.clip||!G.linked) return null; const mA=A.clip.markers||[], mB=B.clip.markers||[], n=Math.min(mA.length,mB.length);
+function ovGapGates(t){ if(!A.clip||!B.clip||!G.linked) return null; const mA=[], mB=[], /* Marker entfernt: nur erkannte Tore */ n=Math.min(mA.length,mB.length);
   if(!n){ const AG=GH.autoGates; if(!AG||!ovFollowOK()) return null; let last=null; AG.forEach((g,k)=>{ if(GH.t0+g.tA<=t+1e-3) last={g:g.gap,k:k+1,auto:true}; }); return last; } /* ohne Marker: automatisch erkannte Tore */
   const fa=A.fps||A.clip.fps||50, fb=B.fps||B.clip.fps||50; let last=null, k0=0;
   for(let k=0;k<n;k++){ const ta=(mA[k]+0.5)/fa, tb=(mB[k]+0.5)/fb; if(ta<G.syncA-0.02) continue; k0++; if(ta<=t+1e-3) last={g:(tb-G.off)-ta,k:k0}; else break; }
@@ -5248,7 +5288,7 @@ function ovGapDraw1(x,ox,oy,w,h,g,nm0,src,dot,row){ if(g==null) return; const k=
   x.fillStyle=col; x.font=`800 ${18*k}px ${ff}`; x.fillText(t2,px+34*k+w1,py+ph/2+0.5*k); x.restore(); }
 /* Abschnitte (wie Sektorzeiten): Rückstand an jedem Tor → Gewinn/Verlust von B zwischen zwei Toren */
 function ovGapList(Ly){ /* Ly: Lauf C (D …) statt B */ if(!A.clip) return []; if(!Ly&&(!B.clip||!G.linked)) return [];
-  const mA=A.clip.markers||[], mB=Ly?(Ly.markB||[]):(B.clip.markers||[]), n=Math.min(mA.length,mB.length), out=[], off=Ly?Ly.off:G.off, sA=Ly?Ly.syncA:G.syncA;
+  const mA=[], mB=[], n=Math.min(mA.length,mB.length), out=[], off=Ly?Ly.off:G.off, sA=Ly?Ly.syncA:G.syncA;
   if(n){ const fa=A.fps||A.clip.fps||50, fb=Ly?Ly.fpsB:(B.fps||B.clip.fps||50); let k0=0; for(let k=0;k<n;k++){ const ta=(mA[k]+0.5)/fa, tb=(mB[k]+0.5)/fb; if(ta<sA-0.02) continue; k0++; out.push({k:k0,tA:ta,g:(tb-off)-ta}); } return out; }
   if(Ly) return (Ly.autoGates||[]).map((g,k)=>({k:k+1,tA:Ly.t0+g.tA,g:g.gap,auto:true}));
   const AG=GH.autoGates; if(!AG||!ovFollowOK()) return []; return AG.map((g,k)=>({k:k+1,tA:GH.t0+g.tA,g:g.gap,auto:true})); }
@@ -5262,7 +5302,7 @@ function secOpen(Ly){ secClose(); const L=ovSectors(Ly); if(L.length<2) return; 
   const worst=L.reduce((p,q)=>q.d>p.d?q:p), best=L.reduce((p,q)=>q.d<p.d?q:p);
   el.innerHTML=(RU.length>1?'<div class="sp-tabs">'+RU.map((u,i)=>'<button data-ru="'+i+'" class="'+(u.L===(Ly||null)?'on':'')+'"><i style="background:'+u.col+'"></i>'+(u.L?u.let:'B')+' '+esc(u.n)+'</button>').join('')+'</div>':'')+'<div class="sp-h"><b>Abschnitte</b><span>'+esc(nb)+' gegenüber '+esc(na)+'</span><button class="sp-x" aria-label="Schliessen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>'
    +'<div class="sp-l">'+L.map((r,i)=>'<button class="sp-r" data-i="'+i+'"><span class="sp-n">'+r.from.replace('Tor ','')+'–'+r.to.replace('Tor ','')+'</span><span class="sp-bar"><i class="'+(r.d>0?'lo':'wi')+'" style="width:'+Math.round(Math.abs(r.d)/mx*50)+'%"></i></span><b class="'+(Math.abs(r.d)<0.005?'':r.d>0?'lo':'wi')+'">'+f(r.d)+'</b><em>'+(r.ca?'ca. ':'')+f(r.cum)+'</em></button>').join('')+'</div>'
-   +'<div class="sp-f">'+(worst.d>0.005?'Am meisten verliert '+esc(nb)+' zwischen <b>'+worst.from+' und '+worst.to+'</b> ('+f(worst.d)+' s)':'')+(best.d<-0.005?(worst.d>0.005?' · ':'')+'gewinnt am meisten zwischen <b>'+best.from+' und '+best.to+'</b> ('+f(best.d)+' s)':'')+(L.some(r=>r.auto)?'<small>Tore automatisch erkannt – mit Markern in A und B genauer.</small>':'')+'</div>';
+   +'<div class="sp-f">'+(worst.d>0.005?'Am meisten verliert '+esc(nb)+' zwischen <b>'+worst.from+' und '+worst.to+'</b> ('+f(worst.d)+' s)':'')+(best.d<-0.005?(worst.d>0.005?' · ':'')+'gewinnt am meisten zwischen <b>'+best.from+' und '+best.to+'</b> ('+f(best.d)+' s)':'')+(L.some(r=>r.auto)?'<small>Tore automatisch erkannt.</small>':'')+'</div>';
   A.stage.appendChild(el); ['pointerdown','wheel','dblclick'].forEach(k=>el.addEventListener(k,ev=>ev.stopPropagation(),{passive:true}));
   el.addEventListener('click',ev=>{ ev.stopPropagation(); if(ev.target.closest('.sp-x')){ secClose(); return; } { const tb=ev.target.closest('[data-ru]'); if(tb){ secOpen(RU[+tb.dataset.ru].L); return; } } const r=ev.target.closest('.sp-r'); if(!r) return; const s=L[+r.dataset.i]; $$('.sp-r',el).forEach(b=>b.classList.toggle('on',b===r)); A.pause&&A.pause(); B.pause&&B.pause(); G.playing=false; if(typeof cmpPlayIcon==='function') cmpPlayIcon(); A.seekTime(Math.max(0,s.tA)); });
   setTimeout(()=>{ document.addEventListener('pointerdown',secOut,true); document.addEventListener('keydown',secKey,true); },0); }
@@ -5279,7 +5319,7 @@ function secDrawTo(x,ox,oy,w,h){ /* Export: Abschnitte als Tafel(n) über dem le
 function secKey(ev){ if(ev.key==='Escape'){ ev.stopPropagation(); secClose(); } }
 function secClose(){ $$('.sec-pop').forEach(e=>e.remove()); document.removeEventListener('pointerdown',secOut,true); document.removeEventListener('keydown',secKey,true); }
 function layGap(L){ /* Rückstand von Lauf C (D …) gegenüber A an der Stelle von A: Tore (Marker), sonst erkannte Tore, sonst laufend */
-  const t=ovTA(), mA=A.clip.markers||[], mB=L.markB||[], n=Math.min(mA.length,mB.length);
+  const t=ovTA(), mA=[], mB=[], n=Math.min(mA.length,mB.length);
   if(n){ const fa=A.fps||A.clip.fps||50; let last=null,k0=0; for(let k=0;k<n;k++){ const ta=(mA[k]+0.5)/fa, tb=(mB[k]+0.5)/L.fpsB; if(ta<L.syncA-0.02) continue; k0++; if(ta<=t+1e-3) last={g:(tb-L.off)-ta,src:'Tor '+k0}; else break; } if(last) return last; }
   if(L.autoGates){ let last=null; L.autoGates.forEach((g,k)=>{ if(L.t0+g.tA<=t+1e-3) last={g:g.gap,src:'Tor '+(k+1)+' (auto)'}; }); if(last) return last; }
   const e=t-L.t0; if(e<0||e>L.eEnd) return null; let s2=0,w=0; for(let k=-3;k<=3;k++){ const g=gapAt(e+k*0.06,L); if(g==null) continue; const ww=4-Math.abs(k); s2+=g*ww; w+=ww; } return w?{g:s2/w,src:'ca.'}:null; }
@@ -6006,7 +6046,7 @@ async function catRun(){
 /* ---------- Tor zu Tor: beim Durchfahren eines markierten Tores springt eine Pille mit Zwischenzeit und Abstand auf ---------- */
 const GATE_HOLD=2.4;
 function gateAt(d){ if(mode!=='cmp'||!A.ready||!B.ready||!A.clip||!B.clip||$('#viewCmp').classList.contains('overlay')) return null;
-  const mA=A.clip.markers, mB=B.clip.markers, n=Math.min(mA.length,mB.length); if(n<2) return null;
+  const mA=[], mB=[], n=0; if(n<2) return null; /* Marker entfernt */
   const m=d===A?mA:mB; let k=-1; for(let j=1;j<n;j++){ if(m[j]<=d.frame) k=j; else break; } if(k<1) return null;
   const age=(d.frame-m[k])/d.fps; if(age>GATE_HOLD) return null;
   const tA=(mA[k]-mA[0])/A.fps, tB=(mB[k]-mB[0])/B.fps, pA=(mA[k-1]-mA[0])/A.fps, pB=(mB[k-1]-mB[0])/B.fps;
@@ -6540,7 +6580,6 @@ addEventListener('message',e=>{ const d=e.data; if(d&&d.type==='vlab:gps'&&d.pay
    · Dateinamen erkennen (Athlet_Ort_JJMMTT_Disziplin_Geschlecht_Lauf)
    · Suche in der Videoliste
    · Videos bleiben nach Neuladen (File System Access, nur Chrome/Edge)
-   · Marker mit Notizen, , / . = Marker springen
    · Hilfsraster
    · Clip-Export (Zeitlupe, Zeichnungen, Info-Leiste, Notizen)
    ========================================================= */
@@ -6680,13 +6719,26 @@ function expSummary(){
   $('#expDurRow').hidden=$('#expDurL').hidden=EXP.range==='loop'||EXP.range==='all'||EXP.range==='ovcut';
   $('#expDur').value=EXP.dur;
   const vid=len/EXP.rate, fmt=t=>t>=60?Math.floor(t/60)+':'+String(Math.floor(t%60)).padStart(2,'0')+' min':t.toFixed(1)+' s', fast=typeof VideoEncoder!=='undefined'&&typeof VideoDecoder!=='undefined', nf=r.b-r.a+1, mk='expMsF:'+expKind(), msf=LS.get(mk,0)||(mode==='cmp'?(innerWidth<=760?70:45):(innerWidth<=760?40:25)), ov=LS.get('expOv:'+expKind(),0)||2.5, ks=LS.get('expK:'+(mode==='cmp'?2:1),0), est=fast?ov+nf*msf/1000:(ks?Math.max(vid,len)*ks+1:vid*(innerWidth<=760?2.2:1)+1); /* schneller Weg: Dauer hängt an der Bildzahl, nicht an der Zeitlupe */
-  $('#expSum').innerHTML=`<span class="es-r"><span>Bereich</span><b>${(r.a/D.fps).toFixed(2)} – ${(r.b/D.fps).toFixed(2)} s</b></span><span class="es-arrow">→</span><span class="es-r"><span>Video${EXP.rate<1?' · Zeitlupe':''}</span><b>${fmt(vid)}</b></span><span class="es-r es-in"><span>Mit</span><b>${expInhalt()}</b></span><span class="es-r"><span>Dauer Export</span><b>ca. ${fmt(est)}</b></span>`;
+  const IC=d=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${d}</svg>`, inh=expInhalt();
+  $('#expSum').innerHTML=`<div class="es-row">${IC('<path d="M4 12h16M4 8v8M20 8v8"/>')}<span>Bereich</span><b>${(r.a/D.fps).toFixed(2)} – ${(r.b/D.fps).toFixed(2)} s</b></div>`
+    +`<div class="es-row">${IC('<rect x="3" y="6" width="14" height="12" rx="2"/><path d="M17 10l4-2v8l-4-2"/>')}<span>Video</span><b>${fmt(vid)}${EXP.rate<1?' <em>'+(EXP.rate===0.5?'½':EXP.rate===0.25?'¼':EXP.rate)+'× Zeitlupe</em>':''}</b></div>`
+    +`<div class="es-row es-in">${IC('<path d="M4 6h16M4 12h16M4 18h10"/>')}<span>Inhalt</span><b>${inh==='nur Video'?'<i class="es-chip">nur Video</i>':inh.split(' · ').map(t=>'<i class="es-chip">'+esc(t)+'</i>').join('')}</b></div>`
+    +`<div class="es-row es-t">${IC('<circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2M9 3h6"/>')}<span>Rechenzeit</span><b>ca. ${fmt(est)}</b></div>`;
+  expPreview();
 }
+function expPreview(){ /* Vorschau: aktuelles Bild so, wie es gespeichert wird (Overlay mit B, Side-by-Side nebeneinander) */
+  const cv=$('#expPv'); if(!cv) return; const x=cv.getContext('2d'), W=cv.width, H=cv.height; x.fillStyle='#0d1116'; x.fillRect(0,0,W,H);
+  const fit=(v,X,Y,w,h)=>{ try{ const vw=v.videoWidth||v.width||16, vh=v.videoHeight||v.height||9, s=Math.min(w/vw,h/vh), dw=vw*s, dh=vh*s; x.drawImage(v,X+(w-dw)/2,Y+(h-dh)/2,dw,dh); return [X+(w-dw)/2,Y+(h-dh)/2,dw,dh]; }catch(e){ return null; } };
+  const ovl=mode==='cmp'&&typeof ovActive==='function'&&ovActive(); let sub='';
+  if(mode==='cmp'&&!ovl){ fit(A.v,0,0,W/2-1,H); fit(B.v,W/2+1,0,W/2-1,H); sub='Side-by-Side · '+(lastName(A.clip)||'A')+' / '+(lastName(B.clip)||'B'); }
+  else if(ovl){ const r=fit(A.v,0,0,W,H); const ob=$('canvas.ovb',A.stage); if(r&&ob&&!ob.hidden&&ob.width) try{ x.drawImage(ob,r[0],r[1],r[2],r[3]); }catch(e){} sub='Overlay · '+(lastName(A.clip)||'A')+' / '+(lastName(B.clip)||'B'); }
+  else { const D=expDecks()[0]; fit(D.v,0,0,W,H); sub=(mode==='gps'?'GPS · ':'')+(D.clip?(lastName(D.clip)||base(D.clip.name)):''); }
+  $('#expSub').textContent=sub; const b=$('#expPvB'); const D=expDecks()[0]; b.textContent=D&&D.fps?(D.time()).toFixed(2)+' s':''; }
 async function startExport(){ EXP.tw0=performance.now(); EXP.secDone=false; EXP._outro=false; EXP._outroRun=false; $('#expProg').hidden=false; $('#expProg i').style.width='0%'; $('#expProg span').textContent='Export wird vorbereitet …';
   if(EXP.live) return;
   if(typeof MediaRecorder==='undefined'||!HTMLCanvasElement.prototype.captureStream){ toast('Export wird in diesem Browser nicht unterstützt (Chrome oder Edge verwenden).',4000); return; }
   const ds=expDecks(), D=ds[0], r=expRangeFrames(); if(r.b<=r.a){ toast('Zu kurz – Start/Ende prüfen.'); return; }
-  const opt={secs:!$('#expSecRow').hidden&&$('#expSec').checked,legend:!$('#expLegRow').hidden&&$('#expLegend').checked,names:$('#expNames').checked,ann:$('#expAnn').checked,info:$('#expInfo').checked,notes:$('#expNotes').checked,gps:$('#expGpsOv').checked};
+  const opt={secs:!$('#expSecRow').hidden&&$('#expSec').checked,legend:!$('#expLegRow').hidden&&$('#expLegend').checked,names:$('#expNames').checked,ann:$('#expAnn').checked,info:$('#expInfo').checked,notes:false,gps:$('#expGpsOv').checked};
   // Leinwand
   const vw=d=>d.v.videoWidth, vh=d=>d.v.videoHeight;
   let H=Math.min(1080,Math.max(...ds.map(vh))); if(ds.length>1) H=Math.min(H,720);
@@ -7723,7 +7775,7 @@ async function fieldSync(){ if(!window.indexedDB) return; let db;
     let c=clips.find(x=>x.field===f.id);
     if(c){ if(c.name!==nm){ c.name=nm; c.meta=parseName(nm); ch=true; } continue; } // in der Field-App umbenannt
     c=addClip({name:nm,size:f.blob.size,mod:f.t0||f.created,url:URL.createObjectURL(f.blob)}); c.field=f.id; if(f.t0) c.fieldT0=f.t0; n++;
-    if(f.marks&&f.marks.length&&!c.markers.length){ const mk=f.marks; c.whenFps.then(()=>{ const fps=c.fps||30; c.markers=[...new Set(mk.map(t=>Math.round(t*fps)))].sort((a,b)=>a-b); c.markers.forEach(fr=>{ if(!(c.notes||{})[fr]) setNote(c,fr,'Beim Filmen'); }); saveClip(c); renderLib(); decks.forEach(d=>{ if(d.clip===c){ d.dirty=true; } }); if(typeof renderMarks==='function') renderMarks(); }); } }
+    if(false&&f.marks&&f.marks.length&&!c.markers.length){ /* Marker aus der Feld-App: Funktion entfernt */ const mk=f.marks; c.whenFps.then(()=>{ const fps=c.fps||30; c.markers=[...new Set(mk.map(t=>Math.round(t*fps)))].sort((a,b)=>a-b); c.markers.forEach(fr=>{ if(!(c.notes||{})[fr]) setNote(c,fr,'Beim Filmen'); }); saveClip(c); renderLib(); decks.forEach(d=>{ if(d.clip===c){ d.dirty=true; } }); if(typeof renderMarks==='function') renderMarks(); }); } }
   clips.filter(c=>c.field&&!seen.has(c.field)&&!decks.some(d=>d.clip===c)).forEach(c=>{ removeClip(c,true); ch=true; }); // in der Field-App gelöscht
   if(n||ch){ renderLib(); syncSelects(); }
   } /* kein Hinweis beim Öffnen – die Läufe stehen einfach in der Liste */
@@ -7812,7 +7864,7 @@ if(false&&!LS.get('hint1',0)){ setTimeout(()=>{ toast(matchMedia('(pointer:coars
 
 /* Update-Hinweis: prüft version.json auf GitHub Pages; «Aktualisieren» lädt die Seite ohne Cache neu */
 (()=>{
-  const BUILD='20261102113516'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
+  const BUILD='20261102121338'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
   // nach einem Update die ?v=… aus der Adresse entfernen
   try{ const u=new URL(location.href); if(u.searchParams.has('v')){ u.searchParams.delete('v'); history.replaceState(null,'',u.pathname+(u.search||'')+u.hash); } }catch(e){}
   const el=$('#upd'); let latest=null, snoozed=null, busy=false;
@@ -7896,7 +7948,6 @@ async function preOvLoad(){ if(PRE_OV) return PRE_OV; try{ const r=await fetch('
        run:async()=>{ await clickEl('#btnSync'); }},
       {t:'Gemeinsam abspielen',p:'Abspielen – beide laufen gemeinsam. So siehst du direkt, wer wo Zeit gewinnt. Mit «1×» auf Zeitlupe schalten.',f:'#viewCmp .ctl.play',
        run:async()=>{ await clickEl('#viewCmp .ctl.play'); await sleep(3600); if(!A.v.paused) cmpToggle(); }},
-      {t:'Abschnittszeiten mit «Tore»',p:'Mit «Tore» markierst du Torpassagen in A und B und bekommst die Zeitdifferenz pro Abschnitt.',f:'#btnSplits',run:async()=>{ await moveTo(...ctr('#btnSplits')); }}
     ],
     overlay:[
       {t:'1 · Beide zum gleichen Moment',p:'Beispiel: Abfahrtstraining Courchevel vom Gegenhang, Boisset (A) gegen Kriechmayr (B). A und B einzeln in ihren Zeitleisten verschieben, bis beide am gleichen Punkt sind – z. B. beim ersten Tor, das in beiden zu sehen ist.',f:rectOf(tlA,tlB),
