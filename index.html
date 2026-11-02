@@ -5423,9 +5423,9 @@ function ovUI(){ vchipPlace();
     acts=ovBtn('edit','Zurück',OVI.back,'ghost','Gleichen Moment neu wählen')+cutBtns+ovMore([['pick','Referenzpunkte neu',OVI.pin],['hand','Von Hand nachschieben',OVI.fix]])+ovBtn('make','Overlay erstellen',OVI.go,'pri'); }
   else { const kc=OV.K.length?`<span class="ov-chip">${OVI.fix}${OV.K.length} Korrektur${OV.K.length>1?'en':''}<button data-ov="fixall" title="Alle Korrekturen entfernen">${OVI.x}</button></span>`:'';
     const BU=(!GH.coarse&&OVS.spot&&!OV.hideB)?ovBUnsure():[];
-    ttl=GH.coarse?'Vorschau':BU.length?'B prüfen':'Fertig'; dot=true; say=GH.bg?'Wird verfeinert · '+Math.round((GH.bg.p||0)*100)+' %':GH.coarse?'Grob gerechnet – «…» › «Neu berechnen» rechnet fein.':BU.length?'B an '+BU.length+' Stelle'+(BU.length>1?'n':'')+' unsicher (gelb) – dort neu übereinanderlegen oder zwei Punkte setzen.':'B daneben? «Korrigieren».'; chips=cut+kc;
+    ttl=GH.coarse?'Vorschau':BU.length?'B prüfen':'Fertig'; dot=true; say=GH.bg?'Wird verfeinert · '+Math.round((GH.bg.p||0)*100)+' %':GH.coarse?'Grob gerechnet – «…» › «Neu berechnen» rechnet fein.':BU.length?'B an '+BU.length+' Stelle'+(BU.length>1?'n':'')+' unsicher (gelb) – dort neu übereinanderlegen oder zwei Punkte setzen.':'B daneben? Neu übereinanderlegen oder zwei Punkte setzen.'; chips=cut+kc;
     tip='Liegt B neben A: an der Stelle anhalten und «Korrigieren». Der Punkt links und das Band in der Zeitleiste zeigen den Zustand: grün ausgerichtet, gelb unsicher, rot Kameraschnitt. Das Auge bei den Läufen oben links blendet einen Lauf ein oder aus.';
-    acts=cutBtns+(BU.length?ovBtn('bnext','Nächste Stelle',OVI.go,'ghost','Zur nächsten unsicheren Stelle springen')+ovBtn('bpts','Zwei Punkte',OVI.pin,'ghost','Zwei gleiche Punkte in A und B antippen, z. B. Torflaggen')+ovBtn('bfix','Neu übereinanderlegen',OVI.fix,'pri','B an dieser Stelle von Hand auf A schieben'):ovBtn('fix','Korrigieren',OVI.fix,'ghost','B an dieser Stelle von Hand nachschieben'))
+    acts=cutBtns+(BU.length?ovBtn('bnext','Nächste Stelle',OVI.go,'ghost','Zur nächsten unsicheren Stelle springen')+ovBtn('bpts','Zwei Punkte',OVI.pin,'ghost','Zwei gleiche Punkte in A und B antippen, z. B. Torflaggen')+ovBtn('bfix','Neu übereinanderlegen',OVI.fix,'pri','B an dieser Stelle von Hand auf A schieben'):ovBtn('bpts','Zwei Punkte',OVI.pin,'ghost','Zwei gleiche Punkte in A und B antippen, z. B. Torflaggen')+ovBtn('fix','Neu übereinanderlegen',OVI.fix,'ghost','B an dieser Stelle von Hand auf A schieben'))
       +ovMore([OVT_READY?['ovtrailnew',OVT.keys.a.length&&OVT.key===GH.key?'Spur bearbeiten (antippen)':'Spur hinter Fahrer:innen setzen …',OVI.pin]:null,OVT_READY&&OVT.trk&&OVT.key===GH.key?['ovtrail',OVT.on?'Spur ausblenden':'Spur einblenden',OVI.go]:null,ovGpsPair()?['ovgps',OVG.on?'GPS-Tacho ausblenden':'GPS-Tacho einblenden',OVI.go]:null,['ovgap',OVGAP.on?'Rückstand ausblenden':'Rückstand einblenden',OVI.go],['nameset','Namen setzen (Fahrer:innen antippen)',OVI.tag],LAY.length<3?['addrun','Weiteren Lauf dazunehmen',OVI.plus]:null,['series','Serie gegen A rechnen …',OVI.go],['make','Neu berechnen',OVI.go],['edit','Neu beginnen',OVI.back]])+ovSaveBtn(); }
   if(SER.on){ ttl='Serie '+(SER.i+1)+' / '+SER.list.length; dot=false; chips=''; say='<b>'+esc(lastName(SER.cur)||'')+'</b> · '+(busy?((($('#ghostBar .gprog span')||{}).textContent)||'Overlay wird erstellt'):SER.msg);
     tip='Alle gewählten Läufe werden nacheinander gegen A gerechnet und gespeichert. Tab offen lassen.'; acts=ovBtn('serstop','Serie abbrechen','','ghost','Nach dem laufenden Schritt aufhören'); }
@@ -6069,8 +6069,8 @@ function renderLayers(){
   const x=cv.getContext('2d'); x.setTransform(1,0,0,1,0,0); x.clearRect(0,0,Wc,Hc); layerDraw(x,0,0,Wc); }
 
 /* ---------- Overlay-Darstellung: weiche Ränder, Farbe angleichen, Geist-Look, ruhige Kamera, weich einblenden ---------- */
-const OVS=Object.assign({edge:true,color:true,ghost:false,spot:true,stab:false,fade:true},(()=>{ try{ return JSON.parse(localStorage.getItem('vlab:ovstyle')||'{}'); }catch(e){ return {}; } })()); OVS.ghost=false; /* Geist-Look mit violettem Schein entfernt */
-function ovsSave(){ try{ localStorage.setItem('vlab:ovstyle',JSON.stringify(OVS)); }catch(e){} }
+const OVS=Object.assign({edge:true,color:true,ghost:false,spot:false,stab:false,fade:true},(()=>{ try{ return JSON.parse(localStorage.getItem('vlab:ovstyle2')||'{}'); }catch(e){ return {}; } })()); OVS.ghost=false; /* Geist-Look mit violettem Schein entfernt */
+function ovsSave(){ try{ localStorage.setItem('vlab:ovstyle2',JSON.stringify(OVS)); }catch(e){} }
 const OVB={cv:null,x:null,fe:null,fw:0,fh:0,gc:null,gx:null,sA:null,sB:null,g:[1,1,1],ge:null};
 function ovsFeather(W,H){ if(OVB.fe&&OVB.fw===W&&OVB.fh===H) return OVB.fe; const c=document.createElement('canvas'); c.width=W; c.height=H; const x=c.getContext('2d'), im=x.createImageData(W,H), d=im.data, F=Math.max(4,Math.round(Math.min(W,H)*0.09));
   for(let y=0;y<H;y++) for(let i=0;i<W;i++){ const e=Math.min(i,y,W-1-i,H-1-y)/F, a=e>=1?1:e*e*(3-2*e); d[(y*W+i)*4+3]=Math.round(255*a); } x.putImageData(im,0,0); OVB.fe=c; OVB.fw=W; OVB.fh=H; return c; }
@@ -8517,7 +8517,7 @@ if(false&&!LS.get('hint1',0)){ setTimeout(()=>{ toast(matchMedia('(pointer:coars
 
 /* Update-Hinweis: prüft version.json auf GitHub Pages; «Aktualisieren» lädt die Seite ohne Cache neu */
 (()=>{
-  const BUILD='20261102194507'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
+  const BUILD='20261102195111'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
   // nach einem Update die ?v=… aus der Adresse entfernen
   try{ const u=new URL(location.href); if(u.searchParams.has('v')){ u.searchParams.delete('v'); history.replaceState(null,'',u.pathname+(u.search||'')+u.hash); } }catch(e){}
   const el=$('#upd'); let latest=null, snoozed=null, busy=false;
