@@ -2511,6 +2511,8 @@ canvas.gap-row[hidden]{display:none}
 @media (max-width:900px){ #useModal .use-g{grid-template-columns:1fr} }
 @media (max-width:760px){ #useModal .use{padding:16px 14px 14px;border-radius:16px} #useModal .use-kpi{grid-template-columns:1fr 1fr;gap:8px} #useModal .use-k b{font-size:24px} #useModal .use-seg{order:3;width:100%} #useModal .use-seg button{flex:1;padding:7px 4px} #useModal .use-c svg.ch{height:150px} }
 #viewCmp .m-sync,#viewCmp:not(.overlay):not(.x-) .m-sync,#viewCmp:not(.overlay):not(.x-) #syncInfo{display:none!important} /* kein «Gleicher Moment»/«Verbunden»-Knopf und kein Hinweis mehr – Anzeige über das Schloss zwischen A und B */
+.dl-pill{position:absolute;left:50%;bottom:12px;transform:translateX(-50%);z-index:6;pointer-events:none;background:rgba(13,17,22,.78);color:#fff;font:650 12px var(--font);padding:5px 11px;border-radius:999px;border:1px solid rgba(255,255,255,.16);font-variant-numeric:tabular-nums;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+.dl-pill[hidden]{display:none}
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
   .aurora{display:none}
@@ -3393,7 +3395,6 @@ setTimeout(function(){ if(de.classList.contains('vgate')&&matchMedia('(min-width
       <dt>Abspielen</dt><dd>Leertaste oder Klick ins Video · Tempo-Knopf wechselt 1× → ½× → ¼× → 0.1×</dd>
       <dt>Bild für Bild</dt><dd>← → oder Mausrad über Video bzw. Zeitleiste · Shift = 10 Bilder</dd>
       <dt>Zeitleiste</dt><dd>Eine Leiste für das ganze Video – antippen oder ziehen springt dorthin · + / − (oder Ctrl + Mausrad) zoomt bis auf einzelne Bilder, oben zeigt dann ein feiner Balken, wo du bist · Film-Knopf: Vorschaubilder ein/aus</dd>
-      <dt>Lupe</dt><dd><kbd>z</kbd>, Pinch oder Ctrl + Mausrad · ziehen = schwenken · Doppelklick = zurück</dd>
       <dt>Vergleichen</dt><dd>Oben «Side-by-Side» wählen – das offene Video ist A, dann B wählen</dd>
     </dl></section>
     <section class="hp" data-hp="analyse" hidden><dl>
@@ -3428,7 +3429,6 @@ setTimeout(function(){ if(de.classList.contains('vgate')&&matchMedia('(min-width
       <dt><kbd>+</kbd> <kbd>−</kbd></dt><dd>Zeitleiste zoomen</dd>
     </dl><dl>
       <dt><kbd>Enter</kbd></dt><dd>Gleichen Moment von A und B setzen</dd>
-      <dt><kbd>z</kbd></dt><dd>Lupe</dd>
       <dt><kbd>1</kbd> – <kbd>6</kbd></dt><dd>Zeichenwerkzeuge</dd>
       <dt><kbd>p</kbd> · <kbd>e</kbd></dt><dd>Standbild · Clip exportieren</dd>
       <dt><kbd>r</kbd></dt><dd>Aufnahme starten / stoppen</dd>
@@ -3438,7 +3438,7 @@ setTimeout(function(){ if(de.classList.contains('vgate')&&matchMedia('(min-width
     <section class="hp" data-hp="mobile" hidden><dl>
       <dt>Am Hang</dt><dd>Für den Einsatz draussen gibt es die schlanke Handy-App <a href="field/" target="_blank" rel="noopener" style="color:var(--red);font-weight:700">Video-Lab Field</a>: filmen, sofort in Zeitlupe ansehen, Side-by-Side, aufs Handy sichern</dd>
       <dt>Videos</dt><dd>«+» öffnet Videos aus Fotos oder Dateien – sie erscheinen oben unter «Geöffnet»</dd>
-      <dt>Bedienen</dt><dd>Tippen = Abspielen · Zeitleiste wischen = Bild für Bild · zwei Finger = Lupe</dd>
+      <dt>Bedienen</dt><dd>Tippen = Abspielen · Zeitleiste wischen = Bild für Bild</dd>
       <dt>Sichern</dt><dd>Nach Export oder Standbild: «Teilen · In Fotos sichern»</dd>
       <dt>Als App</dt><dd>Safari → Teilen → «Zum Home-Bildschirm» – startet wie eine App, auch offline</dd>
     </dl></section>
@@ -3827,7 +3827,7 @@ const STAGE_HTML=(lab,col)=>`<div class="stage">
   <div class="osd-r"><span class="pill lp" hidden>Loop</span><span class="pill rt">1×</span></div>
   <button class="st-fs" type="button" title="Vollbild" aria-label="Vollbild"><svg class="fs-in" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3M21 8V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3M16 21h3a2 2 0 0 0 2-2v-3"/></svg><svg class="fs-out" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3v3a2 2 0 0 1-2 2H3M21 8h-3a2 2 0 0 1-2-2V3M3 16h3a2 2 0 0 1 2 2v3M16 21v-3a2 2 0 0 1 2-2h3"/></svg></button>
   ${lab?`<span class="tag-ab" style="background:${col}">${lab}</span>`:''}
-  <span class="pill zoom-badge">Lupe <b class="zv">2×</b> · Doppelklick = zurück</span>
+  <span class="zv" hidden></span>
   <span class="pill hintpill" hidden></span>
   <span class="pill notepill" hidden></span>
   <canvas class="gpsov" hidden></canvas>
@@ -3869,7 +3869,7 @@ class Deck{
     this.stage.classList.toggle('has',!!c);
     if(!c){ this.v.removeAttribute('src'); try{this.v.load();}catch(e){} applyFx(this); this.dirty=this.annDirty=true; this.osd(); this.changed(); return; }
     this.stage.classList.add('busy');
-    this.v.src=c.url; this.v.playbackRate=this.rate; applyFx(this); fxUI();
+    this.v.src=c.url; this.v.playbackRate=this.rate; applyFx(this); fxUI(); if(typeof demoPrefetch==='function') demoPrefetch(c);
     const myc=c;
     if(/iP(hone|ad|od)|Macintosh/.test(navigator.userAgent)&&'ontouchend' in document){ const v=this.v; v.addEventListener('loadeddata',()=>{ if(this.clip!==myc||!v.paused) return; const t=v.currentTime; const pr=v.play(); if(pr) pr.then(()=>{ v.pause(); v.currentTime=t; }).catch(()=>{}); },{once:true}); } /* iPhone zeigt nach dem Springen sonst kein neues Bild */
     this.v.addEventListener('loadedmetadata',()=>{
@@ -3947,7 +3947,7 @@ class Deck{
   }
   /* --- Lupe --- */
   applyZoom(){ const z=this.z; this.zoomer.style.transform=z.s===1?'':`translate(${z.x}px,${z.y}px) scale(${z.s})`; this.stage.classList.toggle('zoomed',z.s>1); $('.zv',this.stage).textContent=(Math.round(z.s*10)/10)+'×'; this.annDirty=true; }
-  zoomAt(px,py,k){ const z=this.z, W=this.stage.clientWidth, H=this.stage.clientHeight; const s2=clamp(z.s*k,1,8); const ux=(px-z.x)/z.s, uy=(py-z.y)/z.s; z.x=px-s2*ux; z.y=py-s2*uy; z.s=s2; this.clampPan(W,H); this.applyZoom(); }
+  zoomAt(px,py,k){ return; /* Lupe (Video vergrössern) entfernt – Bild bleibt immer ganz */ const z=this.z, W=this.stage.clientWidth, H=this.stage.clientHeight; const s2=clamp(z.s*k,1,8); const ux=(px-z.x)/z.s, uy=(py-z.y)/z.s; z.x=px-s2*ux; z.y=py-s2*uy; z.s=s2; this.clampPan(W,H); this.applyZoom(); }
   clampPan(W,H){ const z=this.z; if(z.s<=1){z.s=1;z.x=0;z.y=0;return;} z.x=clamp(z.x,W-W*z.s,0); z.y=clamp(z.y,H-H*z.s,0); }
   resetZoom(){ this.z={s:1,x:0,y:0}; this.applyZoom(); }
   cycleZoom(){ const W=this.stage.clientWidth,H=this.stage.clientHeight; const next=this.z.s<1.5?2:this.z.s<2.5?3:1; this.resetZoom(); if(next>1) this.zoomAt(W/2,H/2,next); }
@@ -4278,7 +4278,7 @@ function cfTap(d){ const k=d===B?'b':'a'; cfSet(CF.k===k?null:k); }
 function cfSet(k,quiet){ if(k===CF.k) return; A.pause(); B.pause(); G.playing=false; if(typeof cmpPlayIcon==='function') cmpPlayIcon();
   if(k&&!CF.k){ CF.wasLinked=!!G.linked; if(G.linked){ G.linked=false; linkBtn(); updSync(); } }
   if(!k&&CF.k&&A.ready&&B.ready&&(CF.wasLinked||!$('#viewCmp').classList.contains('overlay'))){ /* zurück auf beide: am aktuellen Bild verbinden (im Overlay nur, wenn vorher verbunden – «Weiter» bleibt dein Schritt) */ G.off=B.time()-A.time(); G.syncA=A.time(); G.linked=true; linkBtn(); updSync(); if(!quiet) toast('Wieder beide gemeinsam – gleicher Moment A '+A.time().toFixed(2)+' s ↔ B '+B.time().toFixed(2)+' s',2200); if(typeof ghostUI==='function') ghostUI(); }
-  CF.k=k; cfUI(); if(k&&!quiet) toast('Nur '+(k==='a'?'A':'B')+' wird gesteuert – Zeitleiste, Bild für Bild, Zoom. Nochmals ins Video klicken = wieder beide.',2600); }
+  CF.k=k; cfUI(); if(k&&!quiet) toast('Nur '+(k==='a'?'A':'B')+' wird gesteuert – Zeitleiste, Bild für Bild. Nochmals ins Video klicken = wieder beide.',2600); }
 function cfUI(){ const on=cfOk(); A.stage.style.setProperty('--k-cf','var(--a)'); B.stage.style.setProperty('--k-cf','var(--b)'); A.stage.classList.toggle('cf-on',on&&CF.k==='a'); B.stage.classList.toggle('cf-on',on&&CF.k==='b'); A.stage.classList.toggle('cf-off',on&&CF.k==='b'); B.stage.classList.toggle('cf-off',on&&CF.k==='a'); $('#cStages').classList.toggle('cf-both',on&&!CF.k); cfLock(on); }
 /* Schloss zwischen A und B: zu = beide gemeinsam, offen = nur das angeklickte Video (Farbe A/B). Klick aufs offene Schloss = wieder beide. */
 const LOCK_C='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="10.5" width="14" height="10" rx="2.4"/><path d="M8 10.5V7.8a4 4 0 0 1 8 0v2.7"/></svg>',
@@ -4311,6 +4311,8 @@ function cmpToggle(){
   const playing=!A.v.paused||!B.v.paused;
   if(!playing&&!OV.inPrev&&typeof ovFollowOK==='function'&&ovActive()&&ovFollowOK()) return ovPrevStart(); // fertiges Overlay: ab Start, Halt am Ende
   if(playing){ A.pause(); B.pause(); G.playing=false; return; }
+  if(G.waitPlay){ G.waitPlay=false; demoPill(); return; } /* nochmals gedrückt = Warten abbrechen */
+  { const pf=[A,B].map(d=>d.clip&&d.clip._pf&&d.clip._pct<100?d.clip._pf:null).filter(Boolean); if(pf.length){ G.waitPlay=true; toast('Videos werden geladen – startet automatisch, sobald beide bereit sind.',2600); Promise.all(pf).then(()=>{ const t0=performance.now(), go=()=>{ if(!G.waitPlay) return; if((A.v.readyState<3||B.v.readyState<3||A.v.seeking||B.v.seeking)&&performance.now()-t0<6000) return setTimeout(go,120); G.waitPlay=false; cmpToggle(); }; setTimeout(go,150); }); return; } } /* erst abspielen, wenn beide da sind */
   if(CF.k&&cfOk()){ (CF.k==='a'?A:B).play(); return; } /* nur das angeklickte Video */
   if(G.linked&&A.ready&&B.ready){ A.play(); G.playing=true; G.errS=0;
     // B gleichzeitig starten, wenn es schon am richtigen Bild steht (sonst startet es verspätet)
@@ -4450,7 +4452,6 @@ document.addEventListener('keydown',e=>{
   else if(k==='i'||k==='I'){ if(mode==='single') (e.shiftKey?cutClear():setIn()); }
   else if(k==='o'||k==='O'){ if(mode==='single') (e.shiftKey?cutClear():setOut()); }
   else if(k==='l'||k==='L'){ if(mode==='single') toggleLoop(); else if(!gps) (G.linked?unlink():doSync()); }
-  else if(k==='z'||k==='Z'){ single?D.cycleZoom():(A.cycleZoom(),B.cycleZoom()); }
   else if(k==='f'||k==='F') fullscreen();
   else if(k==='p'||k==='P') snapshot();
   else if(k==='e'||k==='E') openExport();
@@ -8025,13 +8026,24 @@ setInterval(()=>{ const now=performance.now(); decks.forEach(d=>{ const v=d.v, s
 setColor(LS.get('color',COLORS[0])); setTool('none');
 restoreSession();
 /* Beispiel-Rennvideos (Sölden 2025, RS Herren) – liegen neben der App im Ordner demo/ */
-const REAL_DEMO=[["Meillard_Soelden_251026_GS_M_L1.mp4", 15594565], ["Gratz_Soelden_251026_GS_M_L1.mp4", 14564292], ["Braathen_Soelden_251026_GS_M_L1.mp4", 14949042], ["monney_v1_sg_tr9_stelvio_261029.mp4", 6591501], ["monney_v2_sg_tr9_stelvio_261029.mp4", 8210753], ["monney_v4_sg_tr9_stelvio_261029.mp4", 10912089], ["rogentin_v1_sg_tr3_stelvio_261029.mp4", 6865780], ["rogentin_v2_sg_tr3_stelvio_261029.mp4", 8499273], ["rogentin_v4_sg_tr3_stelvio_261029.mp4", 12637917], ["flatscher_sl_schnals_261018_l4_cam1_111.mp4", 9900339], ["fournier_sl_schnals_261018_l4_cam1_114.mp4", 22783033], ["phillips_sl_schnals_261018_l5_cam1_123.mp4", 9939143], ["boisset_vgh_dh_tr1_courchevel_260311.mp4", 21193253], ["kriechmayr_vgh_dh_tr1_courchevel_260311.mp4", 20048025], ["allegre_vgh_dh_tr1_courchevel_260311.mp4", 22408170], ["moltzan_wc_gs_l2_camGH_hafjell_260325.mp4", 20632437], ["rast_wc_gs_l2_camGH_hafjell_260325.mp4", 22233687], ["holdener_wc_sl_l1_camGH_hafjell_260324.mp4", 19428840], ["shiffrin_wc_sl_l1_camGH_hafjell_260324.mp4", 19594008], ["odermatt lauf1 261025 GS soelden v1.mp4", 2676704], ["braathen lauf1 261025 GS soelden v1.mp4", 1935003], ["haechler lauf1 261025 GS soelden v1.mp4", 2524449], ["shiffrin wc gs l1 cam1 soelden 261024.mp4", 4025103], ["holdener wc gs l1 cam1 soelden 261024.mp4", 4312801], ["allenbach wc gs l1 cam1 soelden 261024.mp4", 4315846], ["brignone_wc_sg_camGH_cortina_260212.mp4", 17302153], ["blanc_wc_sg_camGH_cortina_260212.mp4", 11442032], ["schmitt_wc_sg_camGH_cortina_260212.mp4", 16428581], ["curtoni_wc_dh_tr1_camGH_valdisere_251218.mp4", 19536464], ["delago_wc_dh_tr1_camGH_valdisere_251218.mp4", 18695552], ["durrer_wc_dh_tr1_camGH_valdisere_251218.mp4", 19497247], ["ming_wc_dh_tr1_camGH_valdisere_251218.mp4", 20160965]];
+const REAL_DEMO=[["Meillard_Soelden_251026_GS_M_L1.mp4", 15594565, 3941897], ["Gratz_Soelden_251026_GS_M_L1.mp4", 14564292, 3733814], ["Braathen_Soelden_251026_GS_M_L1.mp4", 14949042, 3776874], ["monney_v1_sg_tr9_stelvio_261029.mp4", 6591501, 2704359], ["monney_v2_sg_tr9_stelvio_261029.mp4", 8210753, 3229149], ["monney_v4_sg_tr9_stelvio_261029.mp4", 10912089, 4602992], ["rogentin_v1_sg_tr3_stelvio_261029.mp4", 6865780, 2694602], ["rogentin_v2_sg_tr3_stelvio_261029.mp4", 8499273, 3385232], ["rogentin_v4_sg_tr3_stelvio_261029.mp4", 12637917, 5406107], ["flatscher_sl_schnals_261018_l4_cam1_111.mp4", 9900339, 1202605], ["fournier_sl_schnals_261018_l4_cam1_114.mp4", 22783033, 3076566], ["phillips_sl_schnals_261018_l5_cam1_123.mp4", 9939143, 1159148], ["boisset_vgh_dh_tr1_courchevel_260311.mp4", 21193253, 6715452], ["kriechmayr_vgh_dh_tr1_courchevel_260311.mp4", 20048025, 6825717], ["allegre_vgh_dh_tr1_courchevel_260311.mp4", 22408170, 7158994], ["moltzan_wc_gs_l2_camGH_hafjell_260325.mp4", 20632437, 6868870], ["rast_wc_gs_l2_camGH_hafjell_260325.mp4", 22233687, 7236819], ["holdener_wc_sl_l1_camGH_hafjell_260324.mp4", 19428840, 6751556], ["shiffrin_wc_sl_l1_camGH_hafjell_260324.mp4", 19594008, 6715630], ["odermatt lauf1 261025 GS soelden v1.mp4", 2676704, 0], ["braathen lauf1 261025 GS soelden v1.mp4", 1935003, 0], ["haechler lauf1 261025 GS soelden v1.mp4", 2524449, 0], ["shiffrin wc gs l1 cam1 soelden 261024.mp4", 4025103, 0], ["holdener wc gs l1 cam1 soelden 261024.mp4", 4312801, 0], ["allenbach wc gs l1 cam1 soelden 261024.mp4", 4315846, 0], ["brignone_wc_sg_camGH_cortina_260212.mp4", 17302153, 7045778], ["blanc_wc_sg_camGH_cortina_260212.mp4", 11442032, 4645708], ["schmitt_wc_sg_camGH_cortina_260212.mp4", 16428581, 6684837], ["curtoni_wc_dh_tr1_camGH_valdisere_251218.mp4", 19536464, 9005690], ["delago_wc_dh_tr1_camGH_valdisere_251218.mp4", 18695552, 8380052], ["durrer_wc_dh_tr1_camGH_valdisere_251218.mp4", 19497247, 8889099], ["ming_wc_dh_tr1_camGH_valdisere_251218.mp4", 20160965, 9084157]];
+/* Beispielvideos auf Handy/Tablet: kleine Fassung, beim Wählen ganz herunterladen (mit %), danach lokal – Spulen und Abspielen ohne Warten */
+const DEMO_MOB=(()=>{ try{ return matchMedia('(pointer:coarse)').matches&&Math.min(screen.width,screen.height)<1100; }catch(e){ return false; } })();
+function demoPrefetch(c){ try{ if(!DEMO_MOB) return null; }catch(e){ return null; } if(!c||!c.demo||/^blob:/.test(c.url)) return null; if(c._pf) return c._pf; c._pct=0;
+  c._pf=(async()=>{ try{ const r=await fetch(c.url); if(!r.ok||!r.body) throw 0; const tot=+r.headers.get('content-length')||c.size||0, rd=r.body.getReader(), parts=[]; let got=0;
+      for(;;){ const {done,value}=await rd.read(); if(done) break; parts.push(value); got+=value.length; if(tot) c._pct=Math.min(99,Math.round(got/tot*100)); demoPill(); }
+      c.url=URL.createObjectURL(new Blob(parts,{type:'video/mp4'})); c._pct=100; decks.forEach(d=>{ if(d.clip===c) demoSwap(d,c); }); }
+    catch(e){ c._pct=100; } demoPill(); return c; })(); demoPill(); return c._pf; }
+function demoSwap(d,c){ const v=d.v; if(!v.paused){ v.addEventListener('pause',()=>{ if(d.clip===c) demoSwap(d,c); },{once:true}); return; }
+  const t=v.currentTime; v.addEventListener('loadedmetadata',()=>{ if(d.clip!==c) return; try{ v.currentTime=t; }catch(e){} d.dirty=true; },{once:true}); v.src=c.url; v.playbackRate=d.rate; }
+function demoPill(){ decks.forEach(d=>{ const st=d.stage; if(!st) return; let p=$('.dl-pill',st); const c=d.clip, on=!!(c&&c._pf&&c._pct<100);
+  if(!p){ if(!on) return; p=document.createElement('span'); p.className='dl-pill'; st.appendChild(p); } p.hidden=!on; if(on) p.textContent='Video lädt '+c._pct+' %'; }); }
 // Zeitpunkt im Video, an dem alle Läufe derselben Serie am gleichen Ort sind (gemessen)
 const DEMO_OFF={'boisset_vgh_dh_tr1_courchevel_260311.mp4':0.7,'kriechmayr_vgh_dh_tr1_courchevel_260311.mp4':0.3,'allegre_vgh_dh_tr1_courchevel_260311.mp4':0,'moltzan_wc_gs_l2_camGH_hafjell_260325.mp4':0,'rast_wc_gs_l2_camGH_hafjell_260325.mp4':2.0,'holdener_wc_sl_l1_camGH_hafjell_260324.mp4':0.7,'shiffrin_wc_sl_l1_camGH_hafjell_260324.mp4':0};
 (async()=>{
   if(!/^https?:/.test(location.protocol)) return;
   try{ const r=await fetch((window.VLAB_DEMO||'demo/')+REAL_DEMO[0][0],{method:'HEAD',cache:'no-store'}); if(!r.ok) return; }catch(e){ return; }
-  const real=REAL_DEMO.map(([n,sz])=>addClip({name:n,size:sz,url:(window.VLAB_DEMO||'demo/')+n,demo:true}));
+  const real=REAL_DEMO.map(([n,sz,msz])=>{ const m=DEMO_MOB&&msz>0; return addClip({name:n,size:m?msz:sz,url:(window.VLAB_DEMO||'demo/')+(m?'m/':'')+n,demo:true}); }); /* Handy/Tablet: leichte 540p-Fassung */
   // Rennvideos nach vorne in der Liste
   real.slice().reverse().forEach(c=>{ const i=clips.indexOf(c); if(i>0){ clips.splice(i,1); clips.unshift(c); } });
   if(!S.clip||S.clip.demo){ S.setClip(real[0]); }
@@ -8142,7 +8154,7 @@ if(false&&!LS.get('hint1',0)){ setTimeout(()=>{ toast(matchMedia('(pointer:coars
 
 /* Update-Hinweis: prüft version.json auf GitHub Pages; «Aktualisieren» lädt die Seite ohne Cache neu */
 (()=>{
-  const BUILD='20261102141346'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
+  const BUILD='20261102144039'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
   // nach einem Update die ?v=… aus der Adresse entfernen
   try{ const u=new URL(location.href); if(u.searchParams.has('v')){ u.searchParams.delete('v'); history.replaceState(null,'',u.pathname+(u.search||'')+u.hash); } }catch(e){}
   const el=$('#upd'); let latest=null, snoozed=null, busy=false;
