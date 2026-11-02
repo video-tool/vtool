@@ -2499,7 +2499,7 @@ canvas.gap-row[hidden]{display:none}
 #useModal td .q i s.c{background:var(--red)}
 #useModal td .q em{font-style:normal;min-width:58px;text-align:right}
 #useModal td .muted{color:var(--muted)}
-#useModal td .lt{display:inline-flex;align-items:center;gap:6px}
+#useModal td .lt{display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
 #useModal td .lt::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--line2)}
 #useModal td .lt.now::before{background:var(--good);box-shadow:0 0 0 3px color-mix(in srgb,var(--good) 20%,transparent)}
 #useModal .use-ft{font-size:11.5px;color:var(--muted);display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
@@ -4404,7 +4404,7 @@ function cfLock(on){ const st=$('#cStages'); if(!st) return; let b=$('#cfLock');
   const sep=!CF.k&&!G.linked&&A.ready&&B.ready, open=!!CF.k||sep; /* getrennt (z. B. Overlay Schritt 1): Schloss offen – klicken verbindet A und B am aktuellen Bild */ b.hidden=!on; b.classList.toggle('open',open); b.classList.toggle('ka',CF.k==='a'); b.classList.toggle('kb',CF.k==='b'); b.innerHTML=open?LOCK_O:LOCK_C;
   b.title=sep?'A und B getrennt – je Startpunkt einstellen, dann hier schliessen (verbindet beide)':open?'Nur '+(CF.k==='a'?'A':'B')+' wird gesteuert – klicken = wieder beide gemeinsam':'A und B gemeinsam – ins Video klicken, um nur eines zu bewegen'; b.setAttribute('aria-label',b.title); }
 function cfReset(){ if(CF.k) cfSet(null,true); cfUI(); }
-function linkBtn(){ $('#viewCmp').classList.toggle('cmp-linked',!!G.linked); $$('.m-sync').forEach(b=>{ b.classList.toggle('on',!!G.linked); $('span',b).textContent=G.linked?'Verbunden':'Gleicher Moment'; b.title=G.linked?'A und B laufen gemeinsam – antippen zum Trennen':'A und B an diesem Bild verbinden'; }); const b=$('#btnLink'); b.classList.toggle('on',G.linked); $('span',b).textContent=G.linked?'Verknüpft':'Getrennt';
+function linkBtn(){ $('#viewCmp').classList.toggle('cmp-linked',!!G.linked); cfLock(cfOk()); /* Schloss-Symbol folgt immer dem Zustand (auch bei automatischer Verbindung) */ $$('.m-sync').forEach(b=>{ b.classList.toggle('on',!!G.linked); $('span',b).textContent=G.linked?'Verbunden':'Gleicher Moment'; b.title=G.linked?'A und B laufen gemeinsam – antippen zum Trennen':'A und B an diesem Bild verbinden'; }); const b=$('#btnLink'); b.classList.toggle('on',G.linked); $('span',b).textContent=G.linked?'Verknüpft':'Getrennt';
   const s=$('#btnSync'); if(s){ s.classList.toggle('on',G.linked); const t=$('.sync-lab',s)||(()=>{ const x=document.createElement('span'); x.className='sync-lab'; [...s.childNodes].forEach(n=>{ if(n.nodeType===3) n.remove(); }); s.appendChild(x); return x; })();
     t.textContent='Gleicher Moment'; s.title=G.linked?'A und B laufen gemeinsam – klicken zum Trennen (l)':'A und B am aktuellen Bild verbinden – danach laufen beide gemeinsam (Enter)'; }  if(typeof timHint==='function') try{ timHint(); }catch(e){} try{ if(typeof cfUI==='function') cfUI(); }catch(e){} requestAnimationFrame(()=>{ dispatchEvent(new Event('resize')); }); }
 function updSync(){
@@ -5386,7 +5386,7 @@ function ovUI(){ vchipPlace();
   v.classList.toggle('ov-pick-a',OV.pick==='a'); v.classList.toggle('ov-pick-b',OV.pick==='b');
   const split=ovActive()&&!OV.pick&&!OV.T&&!(OV.follow&&(GH.state==='busy'||ovFollowOK())); // bis B ausgerichtet ist: nebeneinander // Schritt 1: nebeneinander, damit A und B einzeln eingestellt werden können
   if(v.classList.contains('ov-split')!==split){ if(!split&&typeof CF!=='undefined'&&CF.k){ cfSet(null,true); } v.classList.toggle('ov-split',split); setTimeout(()=>{ if(typeof cfUI==='function') cfUI(); },0); decks.forEach(d=>{ d.dirty=true; d.annDirty=true; }); requestAnimationFrame(()=>{ decks.forEach(d=>{ d.dirty=true; }); if(typeof ovMarks==='function') ovMarks(); }); }
-  const one=ovActive()&&G.linked&&!OV.edit; // A und B laufen gemeinsam → nur eine Zeitleiste (zwei nur im Schritt «Gleicher Moment»)
+  const one=false; // Overlay: immer beide Zeitleisten sichtbar, auch wenn A und B verbunden sind
   if(v.classList.contains('ov-one')!==one){ v.classList.toggle('ov-one',one); decks.forEach(d=>{ d.dirty=true; d.annDirty=true; }); requestAnimationFrame(()=>decks.forEach(d=>{ d.dirty=true; })); }
   if(!ovActive()){ ovApplyCut(); return; }
   const st=ovStep(), busy=OV.follow&&GH.state==='busy', done=ovFollowOK();
@@ -5590,7 +5590,7 @@ function useBuckets(S,k){ let i0=0; if(USE.days>=3650){ while(i0<S.length-1&&!(+
   return {unit:wk?'Woche':'Monat',B:[...M.values()]}; }
 function useRender(){ const D=USE.data, U=D.users||[], S=D.series||[], esc=t=>String(t==null?'':t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
   const sum=k=>U.reduce((a,u)=>a+(+u[k]||0),0), act=U.filter(u=>(+u.z||0)+(+u.o||0)+(+u.x||0)>0), fmt=n=>Number(n||0).toLocaleString('de-CH'), P=USE.prev;
-  const rel=t=>{ if(!t) return '–'; const d=(Date.now()-new Date(t))/864e5; return d<1/24?'gerade eben':d<1?'heute':d<2?'gestern':d<14?'vor '+Math.floor(d)+' Tagen':new Date(t).toLocaleDateString('de-CH',{day:'2-digit',month:'2-digit',year:'2-digit'}); };
+  const rel=t=>{ if(!t) return '–'; const w=new Date(t); if(isNaN(w)) return '–'; const uz=w.toLocaleTimeString('de-CH',{hour:'2-digit',minute:'2-digit'}), T=x=>new Date(x.getFullYear(),x.getMonth(),x.getDate()).getTime(), n=Math.round((T(new Date())-T(w))/864e5); /* Kalendertage und Uhrzeit (Ortszeit des Geräts) */ return n<=0?'heute, '+uz:n===1?'gestern, '+uz:n<14?'vor '+n+' Tagen, '+uz:w.toLocaleDateString('de-CH',{day:'2-digit',month:'2-digit',year:'2-digit'})+', '+uz; };
   const dlt=(v,p)=>{ if(P==null||p==null) return ''; if(!p) return v?'<span class="kd up">neu</span>':'<span class="kd">±0</span>'; const c=Math.round((v-p)/p*100); return '<span class="kd '+(c>0?'up':c<0?'dn':'')+'">'+(c>0?'▲ ':c<0?'▼ ':'')+Math.abs(c)+' %</span>'; };
   const zS=sum('z'), oS=sum('o'), xS=sum('x'), cmp=P?'ggü. den '+(USE.days)+' Tagen davor':'';
   const kpi=(cl,l,v,d,sub)=>'<div class="use-k '+cl+'"><span class="kl"><i></i>'+l+'</span><span class="kv"><b>'+fmt(v)+'</b>'+d+'</span><em>'+sub+'</em><svg data-sp="'+cl+'"></svg></div>';
@@ -8511,7 +8511,7 @@ if(false&&!LS.get('hint1',0)){ setTimeout(()=>{ toast(matchMedia('(pointer:coars
 
 /* Update-Hinweis: prüft version.json auf GitHub Pages; «Aktualisieren» lädt die Seite ohne Cache neu */
 (()=>{
-  const BUILD='20261102191747'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
+  const BUILD='20261102193006'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
   // nach einem Update die ?v=… aus der Adresse entfernen
   try{ const u=new URL(location.href); if(u.searchParams.has('v')){ u.searchParams.delete('v'); history.replaceState(null,'',u.pathname+(u.search||'')+u.hash); } }catch(e){}
   const el=$('#upd'); let latest=null, snoozed=null, busy=false;
