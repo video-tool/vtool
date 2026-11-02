@@ -4148,11 +4148,11 @@ B.onUserSeek=d=>{ if(cfTlOwn(d)) return; if(G.linked&&A.ready) A.seekTime(d.time
 A.onTap=B.onTap=d=>{ if(cfOk()){ cfTap(d); return; } cmpToggle(); A.flash(); };
 /* Side-by-Side: ins Video klicken = nur dieses steuern (Rahmen in seiner Farbe), nochmals klicken = wieder beide (Rahmen um beide) */
 const CF={k:null,wasLinked:false};
-function cfOk(){ return mode==='cmp'&&!$('#viewCmp').classList.contains('overlay')&&A.ready&&B.ready; }
+function cfOk(){ const v=$('#viewCmp'); return mode==='cmp'&&(!v.classList.contains('overlay')||v.classList.contains('ov-split'))&&A.ready&&B.ready; } /* auch im Overlay, solange A und B nebeneinander stehen */
 function cfTap(d){ const k=d===B?'b':'a'; cfSet(CF.k===k?null:k); }
 function cfSet(k,quiet){ if(k===CF.k) return; A.pause(); B.pause(); G.playing=false; if(typeof cmpPlayIcon==='function') cmpPlayIcon();
   if(k&&!CF.k){ CF.wasLinked=!!G.linked; if(G.linked){ G.linked=false; linkBtn(); updSync(); } }
-  if(!k&&CF.k&&A.ready&&B.ready){ /* zurück auf beide: immer am aktuellen Bild verbinden */ G.off=B.time()-A.time(); G.syncA=A.time(); G.linked=true; linkBtn(); updSync(); if(!quiet) toast('Wieder beide gemeinsam – gleicher Moment A '+A.time().toFixed(2)+' s ↔ B '+B.time().toFixed(2)+' s',2200); if(typeof ghostUI==='function') ghostUI(); }
+  if(!k&&CF.k&&A.ready&&B.ready&&(CF.wasLinked||!$('#viewCmp').classList.contains('overlay'))){ /* zurück auf beide: am aktuellen Bild verbinden (im Overlay nur, wenn vorher verbunden – «Weiter» bleibt dein Schritt) */ G.off=B.time()-A.time(); G.syncA=A.time(); G.linked=true; linkBtn(); updSync(); if(!quiet) toast('Wieder beide gemeinsam – gleicher Moment A '+A.time().toFixed(2)+' s ↔ B '+B.time().toFixed(2)+' s',2200); if(typeof ghostUI==='function') ghostUI(); }
   CF.k=k; cfUI(); if(k&&!quiet) toast('Nur '+(k==='a'?'A':'B')+' wird gesteuert – Zeitleiste, Bild für Bild, Zoom. Nochmals ins Video klicken = wieder beide.',2600); }
 function cfUI(){ const on=cfOk(); A.stage.style.setProperty('--k-cf','var(--a)'); B.stage.style.setProperty('--k-cf','var(--b)'); A.stage.classList.toggle('cf-on',on&&CF.k==='a'); B.stage.classList.toggle('cf-on',on&&CF.k==='b'); A.stage.classList.toggle('cf-off',on&&CF.k==='b'); B.stage.classList.toggle('cf-off',on&&CF.k==='a'); $('#cStages').classList.toggle('cf-both',on&&!CF.k); }
 function cfReset(){ if(CF.k) cfSet(null,true); cfUI(); }
@@ -4199,7 +4199,7 @@ function linkedTick(){
   else if(tight) B.v.playbackRate=clamp(A.rate*(1-G.errS*4),A.rate*0.75,A.rate*1.25);
   else B.v.playbackRate=clamp(A.rate*(1-err*1.5),A.rate*0.85,A.rate*1.15);
 }
-function setLayout(l){ if(window.mMenuClose) mMenuClose(); if(typeof cfReset==='function'&&l==='overlay') cfReset(); setTimeout(()=>{ if(typeof cfUI==='function') cfUI(); },0); if(l==='overlay'&&typeof OV!=='undefined'&&OV.cut.a==null&&!OV.follow&&A.clip&&A.clip.loop&&A.clip.loop.a!=null){ const L=A.clip.loop, f=A.fps||50; OV.cut.a=L.a/f; if(L.b!=null) OV.cut.b=(L.b+1)/f; } if(l==='ghost') l='side'; if(l==='overlay'&&document.body.classList.contains('pfs')&&typeof pfsSet==='function') pfsSet(false); /* Overlay einrichten braucht Schritte und Leiste */ if(l==='overlay'){ try{ if(DRAW.tool&&DRAW.tool!=='none') setTool('none'); if(TIM.on){ TIM.on=false; timUI(); } }catch(e){} } /* Werkzeuge gibt es im Übereinander-Modus nicht */ if(l!=='overlay'&&typeof OV!=='undefined'&&OV.pick) OV.pick=null; setTimeout(()=>typeof ovUI==='function'&&ovUI(),0);  $$('#layoutSeg button').forEach(x=>x.classList.toggle('on',x.dataset.layout===l)); const v=$('#viewCmp'); v.classList.toggle('overlay',l==='overlay'); v.classList.toggle('ghost',l==='ghost'); if(typeof ghostUI==='function') ghostUI();  LS.set('layout',l); decks.forEach(d=>{ d.dirty=true; d.annDirty=true; }); if(typeof splitsUI==='function') splitsUI(); if(typeof tabsUI==='function') tabsUI(); }
+function setLayout(l){ if(window.mMenuClose) mMenuClose(); setTimeout(()=>{ if(typeof cfUI==='function') cfUI(); },0); if(l==='overlay'&&typeof OV!=='undefined'&&OV.cut.a==null&&!OV.follow&&A.clip&&A.clip.loop&&A.clip.loop.a!=null){ const L=A.clip.loop, f=A.fps||50; OV.cut.a=L.a/f; if(L.b!=null) OV.cut.b=(L.b+1)/f; } if(l==='ghost') l='side'; if(l==='overlay'&&document.body.classList.contains('pfs')&&typeof pfsSet==='function') pfsSet(false); /* Overlay einrichten braucht Schritte und Leiste */ if(l==='overlay'){ try{ if(DRAW.tool&&DRAW.tool!=='none') setTool('none'); if(TIM.on){ TIM.on=false; timUI(); } }catch(e){} } /* Werkzeuge gibt es im Übereinander-Modus nicht */ if(l!=='overlay'&&typeof OV!=='undefined'&&OV.pick) OV.pick=null; setTimeout(()=>typeof ovUI==='function'&&ovUI(),0);  $$('#layoutSeg button').forEach(x=>x.classList.toggle('on',x.dataset.layout===l)); const v=$('#viewCmp'); v.classList.toggle('overlay',l==='overlay'); v.classList.toggle('ghost',l==='ghost'); if(typeof ghostUI==='function') ghostUI();  LS.set('layout',l); decks.forEach(d=>{ d.dirty=true; d.annDirty=true; }); if(typeof splitsUI==='function') splitsUI(); if(typeof tabsUI==='function') tabsUI(); }
 $('#layoutSeg').addEventListener('click',e=>{ const b=e.target.closest('[data-layout]'); if(b) setLayout(b.dataset.layout); });
 $('#opRange').addEventListener('input',e=>$('#viewCmp').style.setProperty('--ovop',e.target.value));
 
@@ -5065,7 +5065,7 @@ function ovUI(){ vchipPlace();
   const v=$('#viewCmp'), k=A.clip&&B.clip?A.clip.id+'|'+B.clip.id:''; if(k!==OV.key){ OV.key=k; OV.T=null; OV.follow=false; OV.pick=null; OV.cut={a:null,b:null}; { const L=A.clip&&A.clip.loop, f=A.fps||A.clip&&A.clip.fps||50; if(L&&L.a!=null){ OV.cut.a=L.a/f; if(L.b!=null) OV.cut.b=(L.b+1)/f; } } /* Start/Ende aus «Ein Video» gelten auch fürs Overlay */ OV.edit=false; OV.found=null; OV.foundEx=null; OV.hideB=false; OV.fix=null; }
   v.classList.toggle('ov-pick-a',OV.pick==='a'); v.classList.toggle('ov-pick-b',OV.pick==='b');
   const split=ovActive()&&!OV.pick&&!OV.T&&!(OV.follow&&(GH.state==='busy'||ovFollowOK())); // bis B ausgerichtet ist: nebeneinander // Schritt 1: nebeneinander, damit A und B einzeln eingestellt werden können
-  if(v.classList.contains('ov-split')!==split){ v.classList.toggle('ov-split',split); decks.forEach(d=>{ d.dirty=true; d.annDirty=true; }); requestAnimationFrame(()=>{ decks.forEach(d=>{ d.dirty=true; }); if(typeof ovMarks==='function') ovMarks(); }); }
+  if(v.classList.contains('ov-split')!==split){ if(!split&&typeof CF!=='undefined'&&CF.k){ cfSet(null,true); } v.classList.toggle('ov-split',split); setTimeout(()=>{ if(typeof cfUI==='function') cfUI(); },0); decks.forEach(d=>{ d.dirty=true; d.annDirty=true; }); requestAnimationFrame(()=>{ decks.forEach(d=>{ d.dirty=true; }); if(typeof ovMarks==='function') ovMarks(); }); }
   const one=ovActive()&&G.linked&&!OV.edit; // A und B laufen gemeinsam → nur eine Zeitleiste (zwei nur im Schritt «Gleicher Moment»)
   if(v.classList.contains('ov-one')!==one){ v.classList.toggle('ov-one',one); decks.forEach(d=>{ d.dirty=true; d.annDirty=true; }); requestAnimationFrame(()=>decks.forEach(d=>{ d.dirty=true; })); }
   if(!ovActive()){ ovApplyCut(); return; }
@@ -7864,7 +7864,7 @@ if(false&&!LS.get('hint1',0)){ setTimeout(()=>{ toast(matchMedia('(pointer:coars
 
 /* Update-Hinweis: prüft version.json auf GitHub Pages; «Aktualisieren» lädt die Seite ohne Cache neu */
 (()=>{
-  const BUILD='20261102121338'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
+  const BUILD='20261102122929'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
   // nach einem Update die ?v=… aus der Adresse entfernen
   try{ const u=new URL(location.href); if(u.searchParams.has('v')){ u.searchParams.delete('v'); history.replaceState(null,'',u.pathname+(u.search||'')+u.hash); } }catch(e){}
   const el=$('#upd'); let latest=null, snoozed=null, busy=false;
