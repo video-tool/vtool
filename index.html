@@ -4383,7 +4383,7 @@ $('#selA').addEventListener('change',e=>{ A.setClip(clips.find(c=>c.id==e.target
 $('#selB').addEventListener('change',e=>{ B.setClip(clips.find(c=>c.id==e.target.value)||null); CF.k=null; unlink(); renderLib(); });
 function cmpPlayIcon(){ $('#viewCmp .ctl.play').innerHTML=(!A.v.paused||!B.v.paused)?ICON.pause:ICON.play; }
 A.onChange=B.onChange=()=>{ cmpPlayIcon(); cmpMeta(); updSync(); splitsUI(); fxUI(); if(typeof cfUI==='function') cfUI(); };
-function cfTlOwn(d){ /* Schloss zu → eine gemeinsame Zeitleiste bewegt A und B; einzeln verschieben nur mit offenem Schloss */ if(G.linked&&!$('#viewCmp').classList.contains('overlay')) return false; if(!(typeof cfOk==='function'&&cfOk()&&!CF.k&&G.linked)) return false; if(performance.now()-(d._tl||0)>150) return false; G.off=B.time()-A.time(); G.syncA=A.time(); updSync(); splitsUI(); return true; }
+function cfTlOwn(d){ /* Schloss zu → eine gemeinsame Zeitleiste bewegt A und B; einzeln verschieben nur mit offenem Schloss */ return false; }
 A.onUserSeek=d=>{ if(cfTlOwn(d)) return; if(G.linked&&B.ready) B.seekTime(d.time()+G.off); updSync(); splitsUI(); };
 B.onUserSeek=d=>{ if(cfTlOwn(d)) return; if(G.linked&&A.ready) A.seekTime(d.time()-G.off); updSync(); splitsUI(); };
 A.onTap=B.onTap=d=>{ if(cfOk()){ cfTap(d); return; } cmpToggle(); A.flash(); };
@@ -5386,7 +5386,7 @@ function ovUI(){ vchipPlace();
   v.classList.toggle('ov-pick-a',OV.pick==='a'); v.classList.toggle('ov-pick-b',OV.pick==='b');
   const split=ovActive()&&!OV.pick&&!OV.T&&!(OV.follow&&(GH.state==='busy'||ovFollowOK())); // bis B ausgerichtet ist: nebeneinander // Schritt 1: nebeneinander, damit A und B einzeln eingestellt werden können
   if(v.classList.contains('ov-split')!==split){ if(!split&&typeof CF!=='undefined'&&CF.k){ cfSet(null,true); } v.classList.toggle('ov-split',split); setTimeout(()=>{ if(typeof cfUI==='function') cfUI(); },0); decks.forEach(d=>{ d.dirty=true; d.annDirty=true; }); requestAnimationFrame(()=>{ decks.forEach(d=>{ d.dirty=true; }); if(typeof ovMarks==='function') ovMarks(); }); }
-  const one=false; // Overlay: immer beide Zeitleisten sichtbar, auch wenn A und B verbunden sind
+  const one=ovActive()&&G.linked&&!OV.edit; // Schloss zu → eine gemeinsame Zeitleiste, Schloss offen → zwei
   if(v.classList.contains('ov-one')!==one){ v.classList.toggle('ov-one',one); decks.forEach(d=>{ d.dirty=true; d.annDirty=true; }); requestAnimationFrame(()=>decks.forEach(d=>{ d.dirty=true; })); }
   if(!ovActive()){ ovApplyCut(); return; }
   const st=ovStep(), busy=OV.follow&&GH.state==='busy', done=ovFollowOK();
@@ -5422,10 +5422,10 @@ function ovUI(){ vchipPlace();
   else if(!done){ ttl='Übereinanderlegen'; say='Gilt nur für dieses Bild.'; tip='«Overlay erstellen» legt B über die ganze Strecke und folgt auch der Kamera.'; chips=cut;
     acts=ovBtn('edit','Zurück',OVI.back,'ghost','Gleichen Moment neu wählen')+cutBtns+ovMore([['pick','Referenzpunkte neu',OVI.pin],['hand','Von Hand nachschieben',OVI.fix]])+ovBtn('make','Overlay erstellen',OVI.go,'pri'); }
   else { const kc=OV.K.length?`<span class="ov-chip">${OVI.fix}${OV.K.length} Korrektur${OV.K.length>1?'en':''}<button data-ov="fixall" title="Alle Korrekturen entfernen">${OVI.x}</button></span>`:'';
-    const BU=(!GH.coarse&&OVS.spot&&!OV.hideB)?ovBUnsure():[], bEd=typeof OVT!=='undefined'&&OVT.edit==='b';
-    ttl=GH.coarse?'Vorschau':BU.length?'B prüfen':'Fertig'; dot=true; say=GH.bg?'Wird verfeinert · '+Math.round((GH.bg.p||0)*100)+' %':GH.coarse?'Grob gerechnet – «…» › «Neu berechnen» rechnet fein.':BU.length?(bEd?'Fahrer:in B im Bild antippen – dann «Nächste Stelle».':'B an '+BU.length+' Stelle'+(BU.length>1?'n':'')+' unsicher (gelb) – dort B antippen.'):'B daneben? «Korrigieren».'; chips=cut+kc;
+    const BU=(!GH.coarse&&OVS.spot&&!OV.hideB)?ovBUnsure():[];
+    ttl=GH.coarse?'Vorschau':BU.length?'B prüfen':'Fertig'; dot=true; say=GH.bg?'Wird verfeinert · '+Math.round((GH.bg.p||0)*100)+' %':GH.coarse?'Grob gerechnet – «…» › «Neu berechnen» rechnet fein.':BU.length?'B an '+BU.length+' Stelle'+(BU.length>1?'n':'')+' unsicher (gelb) – dort neu übereinanderlegen oder zwei Punkte setzen.':'B daneben? «Korrigieren».'; chips=cut+kc;
     tip='Liegt B neben A: an der Stelle anhalten und «Korrigieren». Der Punkt links und das Band in der Zeitleiste zeigen den Zustand: grün ausgerichtet, gelb unsicher, rot Kameraschnitt. Das Auge bei den Läufen oben links blendet einen Lauf ein oder aus.';
-    acts=cutBtns+ovBtn('fix','Korrigieren',OVI.fix,'ghost','B an dieser Stelle von Hand nachschieben')+(BU.length?(bEd?ovBtn('bnext','Nächste Stelle',OVI.go,'','Zur nächsten unsicheren Stelle springen')+ovBtn('bdone','Fertig',OVI.ok,'pri','Antippen beenden'):ovBtn('tapb','B antippen',OVI.pin,'pri','Zur ersten unsicheren Stelle und Fahrer:in B antippen')):'')
+    acts=cutBtns+(BU.length?ovBtn('bnext','Nächste Stelle',OVI.go,'ghost','Zur nächsten unsicheren Stelle springen')+ovBtn('bpts','Zwei Punkte',OVI.pin,'ghost','Zwei gleiche Punkte in A und B antippen, z. B. Torflaggen')+ovBtn('bfix','Neu übereinanderlegen',OVI.fix,'pri','B an dieser Stelle von Hand auf A schieben'):ovBtn('fix','Korrigieren',OVI.fix,'ghost','B an dieser Stelle von Hand nachschieben'))
       +ovMore([OVT_READY?['ovtrailnew',OVT.keys.a.length&&OVT.key===GH.key?'Spur bearbeiten (antippen)':'Spur hinter Fahrer:innen setzen …',OVI.pin]:null,OVT_READY&&OVT.trk&&OVT.key===GH.key?['ovtrail',OVT.on?'Spur ausblenden':'Spur einblenden',OVI.go]:null,ovGpsPair()?['ovgps',OVG.on?'GPS-Tacho ausblenden':'GPS-Tacho einblenden',OVI.go]:null,['ovgap',OVGAP.on?'Rückstand ausblenden':'Rückstand einblenden',OVI.go],['nameset','Namen setzen (Fahrer:innen antippen)',OVI.tag],LAY.length<3?['addrun','Weiteren Lauf dazunehmen',OVI.plus]:null,['series','Serie gegen A rechnen …',OVI.go],['make','Neu berechnen',OVI.go],['edit','Neu beginnen',OVI.back]])+ovSaveBtn(); }
   if(SER.on){ ttl='Serie '+(SER.i+1)+' / '+SER.list.length; dot=false; chips=''; say='<b>'+esc(lastName(SER.cur)||'')+'</b> · '+(busy?((($('#ghostBar .gprog span')||{}).textContent)||'Overlay wird erstellt'):SER.msg);
     tip='Alle gewählten Läufe werden nacheinander gegen A gerechnet und gespeichert. Tab offen lassen.'; acts=ovBtn('serstop','Serie abbrechen','','ghost','Nach dem laufenden Schritt aufhören'); }
@@ -5530,7 +5530,7 @@ function ovAutoRun(ex){ if(AS.busy||!A.ready||!B.ready) return; A.pause(); B.pau
 function ovStart(){ if(!A.ready||!B.ready){ toast('Zuerst Video A und B wählen.'); return; } if(!G.linked){ toast('Zuerst den gleichen Moment setzen.'); return; }
   A.pause(); B.pause(); const t0=ovT0(); A.seekTime(t0); B.seekTime(t0+G.off);
   OV.pa=[]; OV.pb=[]; OV.T=null; OV.pick='a'; OV.follow=false; ovKill(); ovUI(); }
-function ovStop(){ OV.pick=null; if(OV.follow&&GH.state==='busy'){ GH.abort=true; OV.follow=false; } ovUI(); }
+function ovStop(){ OV.pick=null; OV.pickFix=false; if(OV.follow&&GH.state==='busy'){ GH.abort=true; OV.follow=false; } ovUI(); }
 
 function ovMarks(){
   const box=$('#ovMarks'); box.innerHTML=''; if(!OV.pick) return; const d=OV.pick==='a'?A:B, pts=OV.pick==='a'?OV.pa:OV.pb, R=d.rect(), z=d.z, st=d.stage;
@@ -5540,11 +5540,15 @@ function ovMarks(){
   ref.forEach((p,i)=>put([p[0]*B.v.videoWidth/A.v.videoWidth,p[1]*B.v.videoHeight/A.v.videoHeight],i,'ref'));
   pts.forEach((p,i)=>put(p,i,OV.pick));
 }
+/* Zwei Punkte im fertigen Overlay: T (B-Videopixel → A-Videopixel) als Handkorrektur D an der aktuellen Stelle */
+function ovFixFromT(T){ const W=GH.W0, sA=W/A.v.videoWidth, sB=W/B.v.videoWidth, j=clamp(Math.round(ovE()/GH.step),0,GH.S.length-1), Mab=simToAff(GH.S[j].p,W,GH.hA,W,GH.hB), Mba=affMul(affMul([sA,0,0,0,sA,0],T),[1/sB,0,0,0,1/sB,0]), m=affMul(Mba,Mab), c=ovC(), cx=c[0]*W, cy=c[1]*W, co=m[0], si=m[3];
+  return {dx:(m[2]-(cx-co*cx+si*cy))/W,dy:(m[5]-(cy-si*cx-co*cy))/W,s:Math.hypot(co,si),r:Math.atan2(si,co)}; }
 function ovPoint(e){
   const d=OV.pick==='a'?A:B, uv=d.toUV(e), pt=[uv[0]*d.v.videoWidth,uv[1]*d.v.videoHeight];
   if(OV.pick==='a'){ OV.pa.push(pt); if(OV.pa.length===2) OV.pick='b'; }
-  else { OV.pb.push(pt); if(OV.pb.length===2){ const T=ovSim(OV.pa,OV.pb); OV.pick=null;
-    if(!T){ toast('Punkte liegen zu nah beieinander oder passen nicht zusammen – bitte nochmals.'); }
+  else { OV.pb.push(pt); if(OV.pb.length===2){ const T=ovSim(OV.pa,OV.pb), pf=OV.pickFix; OV.pick=null; OV.pickFix=false;
+    if(T&&pf){ OV.fix=ovFixFromT(T); OV.fix0={...OV.fix}; toast('B liegt an dieser Stelle über A – prüfen, bei Bedarf schieben, dann übernehmen.',3600); }
+    else if(!T){ toast('Punkte liegen zu nah beieinander oder passen nicht zusammen – bitte nochmals.'); }
     else { OV.T=T; OV.Tt=A.time(); OV.follow=false; OV.fix={dx:0,dy:0,s:1,r:0}; toast('B liegt über A – bei Bedarf noch schieben, dann «Overlay erstellen».',3600); } } }
   ovUI(); }
 function ovAligned(){ return ovActive()&&!OV.pick&&(!!OV.T||ovFollowOK())&&A.ready&&B.ready; }
@@ -6077,10 +6081,12 @@ function ovsGain(srcA,srcB,e){ const S=OVB; if(!S.sA){ S.sA=document.createEleme
   S.g=S.g.map((v,i)=>v+(tgt[i]-v)*k); S.ge=e; return S.g; }
 /* Wie sicher ist die Lage von Fahrer:in B? Automatische Erkennung, plus angetippte Punkte (±1.5 s sicher, bis 3 s auslaufend) */
 function ovBKeys(){ return (typeof OVT!=='undefined'&&OVT.key===GH.key&&OVT.keys&&OVT.keys.b)||[]; }
-function ovBConf(e){ const TF=typeof tagFused==='function'?tagFused('b'):null; let c=0; if(TF&&TF.C&&TF.C.length){ const xi=clamp(e/GH.step,0,TF.C.length-1), i0=Math.floor(xi), i1=Math.min(TF.C.length-1,i0+1); c=TF.C[i0]+(TF.C[i1]-TF.C[i0])*(xi-i0); } c=clamp((c-0.3)/0.4,0,1);
-  for(const k of ovBKeys()){ const d=Math.abs(k.e-e); if(d<3) c=Math.max(c,d<1.5?1:1-(d-1.5)/1.5); } return c; }
+function ovBFixes(){ return OV.bFixK===GH.key&&OV.bFix||[]; }
+function ovBGoto(){ const e=ovE(), U=ovBUnsure(); if(U.length&&!U.some(g=>e>=g[0]&&e<=g[1])) ovBNext(); }
+function ovBConf(e,raw){ const TF=typeof tagFused==='function'?tagFused('b'):null; let c=0; if(TF&&TF.C&&TF.C.length){ const xi=clamp(e/GH.step,0,TF.C.length-1), i0=Math.floor(xi), i1=Math.min(TF.C.length-1,i0+1); c=TF.C[i0]+(TF.C[i1]-TF.C[i0])*(xi-i0); } c=clamp((c-0.3)/0.4,0,1);
+  if(raw) return c; for(const k of ovBKeys().concat(ovBFixes().map(e=>({e})))){ const d=Math.abs(k.e-e); if(d<3) c=Math.max(c,d<1.5?1:1-(d-1.5)/1.5); } return c; }
 /* Unsichere Stellen von B (für Zeitleiste und Schritt «B prüfen»): [[e0,e1],…] in Overlay-Zeit */
-function ovBUnsure(){ if(!ovFollowOK()||!GH.S||!GH.S.length) return []; const K=ovBKeys(), ck=GH.key+'|'+K.map(k=>k.e.toFixed(2)).join(','); if(GH._bu&&GH._bu.ck===ck) return GH._bu.L;
+function ovBUnsure(){ if(!ovFollowOK()||!GH.S||!GH.S.length) return []; const K=ovBKeys().concat(ovBFixes().map(e=>({e}))), ck=GH.key+'|'+K.map(k=>k.e.toFixed(2)).join(','); if(GH._bu&&GH._bu.ck===ck) return GH._bu.L;
   const st=GH.step||0.1, n=Math.floor((GH.eEnd||0)/st)+1, L=[]; let a=null;
   for(let i=0;i<=n;i++){ const e=Math.min(i*st,GH.eEnd), u=i<n&&ovBConf(e)<0.5; if(u&&a==null) a=e; if(!u&&a!=null){ L.push([a,e]); a=null; } }
   const M=[]; for(const g of L){ const p=M[M.length-1]; if(p&&g[0]-p[1]<0.6) p[1]=g[1]; else M.push(g.slice()); } const out=M.filter(g=>g[1]-g[0]>=0.5);
@@ -6099,18 +6105,18 @@ function ovsB(srcB,srcA,e,op,Mt,Wt,Ht){ const sw=srcB.videoWidth||srcB.displayWi
   if(OVS.edge){ x.globalCompositeOperation='destination-in'; x.drawImage(ovsFeather(BW,BH),0,0); }
   x.setTransform(1,0,0,1,0,0); x.globalCompositeOperation='source-over';
   let ga=op, mode=null;
-  if(OVS.spot&&!(typeof OVT!=='undefined'&&OVT.edit)){ /* (beim Antippen der Spur ganz B zeigen, damit man die Fahrer:in sieht) 3) Ein Bild: A ist der einzige Hintergrund. Von B wird nur die Fahrer:in ausgeschnitten:
+  if(OVS.spot&&!OV.fix&&!(typeof OVT!=='undefined'&&OVT.edit)){ /* (auch beim Übereinanderlegen ganz B zeigen) (beim Antippen der Spur ganz B zeigen, damit man die Fahrer:in sieht) 3) Ein Bild: A ist der einzige Hintergrund. Von B wird nur die Fahrer:in ausgeschnitten:
       Fenster um die Spur von B (angetippte Spur zuerst, sonst automatisch) UND nur dort, wo B sich vom Hintergrund von A unterscheidet (Differenzmaske).
       Der Hintergrund von B wird nie gezeigt. Ist die Spur unsicher, blendet die Fahrer:in B sanft aus statt dass B-Hintergrund erscheint. «Abdunkeln»: Schnee bleibt Schnee. */
     mode='darken'; ga=clamp(0.45+op*1.3,0.4,1); const TT=typeof tagTrack==='function'?tagTrack('b'):null, TF=typeof tagFused==='function'?tagFused('b'):null, TB=TT&&TT.T?TT:TF, qb=TB?trackSmoothAt(TB.T,GH.step,e,0.2):null;
-    const cf=ovBConf(e);
+    const cf=ovBConf(e), wide=ovBConf(e,true)<0.5&&ovBFixes().some(k=>Math.abs(k-e)<3); /* von Hand übereinandergelegt, Spur unsicher: ganzes Bild, nur die Differenz zu A zeigt die Fahrer:in */
     S.cfLow=cf<0.5;
-    if(!qb||cf<0.01){ x.clearRect(0,0,Wt,Ht); }
-    else { let rW=GH.W0*0.03; const si=GH.S&&GH.S[clamp(Math.round(e/GH.step),0,GH.S.length-1)], L=si&&si.mb; if(L){ let bd=GH.W0*0.06,ba=0; for(const m of L){ const d=Math.hypot(m[0]-qb[0],m[1]-qb[1]); if(d<bd){ bd=d; ba=m[2]; } } if(ba) rW=clamp(Math.sqrt(ba)*1.2,GH.W0*0.02,GH.W0*0.06); }
-      const kk=Wt/GH.W0, r0=rW*kk*2.6; S.rr=S.rr&&S.re!=null&&Math.abs(e-S.re)<0.5?S.rr+(r0-S.rr)*0.12:r0; S.re=e; const r=S.rr, px=qb[0]*kk, py=qb[1]*kk;
+    if((!qb&&!wide)||cf<0.01){ x.clearRect(0,0,Wt,Ht); }
+    else { let rW=GH.W0*0.03; const si=GH.S&&GH.S[clamp(Math.round(e/GH.step),0,GH.S.length-1)], L=si&&si.mb; if(L&&qb){ let bd=GH.W0*0.06,ba=0; for(const m of L){ const d=Math.hypot(m[0]-qb[0],m[1]-qb[1]); if(d<bd){ bd=d; ba=m[2]; } } if(ba) rW=clamp(Math.sqrt(ba)*1.2,GH.W0*0.02,GH.W0*0.06); }
+      const kk=Wt/GH.W0, r0=rW*kk*2.6; S.rr=S.rr&&S.re!=null&&Math.abs(e-S.re)<0.5?S.rr+(r0-S.rr)*0.12:r0; S.re=e; const r=wide?Math.hypot(Wt,Ht)/1.1:S.rr, px=wide?Wt/2:qb[0]*kk, py=wide?Ht/2:qb[1]*kk;
       const bx0=Math.max(0,Math.floor(px-r)), by0=Math.max(0,Math.floor(py-r)), bx1=Math.min(Wt,Math.ceil(px+r)), by1=Math.min(Ht,Math.ceil(py+r)), bw=bx1-bx0, bh=by1-by0;
       if(bw<4||bh<4){ x.clearRect(0,0,Wt,Ht); }
-      else { /* Differenzmaske in kleiner Auflösung */ const q=Math.min(1,120/Math.max(bw,bh)), mw=Math.max(4,Math.round(bw*q)), mh=Math.max(4,Math.round(bh*q));
+      else { /* Differenzmaske in kleiner Auflösung */ const q=Math.min(1,(wide?320:120)/Math.max(bw,bh)), mw=Math.max(4,Math.round(bw*q)), mh=Math.max(4,Math.round(bh*q));
         if(!S.dc){ S.dc=document.createElement('canvas'); S.dx=S.dc.getContext('2d',{willReadFrequently:true}); S.mc=document.createElement('canvas'); S.mx=S.mc.getContext('2d'); }
         const dc=S.dc, dx=S.dx; if(dc.width!==mw||dc.height!==mh){ dc.width=mw; dc.height=mh; } if(S.mc.width!==mw||S.mc.height!==mh){ S.mc.width=mw; S.mc.height=mh; }
         let mask=null; try{ dx.globalCompositeOperation='copy'; dx.drawImage(c,bx0,by0,bw,bh,0,0,mw,mh); const db=dx.getImageData(0,0,mw,mh).data;
@@ -6191,7 +6197,7 @@ function renderOv(){
   if(OV.hideB&&!OV.fix){} else if(ovFollowOK()){ const e=ovE(), rf=ovRefAt(e); let M=affMul(ovDMat(ovDAt(e),GH.W0),affInv(ovMat(clamp(e,0,GH.eEnd)))); if(rf) M=affMul([1,0,rf[0],0,1,rf[1]],M); const sc=Wc/GH.W0, op=+$('#opRange').value||0.5;
     const Mt=[sc*M[0],sc*M[1],sc*M[2],sc*M[3],sc*M[4],sc*M[5]], sb=(OVS.edge||OVS.color||OVS.ghost||OVS.spot)&&B.v.readyState>=2&&A.v.readyState>=2?ovsB(B.v,A.v,e,op,Mt,Wc,Hc):null; x.globalAlpha=(sb?sb.ga:op)*ovsFade(e);
     { const mb=sb&&sb.mode?sb.mode:''; if(cv.style.mixBlendMode!==mb) cv.style.mixBlendMode=mb; }
-    /* Fahrer:in B länger nicht sicher erkannt → einmal anbieten, B anzutippen (dann ist B immer sauber sichtbar) */ if(sb&&OVS.spot&&OVB.cfLow&&!A.v.paused){ OVB.lowN=(OVB.lowN||0)+1; if(OVB.lowN>40&&OVB.hintK!==GH.key){ OVB.hintK=GH.key; toast('Fahrer:in B wird hier nicht sicher erkannt und ist deshalb ausgeblendet. B ein paar Mal antippen – dann bleibt B sichtbar.',8000,()=>ovTrailStart('b'),'B antippen'); } } else if(!OVB.cfLow) OVB.lowN=0;
+    /* Fahrer:in B länger nicht sicher erkannt → einmal auf die Korrektur hinweisen */ if(sb&&OVS.spot&&OVB.cfLow&&!A.v.paused){ OVB.lowN=(OVB.lowN||0)+1; if(OVB.lowN>40&&OVB.hintK!==GH.key){ OVB.hintK=GH.key; toast('Fahrer:in B wird hier nicht sicher erkannt und ist deshalb ausgeblendet. Lege die Bilder hier neu übereinander oder setze zwei Punkte.',8000); } } else if(!OVB.cfLow) OVB.lowN=0;
     if(sb){ x.setTransform(1,0,0,1,0,0); x.drawImage(sb.c,0,0); ovsHalo(x,sb.halo,0,0,ovsFade(e)); } else { x.setTransform(sc*M[0],sc*M[3],sc*M[1],sc*M[4],sc*M[2],sc*M[5]); x.drawImage(B.v,0,0,GH.W0,GH.hB); } }
   else { if(cv.style.mixBlendMode) cv.style.mixBlendMode=''; const k=Wc/A.v.videoWidth, M=OV.fix?affMul(ovDMat(OV.fix,A.v.videoWidth),OV.T):OV.T; x.setTransform(k*M[0],k*M[3],k*M[1],k*M[4],k*M[2],k*M[5]); x.drawImage(B.v,0,0,B.v.videoWidth,B.v.videoHeight); }
   x.setTransform(1,0,0,1,0,0); x.globalAlpha=1;
@@ -6258,9 +6264,9 @@ function renderOv(){
     else if(a==='hand') return ovAlign();
     else if(a==='ovtrail'){ OVT.on=!OVT.on; }
     else if(a==='ovtrailnew'){ ovTrailStart(); }
-    else if(a==='tapb'){ ovTrailStart('b'); ovBNext(); ovUI(); }
+    else if(a==='bfix'){ ovBGoto(); A.pause(); B.pause(); G.playing=false; cmpPlayIcon(); const D=ovDAt(ovE()); OV.fix={...D}; OV.fix0={...D}; }
+    else if(a==='bpts'){ ovBGoto(); A.pause(); B.pause(); G.playing=false; cmpPlayIcon(); OV.pa=[]; OV.pb=[]; OV.pickFix=true; OV.pick='a'; }
     else if(a==='bnext'){ ovBNext(); }
-    else if(a==='bdone'){ OVT.edit=null; ovTrailHint(); ovUI(); }
     else if(a==='ovgps'){ OVG.on=!OVG.on; LS.set('ovGps',OVG.on?1:0); }
     else if(a==='ovgap'){ OVGAP.on=!OVGAP.on; LS.set('ovGap',OVGAP.on?1:0); }
     else if(a==='fixreset'){ if(OV.fix){ OV.fix.dx=0; OV.fix.dy=0; OV.fix.s=1; OV.fix.r=0; A.dirty=true; } return; }
@@ -6280,7 +6286,7 @@ function renderOv(){
     else if(a==='fixok'&&!ovFollowOK()){ OV.T=affMul(ovDMat(OV.fix,A.v.videoWidth),OV.T); OV.Tt=A.time(); OV.fix=null; OV.handNew=false; toast('B liegt über A – jetzt in der Zeitleiste vorklicken.',2600); }
     else if(a==='fixok'&&ovFollowOK()){ const W0=GH.W0, j=clamp(Math.round(ovE()/GH.step),0,GH.S.length-1), p0=GH.S[j].p;
       const M=affMul(simToAff(p0,W0,GH.hA,W0,GH.hB),affInv(ovDMat(OV.fix,W0))), p2=affToSim(M,W0,GH.hA,W0,GH.hB); p2[4]=p0[4];
-      const e=j*GH.step; OV.K=OV.K.filter(k=>k.e<e-OVFADE); OV.fix=null; A.pause(); B.pause(); G.playing=false; cmpPlayIcon();
+      const e=j*GH.step; OV.K=OV.K.filter(k=>k.e<e-OVFADE); OV.fix=null; { const key=GH.key; if(OV.bFixK!==key){ OV.bFix=[]; OV.bFixK=key; } OV.bFix.push(e); GH._tf=null; GH._bu=null; } A.pause(); B.pause(); G.playing=false; cmpPlayIcon();
       toast('Wird ab '+fmtS(GH.t0+e)+' neu berechnet – mit deiner Lage als Fixpunkt.',3000); ovUI(); ghostCompute({resume:true,j,p:p2}); return; }
     else if(a==='fixok'){ const e=ovE(); OV.K=OV.K.filter(k=>Math.abs(k.e-e)>=0.15); OV.K.push({e,...OV.fix}); OV.K.sort((p,q)=>p.e-q.e); OV.fix=null; toast('Korrektur übernommen – gilt hier und läuft über ±3 s weich aus.',2600); }
     else if(a==='fixdel'){ const e=ovE(); OV.K=OV.K.filter(k=>Math.abs(k.e-e)>=0.15); OV.fix=null; toast('Korrektur gelöscht.',1400); }
@@ -8511,7 +8517,7 @@ if(false&&!LS.get('hint1',0)){ setTimeout(()=>{ toast(matchMedia('(pointer:coars
 
 /* Update-Hinweis: prüft version.json auf GitHub Pages; «Aktualisieren» lädt die Seite ohne Cache neu */
 (()=>{
-  const BUILD='20261102193006'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
+  const BUILD='20261102193712'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
   // nach einem Update die ?v=… aus der Adresse entfernen
   try{ const u=new URL(location.href); if(u.searchParams.has('v')){ u.searchParams.delete('v'); history.replaceState(null,'',u.pathname+(u.search||'')+u.hash); } }catch(e){}
   const el=$('#upd'); let latest=null, snoozed=null, busy=false;
