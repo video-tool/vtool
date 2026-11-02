@@ -6641,7 +6641,7 @@ function labelMap(m,w,h){ const lab=new Int32Array(m.length), st=[], info=[0]; l
 async function strobeRun(){
   if(STR.busy) return; const [la,lb]=strobeRange(), longN=STR.every>0?STR.every:(lb-la>SD.fps*8.5?Math.max(2,Math.round((lb-la)/10)):0);
   if(longN){ STR.busy=true; $('#strProg').hidden=false; $('#strSave').disabled=true; $('#strVid').disabled=true; $('#strInfo').textContent=(la/SD.fps).toFixed(2)+' – '+(lb/SD.fps).toFixed(2)+' s · alle '+longN+' Bilder · wird berechnet …';
-    try{ const r=await strobeRunLong(la,lb,longN); $('#strProg').hidden=true; $('#strSave').disabled=false; $('#strVid').disabled=true; $('#strVid').title='Video gibt es nur für kurze Bereiche (bis 8 s, Abstand «Auto»)';
+    try{ const r=await strobeRunLong(la,lb,longN); $('#strProg').hidden=true; $('#strSave').disabled=false; $('#strVid').disabled=false;
       $('#strInfo').innerHTML='<span class="es-r"><span>Bereich</span><b>'+(la/SD.fps).toFixed(2)+' – '+(lb/SD.fps).toFixed(2)+' s</b></span><span class="es-r"><span>Abstand</span><b>'+longN+' Bilder</b></span><span class="es-r"><span>Positionen</span><b>'+r.n+(r.n<r.of?' / '+r.of:'')+'</b></span>'+(r.weak?'<span class="str-warn">Kamera stark bewegt – Ergebnis prüfen</span>':r.n<r.of?'<span class="str-warn">Fahrer:in nicht in allen Bildern gefunden</span>':''); }
     catch(e){ console.error(e); toast(e&&e.message?e.message:'Strobo konnte nicht berechnet werden.',3800); $('#strProg').hidden=true; $('#strInfo').textContent=''; }
     finally{ STR.busy=false; } return; }
@@ -6812,18 +6812,20 @@ async function strobeRunLong(a,b,N){
       tq.globalCompositeOperation='source-over'; fx2.setTransform(...toPano(k)); fx2.drawImage(tmp,0,0); fx2.setTransform(1,0,0,1,0,0);
       if(i%3===2){ prog(0.7+0.2*i/bgK.length,'Hintergrund zusammensetzen …'); await tick(); } }
     /* Figuren: Ellipse um die Fahrer:in aus dem eigenen Bild, weich auslaufend */
-    const cents=[], sizes=[], fr=[];
+    const cents=[], sizes=[], fr=[], stamps=[], OWv=Math.min(960,vw)&~1, sv=OWv/W0, gS=sv/s; /* fürs Strobo-Video: Bildgrösse OWv, Bezugskoordinaten ×sv */
     for(let i=0;i<sel.length;i++){ const k=sel[i], ck=affApply(MA[k],TR[k].c[0],TR[k].c[1]), cx=ck[0]*s, cy=ck[1]*s, r=szK(k), rw=r*0.6+4, rh=r*0.85+4; await frameAt(k);
       const st=document.createElement('canvas'); st.width=Math.ceil(rw*2); st.height=Math.ceil(rh*2); const sx=st.getContext('2d'); sx.drawImage(tmp,-(cx-rw),-(cy-rh));
       sx.globalCompositeOperation='destination-in'; sx.translate(rw,rh); sx.scale(rw,rh); const g=sx.createRadialGradient(0,0,0,0,0,1); g.addColorStop(0,'#000'); g.addColorStop(0.6,'#000'); g.addColorStop(1,'rgba(0,0,0,0)'); sx.fillStyle=g; sx.fillRect(-1,-1,2,2);
       fx2.setTransform(...toPano(k)); fx2.drawImage(st,cx-rw,cy-rh); fx2.setTransform(1,0,0,1,0,0);
       const P=[(TR[k].c[0]-x0)*s,(TR[k].c[1]-y0)*s]; cents.push(P); sizes.push([r*0.9,r]); fr.push(AF[k]);
+      stamps.push({cv:st,ox:cx-rw,oy:cy-rh,g:gS,cr:[TR[k].c[0]*sv,TR[k].c[1]*sv],s:r*gS,k});
       if(i%4===3){ prog(0.9+0.09*i/sel.length,'Positionen setzen …'); await tick(); } }
     /* Zuschnitt auf den belegten Bereich, Lücken neutral füllen */
     const id=fx2.getImageData(0,0,PW,PH), o=id.data; let bx0=PW,by0=PH,bx1=0,by1=0; for(let y=0;y<PH;y+=2) for(let x=0;x<PW;x+=2){ if(o[(y*PW+x)*4+3]>250){ if(x<bx0) bx0=x; if(x>bx1) bx1=x; if(y<by0) by0=y; if(y>by1) by1=y; } }
     for(let j=0;j<o.length;j+=4) if(o[j+3]<255){ const al=o[j+3]/255; o[j]=o[j]*al+200*(1-al); o[j+1]=o[j+1]*al+204*(1-al); o[j+2]=o[j+2]*al+210*(1-al); o[j+3]=255; } fx2.putImageData(id,0,0);
     const oc=$('#strCanvas'); oc.width=(bx1-bx0+1)&~1; oc.height=(by1-by0+1)&~1; strView(oc.width,oc.height); const ox=oc.getContext('2d'); ox.drawImage(full,-bx0,-by0);
-    STR.res={long:true,a,b,fps,cents,sizes,fr,OW:960,OH:540,crop:[bx0,by0,oc.width,oc.height],base:ox.getImageData(0,0,oc.width,oc.height),name:base(c.name)+'_Strobo_F'+a+'-'+b+'_alle'+N,found:TR.filter(Boolean).length,of:nA}; strobeDecor();
+    const MAv=MA.map(m=>[m[0],m[1],m[2]*sv,m[3],m[4],m[5]*sv]), trk=[]; for(let k=0;k<nA;k++) if(TR[k]) trk.push({f:AF[k],c:[TR[k].c[0]*sv,TR[k].c[1]*sv],s:szK(k)*gS});
+    STR.res={long:true,a,b,fps,cents,sizes,fr,stamps,AF,MA:MAv,trk,url:c.url,OW:OWv,OH:Math.round(OWv*vh/vw)&~1,crop:[bx0,by0,oc.width,oc.height],base:ox.getImageData(0,0,oc.width,oc.height),name:base(c.name)+'_Strobo_F'+a+'-'+b+'_alle'+N,found:TR.filter(Boolean).length,of:nA}; strobeDecor();
     return {n:sel.length,of:gridN,weak:weak>nA/3}; }
   finally{ try{ v.close(); }catch(e){} } }
 function strobeDecor(x,upto){ const R=STR.res; if(!R) return; const [cx0,cy0]=R.crop||[0,0]; if(!x){ const oc=$('#strCanvas'); x=oc.getContext('2d'); x.putImageData(R.base,0,0); }
@@ -6882,7 +6884,7 @@ async function strobeVideo(){ const R=STR.res; if(!R||STR.busy) return; STR.busy
     const drawFrame=(f,final)=>{ const M=matAt(f); x.setTransform(1,0,0,1,0,0); x.drawImage(fr0,0,0,W,H);
       const P=posAt(f), live=P?affApply(M,P.c[0],P.c[1]):null;
       R.stamps.forEach((st,i)=>{ if(!final&&R.fr[i]>=f) return; const pc=affApply(M,st.cr[0],st.cr[1]); if(!final&&live&&Math.hypot(pc[0]-live[0],pc[1]-live[1])<st.s*0.95) return; /* erst, wenn die Fahrer:in weg ist */
-        shown[i]=final?1:Math.min(1,shown[i]+0.25); const T=affMul(M,affInv(R.MA[R.AF.indexOf(R.fr[i])]||M)); x.save(); x.globalAlpha=shown[i]; x.setTransform(T[0],T[3],T[1],T[4],T[2],T[5]); x.drawImage(st.cv,st.ox,st.oy); x.restore(); });
+        shown[i]=final?1:Math.min(1,shown[i]+0.25); const T=affMul(M,affInv(R.MA[R.AF.indexOf(R.fr[i])]||M)); x.save(); x.globalAlpha=shown[i]; x.setTransform(T[0],T[3],T[1],T[4],T[2],T[5]); if(st.g) x.scale(st.g,st.g); x.drawImage(st.cv,st.ox,st.oy); x.restore(); }); /* st.g: Figur in anderem Massstab (langes Strobo) */
       if(live&&!final){ const sp=soft(fr0,live[0],live[1],P.s); x.drawImage(sp.c2,sp.ox,sp.oy); } /* Fahrer:in vorne */
       if(STR.num) R.stamps.forEach((st,i)=>{ if(shown[i]<0.05) return; const pc=affApply(M,st.cr[0],st.cr[1]), r=clamp(st.s*0.16,7.5*k9,11*k9), px=pc[0]+st.s*0.45+r*0.6, py=pc[1]-st.s*0.5-r*0.9; x.save(); x.globalAlpha=shown[i]; x.shadowColor='rgba(0,0,0,.35)'; x.shadowBlur=3*k9; x.fillStyle='rgba(218,41,28,.95)'; x.beginPath(); x.arc(px,py,r,0,7); x.fill(); x.shadowBlur=0; x.fillStyle='#fff'; x.font=`700 ${r*1.15}px Geist,-apple-system,Segoe UI,sans-serif`; x.textAlign='center'; x.textBaseline='middle'; x.fillText(String(i+1),px,py+0.5*k9); x.restore(); }); };
     for(let q=0;q<frames.length;q++){ const f=frames[q], im=await v.at((f+0.5)/R.fps); fx.drawImage(im,0,0,R.OW,R.OH); drawFrame(f,false); put(); btn.textContent='Video '+Math.round(q/frames.length*100)+' %'; if(q%3===2) await new Promise(r=>setTimeout(r,0)); }
@@ -7501,7 +7503,7 @@ if(false&&!LS.get('hint1',0)){ setTimeout(()=>{ toast(matchMedia('(pointer:coars
 
 /* Update-Hinweis: prüft version.json auf GitHub Pages; «Aktualisieren» lädt die Seite ohne Cache neu */
 (()=>{
-  const BUILD='20261101205908'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
+  const BUILD='20261102064847'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
   // nach einem Update die ?v=… aus der Adresse entfernen
   try{ const u=new URL(location.href); if(u.searchParams.has('v')){ u.searchParams.delete('v'); history.replaceState(null,'',u.pathname+(u.search||'')+u.hash); } }catch(e){}
   const el=$('#upd'); let latest=null, snoozed=null, busy=false;
