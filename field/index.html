@@ -621,8 +621,21 @@ var K='vlab:auth', SB='https://sswtnkwqkmokozrcqrxf.supabase.co', PK='sb_publish
 var de=document.documentElement, $=function(s){return document.getElementById(s)};
 function sess(){ try{ var s=JSON.parse(localStorage.getItem(K)||'null'); if(s&&s.e&&s.exp>Date.now()) return s; }catch(e){} return null; }
 window.vlabAuth={ get:sess, logout:function(){ try{ localStorage.removeItem(K); }catch(e){} location.reload(); } };
+/* Nutzung zählen: nur wer (E-Mail), was (Start, Overlay, Export), wann, wo (Lab/Field, prod/staging) – keine Videos, keine Namen.
+   Warteschlange im Browser, gesendet sobald online (auch offline erstellte Overlays zählen). Lokal (Tests, eigener Rechner) wird nichts gesendet. */
+var QK='vlab:q', APP=location.pathname.indexOf('/field/')>=0?'field':'lab', ENV=window.VLAB_ENV||(location.protocol==='file:'||/^(localhost|127\.|0\.0\.0\.0|192\.168\.|10\.)/.test(location.hostname)?'local':'prod');
+function devId(){ try{ var d=localStorage.getItem('vlab:dev'); if(!d){ d=Math.random().toString(36).slice(2,10); localStorage.setItem('vlab:dev',d); } return d; }catch(e){ return ''; } }
+function qGet(){ try{ var q=JSON.parse(localStorage.getItem(QK)||'[]'); return Array.isArray(q)?q:[]; }catch(e){ return []; } }
+function qSet(q){ try{ localStorage.setItem(QK,JSON.stringify(q.slice(-300))); }catch(e){} }
+var qBusy=false, qT=0;
+function qFlush(){ if(qBusy||ENV==='local') return; var s=sess(), q=qGet(); if(!s||!q.length||navigator.onLine===false) return; var part=q.slice(0,50); qBusy=true;
+  fetch(SB+'/rest/v1/rpc/vlab_track',{method:'POST',headers:{'apikey':PK,'Content-Type':'application/json'},body:JSON.stringify({p_e:s.e,p_ev:part}),keepalive:true})
+    .then(function(r){ if(r.ok){ var q2=qGet(); qSet(q2.slice(part.length)); if(q2.length>part.length) setTimeout(qFlush,800); } })
+    .catch(function(){}).then(function(){ qBusy=false; }); }
+window.vlabTrack=function(k,x){ if(!sess()) return; var q=qGet(); q.push({k:String(k).slice(0,20),a:APP,v:ENV,d:devId(),t:new Date().toISOString(),x:x==null?null:String(x).slice(0,40)}); qSet(q); clearTimeout(qT); qT=setTimeout(qFlush,2500); };
+window.addEventListener('online',qFlush);
 window.addEventListener('keydown',function(e){ if(de.classList.contains('vgate')) e.stopImmediatePropagation(); },true);
-if(sess()){ de.classList.remove('vgate'); return; }
+if(sess()){ de.classList.remove('vgate'); window.vlabTrack('open'); return; }
 de.classList.add('vgate');
 $('gTheme').addEventListener('click',function(){ var d=de.dataset.theme==='dark'?'light':'dark'; if(d==='dark') de.dataset.theme='dark'; else delete de.dataset.theme; try{ localStorage.setItem('vlab:theme',JSON.stringify(d)); }catch(e){} });
 $('gEye').addEventListener('click',function(){ var p=$('gPw'); p.type=p.type==='password'?'text':'password'; p.focus(); });
@@ -645,7 +658,7 @@ $('gLf').addEventListener('submit',async function(ev){
     if(r.ok&&j&&j.ok&&j.me){
       var m=j.me, s={e:m.e||e,n:m.n||'',r:m.r||'',g:m.g||[],src:m.src||'',t:Date.now(),exp:Date.now()+DAYS*864e5};
       try{ localStorage.setItem(K,JSON.stringify(s)); localStorage.setItem('vlab:lastEmail',JSON.stringify(e)); }catch(x){}
-      $('gPw').value=''; go.classList.remove('busy'); go.classList.add('ok');
+      $('gPw').value=''; go.classList.remove('busy'); go.classList.add('ok'); window.vlabTrack('login');
       de.classList.add('vgate-out');
       setTimeout(function(){ de.classList.remove('vgate','vgate-out'); window.dispatchEvent(new Event('resize')); if(window.vlabUserUI) window.vlabUserUI(); },420);
       return;
@@ -1219,7 +1232,7 @@ sessUI();
 })();
 
 load();
-if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)) window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
+if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)&&!window.VLAB_ENV) window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{})); /* Staging: ohne Offline-Speicher, immer frisch */
 document.addEventListener('gesturestart',e=>e.preventDefault());
 </script>
 </body>

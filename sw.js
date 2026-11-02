@@ -1,9 +1,10 @@
-/* Video-Lab Service Worker: App offline verfügbar; Videos werden nie zwischengespeichert. */
+/* Video-Lab Service Worker: App offline verfügbar; Videos werden nie zwischengespeichert. Staging (/staging/) und Field (eigener Worker) bleiben unberührt. */
 const C='vlab-app-v1', CORE=['./','index.html','manifest.webmanifest','icon-192.png','icon-512.png'];
 self.addEventListener('install',e=>{ e.waitUntil(caches.open(C).then(c=>c.addAll(CORE)).then(()=>self.skipWaiting())); });
-self.addEventListener('activate',e=>{ e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==C).map(k=>caches.delete(k)))).then(()=>self.clients.claim())); });
+self.addEventListener('activate',e=>{ e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k.startsWith('vlab-app')&&k!==C).map(k=>caches.delete(k)))).then(()=>self.clients.claim())); });
 self.addEventListener('fetch',e=>{
   const r=e.request; if(r.method!=='GET') return; const u=new URL(r.url); if(u.origin!==location.origin) return;
+  if(u.pathname.includes('/staging/')||u.pathname.includes('/field/')) return; // eigene Bereiche, nicht hier zwischenspeichern
   if(r.headers.has('range')||/\.(mp4|mov|m4v|webm|mkv)$/i.test(u.pathname)||/version\.json$/.test(u.pathname)) return; // Videos & Update-Prüfung direkt
   const nav=r.mode==='navigate', key=nav?'index.html':r;
   // Zuerst Netz (immer die neuste Version), offline aus dem Speicher

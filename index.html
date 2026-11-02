@@ -2948,8 +2948,21 @@ var K='vlab:auth', SB='https://sswtnkwqkmokozrcqrxf.supabase.co', PK='sb_publish
 var de=document.documentElement, $=function(s){return document.getElementById(s)};
 function sess(){ try{ var s=JSON.parse(localStorage.getItem(K)||'null'); if(s&&s.e&&s.exp>Date.now()) return s; }catch(e){} return null; }
 window.vlabAuth={ get:sess, logout:function(){ try{ localStorage.removeItem(K); }catch(e){} location.reload(); } };
+/* Nutzung zählen: nur wer (E-Mail), was (Start, Overlay, Export), wann, wo (Lab/Field, prod/staging) – keine Videos, keine Namen.
+   Warteschlange im Browser, gesendet sobald online (auch offline erstellte Overlays zählen). Lokal (Tests, eigener Rechner) wird nichts gesendet. */
+var QK='vlab:q', APP=location.pathname.indexOf('/field/')>=0?'field':'lab', ENV=window.VLAB_ENV||(location.protocol==='file:'||/^(localhost|127\.|0\.0\.0\.0|192\.168\.|10\.)/.test(location.hostname)?'local':'prod');
+function devId(){ try{ var d=localStorage.getItem('vlab:dev'); if(!d){ d=Math.random().toString(36).slice(2,10); localStorage.setItem('vlab:dev',d); } return d; }catch(e){ return ''; } }
+function qGet(){ try{ var q=JSON.parse(localStorage.getItem(QK)||'[]'); return Array.isArray(q)?q:[]; }catch(e){ return []; } }
+function qSet(q){ try{ localStorage.setItem(QK,JSON.stringify(q.slice(-300))); }catch(e){} }
+var qBusy=false, qT=0;
+function qFlush(){ if(qBusy||ENV==='local') return; var s=sess(), q=qGet(); if(!s||!q.length||navigator.onLine===false) return; var part=q.slice(0,50); qBusy=true;
+  fetch(SB+'/rest/v1/rpc/vlab_track',{method:'POST',headers:{'apikey':PK,'Content-Type':'application/json'},body:JSON.stringify({p_e:s.e,p_ev:part}),keepalive:true})
+    .then(function(r){ if(r.ok){ var q2=qGet(); qSet(q2.slice(part.length)); if(q2.length>part.length) setTimeout(qFlush,800); } })
+    .catch(function(){}).then(function(){ qBusy=false; }); }
+window.vlabTrack=function(k,x){ if(!sess()) return; var q=qGet(); q.push({k:String(k).slice(0,20),a:APP,v:ENV,d:devId(),t:new Date().toISOString(),x:x==null?null:String(x).slice(0,40)}); qSet(q); clearTimeout(qT); qT=setTimeout(qFlush,2500); };
+window.addEventListener('online',qFlush);
 window.addEventListener('keydown',function(e){ if(de.classList.contains('vgate')) e.stopImmediatePropagation(); },true);
-if(sess()){ de.classList.remove('vgate'); return; }
+if(sess()){ de.classList.remove('vgate'); window.vlabTrack('open'); return; }
 de.classList.add('vgate');
 $('gTheme').addEventListener('click',function(){ var d=de.dataset.theme==='dark'?'light':'dark'; if(d==='dark') de.dataset.theme='dark'; else delete de.dataset.theme; try{ localStorage.setItem('vlab:theme',JSON.stringify(d)); }catch(e){} });
 $('gEye').addEventListener('click',function(){ var p=$('gPw'); p.type=p.type==='password'?'text':'password'; p.focus(); });
@@ -2972,7 +2985,7 @@ $('gLf').addEventListener('submit',async function(ev){
     if(r.ok&&j&&j.ok&&j.me){
       var m=j.me, s={e:m.e||e,n:m.n||'',r:m.r||'',g:m.g||[],src:m.src||'',t:Date.now(),exp:Date.now()+DAYS*864e5};
       try{ localStorage.setItem(K,JSON.stringify(s)); localStorage.setItem('vlab:lastEmail',JSON.stringify(e)); }catch(x){}
-      $('gPw').value=''; go.classList.remove('busy'); go.classList.add('ok');
+      $('gPw').value=''; go.classList.remove('busy'); go.classList.add('ok'); window.vlabTrack('login');
       de.classList.add('vgate-out');
       setTimeout(function(){ de.classList.remove('vgate','vgate-out'); window.dispatchEvent(new Event('resize')); if(window.vlabUserUI) window.vlabUserUI(); },420);
       return;
@@ -4833,6 +4846,7 @@ async function ghostCompute(opt){ // opt.resume: ab Bild opt.j mit fester Lage o
   if(GH.abort||ghostKey()!==key){ GH.state='idle'; ghostUI(); toast('Berechnung abgebrochen.'); return; }
   GH.timing={seek:Math.round(GH.tSeek||0),total:Math.round(performance.now()-t0)}; GH.tSeek=0;
   GH.S=S; ghostGap(); tracksBuild(); GH.state='ready'; GH.dirty=true; ghostUI(); if(!coarse) resSave(); if(ovActive()) setTimeout(ovAutoKeys,50);
+  { GH._cnt=GH._cnt||new Set(); if(!GH._cnt.has(key)){ GH._cnt.add(key); if(window.vlabTrack) vlabTrack('overlay'); } } /* Nutzung: jedes neu berechnete Overlay (gleiche Paarung nur einmal je Sitzung) */
   if(coarse){ toast('Vorschau fertig – wird im Hintergrund verfeinert.',3000); if(ovActive()) ovUI(); setTimeout(()=>{ if(GH.state==='ready'&&GH.key===key) ghostCompute({bg:true}); },400); return; }
   const bad=S.filter(s=>!s.ok).length/S.length;
   const nm=ovActive()?'Overlay':'Ghost'; const nc=cuts.a+cuts.b; toast(nc>=2?nm+' erstellt – aber '+(cuts.a&&cuts.b?'beide Videos haben':cuts.a?'Video A hat':'Video B hat')+' Kameraschnitte. Overlay klappt nur mit einer durchgehenden Kamera vom gleichen Standort.':bad>0.3?nm+' erstellt – an '+Math.round(bad*100)+' % der Stellen unsicher (Kamerastandort gleich?)':nm+' erstellt',nc>=2?6500:3500); if(ovActive()) ovUI();
@@ -5812,7 +5826,7 @@ setInterval(resTry,800);
 (()=>{ const b=$('#ovNames'), set=v=>{ $('#viewCmp').classList.toggle('ov-names',v); b.classList.toggle('on',v); LS.set('ovnames',v?1:0); };
   set(LS.get('ovnames',1)!==0); b.addEventListener('click',()=>{ const on=!b.classList.contains('on'); set(on); if(!on&&OV.nameQ) nameSetEnd(); if(on) setTimeout(ovAutoKeys,0); }); })();
 
-if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)) window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
+if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)&&!window.VLAB_ENV) window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{})); /* Staging: ohne Offline-Speicher, immer frisch */
 
 /* Laptop: kein Kopfbalken – Seitenwechsel in die Video-Karte, Logo & Schalter in die Fusszeile der Seitenleiste */
 (()=>{ const mq=matchMedia('(min-width:861px) and (min-height:520px)'), hd=$('header .head-in'), nav=$('nav.tabs');
@@ -6543,7 +6557,7 @@ function invRunApply(tr,run){ // innove-Start = Nullpunkt der Laufzeit, innove-Z
 let DGPS=null;
 function demoGpsFor(c){ if(!c||!/_stelvio_261029\.mp4$/.test(c.name)||c.gpsId) return Promise.resolve(); if(c._dgP) return c._dgP; c._dg=true; return (c._dgP=demoGpsLoad(c)); } /* läuft schon → auf dasselbe Ergebnis warten */
 async function demoGpsLoad(c){
-  const D=await (DGPS||(DGPS=fetch('demo/stelvio_gps.json').then(r=>r.ok?r.json():null).catch(()=>null))); const v=D&&D.videos[c.name]; if(!v) return;
+  const D=await (DGPS||(DGPS=fetch((window.VLAB_DEMO||'demo/')+'stelvio_gps.json').then(r=>r.ok?r.json():null).catch(()=>null))); const v=D&&D.videos[c.name]; if(!v) return;
   if(!GPS.tracks.some(t=>t._stel)){ const made=D.tracks.map(o=>{ const nm=o.athlete.split(' ').slice(1).join(' ')+' · Lauf '+o.run.run_number;
       const t=addTracks([{name:nm,athlete:o.athlete,run:'Lauf '+o.run.run_number,source:'innove',samples:normSamples(o.S.map(([t,lat,lon,alt,speed])=>({t,lat,lon,alt,speed})))}],{link:false})[0]; if(t){ t._stel=o.key; t._demo=true; invRunApply(t,o.run); t.innove={run:o.run}; } return t; }).filter(Boolean);
     } /* Standard ohne Referenz: Vergleich wählt man selbst */
@@ -7336,6 +7350,7 @@ function clipDir(c){ if(!c||c.demo) return null; if(c._node&&c._node.parent&&!c.
   for(const r of FT.roots){ const d=find(r); if(d) return d; } return null; }
 function dirPrep(c){ const d=clipDir(c); if(d) ftPerm(d.h,true); } // Schreibrecht im Klick anfragen
 async function saveOut(blob,fname,c,what){
+  if(window.vlabTrack) vlabTrack('export',what||null); /* Nutzung: Export/Speichern */
   const d=clipDir(c);
   if(d&&await ftPerm(d.h,false)){ try{
     const dot=fname.lastIndexOf('.'), b=fname.slice(0,dot), e=fname.slice(dot); let nm=fname, k=2; while(await ftExists(d.h,nm)) nm=b+'_'+(k++)+e;
@@ -7807,8 +7822,8 @@ const REAL_DEMO=[["Meillard_Soelden_251026_GS_M_L1.mp4", 15594565], ["Gratz_Soel
 const DEMO_OFF={'boisset_vgh_dh_tr1_courchevel_260311.mp4':0.7,'kriechmayr_vgh_dh_tr1_courchevel_260311.mp4':0.3,'allegre_vgh_dh_tr1_courchevel_260311.mp4':0,'moltzan_wc_gs_l2_camGH_hafjell_260325.mp4':0,'rast_wc_gs_l2_camGH_hafjell_260325.mp4':2.0,'holdener_wc_sl_l1_camGH_hafjell_260324.mp4':0.7,'shiffrin_wc_sl_l1_camGH_hafjell_260324.mp4':0};
 (async()=>{
   if(!/^https?:/.test(location.protocol)) return;
-  try{ const r=await fetch('demo/'+REAL_DEMO[0][0],{method:'HEAD',cache:'no-store'}); if(!r.ok) return; }catch(e){ return; }
-  const real=REAL_DEMO.map(([n,sz])=>addClip({name:n,size:sz,url:'demo/'+n,demo:true}));
+  try{ const r=await fetch((window.VLAB_DEMO||'demo/')+REAL_DEMO[0][0],{method:'HEAD',cache:'no-store'}); if(!r.ok) return; }catch(e){ return; }
+  const real=REAL_DEMO.map(([n,sz])=>addClip({name:n,size:sz,url:(window.VLAB_DEMO||'demo/')+n,demo:true}));
   // Rennvideos nach vorne in der Liste
   real.slice().reverse().forEach(c=>{ const i=clips.indexOf(c); if(i>0){ clips.splice(i,1); clips.unshift(c); } });
   if(!S.clip||S.clip.demo){ S.setClip(real[0]); }
@@ -7917,7 +7932,7 @@ if(false&&!LS.get('hint1',0)){ setTimeout(()=>{ toast(matchMedia('(pointer:coars
 
 /* Update-Hinweis: prüft version.json auf GitHub Pages; «Aktualisieren» lädt die Seite ohne Cache neu */
 (()=>{
-  const BUILD='20261102125335'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
+  const BUILD='20261102130651'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
   // nach einem Update die ?v=… aus der Adresse entfernen
   try{ const u=new URL(location.href); if(u.searchParams.has('v')){ u.searchParams.delete('v'); history.replaceState(null,'',u.pathname+(u.search||'')+u.hash); } }catch(e){}
   const el=$('#upd'); let latest=null, snoozed=null, busy=false;
