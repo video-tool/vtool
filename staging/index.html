@@ -7843,7 +7843,7 @@ function cmpAutoLink(){ if(mode!=='cmp'||$('#viewCmp').classList.contains('overl
   const more=document.createElement('div'); more.className='dz-more'; more.id='cmpMore';
   const grp=(lab,nodes)=>{ const g=document.createElement('div'); g.className='dm-grp'; g.innerHTML=`<span class="dm-lab">${lab}</span>`; nodes.filter(Boolean).forEach(n=>g.appendChild(n)); more.appendChild(g); };
   { const hold=document.createElement('div'); hold.hidden=true; hold.id='syncHold'; [$('#btnLink'),$('#btnSync'),$('#syncChip')].filter(Boolean).forEach(n=>hold.appendChild(n)); dock.appendChild(hold); } /* «Gleicher Moment» nicht mehr als Werkzeug: A und B sind automatisch verbunden, einzeln verschieben über Klick ins Video */
-  grp('Messen',[$('#btnTime'),$('#timActs'),$('#btnSplits')]);
+  grp('Zeitmessen',[$('#btnTime'),$('#timActs'),$('#btnSplits')]);
   const rail=$('#cTools .rail'); if(rail) rail.classList.remove('collapsed');
   grp('Zeichnen',[$('#cTools')]);
   const ms=$('.m-sync',L); L.innerHTML=''; Rz.innerHTML=''; if(ms) L.appendChild(ms); /* Handy: «Gleicher Moment» direkt in der Leiste */
@@ -8154,7 +8154,7 @@ if(false&&!LS.get('hint1',0)){ setTimeout(()=>{ toast(matchMedia('(pointer:coars
 
 /* Update-Hinweis: prüft version.json auf GitHub Pages; «Aktualisieren» lädt die Seite ohne Cache neu */
 (()=>{
-  const BUILD='20261102144039'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
+  const BUILD='20261102144452'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
   // nach einem Update die ?v=… aus der Adresse entfernen
   try{ const u=new URL(location.href); if(u.searchParams.has('v')){ u.searchParams.delete('v'); history.replaceState(null,'',u.pathname+(u.search||'')+u.hash); } }catch(e){}
   const el=$('#upd'); let latest=null, snoozed=null, busy=false;
