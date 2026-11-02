@@ -2605,6 +2605,7 @@ canvas.gap-row[hidden]{display:none}
 @media (min-width:601px){ #viewCmp .tl-zoom{top:4px!important;bottom:auto!important;right:6px!important;gap:3px!important;padding:2px;border-radius:10px;background:rgba(12,15,20,.55);backdrop-filter:blur(6px)}
   #viewCmp .tl-zoom button{width:26px!important;height:22px!important;font-size:14px!important;border-radius:7px!important}
   #viewCmp .tl-zoom .tl-film svg{width:13px!important;height:13px!important} }
+#viewCmp.overlay.ov-split.ov-one .strips{grid-template-columns:1fr!important}
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
   .aurora{display:none}
@@ -4399,13 +4400,13 @@ function cfUI(){ const on=cfOk(); A.stage.style.setProperty('--k-cf','var(--a)')
 const LOCK_C='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="10.5" width="14" height="10" rx="2.4"/><path d="M8 10.5V7.8a4 4 0 0 1 8 0v2.7"/></svg>',
       LOCK_O='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="10.5" width="14" height="10" rx="2.4"/><path d="M8 10.5V7.8a4 4 0 0 1 7.6-1.8"/></svg>';
 function cfLock(on){ const st=$('#cStages'); if(!st) return; let b=$('#cfLock'); if(!b){ b=document.createElement('button'); b.id='cfLock'; b.type='button';
-    b.addEventListener('pointerdown',e=>e.stopPropagation()); b.addEventListener('click',e=>{ e.stopPropagation(); if(CF.k) cfSet(null); else toast('A und B laufen gemeinsam. Ins Video klicken, um nur dieses zu bewegen.',2600); }); st.appendChild(b); }
-  const open=!!CF.k; b.hidden=!on; b.classList.toggle('open',open); b.classList.toggle('ka',CF.k==='a'); b.classList.toggle('kb',CF.k==='b'); b.innerHTML=open?LOCK_O:LOCK_C;
-  b.title=open?'Nur '+(CF.k==='a'?'A':'B')+' wird gesteuert – klicken = wieder beide gemeinsam':'A und B gemeinsam – ins Video klicken, um nur eines zu bewegen'; b.setAttribute('aria-label',b.title); }
+    b.addEventListener('pointerdown',e=>e.stopPropagation()); b.addEventListener('click',e=>{ e.stopPropagation(); if(CF.k) cfSet(null); else if(!G.linked&&A.ready&&B.ready){ doSync(); cfUI(); if(typeof ovUI==='function'&&ovActive()) ovUI(); } else toast('A und B laufen gemeinsam. Ins Video klicken, um nur dieses zu bewegen.',2600); }); st.appendChild(b); }
+  const sep=!CF.k&&!G.linked&&A.ready&&B.ready, open=!!CF.k||sep; /* getrennt (z. B. Overlay Schritt 1): Schloss offen – klicken verbindet A und B am aktuellen Bild */ b.hidden=!on; b.classList.toggle('open',open); b.classList.toggle('ka',CF.k==='a'); b.classList.toggle('kb',CF.k==='b'); b.innerHTML=open?LOCK_O:LOCK_C;
+  b.title=sep?'A und B getrennt – je Startpunkt einstellen, dann hier schliessen (verbindet beide)':open?'Nur '+(CF.k==='a'?'A':'B')+' wird gesteuert – klicken = wieder beide gemeinsam':'A und B gemeinsam – ins Video klicken, um nur eines zu bewegen'; b.setAttribute('aria-label',b.title); }
 function cfReset(){ if(CF.k) cfSet(null,true); cfUI(); }
 function linkBtn(){ $('#viewCmp').classList.toggle('cmp-linked',!!G.linked); $$('.m-sync').forEach(b=>{ b.classList.toggle('on',!!G.linked); $('span',b).textContent=G.linked?'Verbunden':'Gleicher Moment'; b.title=G.linked?'A und B laufen gemeinsam – antippen zum Trennen':'A und B an diesem Bild verbinden'; }); const b=$('#btnLink'); b.classList.toggle('on',G.linked); $('span',b).textContent=G.linked?'Verknüpft':'Getrennt';
   const s=$('#btnSync'); if(s){ s.classList.toggle('on',G.linked); const t=$('.sync-lab',s)||(()=>{ const x=document.createElement('span'); x.className='sync-lab'; [...s.childNodes].forEach(n=>{ if(n.nodeType===3) n.remove(); }); s.appendChild(x); return x; })();
-    t.textContent='Gleicher Moment'; s.title=G.linked?'A und B laufen gemeinsam – klicken zum Trennen (l)':'A und B am aktuellen Bild verbinden – danach laufen beide gemeinsam (Enter)'; }  if(typeof timHint==='function') try{ timHint(); }catch(e){} requestAnimationFrame(()=>{ dispatchEvent(new Event('resize')); }); }
+    t.textContent='Gleicher Moment'; s.title=G.linked?'A und B laufen gemeinsam – klicken zum Trennen (l)':'A und B am aktuellen Bild verbinden – danach laufen beide gemeinsam (Enter)'; }  if(typeof timHint==='function') try{ timHint(); }catch(e){} try{ if(typeof cfUI==='function') cfUI(); }catch(e){} requestAnimationFrame(()=>{ dispatchEvent(new Event('resize')); }); }
 function updSync(){
   const el=$('#syncInfo'), ch=$('#syncChip');
   if(ch){ if(!A.ready||!B.ready){ ch.textContent=''; ch.className='sync-chip'; ch.title=''; }
@@ -4895,8 +4896,14 @@ class FrameSrc{
   /* Sofort loslegen: online nur die gerade gebrauchten Teile holen (HTTP-Range, je ~6 MB) statt auf die ganze Datei zu warten. Ist die ganze Datei schon da, die nehmen. */
   static async src(src){ if(src&&src.file) return src.file; const url=typeof src==='string'?src:src.url; if(!url||/^(blob|data):/.test(url)) return FrameSrc.blob(src);
     const C=FrameSrc.bc, p=C&&C.get(url); if(p&&p.done) return p; /* keine ganze Datei nebenher laden – das bremst die Teile, die jetzt gebraucht werden */
-    try{ const r=await fetch(url,{headers:{Range:'bytes=0-0'}}); const m=r.status===206&&/\/(\d+)\s*$/.exec(r.headers.get('Content-Range')||''); try{ r.body&&r.body.cancel(); }catch(e){} if(m){ const size=+m[1];
-      return {size,range:true,slice:(a,b)=>({arrayBuffer:async()=>{ const q=FrameSrc.bc&&FrameSrc.bc.get(url); if(q&&q.done) return (await q).slice(a,b).arrayBuffer(); const rr=await fetch(url,{headers:{Range:'bytes='+a+'-'+(Math.max(a,b)-1)}}); if(rr.status!==206&&!(rr.ok&&a===0)) throw new Error('Range '+rr.status); return rr.arrayBuffer(); }})}; } }catch(e){}
+    try{ const r=await fetch(url,{cache:'no-store',headers:{Range:'bytes=0-0'}}); const m=r.status===206&&/\/(\d+)\s*$/.exec(r.headers.get('Content-Range')||''); try{ r.body&&r.body.cancel(); }catch(e){} if(m){ const size=+m[1];
+      /* kleine Lesezugriffe (Kopfdaten) in 256-KB-Blöcken bündeln und merken; «no-store», sonst wartet der Browser auf das gleichzeitige Laden im Videoplayer (gleiche Adresse) */
+      const BS=1<<18, blk=new Map(), get=(a,b)=>fetch(url,{cache:'no-store',headers:{Range:'bytes='+a+'-'+(Math.max(a,b)-1)}}).then(rr=>{ if(rr.status!==206&&!(rr.ok&&a===0)) throw new Error('Range '+rr.status); return rr.arrayBuffer(); });
+      const block=i=>{ if(!blk.has(i)){ const p=get(i*BS,Math.min(size,(i+1)*BS)); p.catch(()=>blk.delete(i)); blk.set(i,p); while(blk.size>48) blk.delete(blk.keys().next().value); } return blk.get(i); };
+      return {size,range:true,slice:(a,b)=>({arrayBuffer:async()=>{ const q=FrameSrc.bc&&FrameSrc.bc.get(url); if(q&&q.done) return (await q).slice(a,b).arrayBuffer(); b=Math.min(b,size); if(b<=a) return new ArrayBuffer(0);
+        if(b-a>(1<<20)) return get(a,b);
+        const i0=Math.floor(a/BS), i1=Math.floor((b-1)/BS), parts=await Promise.all(Array.from({length:i1-i0+1},(_,k)=>block(i0+k))), out=new Uint8Array(b-a);
+        parts.forEach((ab,k)=>{ const bs=(i0+k)*BS, s0=Math.max(a,bs)-bs, s1=Math.min(b,bs+ab.byteLength)-bs; if(s1>s0) out.set(new Uint8Array(ab,s0,s1-s0),Math.max(a,bs)-a); }); return out.buffer; }})}; } }catch(e){}
     return FrameSrc.blob(src); }
   static async open(src){ const f=new FrameSrc(); const url=typeof src==='string'?src:src.url; f.url=url;
     try{ if(FrameSrc.off) throw new Error('Decoder abgeschaltet'); if(typeof VideoDecoder==='undefined'||typeof VideoFrame==='undefined'||typeof EncodedVideoChunk==='undefined') throw new Error('kein WebCodecs');
@@ -8504,7 +8511,7 @@ if(false&&!LS.get('hint1',0)){ setTimeout(()=>{ toast(matchMedia('(pointer:coars
 
 /* Update-Hinweis: prüft version.json auf GitHub Pages; «Aktualisieren» lädt die Seite ohne Cache neu */
 (()=>{
-  const BUILD='20261102185816'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
+  const BUILD='20261102191747'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
   // nach einem Update die ?v=… aus der Adresse entfernen
   try{ const u=new URL(location.href); if(u.searchParams.has('v')){ u.searchParams.delete('v'); history.replaceState(null,'',u.pathname+(u.search||'')+u.hash); } }catch(e){}
   const el=$('#upd'); let latest=null, snoozed=null, busy=false;
