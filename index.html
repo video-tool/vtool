@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1,user-scalable=no">
 <title>Swiss-Ski Video-Lab</title>
+<script>/* kein Aufblitzen der ungestylten Ansicht beim Laden: Inhalt erst zeigen, wenn die App aufgebaut ist (Sicherheitsnetz 4 s) */document.documentElement.classList.add('vboot');setTimeout(function(){document.documentElement.classList.remove('vboot')},4000);</script>
+<style>html.vboot body>*:not(#gate):not(script){visibility:hidden!important}</style>
 <!--GATE_HEAD-->
 <script>(function(){var d=document.documentElement;try{if(JSON.parse(localStorage.getItem('vlab:theme')||'"light"')==='dark')d.dataset.theme='dark';var s=JSON.parse(localStorage.getItem('vlab:auth')||'null');if(!(s&&s.e&&s.exp>Date.now()))d.classList.add('vgate');}catch(e){d.classList.add('vgate');}})();</script>
 <style id="gateCss">
@@ -2578,7 +2580,8 @@ canvas.gap-row[hidden]{display:none}
 .ovs-r input:focus-visible+i{outline:2px solid rgba(255,90,78,.85);outline-offset:2px}
 /* Side-by-Side: Start/Ende */
 .sbs-cut{display:inline-flex;gap:8px;margin-left:10px}
-#viewCmp.overlay .sbs-cut{display:none!important}
+#viewCmp.overlay .sbs-cut{margin-left:0}
+@media (min-width:761px){ #viewCmp.overlay .ov-cutg{display:none!important} } /* Start/Ende im Overlay unten in der Leiste wie überall */
 .player .dock .ctl.io-btn.on,.player .dock .ctl.io-btn.on:hover{color:#14181f!important;background:#ffd24a!important;border-color:#ffd24a!important}
 #viewCmp .dz-more .tim-hint{order:9;flex:1 1 100%;max-width:640px;margin:2px auto 0;padding:9px 12px;border-radius:12px;background:rgba(255,255,255,.05);font-size:12px;line-height:1.45;color:rgba(255,255,255,.72);display:grid;gap:5px}
 #viewCmp .dz-more .tim-hint[hidden]{display:none!important}
@@ -4885,9 +4888,12 @@ function clipPT(c){ if(!c||c.pt||c._ptJob||!c.url) return; if(!/^blob:/.test(c.u
       const med=gaps[gaps.length>>1]; if(!(med>0)||(c.fps&&Math.abs(1/med-c.fps)>c.fps*0.15)) return; /* passt nicht zur erkannten Bildrate → lieber nicht verwenden */
       c.pt=pt; decks.forEach(d=>{ if(d.clip===c&&d.ready&&d.v.paused){ d.seekFrame(d.frame); } }); }catch(e){} })(); }
 class FrameSrc{
+  /* Video-Datei als Blob: lokale Dateien direkt, online (Beispiel-Läufe) einmal laden und merken – wird im Overlay schon im Voraus geholt, damit «Overlay erstellen» sofort startet */
+  static blob(src){ if(src&&src.file) return Promise.resolve(src.file); const url=typeof src==='string'?src:src.url; const C=FrameSrc.bc||(FrameSrc.bc=new Map());
+    if(!C.has(url)){ const p=fetch(url).then(r=>{ if(!r.ok) throw new Error('HTTP '+r.status); return r.blob(); }); p.catch(()=>C.delete(url)); C.set(url,p); while(C.size>4) C.delete(C.keys().next().value); } return C.get(url); }
   static async open(src){ const f=new FrameSrc(); const url=typeof src==='string'?src:src.url; f.url=url;
     try{ if(FrameSrc.off) throw new Error('Decoder abgeschaltet'); if(typeof VideoDecoder==='undefined'||typeof VideoFrame==='undefined'||typeof EncodedVideoChunk==='undefined') throw new Error('kein WebCodecs');
-      const bl=(src&&src.file)||await (await fetch(url)).blob(); const T=await MP4R.open(bl);
+      const bl=await FrameSrc.blob(src); const T=await MP4R.open(bl);
       const cfg={codec:T.codec,codedWidth:T.w,codedHeight:T.h}; if(T.desc) cfg.description=T.desc; const s=await VideoDecoder.isConfigSupported(cfg); if(!s||!s.supported) throw new Error('Codec '+T.codec);
       const sw=T.rot===90||T.rot===270; Object.assign(f,{T,bl,cfg,fast:true,w:sw?T.h:T.w,h:sw?T.w:T.h,rot:T.rot,rc:[null,null],rci:0,dur:T.dur,fps:T.fps,cache:new Map(),pend:new Set(),pos:0,needKey:true,win:null,hold:null,err:null}); f._mk(); return f; }
     catch(e){ f.why=String(e&&e.message||e); return f._slow(); } }
@@ -4932,6 +4938,7 @@ async function ghostCompute(opt){ // opt.resume: ab Bild opt.j mit fester Lage o
   if(bg){ if(GH.state!=='ready'||GH.bg) return; } else { if(GH.state==='busy') return; GH.bgAbort=true; }
   if(!A.ready||!B.ready||!G.linked){ toast('Zuerst den gleichen Moment von A und B setzen.'); return; }
   if(!bg){ A.pause(); B.pause(); }
+  if(!bg) try{ ghostProgress(0,'Videos werden vorbereitet …'); }catch(e){}
   const key=ghostKey(); if(bg){ GH.bgAbort=false; GH.bg={p:0,k0:OV.K.length}; } else { GH.state='busy'; GH.abort=false; GH.key=key; GH.coarse=coarse; } ghostUI();
   const stop=()=>bg?(GH.bgAbort||ghostKey()!==key||GH.key!==key||GH.state!=='ready'):(GH.abort||ghostKey()!==key);
   const W0=GH.W0, wA=A.v.videoWidth, hA0=A.v.videoHeight, wB=B.v.videoWidth, hB0=B.v.videoHeight;
@@ -5191,7 +5198,7 @@ function tracksBuild(){ if(!GH.S||!GH.S.length||!GH.S.some(s=>s.ma)) { GH.trk=nu
   GH.trk={a:trackViterbi(GH.S,'ma',GH.W0,seeds.a),b:trackViterbi(GH.S,'mb',GH.W0,seeds.b)}; GH.trkAl={a:trkAlFull(GH.trk.a,GH.S,GH.W0),b:trkAlFull(GH.trk.b,GH.S,GH.W0)}; TGD.f=-1; autoGates(); }
 /* Rückstand an jedem Tor ohne Marker: rote Tore in A über die Kamerakette in Pistenkoordinaten sammeln (nur, was ≥ 0.5 s am gleichen Ort steht = Tor),
    dann für A und B den Moment der nächsten Vorbeifahrt bestimmen. Rückstand = Zeit B − Zeit A am selben Tor. */
-function autoGates(){ GH.autoGates=null; const S=GH.S, N=S?S.length:0; if(N<8||!GH.trk) return; const st=GH.step||0.1, E=S.map(x=>x.e);
+function autoGates(){ GH.autoGates=null; return; /* automatische Torerkennung entfernt (zu unzuverlässig, Wunsch Luca) */ const S=GH.S, N=S?S.length:0; if(N<8||!GH.trk) return; const st=GH.step||0.1, E=S.map(x=>x.e);
   let Gm=[1,0,0,0,1,0]; const PA=[],PB=[],pts=[];
   for(let i=0;i<N;i++){ if(i>0) Gm=affMul(Gm,affInv(S[i].q||[1,0,0,0,1,0])); const ta=gapTrk('a',i), tb=gapTrk('b',i); PA.push(ta?affApply(Gm,ta[0],ta[1]):null); PB.push(tb?affApply(Gm,tb[0],tb[1]):null);
     if(S[i].ok&&!S[i].cut) (S[i].gt||[]).forEach(g=>{ const w=affApply(Gm,g[0],g[1]); pts.push([w[0],w[1],i,g[2]?1:0]); }); }
@@ -5338,6 +5345,7 @@ function ovStep(){ if(!G.linked||OV.edit) return 1; if(OV.pick) return 2; if(!OV
 function sbsCut(k){ if(!A.ready){ toast('Zuerst Video A wählen.'); return; } A.pause(); B.pause(); G.playing=false; if(typeof cmpPlayIcon==='function') cmpPlayIcon(); const t=A.time(), fr=1/(A.fps||30);
   if(k==='a'){ if(OV.cut.a!=null&&Math.abs(OV.cut.a-t)<fr*0.6){ OV.cut.a=null; toast('Start gelöscht',1200); } else { OV.cut.a=t; if(OV.cut.b!=null&&OV.cut.b<=t) OV.cut.b=null; toast('Start: '+fmtS(t),1300); } }
   else { if(OV.cut.b!=null&&Math.abs(OV.cut.b-t)<fr*0.6){ OV.cut.b=null; toast('Ende gelöscht',1200); } else { OV.cut.b=t; if(OV.cut.a!=null&&OV.cut.a>=t) OV.cut.a=null; toast('Ende: '+fmtS(t),1300); } }
+  if($('#viewCmp').classList.contains('overlay')&&typeof ovFollowOK==='function'){ /* Overlay: wie die Knöpfe oben – fertig gerechnet bleibt, sonst neu einrichten */ const dn=ovFollowOK(); if(dn) GH.key=ghostKey(); else { OV.T=null; OV.follow=false; } try{ ovUI(); }catch(e){} }
   ovApplyCut(); sbsCutUI(); }
 function sbsCutUI(){ $$('[data-sbs="a"]').forEach(b=>b.classList.toggle('on',OV.cut.a!=null)); $$('[data-sbs="b"]').forEach(b=>b.classList.toggle('on',OV.cut.b!=null)); }
 function ovApplyCut(){ // Ausschnitt als Loop in beiden Zeitleisten anzeigen (Overlay und Side-by-Side)
@@ -5528,8 +5536,8 @@ function ovAligned(){ return ovActive()&&!OV.pick&&(!!OV.T||ovFollowOK())&&A.rea
 function ovDrawB(x,ox,oy,w,h){ // B ausgerichtet über ein A-Bild der Grösse w×h zeichnen (Export, Standbild)
   x.save(); x.beginPath(); x.rect(ox,oy,w,h); x.clip(); x.globalAlpha=+$('#opRange').value||0.5;
   if(OV.hideB){} else if(ovFollowOK()){ const e=ovTA()-GH.t0, rf=ovRefAt(e); let M=affMul(ovDMat(ovDAt(ovE()),GH.W0),affInv(ovMat(clamp(e,0,GH.eEnd)))); if(rf) M=affMul([1,0,rf[0],0,1,rf[1]],M); const sc=w/GH.W0, op=+$('#opRange').value||0.5, sB=B.xImg||B.v, sA=A.xImg||A.v;
-    const Wt=Math.max(2,Math.round(w)), Ht=Math.max(2,Math.round(h)), kk=Wt/GH.W0, Mt=[kk*M[0],kk*M[1],kk*M[2],kk*M[3],kk*M[4],kk*M[5]], sb=(OVS.edge||OVS.color||OVS.ghost)?ovsB(sB,sA,e,op,Mt,Wt,Ht):null; x.globalAlpha=(sb?sb.ga:op)*ovsFade(e);
-    if(sb){ x.setTransform(1,0,0,1,0,0); x.drawImage(sb.c,ox,oy,w,h); ovsHalo(x,sb.halo,ox,oy,ovsFade(e)); } else { x.setTransform(sc*M[0],sc*M[3],sc*M[1],sc*M[4],sc*M[2]+ox,sc*M[5]+oy); x.drawImage(sB,0,0,GH.W0,GH.hB); } }
+    const Wt=Math.max(2,Math.round(w)), Ht=Math.max(2,Math.round(h)), kk=Wt/GH.W0, Mt=[kk*M[0],kk*M[1],kk*M[2],kk*M[3],kk*M[4],kk*M[5]], sb=(OVS.edge||OVS.color||OVS.ghost||OVS.spot)?ovsB(sB,sA,e,op,Mt,Wt,Ht):null; x.globalAlpha=(sb?sb.ga:op)*ovsFade(e);
+    if(sb){ x.setTransform(1,0,0,1,0,0); if(sb.mode) x.globalCompositeOperation=sb.mode; x.drawImage(sb.c,ox,oy,w,h); x.globalCompositeOperation='source-over'; ovsHalo(x,sb.halo,ox,oy,ovsFade(e)); } else { x.setTransform(sc*M[0],sc*M[3],sc*M[1],sc*M[4],sc*M[2]+ox,sc*M[5]+oy); x.drawImage(sB,0,0,GH.W0,GH.hB); } }
   else { const k=w/A.v.videoWidth, M=OV.T; x.setTransform(k*M[0],k*M[3],k*M[1],k*M[4],k*M[2]+ox,k*M[5]+oy); x.drawImage(B.xImg||B.v,0,0,B.v.videoWidth,B.v.videoHeight); }
   x.restore(); x.save(); x.beginPath(); x.rect(ox,oy,w,h); x.clip(); layerDraw(x,ox,oy,w); x.restore(); tagsDrawTo(x,ox,oy,w,h); }
 /* Nutzungsanalyse (nur Admins): Passwort wird nochmals geprüft (Server: vlab_login + vlab_admins), Hash nur im Speicher dieser Seite */
@@ -5622,16 +5630,17 @@ function tagTrack(k){ /* angetippte Spur (genau) vor automatischer Verfolgung */
    Automatische Spur nur, solange sie nahe der Mitte bleibt; sonst (oder ohne Spur) Bildmitte. Bei B über die geglättete Lage – wie B gezeichnet wird. */
 function tagFused(k){ const S=GH.S, n=S?S.length:0; if(!n||!GH.W0) return null; const ms=typeof ovSmoothBuild==='function'?ovSmoothBuild():null;
   const ck=GH.key+'|'+(ms?ms.ck:0)+'|'+(GH.trk?1:0)+'|'+k; GH._tf=GH._tf||{}; if(GH._tf[k]&&GH._tf[k].ck===ck) return GH._tf[k];
-  const W=GH.W0, hA=GH.hA, hB=GH.hB||GH.hA, T0=GH.trk&&GH.trk[k], A0=GH.trkAl&&GH.trkAl[k], lim=W*0.18, T=[], AL=new Float32Array(n);
+  const W=GH.W0, hA=GH.hA, hB=GH.hB||GH.hA, T0=GH.trk&&GH.trk[k], A0=GH.trkAl&&GH.trkAl[k], lim=W*0.18, T=[], AL=new Float32Array(n), CF=new Float32Array(n);
   for(let i=0;i<n;i++){ const e=i*GH.step; let c, q=T0&&T0[i]?T0[i]:null;
     if(k==='b'){ const Mi=affInv(ovMat(e)); c=affApply(Mi,W/2,hB/2); if(q){ q=affApply(Mi,...affApply(ovMatRaw(e),q[0],q[1])); } }
     else c=[W/2,hA/2];
-    const qa=q&&A0?A0[i]:(q?1:0); if(q&&qa>0.35&&Math.hypot(q[0]-c[0],(q[1]-c[1])*1.3)<lim){ const w=clamp((qa-0.35)/0.4,0,1); T.push([c[0]+(q[0]-c[0])*w,c[1]+(q[1]-c[1])*w]); }
+    const qa=q&&A0?A0[i]:(q?1:0); if(q&&qa>0.35&&Math.hypot(q[0]-c[0],(q[1]-c[1])*1.3)<lim){ const w=clamp((qa-0.35)/0.4,0,1); T.push([c[0]+(q[0]-c[0])*w,c[1]+(q[1]-c[1])*w]); CF[i]=w; }
     else T.push([c[0],c[1]]); AL[i]=1; }
   /* sanft über ±0.4 s, damit der Wechsel Spur↔Mitte nicht springt */
   const sg=[]; let g=0; for(let i=0;i<n;i++){ if(i&&S[i].cut) g++; sg.push(g); }
   const h=Math.max(1,Math.round(0.4/GH.step)), Tm=T.map((_,i)=>{ let sx=0,sy=0,sw=0; for(let j=Math.max(0,i-h);j<=Math.min(n-1,i+h);j++){ if(sg[j]!==sg[i]) continue; const w=h+1-Math.abs(j-i); sx+=T[j][0]*w; sy+=T[j][1]*w; sw+=w; } return [sx/sw,sy/sw]; });
-  return GH._tf[k]={ck,T:Tm,AL}; }
+  const Cm=Array.from(CF,(_,i)=>{ let s2=0,w2=0; for(let j=Math.max(0,i-h);j<=Math.min(n-1,i+h);j++){ if(sg[j]!==sg[i]) continue; const w=h+1-Math.abs(j-i); s2+=CF[j]*w; w2+=w; } return s2/w2; });
+  return GH._tf[k]={ck,T:Tm,AL,C:Cm}; }
 function tagItems(){ const ta=tagTrack('a'), tb=tagTrack('b'); const its=[{k:'a',col:'#FFC21A',n:lastName(A.clip),T:ta.T,AL:ta.AL,prec:ta.prec,st:GH.step,t0:GH.t0,W0:GH.W0,h0:GH.hA,e1:GH.eEnd}];
   if(B.clip&&ovFollowOK()) its.push({k:'b',col:'#8B5CF6',n:lastName(B.clip),T:tb.T,AL:tb.AL,prec:tb.prec,st:GH.step,t0:GH.t0,W0:GH.W0,h0:GH.hA,e1:GH.eEnd});
   LAY.forEach((L,i)=>its.push({k:'l'+i,col:L.col,n:L.name,T:L.trkB,AL:L.alB,st:L.step,t0:L.t0,W0:L.W0,h0:L.hA,e1:L.eEnd,L}));
@@ -6041,7 +6050,7 @@ function renderLayers(){
   const x=cv.getContext('2d'); x.setTransform(1,0,0,1,0,0); x.clearRect(0,0,Wc,Hc); layerDraw(x,0,0,Wc); }
 
 /* ---------- Overlay-Darstellung: weiche Ränder, Farbe angleichen, Geist-Look, ruhige Kamera, weich einblenden ---------- */
-const OVS=Object.assign({edge:true,color:true,ghost:false,stab:false,fade:true},(()=>{ try{ return JSON.parse(localStorage.getItem('vlab:ovstyle')||'{}'); }catch(e){ return {}; } })()); OVS.ghost=false; /* Geist-Look mit violettem Schein entfernt */
+const OVS=Object.assign({edge:true,color:true,ghost:false,spot:true,stab:false,fade:true},(()=>{ try{ return JSON.parse(localStorage.getItem('vlab:ovstyle')||'{}'); }catch(e){ return {}; } })()); OVS.ghost=false; /* Geist-Look mit violettem Schein entfernt */
 function ovsSave(){ try{ localStorage.setItem('vlab:ovstyle',JSON.stringify(OVS)); }catch(e){} }
 const OVB={cv:null,x:null,fe:null,fw:0,fh:0,gc:null,gx:null,sA:null,sB:null,g:[1,1,1],ge:null};
 function ovsFeather(W,H){ if(OVB.fe&&OVB.fw===W&&OVB.fh===H) return OVB.fe; const c=document.createElement('canvas'); c.width=W; c.height=H; const x=c.getContext('2d'), im=x.createImageData(W,H), d=im.data, F=Math.max(4,Math.round(Math.min(W,H)*0.09));
@@ -6063,12 +6072,20 @@ function ovsB(srcB,srcA,e,op,Mt,Wt,Ht){ const sw=srcB.videoWidth||srcB.displayWi
   const sx=GH.W0/BW, sy=GH.hB/BH; x.setTransform(Mt[0]*sx,Mt[3]*sx,Mt[1]*sy,Mt[4]*sy,Mt[2],Mt[5]); x.drawImage(bc,0,0);
   if(OVS.edge){ x.globalCompositeOperation='destination-in'; x.drawImage(ovsFeather(BW,BH),0,0); }
   x.setTransform(1,0,0,1,0,0); x.globalCompositeOperation='source-over';
-  let ga=op;
+  let ga=op, mode=null;
+  if(OVS.spot){ /* 3) Ein Bild: A bleibt ganz sichtbar (Hintergrund), von B nur die Fahrer:in in einem weichen Fenster.
+      «Abdunkeln»: Schnee bleibt Schnee, dunkle Fahrer:innen von A und B bleiben beide sichtbar – auch wenn sie sich kreuzen. Ohne sichere Spur wird das Fenster sanft grösser (ganzes B, abgedunkelt). */
+    mode='darken'; ga=clamp(0.35+op*1.3,0.3,1); const TB=typeof tagFused==='function'?tagFused('b'):null, qb=TB?trackSmoothAt(TB.T,GH.step,e,0.2):null;
+    let cf=0; if(TB&&TB.C){ const xi=clamp(e/GH.step,0,TB.C.length-1), i0=Math.floor(xi), i1=Math.min(TB.C.length-1,i0+1); cf=TB.C[i0]+(TB.C[i1]-TB.C[i0])*(xi-i0); } cf=clamp((cf-0.25)/0.5,0,1);
+    if(qb){ let rW=GH.W0*0.03; const si=GH.S&&GH.S[clamp(Math.round(e/GH.step),0,GH.S.length-1)], L=si&&si.mb; if(L){ let bd=GH.W0*0.06,ba=0; for(const m of L){ const d=Math.hypot(m[0]-qb[0],m[1]-qb[1]); if(d<bd){ bd=d; ba=m[2]; } } if(ba) rW=clamp(Math.sqrt(ba)*1.2,GH.W0*0.02,GH.W0*0.06); }
+      const kk=Wt/GH.W0, r0=rW*kk*3.2; S.rr=S.rr&&S.re!=null&&Math.abs(e-S.re)<0.5?S.rr+(r0-S.rr)*0.12:r0; S.re=e; const r=S.rr, px=qb[0]*kk, py=qb[1]*kk;
+      const out=1-cf, g=x.createRadialGradient(px,py,r*0.45,px,py,r); g.addColorStop(0,'rgba(0,0,0,1)'); g.addColorStop(1,'rgba(0,0,0,'+out.toFixed(3)+')');
+      x.globalCompositeOperation='destination-in'; if(out<0.999){ x.fillStyle=g; x.fillRect(0,0,Wt,Ht); } x.globalCompositeOperation='source-over'; } }
   if(OVS.ghost){ /* 3) Geist-Look: Hintergrund von B zurückhaltender, die Fahrer:in B mit einem weichen violetten Schein markiert (ohne harte Masken – die würden bei nicht ganz deckungsgleichem Hintergrund Flecken erzeugen) */
     ga=clamp(op*0.85,0.08,0.85); const TB=typeof tagFused==='function'?tagFused('b'):null, qb=TB?trackSmoothAt(TB.T,GH.step,e,0.25):null;
     if(qb){ let rW=GH.W0*0.03; const si=GH.S&&GH.S[clamp(Math.round(e/GH.step),0,GH.S.length-1)], L=si&&si.mb; if(L){ let bd=GH.W0*0.06,ba=0; for(const m of L){ const d=Math.hypot(m[0]-qb[0],m[1]-qb[1]); if(d<bd){ bd=d; ba=m[2]; } } if(ba) rW=clamp(Math.sqrt(ba)*1.2,GH.W0*0.018,GH.W0*0.05); }
       const kk=Wt/GH.W0; S.halo={x:qb[0]*kk,y:qb[1]*kk,r:rW*kk*2.2}; } else S.halo=null; } else S.halo=null;
-  return {c,ga,halo:S.halo}; }
+  return {c,ga,halo:S.halo,mode}; }
 function ovsHalo(x,h,ox,oy,a){ return; /* violetter Schein entfernt (Wunsch Luca) */ if(!h||!(a>0.01)) return; x.save(); x.setTransform(1,0,0,1,0,0); const g=x.createRadialGradient(ox+h.x,oy+h.y,h.r*0.25,ox+h.x,oy+h.y,h.r); g.addColorStop(0,'rgba(139,92,246,0)'); g.addColorStop(0.45,'rgba(150,108,255,'+(0.34*a).toFixed(3)+')'); g.addColorStop(1,'rgba(139,92,246,0)'); x.fillStyle=g; x.globalCompositeOperation='screen'; x.fillRect(ox+h.x-h.r,oy+h.y-h.r,2*h.r,2*h.r); x.restore(); }
 function ovsFade(e){ if(!OVS.fade) return 1; const a=clamp(e/0.6,0,1); return a*a*(3-2*a); }
 /* Ruhige Kamera: Kameraweg von A (Bildmitte in Pistenkoordinaten) über ±0.6 s glätten; Bild um die Differenz verschieben, leicht vergrössert (keine Ränder) */
@@ -6089,7 +6106,7 @@ function ovStabLive(){ const z=A.zoomer; if(!z) return; const s=mode==='cmp'&&$(
   if(!s){ if(z._stab){ z._stab=false; z.style.transform=''; } return; } const k=A.rect().w/GH.W0; z._stab=true; z.style.transformOrigin='50% 50%'; z.style.transform='translate('+(s.z*s.tx*k).toFixed(2)+'px,'+(s.z*s.ty*k).toFixed(2)+'px) scale('+s.z.toFixed(4)+')'; }
 
 (()=>{ const b=$('#ovStyle'); if(!b) return; let pop=null; const close=()=>{ if(pop){ pop.remove(); pop=null; b.classList.remove('on'); } };
-  const ITEMS=[['edge','Weiche Ränder','B geht ohne Kante in A über'],['color','Farbe angleichen','Helligkeit und Farbe von B wie A'],['stab','Ruhige Kamera','Schwenks von A leicht geglättet'],['fade','Weich einblenden','B erscheint am Start weich']];
+  const ITEMS=[['spot','Ein Bild','A als Hintergrund, nur Fahrer:in B eingeblendet – kein Flackern'],['edge','Weiche Ränder','B geht ohne Kante in A über'],['color','Farbe angleichen','Helligkeit und Farbe von B wie A'],['stab','Ruhige Kamera','Schwenks von A leicht geglättet'],['fade','Weich einblenden','B erscheint am Start weich']];
   b.addEventListener('click',e=>{ e.stopPropagation(); if(pop){ close(); return; } pop=document.createElement('div'); pop.className='ovs-pop'; pop.innerHTML='<b class="ovs-h">Darstellung</b>'+ITEMS.map(([k,l,d])=>'<label class="ovs-r"><span><b>'+l+'</b><small>'+d+'</small></span><input type="checkbox" data-k="'+k+'"'+(OVS[k]?' checked':'')+'><i></i></label>').join('');
     pop.addEventListener('change',ev=>{ const c=ev.target.closest('[data-k]'); if(!c) return; OVS[c.dataset.k]=c.checked; ovsSave(); OVB.ge=null; A.dirty=true; });
     pop.addEventListener('pointerdown',ev=>ev.stopPropagation()); document.body.appendChild(pop); b.classList.add('on'); const r=b.getBoundingClientRect(); pop.style.left=Math.max(8,Math.min(innerWidth-pop.offsetWidth-8,r.left))+'px'; pop.style.top=(r.bottom+8)+'px'; });
@@ -6130,9 +6147,10 @@ function renderOv(){
   if(cv.width!==Wc||cv.height!==Hc){ cv.width=Wc; cv.height=Hc; }
   const x=cv.getContext('2d'); x.setTransform(1,0,0,1,0,0); x.clearRect(0,0,Wc,Hc); x.globalAlpha=+$('#opRange').value||0.5;
   if(OV.hideB&&!OV.fix){} else if(ovFollowOK()){ const e=ovE(), rf=ovRefAt(e); let M=affMul(ovDMat(ovDAt(e),GH.W0),affInv(ovMat(clamp(e,0,GH.eEnd)))); if(rf) M=affMul([1,0,rf[0],0,1,rf[1]],M); const sc=Wc/GH.W0, op=+$('#opRange').value||0.5;
-    const Mt=[sc*M[0],sc*M[1],sc*M[2],sc*M[3],sc*M[4],sc*M[5]], sb=(OVS.edge||OVS.color||OVS.ghost)&&B.v.readyState>=2&&A.v.readyState>=2?ovsB(B.v,A.v,e,op,Mt,Wc,Hc):null; x.globalAlpha=(sb?sb.ga:op)*ovsFade(e);
+    const Mt=[sc*M[0],sc*M[1],sc*M[2],sc*M[3],sc*M[4],sc*M[5]], sb=(OVS.edge||OVS.color||OVS.ghost||OVS.spot)&&B.v.readyState>=2&&A.v.readyState>=2?ovsB(B.v,A.v,e,op,Mt,Wc,Hc):null; x.globalAlpha=(sb?sb.ga:op)*ovsFade(e);
+    { const mb=sb&&sb.mode?sb.mode:''; if(cv.style.mixBlendMode!==mb) cv.style.mixBlendMode=mb; }
     if(sb){ x.setTransform(1,0,0,1,0,0); x.drawImage(sb.c,0,0); ovsHalo(x,sb.halo,0,0,ovsFade(e)); } else { x.setTransform(sc*M[0],sc*M[3],sc*M[1],sc*M[4],sc*M[2],sc*M[5]); x.drawImage(B.v,0,0,GH.W0,GH.hB); } }
-  else { const k=Wc/A.v.videoWidth, M=OV.fix?affMul(ovDMat(OV.fix,A.v.videoWidth),OV.T):OV.T; x.setTransform(k*M[0],k*M[3],k*M[1],k*M[4],k*M[2],k*M[5]); x.drawImage(B.v,0,0,B.v.videoWidth,B.v.videoHeight); }
+  else { if(cv.style.mixBlendMode) cv.style.mixBlendMode=''; const k=Wc/A.v.videoWidth, M=OV.fix?affMul(ovDMat(OV.fix,A.v.videoWidth),OV.T):OV.T; x.setTransform(k*M[0],k*M[3],k*M[1],k*M[4],k*M[2],k*M[5]); x.drawImage(B.v,0,0,B.v.videoWidth,B.v.videoHeight); }
   x.setTransform(1,0,0,1,0,0); x.globalAlpha=1;
   $('#viewCmp').classList.toggle('ov-fixing',!!OV.fix); A.stage.classList.toggle('ov-fixstage',!!OV.fix);
   ovStabLive();
@@ -6235,6 +6253,7 @@ function renderOv(){
   document.addEventListener('pointerdown',e=>{ if((OV.more||OV.svm)&&!e.target.closest('.ov-morew')){ OV.more=false; OV.svm=false; ovUI(); } });
   addEventListener('resize',ovMarks);
   setInterval(()=>{ if(ovActive()&&(OV.follow||!G.linked)) ovUI(); },400);
+  setInterval(()=>{ /* Overlay offen, A und B gewählt → Videodaten schon jetzt laden (nur online-Beispiele; lokale Dateien sind sofort da) */ if(!ovActive()||!A.ready||!B.ready||!A.clip||!B.clip||typeof VideoDecoder==='undefined') return; for(const c of [A.clip,B.clip]) if(!c.file&&c.url) FrameSrc.blob(c).catch(()=>{}); },1500);
   setInterval(()=>{ if(OV.prevEnd==null) return; const pl=!A.v.paused||!B.v.paused; if(!pl){ OV.prevAt=A.time(); return; }
     if(OV.cut.b==null&&A.time()>=OV.prevEnd-0.02){ cmpToggle(); cmpPlayIcon(); OV.prevEnd=null; OV.prevAt=null; ovUI(); } },80);
   const _sync=window.doSync;
@@ -8446,7 +8465,7 @@ if(false&&!LS.get('hint1',0)){ setTimeout(()=>{ toast(matchMedia('(pointer:coars
 
 /* Update-Hinweis: prüft version.json auf GitHub Pages; «Aktualisieren» lädt die Seite ohne Cache neu */
 (()=>{
-  const BUILD='20261102170804'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
+  const BUILD='20261102172814'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
   // nach einem Update die ?v=… aus der Adresse entfernen
   try{ const u=new URL(location.href); if(u.searchParams.has('v')){ u.searchParams.delete('v'); history.replaceState(null,'',u.pathname+(u.search||'')+u.hash); } }catch(e){}
   const el=$('#upd'); let latest=null, snoozed=null, busy=false;
@@ -8535,7 +8554,7 @@ async function preOvLoad(){ if(PRE_OV) return PRE_OV; try{ const r=await fetch('
       {t:'1 · Beide zum gleichen Moment',p:'Beispiel: Abfahrtstraining Courchevel vom Gegenhang, Boisset (A) gegen Kriechmayr (B). A und B einzeln in ihren Zeitleisten verschieben, bis beide am gleichen Punkt sind – z. B. beim ersten Tor, das in beiden zu sehen ist.',f:rectOf(tlA,tlB),
        run:async()=>{ setLayout('overlay'); A.setClip(demo(BO)); B.setClip(demo(KR)); unlink(); syncSelects(); renderLib(); await waitReady(); A.seekTime(0.5); B.seekTime(1.5); OV.cut={a:null,b:null}; OV.T=null; OV.follow=false; OV.edit=false; OV.pick=null; ovUI(); await sleep(500); await scrub(A,PRE_OV.cut.a,1400); await scrub(B,PRE_OV.cut.a+PRE_OV.off,1400); }},
       {t:'Weiter',p:'«Weiter» verbindet A und B an diesem Moment. «Automatisch suchen» findet die Stelle auch selbst, wenn beide vom gleichen Standort gefilmt sind.',f:'[data-ov="sync"]',run:async()=>{ await clickEl('[data-ov="sync"]'); }},
-      {t:'Start und Ende (optional)',p:'Mit «Start» und «Ende» wählst du den Teil der Strecke, der übereinandergelegt wird. Ohne Angabe gilt das ganze Video.',f:'.ov-cutg',run:async()=>{ await clickEl('[data-ov="cuta"]'); }},
+      {t:'Start und Ende (optional)',p:'Mit «Start» und «Ende» wählst du den Teil der Strecke, der übereinandergelegt wird. Ohne Angabe gilt das ganze Video.',f:innerWidth>760?'.sbs-cut':'.ov-cutg',run:async()=>{ await clickEl(innerWidth>760?'[data-sbs="a"]':'[data-ov="cuta"]'); }},
       {t:'2 · Übereinanderlegen',p:'Im echten Ablauf schiebst du jetzt B auf A, bis die Tore übereinanderliegen («B schieben»), oder lässt es die App machen. «Overlay erstellen» – die App legt B über A und führt es von Start bis Ende mit, auch wenn die Kamera schwenkt und zoomt. Das dauert etwa 2–3 Minuten (hier vorbereitet).',f:'[data-ov="make"]',
        run:async()=>{ OV.cut.b=PRE_OV.cut.b; ovUI(); preloadOv(); await clickEl('[data-ov="make"]'); }},
       {t:'3 · Fertig',p:'Abspielen oder scrubben: Boisset und Kriechmayr fahren im selben Bild. Liegt B irgendwo daneben: anhalten und «Korrigieren». «Speichern» exportiert das Overlay als Video.',f:stage,
@@ -8586,6 +8605,8 @@ async function preOvLoad(){ if(PRE_OV) return PRE_OV; try{ const r=await fetch('
 
 /* Höhe der unteren Leiste messen → Overlay-Leiste sitzt genau darauf (keine Lücke, nichts scheint durch) */
 (function(){ const set=()=>{ const t=$('.tabs'); if(t&&t.offsetParent!==null&&getComputedStyle(t).position==='fixed') document.documentElement.style.setProperty('--tabsH',Math.round(innerHeight-t.getBoundingClientRect().top)+'px'); }; addEventListener('resize',set); addEventListener('orientationchange',()=>setTimeout(set,300)); setTimeout(set,0); setTimeout(set,800); try{ new ResizeObserver(set).observe($('.tabs')); }catch(e){} })();
+/* App aufgebaut → sichtbar machen */
+requestAnimationFrame(()=>requestAnimationFrame(()=>setTimeout(()=>document.documentElement.classList.remove('vboot'),30)));
 </script>
 </body>
 </html>
