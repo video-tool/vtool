@@ -4210,7 +4210,8 @@ class Deck{
       for(const g of GT){ const x=X(g.f); if(x<-12||x>W+12) continue; ctx.fillStyle='rgba(255,255,255,.85)'; ctx.fillRect(Math.round(x)-0.5,TH-12,1.5,12);
         ctx.beginPath(); ctx.moveTo(x,TH-19); ctx.lineTo(x+5,TH-14); ctx.lineTo(x,TH-9); ctx.lineTo(x-5,TH-14); ctx.closePath(); ctx.fillStyle=g.auto?'#e9edf2':'#DA291C'; ctx.fill(); ctx.strokeStyle='rgba(0,0,0,.45)'; ctx.lineWidth=1; ctx.stroke();
         if(ppf*fps>=40){ const tw=ctx.measureText(g.lab).width+7; ctx.fillStyle='rgba(12,15,20,.82)'; if(ctx.roundRect){ ctx.beginPath(); ctx.roundRect(x-tw/2,TH-33,tw,12,3); ctx.fill(); } else ctx.fillRect(x-tw/2,TH-33,tw,12); ctx.fillStyle='#fff'; ctx.fillText(g.lab,x,TH-26.5); } }
-      ctx.restore(); }
+      ctx.restore();
+      if(this===A&&typeof ovActive==='function'&&ovActive()&&typeof ovFollowOK==='function'&&ovFollowOK()&&typeof OVS!=='undefined'&&OVS.spot&&!OV.hideB){ /* B unsicher → gelbes Band (dort B antippen) */ const U=ovBUnsure(); ctx.save(); for(const g of U){ const x0=X((GH.t0+g[0])*this.fps), x1=X((GH.t0+g[1])*this.fps); if(x1<0||x0>W) continue; ctx.fillStyle='rgba(255,210,74,.16)'; ctx.fillRect(x0,0,x1-x0,TH); ctx.fillStyle='#ffd24a'; ctx.fillRect(x0,TH-5,Math.max(2,x1-x0),5); } ctx.restore(); } }
     // Marker (Funktion entfernt)
     for(const m of []){ const x=X(m); if(x<-10||x>W+10) continue;
       ctx.fillStyle='rgba(255,90,78,.95)'; ctx.fillRect(Math.round(x)-1,0,2,TH);
@@ -4890,10 +4891,16 @@ function clipPT(c){ if(!c||c.pt||c._ptJob||!c.url) return; if(!/^blob:/.test(c.u
 class FrameSrc{
   /* Video-Datei als Blob: lokale Dateien direkt, online (Beispiel-Läufe) einmal laden und merken – wird im Overlay schon im Voraus geholt, damit «Overlay erstellen» sofort startet */
   static blob(src){ if(src&&src.file) return Promise.resolve(src.file); const url=typeof src==='string'?src:src.url; const C=FrameSrc.bc||(FrameSrc.bc=new Map());
-    if(!C.has(url)){ const p=fetch(url).then(r=>{ if(!r.ok) throw new Error('HTTP '+r.status); return r.blob(); }); p.catch(()=>C.delete(url)); C.set(url,p); while(C.size>4) C.delete(C.keys().next().value); } return C.get(url); }
+    if(!C.has(url)){ const p=fetch(url).then(r=>{ if(!r.ok) throw new Error('HTTP '+r.status); return r.blob(); }); p.then(()=>{ p.done=true; },()=>C.delete(url)); C.set(url,p); while(C.size>4) C.delete(C.keys().next().value); } return C.get(url); }
+  /* Sofort loslegen: online nur die gerade gebrauchten Teile holen (HTTP-Range, je ~6 MB) statt auf die ganze Datei zu warten. Ist die ganze Datei schon da, die nehmen. */
+  static async src(src){ if(src&&src.file) return src.file; const url=typeof src==='string'?src:src.url; if(!url||/^(blob|data):/.test(url)) return FrameSrc.blob(src);
+    const C=FrameSrc.bc, p=C&&C.get(url); if(p&&p.done) return p; /* keine ganze Datei nebenher laden – das bremst die Teile, die jetzt gebraucht werden */
+    try{ const r=await fetch(url,{headers:{Range:'bytes=0-0'}}); const m=r.status===206&&/\/(\d+)\s*$/.exec(r.headers.get('Content-Range')||''); try{ r.body&&r.body.cancel(); }catch(e){} if(m){ const size=+m[1];
+      return {size,range:true,slice:(a,b)=>({arrayBuffer:async()=>{ const q=FrameSrc.bc&&FrameSrc.bc.get(url); if(q&&q.done) return (await q).slice(a,b).arrayBuffer(); const rr=await fetch(url,{headers:{Range:'bytes='+a+'-'+(Math.max(a,b)-1)}}); if(rr.status!==206&&!(rr.ok&&a===0)) throw new Error('Range '+rr.status); return rr.arrayBuffer(); }})}; } }catch(e){}
+    return FrameSrc.blob(src); }
   static async open(src){ const f=new FrameSrc(); const url=typeof src==='string'?src:src.url; f.url=url;
     try{ if(FrameSrc.off) throw new Error('Decoder abgeschaltet'); if(typeof VideoDecoder==='undefined'||typeof VideoFrame==='undefined'||typeof EncodedVideoChunk==='undefined') throw new Error('kein WebCodecs');
-      const bl=await FrameSrc.blob(src); const T=await MP4R.open(bl);
+      const bl=await FrameSrc.src(src); const T=await MP4R.open(bl);
       const cfg={codec:T.codec,codedWidth:T.w,codedHeight:T.h}; if(T.desc) cfg.description=T.desc; const s=await VideoDecoder.isConfigSupported(cfg); if(!s||!s.supported) throw new Error('Codec '+T.codec);
       const sw=T.rot===90||T.rot===270; Object.assign(f,{T,bl,cfg,fast:true,w:sw?T.h:T.w,h:sw?T.w:T.h,rot:T.rot,rc:[null,null],rci:0,dur:T.dur,fps:T.fps,cache:new Map(),pend:new Set(),pos:0,needKey:true,win:null,hold:null,err:null}); f._mk(); return f; }
     catch(e){ f.why=String(e&&e.message||e); return f._slow(); } }
@@ -4906,7 +4913,7 @@ class FrameSrc{
   _wakeDq(){ const r=this.wkd; if(r){ this.wkd=null; r(); } }
   _waitDq(ms){ return new Promise(r=>{ this.wkd=r; setTimeout(r,ms||400); }); } /* wartet, bis der Decoder ein Paket angenommen hat */
   _drop(){ if(this.cache){ for(const fr of this.cache.values()) if(fr!==this.hold) fr.close(); this.cache.clear(); } }
-  async _bytes(off,sz){ const w=this.win; if(w&&off>=w.a&&off+sz<=w.b) return new Uint8Array(w.buf,off-w.a,sz); const n=Math.max(sz,6<<20), a=off, b=Math.min(this.bl.size,a+n); const buf=await this.bl.slice(a,b).arrayBuffer(); this.win={a,b,buf}; return new Uint8Array(buf,0,sz); }
+  async _bytes(off,sz){ const w=this.win; if(w&&off>=w.a&&off+sz<=w.b) return new Uint8Array(w.buf,off-w.a,sz); const n=Math.max(sz,this.bl.range?(this.nw=Math.min(6<<20,(this.nw||(1<<18))*2)):6<<20), a=off, b=Math.min(this.bl.size,a+n); const buf=await this.bl.slice(a,b).arrayBuffer(); this.win={a,b,buf}; return new Uint8Array(buf,0,sz); }
   _idx(t){ const P=this.T.P, S=this.T.S, tt=t+1e-4; let lo=0, hi=P.length-1; while(lo<hi){ const m=(lo+hi+1)>>1; if(S[P[m]].t<=tt) lo=m; else hi=m-1; } return P[lo]; }
   _hold(fr){ const h=this.hold; if(h&&h!==fr&&!this.cache.has(h.timestamp)){ try{ h.close(); }catch(e){} } this.hold=fr; return this.rot?this._rot(fr):fr; }
   _rot(fr){ /* gedrehtes Video: Bild wie im Player aufrecht zurückgeben (zwei Leinwände abwechselnd, damit das vorige Bild gültig bleibt) */ const i=this.rci=1-this.rci; let c=this.rc[i]; if(!c){ c=this.rc[i]=document.createElement('canvas'); c.width=this.w; c.height=this.h; }
@@ -5408,9 +5415,10 @@ function ovUI(){ vchipPlace();
   else if(!done){ ttl='Übereinanderlegen'; say='Gilt nur für dieses Bild.'; tip='«Overlay erstellen» legt B über die ganze Strecke und folgt auch der Kamera.'; chips=cut;
     acts=ovBtn('edit','Zurück',OVI.back,'ghost','Gleichen Moment neu wählen')+cutBtns+ovMore([['pick','Referenzpunkte neu',OVI.pin],['hand','Von Hand nachschieben',OVI.fix]])+ovBtn('make','Overlay erstellen',OVI.go,'pri'); }
   else { const kc=OV.K.length?`<span class="ov-chip">${OVI.fix}${OV.K.length} Korrektur${OV.K.length>1?'en':''}<button data-ov="fixall" title="Alle Korrekturen entfernen">${OVI.x}</button></span>`:'';
-    ttl=GH.coarse?'Vorschau':'Fertig'; dot=true; say=GH.bg?'Wird verfeinert · '+Math.round((GH.bg.p||0)*100)+' %':GH.coarse?'Grob gerechnet – «…» › «Neu berechnen» rechnet fein.':'B daneben? «Korrigieren».'; chips=cut+kc;
+    const BU=(!GH.coarse&&OVS.spot&&!OV.hideB)?ovBUnsure():[], bEd=typeof OVT!=='undefined'&&OVT.edit==='b';
+    ttl=GH.coarse?'Vorschau':BU.length?'B prüfen':'Fertig'; dot=true; say=GH.bg?'Wird verfeinert · '+Math.round((GH.bg.p||0)*100)+' %':GH.coarse?'Grob gerechnet – «…» › «Neu berechnen» rechnet fein.':BU.length?(bEd?'Fahrer:in B im Bild antippen – dann «Nächste Stelle».':'B an '+BU.length+' Stelle'+(BU.length>1?'n':'')+' unsicher (gelb) – dort B antippen.'):'B daneben? «Korrigieren».'; chips=cut+kc;
     tip='Liegt B neben A: an der Stelle anhalten und «Korrigieren». Der Punkt links und das Band in der Zeitleiste zeigen den Zustand: grün ausgerichtet, gelb unsicher, rot Kameraschnitt. Das Auge bei den Läufen oben links blendet einen Lauf ein oder aus.';
-    acts=cutBtns+ovBtn('fix','Korrigieren',OVI.fix,'ghost','B an dieser Stelle von Hand nachschieben')
+    acts=cutBtns+ovBtn('fix','Korrigieren',OVI.fix,'ghost','B an dieser Stelle von Hand nachschieben')+(BU.length?(bEd?ovBtn('bnext','Nächste Stelle',OVI.go,'','Zur nächsten unsicheren Stelle springen')+ovBtn('bdone','Fertig',OVI.ok,'pri','Antippen beenden'):ovBtn('tapb','B antippen',OVI.pin,'pri','Zur ersten unsicheren Stelle und Fahrer:in B antippen')):'')
       +ovMore([OVT_READY?['ovtrailnew',OVT.keys.a.length&&OVT.key===GH.key?'Spur bearbeiten (antippen)':'Spur hinter Fahrer:innen setzen …',OVI.pin]:null,OVT_READY&&OVT.trk&&OVT.key===GH.key?['ovtrail',OVT.on?'Spur ausblenden':'Spur einblenden',OVI.go]:null,ovGpsPair()?['ovgps',OVG.on?'GPS-Tacho ausblenden':'GPS-Tacho einblenden',OVI.go]:null,['ovgap',OVGAP.on?'Rückstand ausblenden':'Rückstand einblenden',OVI.go],['nameset','Namen setzen (Fahrer:innen antippen)',OVI.tag],LAY.length<3?['addrun','Weiteren Lauf dazunehmen',OVI.plus]:null,['series','Serie gegen A rechnen …',OVI.go],['make','Neu berechnen',OVI.go],['edit','Neu beginnen',OVI.back]])+ovSaveBtn(); }
   if(SER.on){ ttl='Serie '+(SER.i+1)+' / '+SER.list.length; dot=false; chips=''; say='<b>'+esc(lastName(SER.cur)||'')+'</b> · '+(busy?((($('#ghostBar .gprog span')||{}).textContent)||'Overlay wird erstellt'):SER.msg);
     tip='Alle gewählten Läufe werden nacheinander gegen A gerechnet und gespeichert. Tab offen lassen.'; acts=ovBtn('serstop','Serie abbrechen','','ghost','Nach dem laufenden Schritt aufhören'); }
@@ -5773,7 +5781,7 @@ const OVT={on:false,len:1.6,trk:null,al:null,key:'',edit:null,keys:{a:[],b:[]},s
 function ovB2A(e){ return affMul(ovDMat(ovDAt(e),GH.W0),affInv(ovMat(clamp(e,0,GH.eEnd)))); }
 function ovTapA(ev){ const st=A.stage, r=st.getBoundingClientRect(), R=A.rect(), z=A.z||{x:0,y:0,s:1}; const u=((ev.clientX-r.left-z.x)/z.s-R.x)/R.w, v=((ev.clientY-r.top-z.y)/z.s-R.y)/R.h; return [u*GH.W0,v*GH.W0*R.h/R.w]; }
 function ovTrailReset(){ OVT.keys={a:[],b:[]}; OVT.seg={a:new Map(),b:new Map()}; OVT.trk=null; OVT.al=null; OVT.key=GH.key; OVT.q.length=0; for(const k in TRS){ try{ TRS[k].close(); }catch(e){} delete TRS[k]; } }
-function ovTrailStart(){ if(!ovFollowOK()){ toast('Zuerst das Overlay erstellen.'); return; } if(OVT.key!==GH.key) ovTrailReset(); A.pause(); B.pause(); G.playing=false; cmpPlayIcon(); OVT.edit=OVT.edit||'a'; OVT.on=true; ovTrailHint(); }
+function ovTrailStart(k){ if(!ovFollowOK()){ toast('Zuerst das Overlay erstellen.'); return; } if(OVT.key!==GH.key) ovTrailReset(); A.pause(); B.pause(); G.playing=false; cmpPlayIcon(); OVT.edit=k||OVT.edit||'a'; OVT.on=true; ovTrailHint(); }
 function ovTrailHint(){ let h=$('#trailHint'); if(!h){ h=document.createElement('div'); h.id='trailHint'; h.className='trail-hint'; A.stage.appendChild(h);
     h.addEventListener('pointerdown',ev=>{ ev.stopPropagation(); const b=ev.target.closest('[data-tk]'); if(!b) return; ev.preventDefault(); const k=b.dataset.tk;
       if(k==='done'){ OVT.edit=null; ovTrailHint(); } else if(k==='undo'){ const L=OVT.keys[OVT.edit]; if(L.length){ L.sort((x,y)=>x.t-y.t); const last=L.reduce((m,x)=>x.at>m.at?x:m,L[0]); L.splice(L.indexOf(last),1); ovTrailSeg(OVT.edit); } } else { OVT.edit=k; ovTrailHint(); } }); }
@@ -5783,7 +5791,7 @@ A.stage.addEventListener('pointerdown',ev=>{ if(!OVT.edit||!ovActive()||!ovFollo
   ev.preventDefault(); ev.stopPropagation(); A.pause(); B.pause(); G.playing=false; const pA=ovTapA(ev), e=ovE(), k=OVT.edit;
   const pt=k==='a'?pA:affApply(affInv(ovB2A(e)),pA[0],pA[1]); /* B: in B-Bild-Lage */
   const L=OVT.keys[k]; for(let i=L.length-1;i>=0;i--) if(L[i].auto) L.splice(i,1); const near=L.findIndex(x=>Math.abs(x.e-e)<0.05); const key={e,x:pt[0],y:pt[1],at:performance.now()}; if(near>=0) L[near]=key; else L.push(key); L.sort((x,y)=>x.e-y.e);
-  ovTrailSeg(k); ovTrailHint(); },true);
+  ovTrailSeg(k); ovTrailHint(); A.dirty=true; if(typeof ovUI==='function') ovUI(); },true);
 /* Segmente neu rechnen, deren Schlüsselbilder sich geändert haben */
 function ovKeyId(a){ return a?a.e.toFixed(3)+'|'+a.x.toFixed(1)+'|'+a.y.toFixed(1):'·'; }
 function ovTrailSeg(k){ const L=OVT.keys[k], need=[], want=[]; L.sort((x,y)=>x.e-y.e);
@@ -6060,6 +6068,17 @@ function ovsGain(srcA,srcB,e){ const S=OVB; if(!S.sA){ S.sA=document.createEleme
   if(S.ge!=null&&Math.abs(e-S.ge)<0.2) return S.g; const mean=(src,c)=>{ const x=c.getContext('2d',{willReadFrequently:true}); try{ const w=src.videoWidth||src.displayWidth||src.width, h=src.videoHeight||src.displayHeight||src.height; x.drawImage(src,w*0.2,h*0.2,w*0.6,h*0.6,0,0,48,27); const d=x.getImageData(0,0,48,27).data; let r=0,g=0,b=0; for(let i=0;i<d.length;i+=4){ r+=d[i]; g+=d[i+1]; b+=d[i+2]; } const n=d.length/4; return [r/n,g/n,b/n]; }catch(err){ return null; } };
   const a=mean(srcA,S.sA), b=mean(srcB,S.sB); if(!a||!b) return S.g; const tgt=a.map((v,i)=>clamp((v+6)/(b[i]+6),0.65,1.6)), k=S.ge==null||Math.abs(e-S.ge)>2?1:clamp(Math.abs(e-S.ge)/1.0,0.05,1);
   S.g=S.g.map((v,i)=>v+(tgt[i]-v)*k); S.ge=e; return S.g; }
+/* Wie sicher ist die Lage von Fahrer:in B? Automatische Erkennung, plus angetippte Punkte (±1.5 s sicher, bis 3 s auslaufend) */
+function ovBKeys(){ return (typeof OVT!=='undefined'&&OVT.key===GH.key&&OVT.keys&&OVT.keys.b)||[]; }
+function ovBConf(e){ const TF=typeof tagFused==='function'?tagFused('b'):null; let c=0; if(TF&&TF.C&&TF.C.length){ const xi=clamp(e/GH.step,0,TF.C.length-1), i0=Math.floor(xi), i1=Math.min(TF.C.length-1,i0+1); c=TF.C[i0]+(TF.C[i1]-TF.C[i0])*(xi-i0); } c=clamp((c-0.3)/0.4,0,1);
+  for(const k of ovBKeys()){ const d=Math.abs(k.e-e); if(d<3) c=Math.max(c,d<1.5?1:1-(d-1.5)/1.5); } return c; }
+/* Unsichere Stellen von B (für Zeitleiste und Schritt «B prüfen»): [[e0,e1],…] in Overlay-Zeit */
+function ovBUnsure(){ if(!ovFollowOK()||!GH.S||!GH.S.length) return []; const K=ovBKeys(), ck=GH.key+'|'+K.map(k=>k.e.toFixed(2)).join(','); if(GH._bu&&GH._bu.ck===ck) return GH._bu.L;
+  const st=GH.step||0.1, n=Math.floor((GH.eEnd||0)/st)+1, L=[]; let a=null;
+  for(let i=0;i<=n;i++){ const e=Math.min(i*st,GH.eEnd), u=i<n&&ovBConf(e)<0.5; if(u&&a==null) a=e; if(!u&&a!=null){ L.push([a,e]); a=null; } }
+  const M=[]; for(const g of L){ const p=M[M.length-1]; if(p&&g[0]-p[1]<0.6) p[1]=g[1]; else M.push(g.slice()); } const out=M.filter(g=>g[1]-g[0]>=0.5);
+  GH._bu={ck,L:out}; return out; }
+function ovBNext(){ const U=ovBUnsure(); if(!U.length){ toast('B ist überall sicher erkannt.',1600); return; } const e=ovE(), g=U.find(g=>(g[0]+g[1])/2>e+0.3)||U[0], t=GH.t0+(g[0]+g[1])/2; A.pause(); B.pause(); G.playing=false; cmpPlayIcon(); A.seekTime(t); if(A.onUserSeek) A.onUserSeek(A); }
 /* B fertig gestaltet in Koordinaten der Zielfläche (Wt×Ht): Farbe angeglichen, weicher Rand, Geist-Maske. Mt = B-Bild (GH.W0×GH.hB) → Zielfläche */
 function ovsB(srcB,srcA,e,op,Mt,Wt,Ht){ const sw=srcB.videoWidth||srcB.displayWidth||srcB.width, sh=srcB.videoHeight||srcB.displayHeight||srcB.height; if(!sw||!sh) return null;
   const S=OVB; if(!S.cv){ S.cv=document.createElement('canvas'); S.x=S.cv.getContext('2d'); S.bc=document.createElement('canvas'); S.bx=S.bc.getContext('2d'); S.gc=document.createElement('canvas'); S.gx=S.gc.getContext('2d',{willReadFrequently:true}); S.ac=document.createElement('canvas'); S.ax=S.ac.getContext('2d',{willReadFrequently:true}); S.wc=document.createElement('canvas'); S.wx=S.wc.getContext('2d',{willReadFrequently:true}); }
@@ -6073,14 +6092,30 @@ function ovsB(srcB,srcA,e,op,Mt,Wt,Ht){ const sw=srcB.videoWidth||srcB.displayWi
   if(OVS.edge){ x.globalCompositeOperation='destination-in'; x.drawImage(ovsFeather(BW,BH),0,0); }
   x.setTransform(1,0,0,1,0,0); x.globalCompositeOperation='source-over';
   let ga=op, mode=null;
-  if(OVS.spot){ /* 3) Ein Bild: A bleibt ganz sichtbar (Hintergrund), von B nur die Fahrer:in in einem weichen Fenster.
-      «Abdunkeln»: Schnee bleibt Schnee, dunkle Fahrer:innen von A und B bleiben beide sichtbar – auch wenn sie sich kreuzen. Ohne sichere Spur wird das Fenster sanft grösser (ganzes B, abgedunkelt). */
-    mode='darken'; ga=clamp(0.35+op*1.3,0.3,1); const TB=typeof tagFused==='function'?tagFused('b'):null, qb=TB?trackSmoothAt(TB.T,GH.step,e,0.2):null;
-    let cf=0; if(TB&&TB.C){ const xi=clamp(e/GH.step,0,TB.C.length-1), i0=Math.floor(xi), i1=Math.min(TB.C.length-1,i0+1); cf=TB.C[i0]+(TB.C[i1]-TB.C[i0])*(xi-i0); } cf=clamp((cf-0.25)/0.5,0,1);
-    if(qb){ let rW=GH.W0*0.03; const si=GH.S&&GH.S[clamp(Math.round(e/GH.step),0,GH.S.length-1)], L=si&&si.mb; if(L){ let bd=GH.W0*0.06,ba=0; for(const m of L){ const d=Math.hypot(m[0]-qb[0],m[1]-qb[1]); if(d<bd){ bd=d; ba=m[2]; } } if(ba) rW=clamp(Math.sqrt(ba)*1.2,GH.W0*0.02,GH.W0*0.06); }
-      const kk=Wt/GH.W0, r0=rW*kk*3.2; S.rr=S.rr&&S.re!=null&&Math.abs(e-S.re)<0.5?S.rr+(r0-S.rr)*0.12:r0; S.re=e; const r=S.rr, px=qb[0]*kk, py=qb[1]*kk;
-      const out=1-cf, g=x.createRadialGradient(px,py,r*0.45,px,py,r); g.addColorStop(0,'rgba(0,0,0,1)'); g.addColorStop(1,'rgba(0,0,0,'+out.toFixed(3)+')');
-      x.globalCompositeOperation='destination-in'; if(out<0.999){ x.fillStyle=g; x.fillRect(0,0,Wt,Ht); } x.globalCompositeOperation='source-over'; } }
+  if(OVS.spot&&!(typeof OVT!=='undefined'&&OVT.edit)){ /* (beim Antippen der Spur ganz B zeigen, damit man die Fahrer:in sieht) 3) Ein Bild: A ist der einzige Hintergrund. Von B wird nur die Fahrer:in ausgeschnitten:
+      Fenster um die Spur von B (angetippte Spur zuerst, sonst automatisch) UND nur dort, wo B sich vom Hintergrund von A unterscheidet (Differenzmaske).
+      Der Hintergrund von B wird nie gezeigt. Ist die Spur unsicher, blendet die Fahrer:in B sanft aus statt dass B-Hintergrund erscheint. «Abdunkeln»: Schnee bleibt Schnee. */
+    mode='darken'; ga=clamp(0.45+op*1.3,0.4,1); const TT=typeof tagTrack==='function'?tagTrack('b'):null, TF=typeof tagFused==='function'?tagFused('b'):null, TB=TT&&TT.T?TT:TF, qb=TB?trackSmoothAt(TB.T,GH.step,e,0.2):null;
+    const cf=ovBConf(e);
+    S.cfLow=cf<0.5;
+    if(!qb||cf<0.01){ x.clearRect(0,0,Wt,Ht); }
+    else { let rW=GH.W0*0.03; const si=GH.S&&GH.S[clamp(Math.round(e/GH.step),0,GH.S.length-1)], L=si&&si.mb; if(L){ let bd=GH.W0*0.06,ba=0; for(const m of L){ const d=Math.hypot(m[0]-qb[0],m[1]-qb[1]); if(d<bd){ bd=d; ba=m[2]; } } if(ba) rW=clamp(Math.sqrt(ba)*1.2,GH.W0*0.02,GH.W0*0.06); }
+      const kk=Wt/GH.W0, r0=rW*kk*2.6; S.rr=S.rr&&S.re!=null&&Math.abs(e-S.re)<0.5?S.rr+(r0-S.rr)*0.12:r0; S.re=e; const r=S.rr, px=qb[0]*kk, py=qb[1]*kk;
+      const bx0=Math.max(0,Math.floor(px-r)), by0=Math.max(0,Math.floor(py-r)), bx1=Math.min(Wt,Math.ceil(px+r)), by1=Math.min(Ht,Math.ceil(py+r)), bw=bx1-bx0, bh=by1-by0;
+      if(bw<4||bh<4){ x.clearRect(0,0,Wt,Ht); }
+      else { /* Differenzmaske in kleiner Auflösung */ const q=Math.min(1,120/Math.max(bw,bh)), mw=Math.max(4,Math.round(bw*q)), mh=Math.max(4,Math.round(bh*q));
+        if(!S.dc){ S.dc=document.createElement('canvas'); S.dx=S.dc.getContext('2d',{willReadFrequently:true}); S.mc=document.createElement('canvas'); S.mx=S.mc.getContext('2d'); }
+        const dc=S.dc, dx=S.dx; if(dc.width!==mw||dc.height!==mh){ dc.width=mw; dc.height=mh; } if(S.mc.width!==mw||S.mc.height!==mh){ S.mc.width=mw; S.mc.height=mh; }
+        let mask=null; try{ dx.globalCompositeOperation='copy'; dx.drawImage(c,bx0,by0,bw,bh,0,0,mw,mh); const db=dx.getImageData(0,0,mw,mh).data;
+          const aw=srcA.videoWidth||srcA.displayWidth||srcA.width, ah=srcA.videoHeight||srcA.displayHeight||srcA.height, fx=aw/Wt, fy=ah/Ht; dx.drawImage(srcA,bx0*fx,by0*fy,bw*fx,bh*fy,0,0,mw,mh); const da=dx.getImageData(0,0,mw,mh).data;
+          const n=mw*mh, m=new Float32Array(n); for(let k=0,o=0;k<n;k++,o+=4){ if(db[o+3]<8){ m[k]=0; continue; } const d=(Math.abs(db[o]-da[o])+Math.abs(db[o+1]-da[o+1])+Math.abs(db[o+2]-da[o+2]))/3, v=clamp((d-12)/22,0,1); m[k]=v; }
+          /* kleine Flecken weg, Fahrer:in etwas grösser (max über 3×3, zweimal) */ let cur=m; for(let it=0;it<2;it++){ const nx=new Float32Array(n); for(let yy=0;yy<mh;yy++) for(let xx=0;xx<mw;xx++){ let mv=0; for(let oy=-1;oy<=1;oy++){ const y2=yy+oy; if(y2<0||y2>=mh) continue; for(let ox=-1;ox<=1;ox++){ const x2=xx+ox; if(x2<0||x2>=mw) continue; const v=cur[y2*mw+x2]; if(v>mv) mv=v; } } nx[yy*mw+xx]=mv; } cur=nx; }
+          const im=S.mx.createImageData(mw,mh), dd=im.data, cxm=(px-bx0)*q, cym=(py-by0)*q, rm=r*q; for(let yy=0;yy<mh;yy++) for(let xx=0;xx<mw;xx++){ const k=yy*mw+xx, rr=Math.hypot(xx-cxm,yy-cym)/rm, w=rr<0.55?1:rr>1?0:1-(rr-0.55)/0.45; dd[k*4+3]=Math.round(255*cur[k]*w*cf); }
+          S.mx.putImageData(im,0,0); mask=S.mc; }catch(err){ mask=null; }
+        x.globalCompositeOperation='destination-in'; x.imageSmoothingEnabled=true;
+        if(mask){ try{ x.filter='blur('+Math.max(1,Math.round(1.5/q))+'px)'; }catch(err){} x.drawImage(mask,0,0,mw,mh,bx0,by0,bw,bh); try{ x.filter='none'; }catch(err){} }
+        else { const g=x.createRadialGradient(px,py,r*0.45,px,py,r); g.addColorStop(0,'rgba(0,0,0,'+cf.toFixed(3)+')'); g.addColorStop(1,'rgba(0,0,0,0)'); x.fillStyle=g; x.fillRect(0,0,Wt,Ht); }
+        x.globalCompositeOperation='source-over'; } } }
   if(OVS.ghost){ /* 3) Geist-Look: Hintergrund von B zurückhaltender, die Fahrer:in B mit einem weichen violetten Schein markiert (ohne harte Masken – die würden bei nicht ganz deckungsgleichem Hintergrund Flecken erzeugen) */
     ga=clamp(op*0.85,0.08,0.85); const TB=typeof tagFused==='function'?tagFused('b'):null, qb=TB?trackSmoothAt(TB.T,GH.step,e,0.25):null;
     if(qb){ let rW=GH.W0*0.03; const si=GH.S&&GH.S[clamp(Math.round(e/GH.step),0,GH.S.length-1)], L=si&&si.mb; if(L){ let bd=GH.W0*0.06,ba=0; for(const m of L){ const d=Math.hypot(m[0]-qb[0],m[1]-qb[1]); if(d<bd){ bd=d; ba=m[2]; } } if(ba) rW=clamp(Math.sqrt(ba)*1.2,GH.W0*0.018,GH.W0*0.05); }
@@ -6149,6 +6184,7 @@ function renderOv(){
   if(OV.hideB&&!OV.fix){} else if(ovFollowOK()){ const e=ovE(), rf=ovRefAt(e); let M=affMul(ovDMat(ovDAt(e),GH.W0),affInv(ovMat(clamp(e,0,GH.eEnd)))); if(rf) M=affMul([1,0,rf[0],0,1,rf[1]],M); const sc=Wc/GH.W0, op=+$('#opRange').value||0.5;
     const Mt=[sc*M[0],sc*M[1],sc*M[2],sc*M[3],sc*M[4],sc*M[5]], sb=(OVS.edge||OVS.color||OVS.ghost||OVS.spot)&&B.v.readyState>=2&&A.v.readyState>=2?ovsB(B.v,A.v,e,op,Mt,Wc,Hc):null; x.globalAlpha=(sb?sb.ga:op)*ovsFade(e);
     { const mb=sb&&sb.mode?sb.mode:''; if(cv.style.mixBlendMode!==mb) cv.style.mixBlendMode=mb; }
+    /* Fahrer:in B länger nicht sicher erkannt → einmal anbieten, B anzutippen (dann ist B immer sauber sichtbar) */ if(sb&&OVS.spot&&OVB.cfLow&&!A.v.paused){ OVB.lowN=(OVB.lowN||0)+1; if(OVB.lowN>40&&OVB.hintK!==GH.key){ OVB.hintK=GH.key; toast('Fahrer:in B wird hier nicht sicher erkannt und ist deshalb ausgeblendet. B ein paar Mal antippen – dann bleibt B sichtbar.',8000,()=>ovTrailStart('b'),'B antippen'); } } else if(!OVB.cfLow) OVB.lowN=0;
     if(sb){ x.setTransform(1,0,0,1,0,0); x.drawImage(sb.c,0,0); ovsHalo(x,sb.halo,0,0,ovsFade(e)); } else { x.setTransform(sc*M[0],sc*M[3],sc*M[1],sc*M[4],sc*M[2],sc*M[5]); x.drawImage(B.v,0,0,GH.W0,GH.hB); } }
   else { if(cv.style.mixBlendMode) cv.style.mixBlendMode=''; const k=Wc/A.v.videoWidth, M=OV.fix?affMul(ovDMat(OV.fix,A.v.videoWidth),OV.T):OV.T; x.setTransform(k*M[0],k*M[3],k*M[1],k*M[4],k*M[2],k*M[5]); x.drawImage(B.v,0,0,B.v.videoWidth,B.v.videoHeight); }
   x.setTransform(1,0,0,1,0,0); x.globalAlpha=1;
@@ -6215,6 +6251,9 @@ function renderOv(){
     else if(a==='hand') return ovAlign();
     else if(a==='ovtrail'){ OVT.on=!OVT.on; }
     else if(a==='ovtrailnew'){ ovTrailStart(); }
+    else if(a==='tapb'){ ovTrailStart('b'); ovBNext(); ovUI(); }
+    else if(a==='bnext'){ ovBNext(); }
+    else if(a==='bdone'){ OVT.edit=null; ovTrailHint(); ovUI(); }
     else if(a==='ovgps'){ OVG.on=!OVG.on; LS.set('ovGps',OVG.on?1:0); }
     else if(a==='ovgap'){ OVGAP.on=!OVGAP.on; LS.set('ovGap',OVGAP.on?1:0); }
     else if(a==='fixreset'){ if(OV.fix){ OV.fix.dx=0; OV.fix.dy=0; OV.fix.s=1; OV.fix.r=0; A.dirty=true; } return; }
@@ -6253,7 +6292,7 @@ function renderOv(){
   document.addEventListener('pointerdown',e=>{ if((OV.more||OV.svm)&&!e.target.closest('.ov-morew')){ OV.more=false; OV.svm=false; ovUI(); } });
   addEventListener('resize',ovMarks);
   setInterval(()=>{ if(ovActive()&&(OV.follow||!G.linked)) ovUI(); },400);
-  setInterval(()=>{ /* Overlay offen, A und B gewählt → Videodaten schon jetzt laden (nur online-Beispiele; lokale Dateien sind sofort da) */ if(!ovActive()||!A.ready||!B.ready||!A.clip||!B.clip||typeof VideoDecoder==='undefined') return; for(const c of [A.clip,B.clip]) if(!c.file&&c.url) FrameSrc.blob(c).catch(()=>{}); },1500);
+
   setInterval(()=>{ if(OV.prevEnd==null) return; const pl=!A.v.paused||!B.v.paused; if(!pl){ OV.prevAt=A.time(); return; }
     if(OV.cut.b==null&&A.time()>=OV.prevEnd-0.02){ cmpToggle(); cmpPlayIcon(); OV.prevEnd=null; OV.prevAt=null; ovUI(); } },80);
   const _sync=window.doSync;
@@ -6267,7 +6306,7 @@ function pairKey(kind){ if(!A.clip||!B.clip) return null; const k=c=>c.name+'#'+
 function resFile(kind){ const b=c=>base(c.name).replace(/[^\w\-]+/g,'_'); return '.videolab_'+(kind==='ov'?'overlay':'ghost')+'_'+b(A.clip)+'__'+b(B.clip)+'.json'; }
 function resPack(kind){ const r=n=>Math.round(n*1e4)/1e4, pt=q=>q?[Math.round(q[0]*10)/10,Math.round(q[1]*10)/10]:null;
   const ghOk=GH.state==='ready'&&GH.key===ghostKey()&&GH.S&&GH.S.length;
-  return {v:1,kind,a:A.clip.name,b:B.clip.name,at:Date.now(),off:G.off,syncA:G.syncA,
+  return {v:1,kind,a:A.clip.name,b:B.clip.name,at:Date.now(),off:G.off,syncA:G.syncA,ser:!!(typeof SER!=='undefined'&&SER.on),
     ov:kind==='ov'?{cut:OV.cut,T:OV.T,pa:OV.pa,pb:OV.pb,K:OV.K,follow:ovFollowOK(),names:{a:TAGS.path.a?[...TAGS.path.a].filter((_,i)=>i%2===0).map(([f,q])=>[f,+q[0].toFixed(4),+q[1].toFixed(4)]):null,b:TAGS.path.b?[...TAGS.path.b].filter((_,i)=>i%2===0).map(([f,q])=>[f,+q[0].toFixed(4),+q[1].toFixed(4)]):null}}:null,
     gh:ghOk?{t0:GH.t0,off:GH.off,step:GH.step,eEnd:GH.eEnd,W0:GH.W0,hA:GH.hA,hB:GH.hB,gapE:GH.gapE,gapV:GH.gapV,
       S:GH.S.map(s=>[r(s.e),s.p.map(r),s.ok?1:0,pt(s.pa),pt(s.pb),pt(s.ca),pt(s.cb),s.q?s.q.map(r):null,s.ma||null,s.mb||null,s.cut==null?null:s.cut,s.M?s.M.map(v=>+v.toFixed(4)):null]),seeds:GH.seeds||{}}:null}; }
@@ -6284,7 +6323,7 @@ async function resTry(){
   let d=await idbGet(key);
   if(!d){ const dir=clipDir(A.clip); if(dir){ try{ const fh=await dir.h.getFileHandle(resFile(kind)); d=JSON.parse(await (await fh.getFile()).text()); }catch(e){} } }
   if(!d||pairKey(kind)!==key||GH.state==='busy') return;
-  if(kind==='ov'){ /* Overlay nie automatisch übernehmen: zuerst Startpunkt von A und B von Hand – gespeichertes Overlay nur auf Wunsch */ const dt=new Date(d.at), when=dt.toLocaleDateString('de-CH',{day:'2-digit',month:'2-digit'});
+  if(kind==='ov'&&!d.ser){ /* Overlay nie automatisch übernehmen (ausser aus einer «Serie gegen A» – die ist genau dafür da): zuerst Startpunkt von A und B von Hand – gespeichertes Overlay nur auf Wunsch */ const dt=new Date(d.at), when=dt.toLocaleDateString('de-CH',{day:'2-digit',month:'2-digit'});
     toast('Für A und B gibt es ein gespeichertes Overlay (vom '+when+') – nur bei Bedarf laden.',7000,()=>{ if(pairKey('ov')===key&&pairKind()==='ov'&&GH.state!=='busy') resApply(d,'ov'); },'Laden'); return; }
   resApply(d,kind); }
 function resApply(d,kind){
@@ -8465,7 +8504,7 @@ if(false&&!LS.get('hint1',0)){ setTimeout(()=>{ toast(matchMedia('(pointer:coars
 
 /* Update-Hinweis: prüft version.json auf GitHub Pages; «Aktualisieren» lädt die Seite ohne Cache neu */
 (()=>{
-  const BUILD='20261102172814'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
+  const BUILD='20261102185816'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
   // nach einem Update die ?v=… aus der Adresse entfernen
   try{ const u=new URL(location.href); if(u.searchParams.has('v')){ u.searchParams.delete('v'); history.replaceState(null,'',u.pathname+(u.search||'')+u.hash); } }catch(e){}
   const el=$('#upd'); let latest=null, snoozed=null, busy=false;
