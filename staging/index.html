@@ -4452,7 +4452,7 @@ function linkedTick(){
 }
 /* Weicher Wechsel zwischen Ansichten: kurz einblenden statt hart umschalten (respektiert «weniger Bewegung») */
 function viewIn(sel){ if(typeof decks!=='undefined') decks.forEach(d=>d._vt=0); const el=typeof sel==='string'?$(sel):sel; if(!el||matchMedia('(prefers-reduced-motion:reduce)').matches) return; el.classList.remove('v-in'); void el.offsetWidth; el.classList.add('v-in'); clearTimeout(el._vin); el._vin=setTimeout(()=>el.classList.remove('v-in'),320); }
-function setLayout(l){ if(l!=='overlay'&&$('#viewCmp').classList.contains('overlay')&&!G.linked){ G.autoKey=null; setTimeout(()=>{ if(typeof cmpAutoLink==='function') cmpAutoLink(); },0); } /* zurück aus dem Overlay: A und B wieder gemeinsam, Schloss zu */ if(window.mMenuClose) mMenuClose(); if(typeof mode!=='undefined'&&mode==='cmp') viewIn('#cStages'); setTimeout(()=>{ if(typeof cfUI==='function') cfUI(); },0); if(l==='overlay'&&typeof OV!=='undefined'&&OV.cut.a==null&&!OV.follow&&A.clip&&A.clip.loop&&A.clip.loop.a!=null){ const L=A.clip.loop, f=A.fps||50; OV.cut.a=L.a/f; if(L.b!=null) OV.cut.b=(L.b+1)/f; } if(l==='ghost') l='side'; if(l==='overlay'&&document.body.classList.contains('pfs')&&typeof pfsSet==='function') pfsSet(false); /* Overlay einrichten braucht Schritte und Leiste */ if(l==='overlay'){ try{ if(DRAW.tool&&DRAW.tool!=='none') setTool('none'); if(TIM.on){ TIM.on=false; timUI(); } }catch(e){} } /* Overlay beginnt immer mit Schritt 1: Startpunkt in A und B von Hand setzen (keine automatische Verbindung aus Side-by-Side übernehmen) */ if(l==='overlay'&&typeof OV!=='undefined'&&!OV.T&&!OV.follow&&G.linked&&!(typeof GH!=='undefined'&&GH.state==='busy')){ try{ unlink(); }catch(e){} } /* Werkzeuge gibt es im Übereinander-Modus nicht */ if(l!=='overlay'&&typeof OV!=='undefined'&&OV.pick) OV.pick=null; setTimeout(()=>typeof ovUI==='function'&&ovUI(),0);  $$('#layoutSeg button').forEach(x=>x.classList.toggle('on',x.dataset.layout===l)); const v=$('#viewCmp'); v.classList.toggle('overlay',l==='overlay'); v.classList.toggle('ghost',l==='ghost'); if(typeof ghostUI==='function') ghostUI();  LS.set('layout',l); decks.forEach(d=>{ d.dirty=true; d.annDirty=true; }); if(typeof splitsUI==='function') splitsUI(); if(typeof tabsUI==='function') tabsUI(); }
+function setLayout(l){ if(l!=='overlay'&&$('#viewCmp').classList.contains('overlay')&&!G.linked){ G.autoKey=null; setTimeout(()=>{ if(typeof cmpAutoLink==='function') cmpAutoLink(); },0); } /* zurück aus dem Overlay: A und B wieder gemeinsam, Schloss zu */ if(window.mMenuClose) mMenuClose(); if(typeof mode!=='undefined'&&mode==='cmp') viewIn('#cStages'); setTimeout(()=>{ if(typeof cfUI==='function') cfUI(); },0); if(l==='overlay'&&typeof OV!=='undefined'&&OV.cut.a==null&&!OV.follow&&A.clip&&A.clip.loop&&A.clip.loop.a!=null){ const L=A.clip.loop, f=A.fps||50; OV.cut.a=L.a/f; if(L.b!=null) OV.cut.b=(L.b+1)/f; } if(l==='ghost') l='side'; if(l==='overlay'&&document.body.classList.contains('pfs')&&typeof pfsSet==='function') pfsSet(false); /* Overlay einrichten braucht Schritte und Leiste */ if(l==='overlay'){ try{ if(DRAW.tool&&DRAW.tool!=='none') setTool('none'); if(TIM.on){ TIM.on=false; timUI(); } }catch(e){} } /* Overlay beginnt immer mit Schritt 1; A und B bleiben verbunden (Schloss zu), einzeln einstellen = ins Video klicken */ if(l==='overlay'&&typeof OV!=='undefined'&&!OV.T&&!OV.follow&&!(typeof GH!=='undefined'&&GH.state==='busy')) OV.edit=true; /* Werkzeuge gibt es im Übereinander-Modus nicht */ if(l!=='overlay'&&typeof OV!=='undefined'&&OV.pick) OV.pick=null; setTimeout(()=>typeof ovUI==='function'&&ovUI(),0);  $$('#layoutSeg button').forEach(x=>x.classList.toggle('on',x.dataset.layout===l)); const v=$('#viewCmp'); v.classList.toggle('overlay',l==='overlay'); v.classList.toggle('ghost',l==='ghost'); if(typeof ghostUI==='function') ghostUI();  LS.set('layout',l); decks.forEach(d=>{ d.dirty=true; d.annDirty=true; }); if(typeof splitsUI==='function') splitsUI(); if(typeof tabsUI==='function') tabsUI(); }
 $('#layoutSeg').addEventListener('click',e=>{ const b=e.target.closest('[data-layout]'); if(b) setLayout(b.dataset.layout); });
 $('#opRange').addEventListener('input',e=>$('#viewCmp').style.setProperty('--ovop',e.target.value));
 
@@ -5383,11 +5383,12 @@ function ovPrevStart(){ // Overlay vom Start des Ausschnitts (bzw. der Berechnun
   if(here) return go(); A.seekTime(Math.max(0,t)); A.onUserSeek&&A.onUserSeek(A); setTimeout(go,160); }
 function ovBtn(id,label,icon,cls,title){ return `<button class="ov-b ${cls||''}" data-ov="${id}" ${title?`title="${title}"`:''}>${icon||''}<span>${label}</span></button>`; }
 function ovUI(){ vchipPlace();
-  const v=$('#viewCmp'), k=A.clip&&B.clip?A.clip.id+'|'+B.clip.id:''; if(k!==OV.key){ OV.key=k; OV.T=null; OV.follow=false; OV.pick=null; OV.cut={a:null,b:null}; { const L=A.clip&&A.clip.loop, f=A.fps||A.clip&&A.clip.fps||50; if(L&&L.a!=null){ OV.cut.a=L.a/f; if(L.b!=null) OV.cut.b=(L.b+1)/f; } } /* Start/Ende aus «Ein Video» gelten auch fürs Overlay */ OV.edit=false; OV.found=null; OV.foundEx=null; OV.hideB=false; OV.fix=null; }
+  const v=$('#viewCmp'), k=A.clip&&B.clip?A.clip.id+'|'+B.clip.id:''; if(k!==OV.key){ OV.key=k; OV.T=null; OV.follow=false; OV.pick=null; OV.cut={a:null,b:null}; { const L=A.clip&&A.clip.loop, f=A.fps||A.clip&&A.clip.fps||50; if(L&&L.a!=null){ OV.cut.a=L.a/f; if(L.b!=null) OV.cut.b=(L.b+1)/f; } } /* Start/Ende aus «Ein Video» gelten auch fürs Overlay */ OV.edit=!!k; OV.found=null; OV.foundEx=null; OV.hideB=false; OV.fix=null; }
   v.classList.toggle('ov-pick-a',OV.pick==='a'); v.classList.toggle('ov-pick-b',OV.pick==='b');
   const split=ovActive()&&!OV.pick&&!OV.T&&!(OV.follow&&(GH.state==='busy'||ovFollowOK())); // bis B ausgerichtet ist: nebeneinander // Schritt 1: nebeneinander, damit A und B einzeln eingestellt werden können
   if(v.classList.contains('ov-split')!==split){ if(!split&&typeof CF!=='undefined'&&CF.k){ cfSet(null,true); } v.classList.toggle('ov-split',split); setTimeout(()=>{ if(typeof cfUI==='function') cfUI(); },0); decks.forEach(d=>{ d.dirty=true; d.annDirty=true; }); requestAnimationFrame(()=>{ decks.forEach(d=>{ d.dirty=true; }); if(typeof ovMarks==='function') ovMarks(); }); }
-  const one=ovActive()&&G.linked&&!OV.edit; // Schloss zu → eine gemeinsame Zeitleiste, Schloss offen → zwei
+  if(ovActive()&&!G.linked&&!CF.k&&!OV.T&&!OV.follow&&!OV.found&&!AS.busy&&GH.state!=='busy'&&A.ready&&B.ready&&!document.body.classList.contains('touring')){ OV.edit=true; G.off=B.time()-A.time(); G.syncA=A.time(); G.linked=true; linkBtn(); updSync(); } /* offen nur, solange ein Video angeklickt ist */
+  const one=ovActive()&&G.linked; // Schloss zu → eine gemeinsame Zeitleiste, Schloss offen → zwei
   if(v.classList.contains('ov-one')!==one){ v.classList.toggle('ov-one',one); decks.forEach(d=>{ d.dirty=true; d.annDirty=true; }); requestAnimationFrame(()=>decks.forEach(d=>{ d.dirty=true; })); }
   if(!ovActive()){ ovApplyCut(); return; }
   const st=ovStep(), busy=OV.follow&&GH.state==='busy', done=ovFollowOK();
@@ -5415,8 +5416,8 @@ function ovUI(){ vchipPlace();
     chips=`<span class="ov-found" title="Links A, rechts B am gefundenen Moment"><span><img src="${F.ia}" alt=""><i style="background:var(--a)">A</i></span><span><img src="${F.ib}" alt=""><i style="background:var(--b)">B</i></span></span>`;
     say=`Gefunden · B ${o>=0?'+':'−'}${Math.abs(o).toFixed(2)} s – passt das?`; tip='Links A, rechts B am gefundenen Moment. Gleiches Tor, gleiche Lage? Dann «Passt». Sonst «Nochmals suchen» (nächstbeste Stelle) oder «Von Hand».';
     acts=ovBtn('autohand','Von Hand','','ghost','A und B selbst zum selben Tor ziehen')+ovBtn('autoagain','Nochmals suchen',OVI.go,'','Nächstbeste Stelle suchen')+ovBtn('autook','Passt',OVI.ok,'pri','A und B an diesem Moment verbinden und Overlay erstellen'); }
-  else if(st===1){ ttl='Gleicher Moment'; say=matchMedia('(max-width:600px)').matches?'A: Zeitleiste · B: im Bild wischen':'A und B zum selben Tor ziehen – oder suchen lassen.';
-    tip='A und B einzeln in ihrer Zeitleiste zum selben Tor ziehen, dann «Weiter» – das Overlay wird gleich erstellt. «Automatisch suchen» findet den gleichen Moment selbst, wenn beide vom gleichen Standort gefilmt sind.';
+  else if(st===1){ ttl='Gleicher Moment'; say='Ins Video klicken, A und B einzeln zum selben Tor bringen – oder suchen lassen.';
+    tip='Ins Video klicken (farbiger Rahmen, Schloss offen): nur dieses Video bewegt sich. Nochmals klicken: Schloss zu, eine gemeinsame Zeitleiste. Stehen A und B am selben Tor, «Weiter» – das Overlay wird gleich erstellt. «Automatisch suchen» findet den gleichen Moment selbst, wenn beide vom gleichen Standort gefilmt sind.';
     acts=ovMore([['series','Serie gegen A rechnen …',OVI.go]])+ovBtn('auto',AS.busy?'Sucht …':'Automatisch suchen',OVI.go,'ghost','Gleichen Moment in A und B automatisch suchen (gleicher Kamerastandort)')+ovBtn('sync','Weiter',OVI.ok,'pri','A und B an diesem Moment verbinden und Overlay erstellen'); }
   else if(st===2){ ttl='Übereinanderlegen'; say='B über A schieben oder gleich «Overlay erstellen».'; tip='B wird über A gelegt und folgt der Kamera. Mit «Start» und «Ende» nur einen Teil der Strecke übereinanderlegen.'; chips=cut;
     acts=ovBtn('edit','Zurück',OVI.back,'ghost','Gleichen Moment neu wählen')+cutBtns+ovMore([['pick','Referenzpunkte antippen',OVI.pin]])+ovBtn('hand','B schieben',OVI.fix,'','B von Hand über A legen')+ovBtn('make','Overlay erstellen',OVI.go,'pri','B automatisch über A legen und der Kamera folgen'); }
@@ -6070,8 +6071,8 @@ function renderLayers(){
   const x=cv.getContext('2d'); x.setTransform(1,0,0,1,0,0); x.clearRect(0,0,Wc,Hc); layerDraw(x,0,0,Wc); }
 
 /* ---------- Overlay-Darstellung: weiche Ränder, Farbe angleichen, Geist-Look, ruhige Kamera, weich einblenden ---------- */
-const OVS=Object.assign({edge:true,color:true,ghost:false,spot:false,stab:false,fade:true},(()=>{ try{ return JSON.parse(localStorage.getItem('vlab:ovstyle2')||'{}'); }catch(e){ return {}; } })()); OVS.ghost=false; /* Geist-Look mit violettem Schein entfernt */
-function ovsSave(){ try{ localStorage.setItem('vlab:ovstyle2',JSON.stringify(OVS)); }catch(e){} }
+const OVS=Object.assign({edge:true,color:true,ghost:false,spot:false,stab:true,fade:true},(()=>{ try{ return JSON.parse(localStorage.getItem('vlab:ovstyle3')||'{}'); }catch(e){ return {}; } })()); OVS.ghost=false; /* Geist-Look mit violettem Schein entfernt */
+function ovsSave(){ try{ localStorage.setItem('vlab:ovstyle3',JSON.stringify(OVS)); }catch(e){} }
 const OVB={cv:null,x:null,fe:null,fw:0,fh:0,gc:null,gx:null,sA:null,sB:null,g:[1,1,1],ge:null};
 function ovsFeather(W,H){ if(OVB.fe&&OVB.fw===W&&OVB.fh===H) return OVB.fe; const c=document.createElement('canvas'); c.width=W; c.height=H; const x=c.getContext('2d'), im=x.createImageData(W,H), d=im.data, F=Math.max(4,Math.round(Math.min(W,H)*0.09));
   for(let y=0;y<H;y++) for(let i=0;i<W;i++){ const e=Math.min(i,y,W-1-i,H-1-y)/F, a=e>=1?1:e*e*(3-2*e); d[(y*W+i)*4+3]=Math.round(255*a); } x.putImageData(im,0,0); OVB.fe=c; OVB.fw=W; OVB.fh=H; return c; }
@@ -6251,7 +6252,7 @@ function renderOv(){
       if(dn){ GH.key=ghostKey(); } else { OV.T=null; OV.follow=false; } toast((a==='cuta'?'Start':'Ende')+' des Overlays: '+fmtS(t)+(dn&&!inside?' – ausserhalb der Berechnung, «Neu berechnen»':''),dn&&!inside?3200:1400); ovApplyCut(); }
     else if(a==='cutx'){ const dn=ovFollowOK(); OV.cut={a:null,b:null}; if(dn) GH.key=ghostKey(); else { OV.T=null; OV.follow=false; } ovApplyCut(); }
     else if(a==='sync'){ OV.found=null; OV.foundEx=null; doSync(); OV.edit=false; OV.T=null; OV.follow=false; OV.pick=null; return ovMakeNow(); }
-    else if(a==='edit'){ ovKill(); tagsReset(); OV.edit=true; OV.T=null; OV.fix=null; OV.follow=false; OV.pick=null; unlink(); toast('A und B einzeln zum selben Tor ziehen, dann «Weiter».',2600); }
+    else if(a==='edit'){ ovKill(); tagsReset(); OV.edit=true; OV.T=null; OV.fix=null; OV.follow=false; OV.pick=null; toast('Ins Video klicken, um nur dieses zu bewegen. A und B zum selben Tor bringen, dann «Weiter».',3000); }
     else if(a==='auto'){ OV.foundEx=null; return ovAutoRun([]); }
     else if(a==='autoagain'){ const F=OV.found; return ovAutoRun(F?F.ex:(OV.foundEx||[])); }
     else if(a==='autook'){ OV.found=null; OV.foundEx=null; doSync(); OV.edit=false; OV.T=null; OV.follow=false; OV.pick=null; return ovMakeNow(); }
@@ -6301,7 +6302,7 @@ function renderOv(){
     addEventListener('resize',()=>{ ovFit(); if(!$('#ovBub').hidden) ovBub(true); });
     if(window.ResizeObserver) new ResizeObserver(()=>ovFit()).observe($('#ovTxt')); }
   $('#ovSteps').addEventListener('click',e=>{ const li=e.target.closest('li'); if(!li||OV.pick||GH.state==='busy') return; const n=+li.dataset.st;
-    OV.fix=null; if(n===1&&G.linked){ OV.edit=true; OV.T=null; OV.follow=false; unlink(); } else if(n===2&&G.linked){ OV.edit=false; return ovAlign(); } ovUI(); });
+    OV.fix=null; if(n===1&&G.linked){ OV.edit=true; OV.T=null; OV.follow=false; } else if(n===2&&G.linked){ OV.edit=false; return ovAlign(); } ovUI(); });
   document.addEventListener('keydown',e=>{ if(e.key==='Escape'&&(OV.more||OV.svm)){ OV.more=false; OV.svm=false; ovUI(); return; } if(e.key==='Escape'&&OV.pick){ e.stopPropagation(); ovStop(); } },true);
   document.addEventListener('pointerdown',e=>{ if((OV.more||OV.svm)&&!e.target.closest('.ov-morew')){ OV.more=false; OV.svm=false; ovUI(); } });
   addEventListener('resize',ovMarks);
@@ -8518,7 +8519,7 @@ if(false&&!LS.get('hint1',0)){ setTimeout(()=>{ toast(matchMedia('(pointer:coars
 
 /* Update-Hinweis: prüft version.json auf GitHub Pages; «Aktualisieren» lädt die Seite ohne Cache neu */
 (()=>{
-  const BUILD='20261102195111'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
+  const BUILD='20261102202730'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
   // nach einem Update die ?v=… aus der Adresse entfernen
   try{ const u=new URL(location.href); if(u.searchParams.has('v')){ u.searchParams.delete('v'); history.replaceState(null,'',u.pathname+(u.search||'')+u.hash); } }catch(e){}
   const el=$('#upd'); let latest=null, snoozed=null, busy=false;
