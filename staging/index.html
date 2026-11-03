@@ -5414,7 +5414,7 @@ function ovUI(){ vchipPlace();
     tip=OV.pick==='a'?'Am besten eine Torflagge – die zwei Punkte weit auseinander.':'Die gestrichelten Kreise zeigen die Lage der Punkte in A.';
     acts=ovBtn('cancel','Abbrechen'); }
   else if(OV.nameQ&&OV.nameQ.length){ const it=OV.nameQ[0]; ttl='Namen'; say=`Im Bild auf <b>${it.n}</b> tippen`; acts=ovBtn('nameskip','Überspringen','','ghost')+ovBtn('namedone','Fertig',OVI.ok,'pri'); }
-  else if(OV.fix&&!done){ ttl='Übereinanderlegen'; say=(OV.auto==='busy'?'B wird automatisch über A gelegt …':OV.auto==='ok'?'B liegt automatisch über A – prüfen, sonst ziehen':'B auf A schieben')+' '+FI; tip='Im Bild ziehen = verschieben. '+HT+' Das Overlay beginnt an diesem Bild. Ohne Schieben: «Automatisch» – die App legt B selbst über A.';
+  else if(OV.fix&&!done){ ttl='Übereinanderlegen'; say=(OV.auto==='busy'?'B wird automatisch über A gelegt …':OV.auto==='ok'?'B liegt automatisch über A – prüfen, sonst ziehen':OV.auto==='no'?'Nicht automatisch gefunden – B schieben oder zwei Punkte setzen':'B auf A schieben')+' '+FI; tip='Im Bild ziehen = verschieben. '+HT+' Das Overlay beginnt an diesem Bild. Ohne Schieben: «Automatisch» – die App legt B selbst über A.';
     acts=ovBtn('edit','Zurück',OVI.back,'ghost','Gleichen Moment neu wählen')+ovMore([matchMedia('(max-width:760px)').matches?['automk','Automatisch übereinanderlegen',OVI.go]:null,['pick','Referenzpunkte antippen',OVI.pin],['fixreset','Auf 0 setzen',OVI.reset]])+(matchMedia('(max-width:760px)').matches?'':ovBtn('automk','Automatisch','','ghost','Ohne Schieben – B selbst über A legen und rechnen'))+ovBtn('mkhand','Overlay erstellen',OVI.go,'pri','Mit dieser Lage rechnen – B folgt danach der Kamera'); }
   else if(OV.fix){ const near=OV.K.some(k=>Math.abs(k.e-ovE())<0.15); ttl='Korrigieren'; say='B auf die Tore ziehen '+FI; tip='Ab diesem Bild wird mit deiner Lage neu gerechnet – davor bleibt alles. '+HT;
     acts=(near?ovBtn('fixdel','Korrektur löschen',OVI.trash,'ghost'):'')+ovBtn('fixreset','Auf 0',OVI.reset,'ghost','Handkorrektur zurücksetzen')+ovBtn('fixno','Abbrechen','','ghost')+ovBtn('fixok','Übernehmen',OVI.ok,'pri','Ab diesem Bild wird mit deiner Lage neu berechnet – davor bleibt alles'); }
@@ -5513,15 +5513,24 @@ function ovMakeNow(){ // nach «Weiter»/«Passt»: Schritt 2 – B von Hand üb
 function ovAlign(){ if(!A.ready||!B.ready) return; A.pause(); B.pause(); G.playing=false; cmpPlayIcon();
   if(!G.linked||OV.edit){ doSync(); OV.edit=false; } OV.follow=false; OV.pick=null;
   const fresh=!OV.T; if(!OV.T){ OV.T=[A.v.videoWidth/B.v.videoWidth,0,0,0,A.v.videoHeight/B.v.videoHeight,0]; } OV.handNew=false; OV.fix={dx:0,dy:0,s:1,r:0}; OV.auto=fresh?'busy':OV.auto; ovUI();
-  if(fresh){ let n=0; const go=()=>{ if(!OV.fix){ OV.auto=null; return; } if(++n<100&&(A.v.readyState<2||B.v.readyState<2||A.v.seeking||B.v.seeking)){ setTimeout(go,40); return; } /* erst rechnen, wenn beide Bilder da sind */
-    const ok=ovAutoPose(); OV.auto=ok?'ok':'no'; A.dirty=true; ovUI(); }; setTimeout(go,30); } }
-function ovAutoPose(){ /* Schritt 2: B gleich automatisch über A legen (Zoom und leichte Drehung inklusive) – von Hand nur noch nachkorrigieren */
-  try{ const W0=GH.W0, wA=A.v.videoWidth, wB=B.v.videoWidth, hA=Math.round(W0*A.v.videoHeight/wA)&~1, hB=Math.round(W0*B.v.videoHeight/wB)&~1;
-    const g=(v,h)=>{ const c=document.createElement('canvas'); c.width=W0; c.height=h; const x=c.getContext('2d',{willReadFrequently:true}); x.drawImage(v,0,0,W0,h); return pyramid(grayN(x.getImageData(0,0,W0,h)),W0,h); };
-    const r=alignWide(g(A.v,hA),g(B.v,hB)); if(!r||!r.ok||r.inl<0.4){ console.warn('ovAutoPose: keine sichere Lage',r&&r.inl,A.v.readyState,B.v.readyState); return false; }
-    const sA=W0/wA, sB=W0/wB, Mv=affMul(affMul([1/sB,0,0,0,1/sB,0],simToAff(r.p,W0,hA,W0,hB)),[sA,0,0,0,sA,0]); /* A-Videopixel → B-Videopixel */
-    OV.T=affInv(Mv); OV.Tt=A.time(); return true; }catch(e){ console.warn('ovAutoPose',e); return false; } }
+  if(fresh){ let n=0; const tk=OV.autoTk=(OV.autoTk||0)+1, go=async()=>{ if(!OV.fix||tk!==OV.autoTk){ if(tk===OV.autoTk) OV.auto=null; return; } if(++n<100&&(A.v.readyState<2||B.v.readyState<2||A.v.seeking||B.v.seeking)){ setTimeout(go,40); return; } /* erst rechnen, wenn beide Bilder da sind */
+    let ok=false; try{ ok=await ovAutoPose(tk); }catch(e){ console.warn('ovAutoPose',e); } if(tk!==OV.autoTk) return; OV.auto=ok?'ok':'no'; A.dirty=true; ovUI(); if(OV.autoGo){ OV.autoGo=false; ovGo(true); } }; setTimeout(go,30); } }
+/* Schritt 2: B gleich automatisch über A legen (Zoom und leichte Drehung inklusive). Wahl über Kanten (c, kleiner = besser). Ist das aktuelle Bild nicht eindeutig (z. B. Kameras unterschiedlich gezoomt, wenig Struktur), bis 10 s weiter vorne suchen und die Lage über die Kamerakette zurück zum Start tragen. */
+async function ovAutoPose(tk){ const W0=GH.W0, wA=A.v.videoWidth, wB=B.v.videoWidth, hA=Math.round(W0*A.v.videoHeight/wA)&~1, hB=Math.round(W0*B.v.videoHeight/wB)&~1, t0=A.time(), off=G.off, sA=W0/wA, sB=W0/wB;
+  const mk=h=>{ const c=document.createElement('canvas'); c.width=W0; c.height=h; return c.getContext('2d',{willReadFrequently:true}); }, xa=mk(hA), xb=mk(hB), g=(im,x,h)=>{ x.drawImage(im,0,0,W0,h); return pyramid(grayN(x.getImageData(0,0,W0,h)),W0,h); };
+  const sure=r=>r&&r.ok&&r.inl>=0.4&&(r.c<=-0.85||(r.gates>=3&&r.c<=-0.7)), done=(p)=>{ OV.T=affInv(affMul(affMul([1/sB,0,0,0,1/sB,0],simToAff(p,W0,hA,W0,hB)),[sA,0,0,0,sA,0])); OV.Tt=t0; return true; };
+  let r0=null; try{ r0=alignWide(g(A.v,xa,hA),g(B.v,xb,hB)); }catch(e){} if(sure(r0)) return done(r0.p);
+  let va,vb; try{ va=await FrameSrc.open(A.clip); vb=await FrameSrc.open(B.clip); }catch(e){ return false; }
+  try{ let best=r0&&r0.ok&&r0.inl>=0.4?{r:r0,t:t0}:null; const tMax=Math.min(A.dur,B.dur-off)-0.2, tEnd=OV.cut.b!=null?Math.min(OV.cut.b,tMax):tMax;
+    for(let k=1;k<=10;k++){ const t=t0+k; if(t>tEnd) break; if(tk!==OV.autoTk) return false; const r=alignWide(g(await va.at(t),xa,hA),g(await vb.at(t+off),xb,hB)); await new Promise(z=>setTimeout(z,0)); if(r&&r.ok&&r.inl>=0.4&&(!best||r.c<best.r.c)) best={r,t}; if(sure(r)&&r.c<=-0.9) break; }
+    if(!best||best.r.c>-0.72){ console.warn('ovAutoPose: keine sichere Lage',best&&best.r.c); return false; } if(best.t===t0) return done(best.r.p);
+    const d=t0-best.t, ns=Math.max(1,Math.ceil(Math.abs(d)/0.1)); let M=simToAff(best.r.p,W0,hA,W0,hB), qa=[0,0,0,0,0], qb=[0,0,0,0,0], pA=g(await va.at(best.t),xa,hA), pB=g(await vb.at(best.t+off),xb,hB);
+    for(let k=1;k<=ns;k++){ if(tk!==OV.autoTk) return false; const t=best.t+d*k/ns, nA=g(await va.at(t),xa,hA), nB=g(await vb.at(t+off),xb,hB), ra=align(pA,nA,qa,false,1,true), rb=align(pB,nB,qb,false,1,true); if(!ra.ok||!rb.ok||ra.inl<0.3||rb.inl<0.3){ console.warn('ovAutoPose: Kette unterbrochen'); return false; } M=affMul(affMul(simToAff(rb.p,W0,hB,W0,hB),M),affInv(simToAff(ra.p,W0,hA,W0,hA))); qa=ra.p.slice(); qa[4]=0; qb=rb.p.slice(); qb[4]=0; pA=nA; pB=nB; if(k%5===0) await new Promise(z=>setTimeout(z,0)); }
+    return done(affToSim(M,W0,hA,W0,hB)); }
+  finally{ try{ va.close(); vb.close(); }catch(e){} } }
 function ovGo(hand){ // Schritt 2 → 3: mit der geschobenen Lage (oder ohne: automatisch) rechnen
+  if(hand&&OV.auto==='busy'){ OV.autoGo=true; toast('B wird noch automatisch über A gelegt – das Overlay startet gleich.',2600); return; }
+  if(hand&&OV.auto==='no'&&OV.fix&&!OV.fix.dx&&!OV.fix.dy&&OV.fix.s===1&&!OV.fix.r){ OV.auto=null; toast('B liess sich nicht automatisch über A legen. Tippe zwei gleiche Punkte in A und B an, am besten Torflaggen.',5000); ovStart(); return; }
   if(hand&&OV.fix&&OV.T){ OV.T=affMul(ovDMat(OV.fix,A.v.videoWidth),OV.T); OV.Tt=A.time();
     const t=A.time(), fr=1/(A.fps||30); if(Math.abs(t-ovT0())>fr*0.6){ if(OV.cut.a!=null) OV.cut.a=t; else doSync(); } } // die Lage gilt für dieses Bild → hier beginnt das Overlay
   if(!hand) OV.T=null; OV.fix=null; OV.handNew=false; OV.follow=true; OV.K=[]; ovUI(); ghostCompute({}); }
@@ -8485,7 +8494,7 @@ if(false&&!LS.get('hint1',0)){ setTimeout(()=>{ toast(matchMedia('(pointer:coars
 
 /* Update-Hinweis: prüft version.json auf GitHub Pages; «Aktualisieren» lädt die Seite ohne Cache neu */
 (()=>{
-  const BUILD='20261103123621'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
+  const BUILD='20261103134151'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
   // nach einem Update die ?v=… aus der Adresse entfernen
   try{ const u=new URL(location.href); if(u.searchParams.has('v')){ u.searchParams.delete('v'); history.replaceState(null,'',u.pathname+(u.search||'')+u.hash); } }catch(e){}
   const el=$('#upd'); let latest=null, snoozed=null, busy=false;
