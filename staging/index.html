@@ -4938,7 +4938,7 @@ async function ghostCompute(opt){ // opt.resume: ab Bild opt.j mit fester Lage o
   if(eEnd<0.3){ GH.state='idle'; ghostUI(); toast('Zu kurz – Start/Ende prüfen.'); return; }
   // Startwert aus den Referenzpunkten (B-Videopixel → A-Videopixel) in Analyse-Koordinaten A→B umrechnen
   let refP=null; if(useOv&&OV.T){ const sA=W0/wA, sB=W0/wB, Ti=affInv(OV.T); const Mab=affMul(affMul([sB,0,0,0,sB,0],Ti),[1/sA,0,0,0,1/sA,0]); refP=affToSim(Mab,W0,hA,W0,hB); }
-  const step=clamp(eEnd/300,0.1,0.25)*(coarse?4:1); /* fein ~10 Bilder/s reicht (dazwischen wird interpoliert), Vorschau ~2.5 Bilder/s */ if(!bg) GH.step=step;
+  const step=clamp(eEnd/900,0.1,0.25)*(coarse?4:1); /* fein ~10 Bilder/s reicht (dazwischen wird interpoliert), Vorschau ~2.5 Bilder/s */ if(!bg) GH.step=step;
   let va,vb;
   try{ [va,vb]=await Promise.all([FrameSrc.open(A.clip),FrameSrc.open(B.clip)]); }catch(e){ if(bg){ GH.bg=null; return; } GH.state='idle'; ghostUI(); toast('Videos konnten nicht geladen werden.'); return; }
   let IA=null, IB=null; /* aktuelles Bildpaar */
@@ -5364,12 +5364,14 @@ function preTick(){ if(PRE.state==='run'){ if(!ovFollowOK()||OV.fix||PRE.rk!==pr
 async function preRender(key){ const run=++PRE.run, live=()=>run===PRE.run; PRE.state='run'; PRE.rk=key; PRE.key=key; PRE.p=0; let srcs=null, enc=null; const end=st=>{ try{ enc&&enc.state!=='closed'&&enc.close(); }catch(e){} (srcs||[]).forEach(q=>{ try{ q.close(); }catch(e){} }); if(run===PRE.run){ PRE.state=st; ovUI(); } };
   try{ const W0=Math.min(1280,A.v.videoWidth), W=W0&~1, H=Math.round(W*A.v.videoHeight/A.v.videoWidth)&~1, fps=A.fps, cfg=await wcConfig(W,H,fps); if(!cfg||!live()) return end(cfg?'idle':'off');
     srcs=await Promise.all([FrameSrc.open(A.clip),FrameSrc.open(B.clip)]); if(!live()) return end('idle'); if(!srcs[0].fast||!srcs[1].fast) return end('off');
+    /* Feinabgleich: A und B im Abstand von 0.08 s vergleichen und glätten (bisher nur beim Export), gilt danach für Vorschau, Standbild und Export */
+    if(REF.key!==GH.key){ PRE.ph='fein'; try{ const rr=await ovRefineBuild(srcs[0],srcs[1],0,GH.eEnd,f=>{ PRE.p=f*0.6; }); if(!live()) return end('idle'); if(rr.n){ REF.key=GH.key; REF.E=rr.E; REF.X=rr.X; REF.Y=rr.Y; A.dirty=true; } }catch(err){ console.warn('Feinabgleich',err); } if(!live()) return end('idle'); key=preKey(); PRE.rk=key; PRE.key=key; PRE.wk=key; } PRE.ph='';
     const cv=document.createElement('canvas'); cv.width=W; cv.height=H; const x=cv.getContext('2d'), mux=new Mp4Muxer.Muxer({target:new Mp4Muxer.ArrayBufferTarget(),video:{codec:'avc',width:W,height:H},fastStart:'in-memory',firstTimestampBehavior:'offset'}); let err=null; enc=new VideoEncoder({output:(c,m)=>{ try{ mux.addVideoChunk(c,m); }catch(e){ err=e; } },error:e=>{ err=e; }}); enc.configure(cfg);
-    const f0=Math.max(0,Math.ceil(GH.t0*fps)), f1=Math.min(A.nF-1,Math.floor((GH.t0+GH.eEnd)*fps)), N=f1-f0+1, t00=performance.now(), op=+$('#opRange').value||0.5; let stride=1, n=0;
+    PRE.pb=PRE.p; const f0=Math.max(0,Math.ceil(GH.t0*fps)), f1=Math.min(A.nF-1,Math.floor((GH.t0+GH.eEnd)*fps)), N=f1-f0+1, t00=performance.now(), op=+$('#opRange').value||0.5; let stride=1, n=0;
     for(let f=f0;f<=f1;f+=stride){ if(!live()) return end('idle'); if(err) throw err; const imA=await srcs[0].at(A.tOf(f)), tB=(f+0.5)/fps+G.off, fb=clamp(Math.floor(tB*B.fps),0,B.nF-1), imB=tB>=0&&tB<B.dur?await srcs[1].at(B.tOf(fb)):null; if(!live()) return end('idle');
       const e=(f+0.5)/fps-GH.t0; x.setTransform(1,0,0,1,0,0); x.globalAlpha=1; x.drawImage(imA,0,0,W,H);
       if(imB){ const rf=ovRefAt(e); let M=affMul(ovDMat(ovDAt(e),GH.W0),affInv(ovMat(clamp(e,0,GH.eEnd)))); if(rf) M=affMul([1,0,rf[0],0,1,rf[1]],M); const k=W/GH.W0, Mt=M.map(v=>k*v), sb=(OVS.edge||OVS.color)?ovsB(imB,imA,e,op,Mt,W,H):null; x.globalAlpha=(sb?sb.ga:op)*ovsFade(e); if(sb){ x.setTransform(1,0,0,1,0,0); if(sb.mode) x.globalCompositeOperation=sb.mode; x.drawImage(sb.c,0,0,W,H); x.globalCompositeOperation='source-over'; } else { x.setTransform(Mt[0],Mt[3],Mt[1],Mt[4],Mt[2],Mt[5]); x.drawImage(imB,0,0,GH.W0,GH.hB); } }
-      while(enc.encodeQueueSize>16&&live()) await new Promise(r=>setTimeout(r,6)); const vf=new VideoFrame(cv,{timestamp:Math.round((f-f0)/fps*1e6),duration:Math.round(stride/fps*1e6)}); enc.encode(vf,{keyFrame:n%25===0}); vf.close(); n++; PRE.p=(f-f0+1)/N;
+      while(enc.encodeQueueSize>16&&live()) await new Promise(r=>setTimeout(r,6)); const vf=new VideoFrame(cv,{timestamp:Math.round((f-f0)/fps*1e6),duration:Math.round(stride/fps*1e6)}); enc.encode(vf,{keyFrame:n%25===0}); vf.close(); n++; PRE.p=PRE.pb+(1-PRE.pb)*(f-f0+1)/N;
       if(n%2===0) await new Promise(r=>setTimeout(r,A.v.paused?0:24));
       if(n===40||n%100===0){ const el=(performance.now()-t00)/1000, rest=el/n*((f1-f)/stride); if(rest>35&&stride===1&&fps>30) stride=2; else if(rest>70) return end('slow'); } }
     await enc.flush(); if(!live()) return end('idle'); mux.finalize(); const url=URL.createObjectURL(new Blob([mux.target.buffer],{type:'video/mp4'})), v=preEl(); if(PRE.url){ URL.revokeObjectURL(PRE.url); } PRE.url=url; PRE.t0=f0/fps; PRE.ms=Math.round(performance.now()-t00); v.src=url; v.load(); end('ready'); }
@@ -6252,7 +6254,7 @@ function renderOv(){
     else if(a==='fixok'&&!ovFollowOK()){ OV.T=affMul(ovDMat(OV.fix,A.v.videoWidth),OV.T); OV.Tt=A.time(); OV.fix=null; OV.handNew=false; toast('B liegt über A – jetzt in der Zeitleiste vorklicken.',2600); }
     else if(a==='fixok'&&ovFollowOK()){ const W0=GH.W0, j=clamp(Math.round(ovE()/GH.step),0,GH.S.length-1), p0=GH.S[j].p;
       const M=affMul(simToAff(p0,W0,GH.hA,W0,GH.hB),affInv(ovDMat(OV.fix,W0))), p2=affToSim(M,W0,GH.hA,W0,GH.hB); p2[4]=p0[4];
-      const e=j*GH.step; OV.K=OV.K.filter(k=>k.e<e-OVFADE); OV.fix=null; GH._tf=null; A.pause(); B.pause(); G.playing=false; cmpPlayIcon();
+      const e=j*GH.step; OV.K=OV.K.filter(k=>k.e<e-OVFADE); OV.fix=null; GH._tf=null; REF.key=null; A.pause(); B.pause(); G.playing=false; cmpPlayIcon();
       toast('Wird ab '+fmtS(GH.t0+e)+' neu berechnet – mit deiner Lage als Fixpunkt.',3000); ovUI(); ghostCompute({resume:true,j,p:p2}); return; }
     else if(a==='fixok'){ const e=ovE(); OV.K=OV.K.filter(k=>Math.abs(k.e-e)>=0.15); OV.K.push({e,...OV.fix}); OV.K.sort((p,q)=>p.e-q.e); OV.fix=null; toast('Korrektur übernommen – gilt hier und läuft über ±3 s weich aus.',2600); }
     else if(a==='fixdel'){ const e=ovE(); OV.K=OV.K.filter(k=>Math.abs(k.e-e)>=0.15); OV.fix=null; toast('Korrektur gelöscht.',1400); }
@@ -8483,7 +8485,7 @@ if(false&&!LS.get('hint1',0)){ setTimeout(()=>{ toast(matchMedia('(pointer:coars
 
 /* Update-Hinweis: prüft version.json auf GitHub Pages; «Aktualisieren» lädt die Seite ohne Cache neu */
 (()=>{
-  const BUILD='20261103100826'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
+  const BUILD='20261103123621'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
   // nach einem Update die ?v=… aus der Adresse entfernen
   try{ const u=new URL(location.href); if(u.searchParams.has('v')){ u.searchParams.delete('v'); history.replaceState(null,'',u.pathname+(u.search||'')+u.hash); } }catch(e){}
   const el=$('#upd'); let latest=null, snoozed=null, busy=false;
