@@ -6488,7 +6488,9 @@ document.addEventListener('click',e=>{ const b=e.target.closest('[data-act="sbs"
 const AS={key:'',busy:false}; var TRK_CW=3; // Gewicht «Fahrer:in nahe Bildmitte» (getestet: 1.5 / 2.2 / 3 – 3 insgesamt am wenigsten Fehltreffer)
 async function autoSyncFind(ca,cb,prog,ex){ ex=ex||[]; // gleicher Kamerastandort → gleiche Kameralage = gleiche Stelle der Strecke. Ganze Videos vergleichen, beide Richtungen.
   const W=64, H=36, cv=document.createElement('canvas'); cv.width=W; cv.height=H; const x=cv.getContext('2d',{willReadFrequently:true});
-  const grab=v=>{ x.drawImage(v,0,0,W,H); const d=x.getImageData(0,0,W,H).data, g=new Float32Array(W*H); let m=0; for(let i=0,j=0;i<g.length;i++,j+=4){ g[i]=0.299*d[j]+0.587*d[j+1]+0.114*d[j+2]; m+=g[i]; } m/=g.length; let sd=0; for(let i=0;i<g.length;i++){ g[i]-=m; sd+=g[i]*g[i]; } sd=Math.sqrt(sd/g.length)||1; for(let i=0;i<g.length;i++) g[i]*=40/sd; return g; }; // Helligkeit + Kontrast ausgleichen
+  /* Kantenbild 64×36: robust gegen Licht und Schatten der zwei Läufe, kleine Kameraabweichung wird beim Vergleich erlaubt */ const cv2=document.createElement('canvas'); cv2.width=W*2; cv2.height=H*2; const x2=cv2.getContext('2d',{willReadFrequently:true});
+  const edge=v=>{ const w=W*2,h=H*2; x2.drawImage(v,0,0,w,h); const d=x2.getImageData(0,0,w,h).data, l=new Float32Array(w*h), e=new Float32Array(W*H); for(let i=0,j=0;i<l.length;i++,j+=4) l[i]=0.299*d[j]+0.587*d[j+1]+0.114*d[j+2]; for(let y=1;y<h-1;y++) for(let q=1;q<w-1;q++){ const i=y*w+q; e[(y>>1)*W+(q>>1)]+=Math.abs(l[i+1]-l[i-1])+Math.abs(l[i+w]-l[i-w]); } let m=0; for(let i=0;i<e.length;i++) m+=e[i]; m/=e.length; let sd=0; for(let i=0;i<e.length;i++){ e[i]-=m; sd+=e[i]*e[i]; } sd=Math.sqrt(sd/e.length)||1; for(let i=0;i<e.length;i++) e[i]/=sd; return e; };
+  const grab=v=>{ x.drawImage(v,0,0,W,H); const d=x.getImageData(0,0,W,H).data, g=new Float32Array(W*H); let m=0; for(let i=0,j=0;i<g.length;i++,j+=4){ g[i]=0.299*d[j]+0.587*d[j+1]+0.114*d[j+2]; m+=g[i]; } m/=g.length; let sd=0; for(let i=0;i<g.length;i++){ g[i]-=m; sd+=g[i]*g[i]; } sd=Math.sqrt(sd/g.length)||1; for(let i=0;i<g.length;i++) g[i]*=40/sd; g.e=edge(v); return g; }; // Helligkeit + Kontrast ausgleichen
   const ck=ca.id+'|'+cb.id, hit=AS.scan&&AS.scan.k===ck; const va=hit?null:await loadV(ca.url), vb=hit?null:await loadV(cb.url); const st=0.25;
   try{
     // Schnell: Video stumm im Zeitraffer abspielen und Bilder mitnehmen (viel schneller als hunderte Sprünge); Lücken danach per Sprung füllen
@@ -6503,18 +6505,19 @@ async function autoSyncFind(ca,cb,prog,ex){ ex=ex||[]; // gleicher Kamerastandor
     const diff=(p,q)=>{ let s=0; for(let i=0;i<p.length;i+=2){ const d=p[i]-q[i]; s+=d*d; } return s/(p.length/2); };
     // Bewegung je Bild (Kamera schwenkt = Fahrer:in unterwegs) – ruhige Startbilder zählen kaum
     const mv=S=>S.map((g,i)=>i?Math.min(1,diff(g,S[i-1])/60):0); const mA=mv(SA), mB=mv(SB);
-    const minOv=Math.round(4/st); let best=null; const sc=[], kv=[];
-    for(let k=-(SA.length-minOv); k<=SB.length-minOv; k++){ // B-Index = A-Index + k
-      let s=0,w=0; const i0=Math.max(0,-k), i1=Math.min(SA.length,SB.length-k);
-      if(i1-i0<minOv) continue; for(let i=i0;i<i1;i+=1){ const ww=0.15+Math.max(mA[i],mB[i+k]); s+=ww*diff(SA[i],SB[i+k]); w+=ww; }
-      const v=s/w; let mvw=0; for(let i=i0;i<i1;i++) mvw+=mA[i]; if(mvw<3) continue; sc.push(v); kv.push([k,v]); if(ex.some(o=>Math.abs(k*st-o)<3)) continue; if(!best||v<best.v) best={v,k,i0,i1}; }
+    const minOv=Math.round(4/st); let best=null; const sc=[], kv=[], R=3, M=[];
+    const ncc=(p,q)=>{ let bm=-9; for(let dy=-R;dy<=R;dy++) for(let dx=-R;dx<=R;dx++){ let c=0,n=0; for(let y=R;y<H-R;y+=2){ const oa=y*W, ob=(y+dy)*W+dx; for(let x0=R;x0<W-R;x0+=2){ c+=p[oa+x0]*q[ob+x0]; n++; } } c/=n; if(c>bm) bm=c; } return bm; };
+    let nk=0; for(let k=-(SA.length-minOv); k<=SB.length-minOv; k++){ // B-Index = A-Index + k
+      const i0=Math.max(0,-k), i1=Math.min(SA.length,SB.length-k); if(i1-i0<minOv) continue; let mvw=0; for(let i=i0;i<i1;i++) mvw+=mA[i]; if(mvw<3) continue;
+      M.length=0; for(let i=i0;i<i1;i+=2) M.push(ncc(SA[i].e,SB[i+k].e)); M.sort((a,b)=>a-b); let t=0,c=0; for(let i=M.length>>2;i<M.length;i++){ t+=M[i]; c++; } const v=-t/c; /* kleiner = besser; schlechtestes Viertel zählt nicht (Fahrer:in im Bild, Schatten) */
+      sc.push(v); kv.push([k,v]); if(!ex.some(o=>Math.abs(k*st-o)<3)&&(!best||v<best.v)) best={v,k,i0,i1}; if(++nk%25===0){ if(AS.abort) return null; await new Promise(z=>setTimeout(z,0)); } }
     if(!best) return null; sc.sort((a,b)=>a-b); const med=sc[sc.length>>1]||best.v;
     // Startpunkt: erstes Bild im gemeinsamen Bereich, an dem A sich bewegt
     let iS=best.i0; for(let i=best.i0;i<best.i1;i++){ if(mA[i]>0.5){ iS=Math.max(best.i0,i-1); break; } }
     // Eindeutigkeit: wie weit liegt die beste andere Stelle (mehr als 3 s daneben) über dem Bestwert?
     let alt=null; for(const [k,v] of kv) if(Math.abs(k-best.k)*st>3&&(alt==null||v<alt)) alt=v;
     const sep=alt==null||med<=best.v?1:clamp((alt-best.v)/(med-best.v),0,1);
-    return {tA:iS*st, off:best.k*st, conf:med>0?1-best.v/med:0, sep}; }
+    const peak=-best.v; return {tA:iS*st, off:best.k*st, conf:peak>=0.25&&(sep>=0.3||ex.length)?Math.min(0.99,0.4+sep*0.5):Math.min(0.2,peak), sep, peak}; }
   finally{ [va,vb].forEach(v=>{ if(!v) return; try{ v.removeAttribute('src'); v.load(); v.remove(); }catch(e){} }); } }
 // Nutzer verschiebt selbst → Suche abbrechen
 ['pointerdown','keydown'].forEach(t=>document.addEventListener(t,e=>{ if(AS.busy&&e.target.closest&&e.target.closest('#cStrips,#cStages')) AS.abort=true; },true));
@@ -8493,7 +8496,7 @@ if(false&&!LS.get('hint1',0)){ setTimeout(()=>{ toast(matchMedia('(pointer:coars
 
 /* Update-Hinweis: prüft version.json auf GitHub Pages; «Aktualisieren» lädt die Seite ohne Cache neu */
 (()=>{
-  const BUILD='20261103134151'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
+  const BUILD='20261103152611'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
   // nach einem Update die ?v=… aus der Adresse entfernen
   try{ const u=new URL(location.href); if(u.searchParams.has('v')){ u.searchParams.delete('v'); history.replaceState(null,'',u.pathname+(u.search||'')+u.hash); } }catch(e){}
   const el=$('#upd'); let latest=null, snoozed=null, busy=false;
