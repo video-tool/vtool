@@ -4954,7 +4954,7 @@ async function ghostCompute(opt){ // opt.resume: ab Bild opt.j mit fester Lage o
     const r=affToSim(M,W0,hA,W0,hB); r[4]=refP[4]; refP=r; }catch(e){ console.warn('Handlage nicht übertragbar',e); } }
   const DBG=[]; if(!bg) GH.dbg=DBG; const hist=[]; let fail=0; const S=[]; let prev=null, prevPA=null, prevPB=null, pInit=[0,0,0,0,0], lastQa=[0,0,0,0,0], lastQb=[0,0,0,0,0]; const trk={a:null,b:null};
   const n=Math.max(2,Math.floor(eEnd/step)+1), t0=performance.now();
-  GH.paused=false; GH.rewind=null; GH.peek=null; GH.peekI=null; GH.fixApply=null;
+  GH.paused=false; GH.peek=null; GH.peekI=null; GH.fixApply=null;
   const lv=useOv&&!(opt&&opt.resume)&&!bg?ovLiveCanvas():null; // beim Nachrechnen nach einer Korrektur bleibt das Bild an der korrigierten Stelle stehen
   // Bildpaare für die Live-Vorschau zwischenspeichern (die Videos springen schon zum nächsten Bild)
   const lbA=document.createElement('canvas'), lbB=document.createElement('canvas');
@@ -4976,14 +4976,6 @@ async function ghostCompute(opt){ // opt.resume: ab Bild opt.j mit fester Lage o
     grab(); drawLive(M); i=j+1; }
   while(i<n){
     if(stop()){ break; }
-    if(GH.rewind!=null){ // zurückspringen: ab Bild j neu rechnen, Kette ab j-1 wieder aufbauen
-      if(pend){ await pend; pend=null; }
-      const j=clamp(GH.rewind,1,S.length-1); GH.rewind=null; S.length=j; if(GH.dbg.length>j) GH.dbg.length=j; i=j;
-      const sp=S[j-1]; prev={p:sp.p,M:simToAff(sp.p,W0,hA,W0,hB)};
-      await seekPair((j-1)*step);
-      xa.drawImage(IA,0,0,W0,hA); xb.drawImage(IB,0,0,W0,hB);
-      prevPA=pyramid(grayN(xa.getImageData(0,0,W0,hA)),W0,hA); prevPB=pyramid(grayN(xb.getImageData(0,0,W0,hB)),W0,hB);
-      lastQa=[0,0,0,0,0]; lastQb=[0,0,0,0,0]; fail=0; mvHist=[]; }
     const e=i*step;
     const tS=performance.now(); if(pend&&pendI===i) await pend; else { if(pend) await pend; await seekPair(e); } pend=null; GH.tSeek=(GH.tSeek||0)+performance.now()-tS;
     xa.drawImage(IA,0,0,W0,hA); xb.drawImage(IB,0,0,W0,hB); grab();
@@ -5046,7 +5038,7 @@ async function ghostCompute(opt){ // opt.resume: ab Bild opt.j mit fester Lage o
     if(!bg){ GH.curLen=S.length; drawLive(M); }
     if(!bg&&!cutWarn&&cuts.a+cuts.b>=2){ cutWarn=true; toast('Achtung: '+(cuts.a&&cuts.b?'A und B haben':cuts.a?'Video A hat':'Video B hat')+' Kameraschnitte (TV-Bild) – Overlay braucht eine durchgehende Kamera vom gleichen Standort.',6000); }
     if(bg){ GH.bg.p=(i+1)/n; { const nw=performance.now(); if(!GH.bgUi||nw-GH.bgUi>700){ GH.bgUi=nw; if(ovActive()) ovUI(); } } await new Promise(r=>setTimeout(r,0)); while(EXP.live&&!stop()) await new Promise(r=>setTimeout(r,300)); } /* beim Speichern pausieren */ else { const el=(performance.now()-t0)/1000, rest=el/(i+1)*(n-i-1); ghostProgress((i+1)/n,'Bild '+(i+1)+' / '+n+' · bei '+fmtS(GH.t0+e)+' · noch ca. '+Math.ceil(rest)+' s'); await new Promise(r=>setTimeout(r,0)); }
-    let Mv=M; while(!bg&&GH.paused&&!GH.abort&&GH.rewind==null){ // angehalten: Vorschau zeigen, Korrektur übernehmen
+    let Mv=M; while(!bg&&GH.paused&&!GH.abort){ // angehalten: Vorschau zeigen, Korrektur übernehmen
       await new Promise(r=>setTimeout(r,60));
       if(GH.peek!=null){ /* Klick in die Zeitleiste: Stelle nur ansehen, die Berechnung bleibt erhalten */ const j=clamp(GH.peek,0,S.length-1); GH.peek=null; if(pend){ await pend; pend=null; } GH.peekI=j; await seekPair(j*step); grab(); Mv=simToAff(S[j].p,W0,hA,W0,hB); }
       if(GH.fixApply){ const D=ovDMat(GH.fixApply,W0); GH.fixApply=null;
@@ -5055,7 +5047,6 @@ async function ghostCompute(opt){ // opt.resume: ab Bild opt.j mit fester Lage o
         const last=S[S.length-1]; last.p=p2; last.ok=true; last.M=null; prev={p:p2,M}; hist.length=0; fail=0; GH.paused=false; Mv=M; }
       drawLive(Mv); }
     if(!bg){ GH.peek=null; GH.peekI=null; }
-    if(!bg&&GH.rewind!=null) continue;
     i++;
   }
   if(pend){ try{ await pend; }catch(e){} pend=null; }
@@ -5191,28 +5182,7 @@ function tracksBuild(){ if(!GH.S||!GH.S.length||!GH.S.some(s=>s.ma)) { GH.trk=nu
   GH.trk={a:trackViterbi(GH.S,'ma',GH.W0,seeds.a),b:trackViterbi(GH.S,'mb',GH.W0,seeds.b)}; GH.trkAl={a:trkAlFull(GH.trk.a,GH.S,GH.W0),b:trkAlFull(GH.trk.b,GH.S,GH.W0)}; TGD.f=-1; autoGates(); }
 /* Rückstand an jedem Tor ohne Marker: rote Tore in A über die Kamerakette in Pistenkoordinaten sammeln (nur, was ≥ 0.5 s am gleichen Ort steht = Tor),
    dann für A und B den Moment der nächsten Vorbeifahrt bestimmen. Rückstand = Zeit B − Zeit A am selben Tor. */
-function autoGates(){ GH.autoGates=null; return; /* automatische Torerkennung entfernt (zu unzuverlässig, Wunsch Luca) */ const S=GH.S, N=S?S.length:0; if(N<8||!GH.trk) return; const st=GH.step||0.1, E=S.map(x=>x.e);
-  let Gm=[1,0,0,0,1,0]; const PA=[],PB=[],pts=[];
-  for(let i=0;i<N;i++){ if(i>0) Gm=affMul(Gm,affInv(S[i].q||[1,0,0,0,1,0])); const ta=gapTrk('a',i), tb=gapTrk('b',i); PA.push(ta?affApply(Gm,ta[0],ta[1]):null); PB.push(tb?affApply(Gm,tb[0],tb[1]):null);
-    if(S[i].ok&&!S[i].cut) (S[i].gt||[]).forEach(g=>{ const w=affApply(Gm,g[0],g[1]); pts.push([w[0],w[1],i,g[2]?1:0]); }); }
-  const R=GH.W0*0.022, cl=[]; for(const p of pts){ let c=null,bd=R; for(const q of cl){ const d=Math.hypot(q.x-p[0],q.y-p[1]); if(d<bd){ bd=d; c=q; } } if(!c){ c={x:p[0],y:p[1],n:0,np:0,ids:new Set()}; cl.push(c); } c.x=(c.x*c.n+p[0])/(c.n+1); c.y=(c.y*c.n+p[1])/(c.n+1); c.n++; c.np+=p[3]; c.ids.add(p[2]); }
-  const minN=Math.max(4,Math.round(0.5/st)), gates=cl.filter(c=>c.ids.size>=minN);
-  const pass=(P,g)=>{ let best=1e9,bt=null,bi=-1; for(let i=0;i<N-1;i++){ const a=P[i],b=P[i+1]; if(!a||!b) continue; const vx=b[0]-a[0], vy=b[1]-a[1], L2=vx*vx+vy*vy, u=L2>0?clamp(((g.x-a[0])*vx+(g.y-a[1])*vy)/L2,0,1):0, d=Math.hypot(a[0]+u*vx-g.x,a[1]+u*vy-g.y); if(d<best){ best=d; bt=E[i]+u*(E[i+1]-E[i]); bi=i; } }
-    if(best>=GH.W0*0.07) return null;
-    /* genauer: Fahrrichtung aus ±0.3 s, Abstand längs der Fahrrichtung über ±0.25 s als Gerade → Nulldurchgang (seitliches Zittern der Spur zählt nicht mehr) */
-    const w=Math.max(2,Math.round(0.3/st)), i0=Math.max(0,bi-w), i1=Math.min(N-1,bi+1+w); if(P[i0]&&P[i1]){ const dx=P[i1][0]-P[i0][0], dy=P[i1][1]-P[i0][1], L=Math.hypot(dx,dy);
-      if(L>GH.W0*0.01){ const ux=dx/L, uy=dy/L, h=Math.max(2,Math.round(0.25/st)); let n=0,st_=0,sd=0,stt=0,std=0; for(let k=Math.max(0,bi-h);k<=Math.min(N-1,bi+1+h);k++){ const p=P[k]; if(!p) continue; const d=(p[0]-g.x)*ux+(p[1]-g.y)*uy, t=E[k]; n++; st_+=t; sd+=d; stt+=t*t; std+=t*d; }
-        if(n>=4){ const den=n*stt-st_*st_, a=den?(n*std-st_*sd)/den:0, b0=(sd-a*st_)/n; if(a>0){ const tz=-b0/a; if(Math.abs(tz-bt)<0.3) bt=tz; } } } }
-    return {t:bt,d:best}; };
-  let res=[]; for(const g of gates){ const a=pass(PA,g), b=pass(PB,g); if(a&&b&&Math.abs(b.t-a.t)<4) res.push({x:g.x,y:g.y,tA:a.t,tB:b.t,gap:b.t-a.t,d:Math.max(a.d,b.d),pole:g.np>g.n/2}); }
-  res.sort((p,q)=>p.tA-q.tA); const out=[]; for(const r of res){ const l=out[out.length-1]; if(l&&r.tA-l.tA<0.35){ if(r.d<l.d) out[out.length-1]=r; continue; } out.push(r); } /* zwei Stangen eines Tors → eins */
-  /* Ausreisser weg: wo der laufende Rückstand bekannt ist, muss das Tor dazu passen; sonst nah am Median der übrigen Tore */
-  const ok2=[]; const md=out.length?out.map(r=>r.gap).sort((p,q)=>p-q)[out.length>>1]:0;
-  for(const r of out){ const c=typeof gapAt==='function'&&GH.gapE&&GH.gapE.length?gapAt(r.tA):null; if(c!=null?Math.abs(r.gap-c)<=0.25:(out.length>=3&&Math.abs(r.gap-md)<=0.4)){ if(r.pole&&c!=null) r.gap=(r.gap+c)/2; /* Slalom-Stange: Durchfahrt und laufender Rückstand gemittelt – halbiert das Zittern */ ok2.push(r); } /* ohne Bestätigung nur, wenn mehrere Tore übereinstimmen */ }
-  for(let guard=0;guard<20&&ok2.length>1;guard++){ let bad=-1; for(let i=1;i<ok2.length;i++){ const a=ok2[i-1], b=ok2[i]; if(Math.abs(b.gap-a.gap)>0.15+0.12*Math.abs(b.tA-a.tA)){ bad=i; break; } } if(bad<0) break;
-    const ref=g=>{ const c=typeof gapAt==='function'&&GH.gapE&&GH.gapE.length?gapAt(g.tA):null; if(c!=null) return c; const o=ok2.filter(x=>x!==g).map(x=>x.gap).sort((p,q)=>p-q); return o.length?o[o.length>>1]:g.gap; };
-    const a=ok2[bad-1], b=ok2[bad]; ok2.splice(Math.abs(a.gap-ref(a))>Math.abs(b.gap-ref(b))?bad-1:bad,1); } /* unmöglicher Sprung zwischen zwei Toren → das schlechter passende Tor weg */
-  GH.autoGates=ok2.length?ok2:null; }
+function autoGates(){ GH.autoGates=null; } /* automatische Torerkennung entfernt (zu unzuverlässig, Wunsch Luca) */
 // Deckkraft je Bild: bei Sprüngen und am Rand von Lücken sanft aus- und wieder einblenden, statt quer übers Bild zu gleiten
 function trkAlpha(T,S,W){ const N=T?T.length:0, al=new Float32Array(N); if(!N) return al; const bad=new Uint8Array(N);
   for(let i=0;i<N;i++){ if(!T[i]){ bad[i]=1; continue; } if(i&&T[i-1]){ const q=S[i].q||[1,0,0,0,1,0], pp=affApply(q,T[i-1][0],T[i-1][1]); if(Math.hypot(T[i][0]-pp[0],T[i][1]-pp[1])>W*0.08){ bad[i]=1; bad[i-1]=Math.max(bad[i-1],2); } } }
@@ -5272,12 +5242,6 @@ function gapAt(e,L){ const E=L?L.gapE:GH.gapE, V=L?L.gapV:GH.gapV; if(!E||!E.len
   let a=i; while(a>=0&&V[a]==null) a--; let b=i+1; while(b<E.length&&V[b]==null) b++;
   if(a>=0&&e-E[a]>0.6) a=-1; if(b<E.length&&E[b]-e>0.6) b=E.length;
   if(a<0&&b>=E.length) return null; if(a<0) return V[b]; if(b>=E.length) return V[a]; const f=clamp((e-E[a])/(E[b]-E[a]),0,1); return V[a]+(V[b]-V[a])*f; }
-function posBAt(e){ // Geist-Position: berechnete Bahn (zusammenhängend), sonst nächste bekannte Lage innerhalb 1 s
-  if(GH.trk&&GH.trk.b){ const T=GH.trk.b, q=trackAt(T,GH.step,e); if(q) return q; const i=Math.round(e/GH.step), r=Math.round(1/GH.step); for(let d=1;d<=r;d++){ const u=T[i-d]||T[i+d]; if(u) return u; } }
-  return posBAtOld(e); }
-function posBAtOld(e){ const S=GH.S; const x=clamp(e/GH.step,0,S.length-1), i=Math.floor(x); const P=s=>s.pb||s.cb; let a=i; while(a>=0&&!P(S[a])) a--; let b=i+1; while(b<S.length&&!P(S[b])) b++;
-  if(a<0&&b>=S.length) return null; if(a<0) return P(S[b]); if(b>=S.length) return P(S[a]);
-  const f=clamp((e-S[a].e)/(S[b].e-S[a].e),0,1), pa=P(S[a]), pb=P(S[b]); return [pa[0]+(pb[0]-pa[0])*f,pa[1]+(pb[1]-pa[1])*f]; }
 function paramsAt(e){ const S=GH.S; const x=clamp(e/GH.step,0,S.length-1), i=Math.floor(x), j=Math.min(S.length-1,i+1), f=x-i; return S[i].p.map((v,k)=>v+(S[j].p[k]-v)*f); }
 /* Lage B über A (A-Analyse-Pixel → B-Analyse-Pixel): affin verfeinert, wenn vorhanden, sonst Ähnlichkeit */
 function ovMatRaw(e){ const S=GH.S, x=clamp(e/GH.step,0,S.length-1), i=Math.floor(x), j=Math.min(S.length-1,i+1), f=x-i, a=S[i]&&S[i].M, b=S[j]&&S[j].M; if(a&&b) return a.map((v,k)=>v+(b[k]-v)*f); if(a&&f<0.5) return a; if(b&&f>=0.5) return b; return simToAff(paramsAt(e),GH.W0,GH.hA,GH.W0,GH.hB); }
@@ -5576,8 +5540,8 @@ function ovAligned(){ return ovActive()&&!OV.pick&&(!!OV.T||ovFollowOK())&&A.rea
 function ovDrawB(x,ox,oy,w,h){ // B ausgerichtet über ein A-Bild der Grösse w×h zeichnen (Export, Standbild)
   x.save(); x.beginPath(); x.rect(ox,oy,w,h); x.clip(); x.globalAlpha=+$('#opRange').value||0.5;
   if(OV.hideB){} else if(ovFollowOK()){ const e=ovTA()-GH.t0, rf=ovRefAt(e); let M=affMul(ovDMat(ovDAt(ovE()),GH.W0),affInv(ovMat(clamp(e,0,GH.eEnd)))); if(rf) M=affMul([1,0,rf[0],0,1,rf[1]],M); const sc=w/GH.W0, op=+$('#opRange').value||0.5, sB=B.xImg||B.v, sA=A.xImg||A.v;
-    const Wt=Math.max(2,Math.round(w)), Ht=Math.max(2,Math.round(h)), kk=Wt/GH.W0, Mt=[kk*M[0],kk*M[1],kk*M[2],kk*M[3],kk*M[4],kk*M[5]], sb=(OVS.edge||OVS.color||OVS.ghost)?ovsB(sB,sA,e,op,Mt,Wt,Ht):null; x.globalAlpha=(sb?sb.ga:op)*ovsFade(e);
-    if(sb){ x.setTransform(1,0,0,1,0,0); if(sb.mode) x.globalCompositeOperation=sb.mode; x.drawImage(sb.c,ox,oy,w,h); x.globalCompositeOperation='source-over'; ovsHalo(x,sb.halo,ox,oy,ovsFade(e)); } else { x.setTransform(sc*M[0],sc*M[3],sc*M[1],sc*M[4],sc*M[2]+ox,sc*M[5]+oy); x.drawImage(sB,0,0,GH.W0,GH.hB); } }
+    const Wt=Math.max(2,Math.round(w)), Ht=Math.max(2,Math.round(h)), kk=Wt/GH.W0, Mt=[kk*M[0],kk*M[1],kk*M[2],kk*M[3],kk*M[4],kk*M[5]], sb=(OVS.edge||OVS.color)?ovsB(sB,sA,e,op,Mt,Wt,Ht):null; x.globalAlpha=(sb?sb.ga:op)*ovsFade(e);
+    if(sb){ x.setTransform(1,0,0,1,0,0); if(sb.mode) x.globalCompositeOperation=sb.mode; x.drawImage(sb.c,ox,oy,w,h); x.globalCompositeOperation='source-over'; } else { x.setTransform(sc*M[0],sc*M[3],sc*M[1],sc*M[4],sc*M[2]+ox,sc*M[5]+oy); x.drawImage(sB,0,0,GH.W0,GH.hB); } }
   else { const k=w/A.v.videoWidth, M=OV.T; x.setTransform(k*M[0],k*M[3],k*M[1],k*M[4],k*M[2]+ox,k*M[5]+oy); x.drawImage(B.xImg||B.v,0,0,B.v.videoWidth,B.v.videoHeight); }
   x.restore(); x.save(); x.beginPath(); x.rect(ox,oy,w,h); x.clip(); layerDraw(x,ox,oy,w); x.restore(); tagsDrawTo(x,ox,oy,w,h); }
 /* Nutzungsanalyse (nur Admins): Passwort wird nochmals geprüft (Server: vlab_login + vlab_admins), Hash nur im Speicher dieser Seite */
@@ -5896,7 +5860,6 @@ function ovTrailRender(){ const c=ovTrailCanvas(), on=OVT.on&&ovActive()&&!OV.fi
 /* ---------- Namens-Pillen: folgen den Fahrer:innen im Overlay, ohne Fahrer oder die andere Pille zu überdecken ---------- */
 const TAGS={el:null,st:{a:{x:0,y:0,o:0,c:0},b:{x:0,y:0,o:0,c:0}}};
 const TSIDE={}; // Seite je Pillen-Paar merken: erst wechseln, wenn die Fahrer:innen deutlich die Seite tauschen (kein Hin und Her)
-function tagSide(k,dx,m){ const pv=TSIDE[k]; const r=pv==null?dx>=0:pv?dx>-m:dx>m; TSIDE[k]=r; return r; }
 function lastName(c){ if(!c) return ''; const n=c.meta&&c.meta.ok&&c.meta.athlete?c.meta.athlete:base(c.name).split(/[_\s\-·]+/)[0]; const w=n.trim().split(/\s+/); const l=w[w.length-1]||n; return l.charAt(0).toUpperCase()+l.slice(1); }
 function posAt(e,k,fb,L){ const S=L?L.S:GH.S, step=L?L.step:GH.step; if(!S||!S.length||!(step>0)||!isFinite(e)) return null; const x=clamp(e/step,0,S.length-1), i=Math.floor(x);
   let a=i; while(a>=0&&!S[a][k]) a--; let b=i+1; while(b<S.length&&!S[b][k]) b++;
@@ -5948,47 +5911,8 @@ function ovTags(on){
 /* Verfolgung: Vorhersage aus Tempo/Richtung, nur Treffer im engen Fenster um die Vorhersage (Rutscher & Zuschauer fallen weg) */
 const TGD={a:document.createElement('canvas'),b:document.createElement('canvas'),t:0,f:-1};
 const TRK={}; TAGS.live={}; TAGS.path={}; TAGS.seed=null;
-function trkPrior(it){ const e=it.L?ovTA()-it.L.t0:ovE(); if(it.L&&(e<0||e>it.L.eEnd)) return null; const p=posAt(e,it.pk,null,it.L); return p?[p[0]/(it.L?it.L.W0:GH.W0),p[1]/(it.L?it.L.hA:GH.hA)]:null; }
-function pathAt(k,fr,tol){ const P=TAGS.path[k]; if(!P) return null; for(let d=0;d<=tol;d++){ const q=P.get(fr-d)||P.get(fr+d); if(q) return q; } return null; }
-function trkStep(k,list,W,H,it){
-  const mt=A.v.currentTime, fr=A.frame; let T=TRK[k];
-  if(T&&Math.abs(mt-T.t)>0.6) T=TRK[k]=null; // Sprung in der Zeitleiste
-  if(!T){ const q=pathAt(k,fr,3); if(q){ T=TRK[k]={u:q[0],v:q[1],du:0,dv:0,t:mt,miss:0,ok:true}; } }
-  if(!T){ // automatisch fassen: grösster bewegter Fleck, der zweimal hintereinander am gleichen Ort auftaucht
-    const big=list.filter(b=>b.a>=5).sort((x,y)=>y.a-x.a)[0], C=TAGS.cand||(TAGS.cand={}); if(!big){ C[k]=null; return; }
-    const u=big.x/W, v=big.y/H, c=C[k]; if(c&&Math.hypot(u-c.u,(v-c.v)*H/W)<0.05){ c.n++; c.u=u; c.v=v; } else C[k]={u,v,n:1};
-    if(C[k].n>=2){ T=TRK[k]={u,v,du:0,dv:0,t:mt,miss:0,ok:true}; C[k]=null; } else return; }
-  const dt=clamp(mt-T.t,-0.3,0.3); T.t=mt; const pu=T.u+T.du*dt, pv=T.v+T.dv*dt, gate=0.025+0.012*Math.min(T.miss,4)+Math.abs(dt)*0.08;
-  let best=null,bs=-1; for(const b of list){ if(b.a<3) continue; const d=Math.hypot(b.x/W-pu,(b.y/H-pv)*H/W); if(d>gate) continue; const sc=b.a*Math.exp(-d/(gate*0.5)); if(sc>bs){ bs=sc; best=b; } }
-  if(best){ const ru=best.x/W-pu, rv=best.y/H-pv; T.u=pu+ru*0.6; T.v=pv+rv*0.6; if(Math.abs(dt)>0.01){ T.du=clamp(T.du+ru/dt*0.25,-1.5,1.5); T.dv=clamp(T.dv+rv/dt*0.25,-1.5,1.5); } T.miss=0; }
-  else { T.u=pu; T.v=pv; T.miss++; T.du*=0.9; T.dv*=0.9; if(T.miss>15){ TRK[k]=null; return; } }
-  if(!TAGS.path[k]) TAGS.path[k]=new Map(); if(T.miss<3) TAGS.path[k].set(fr,[T.u,T.v]); }
 /* Bewegung statt Unterschied: Fahrer:innen bewegen sich schnell, Zuschauer stehen, Rutscher sind langsam. Kamerabewegung wird herausgerechnet. */
 const MOV={W:360,prev:null,tmp:document.createElement('canvas')};
-function grayData(id){ const d=id.data, n=d.length>>2, g=new Float32Array(n); for(let i=0,j=0;i<n;i++,j+=4) g[i]=0.299*d[j]+0.587*d[j+1]+0.114*d[j+2]; return g; }
-function tagsDetect(items){
-  const now=performance.now(), fr=A.frame; if(A.v.paused?fr===TGD.f:now-TGD.t<70) return;
-  if(!A.v.videoWidth||A.v.readyState<2||A.v.seeking) return;
-  TGD.t=now; TGD.f=fr; const bBusy=B.clip&&(B.v.seeking||B.v.readyState<2);
-  const W=MOV.W, H=Math.round(W*A.v.videoHeight/A.v.videoWidth), n=W*H, sc=W/GH.W0, mt=A.v.currentTime;
-  const mk=()=>{ const c=document.createElement('canvas'); c.width=W; c.height=H; return c; };
-  const cur={t:mt,a:mk(),b:{}}; cur.a.getContext('2d').drawImage(A.v,0,0,W,H);
-  for(const it of items){ if(it.k==='a') continue; const L=it.L, v=L?L.v:B.v; if(!v||v.readyState<2||v.seeking||(!L&&bBusy)) continue;
-    let M; if(L){ const e=ovTA()-L.t0; if(e<0||e>L.eEnd) continue; M=affInv(simToAff(paramsAtL(L,clamp(e,0,L.eEnd)),L.W0,L.hA,L.W0,L.hB)); }
-    else { M=affMul(ovDMat(ovDAt(ovE()),GH.W0),affInv(ovMat(clamp(ovE(),0,GH.eEnd)))); }
-    const c=mk(), x=c.getContext('2d'); x.setTransform(sc*M[0],sc*M[3],sc*M[1],sc*M[4],sc*M[2],sc*M[5]); x.drawImage(v,0,0,GH.W0,L?L.hB:GH.hB); cur.b[it.k]=c; }
-  const P=MOV.prev; MOV.prev=cur;
-  if(!P) return; const dt=mt-P.t; if(Math.abs(dt)<0.02||Math.abs(dt)>0.45) return; // zu nah / zu weit auseinander für eine Bewegungsmessung
-  // Kamerabewegung vorher → jetzt aus den beiden A-Bildern bestimmen
-  const ga=grayData(cur.a.getContext('2d').getImageData(0,0,W,H)), gp=grayData(P.a.getContext('2d').getImageData(0,0,W,H));
-  const r=align(pyramid(gp,W,H,3),pyramid(ga,W,H,3),[0,0,0,0,0],false,1); const Q=r&&r.ok&&r.inl>0.3?simToAff(r.p,W,H,W,H):[1,0,0,0,1,0];
-  const T=MOV.tmp; if(T.width!==W||T.height!==H){ T.width=W; T.height=H; } const tx=T.getContext('2d',{willReadFrequently:true});
-  const warp=c=>{ tx.setTransform(1,0,0,1,0,0); tx.clearRect(0,0,W,H); tx.setTransform(Q[0],Q[3],Q[1],Q[4],Q[2],Q[5]); tx.drawImage(c,0,0); tx.setTransform(1,0,0,1,0,0); return tx.getImageData(0,0,W,H).data; };
-  const motion=(curC,prevC)=>{ const a=curC.getContext('2d').getImageData(0,0,W,H).data, b=warp(prevC), m=new Uint8Array(n);
-    for(let i=0,j=0;i<n;i++,j+=4){ if(a[j+3]<200||b[j+3]<200) continue; const d=Math.abs(0.299*(a[j]-b[j])+0.587*(a[j+1]-b[j+1])+0.114*(a[j+2]-b[j+2])); if(d>26) m[i]=1; }
-    return blobs(morph(m,W,H,true),W,H,4).filter(bb=>bb.a<n*0.01); };
-  trkStep('a',motion(cur.a,P.a),W,H,items[0]);
-  for(const it of items){ if(it.k==='a'||!cur.b[it.k]||!P.b[it.k]) continue; trkStep(it.k,motion(cur.b[it.k],P.b[it.k]),W,H,it); } }
 /* Pille auf die richtige Person ziehen */
 function tagDrag(el){
   el.addEventListener('pointerdown',e=>{ e.stopPropagation(); e.preventDefault(); const k=el.dataset.k, S0=TAGS.st[k]; if(!S0) return;
@@ -6089,7 +6013,7 @@ function renderLayers(){
   const x=cv.getContext('2d'); x.setTransform(1,0,0,1,0,0); x.clearRect(0,0,Wc,Hc); layerDraw(x,0,0,Wc); }
 
 /* ---------- Overlay-Darstellung: weiche Ränder, Farbe angleichen, Geist-Look, ruhige Kamera, weich einblenden ---------- */
-const OVS={edge:true,color:true,ghost:false,stab:true,fade:true}; /* fest: weiche Ränder, Farbe angleichen, Ruhige Kamera, weich einblenden */
+const OVS={edge:true,color:true,stab:true,fade:true}; /* fest: weiche Ränder, Farbe angleichen, Ruhige Kamera, weich einblenden */
 const OVB={cv:null,x:null,fe:null,fw:0,fh:0,gc:null,gx:null,sA:null,sB:null,g:[1,1,1],ge:null};
 function ovsFeather(W,H){ if(OVB.fe&&OVB.fw===W&&OVB.fh===H) return OVB.fe; const c=document.createElement('canvas'); c.width=W; c.height=H; const x=c.getContext('2d'), im=x.createImageData(W,H), d=im.data, F=Math.max(4,Math.round(Math.min(W,H)*0.09));
   for(let y=0;y<H;y++) for(let i=0;i<W;i++){ const e=Math.min(i,y,W-1-i,H-1-y)/F, a=e>=1?1:e*e*(3-2*e); d[(y*W+i)*4+3]=Math.round(255*a); } x.putImageData(im,0,0); OVB.fe=c; OVB.fw=W; OVB.fh=H; return c; }
@@ -6113,12 +6037,7 @@ function ovsB(srcB,srcA,e,op,Mt,Wt,Ht){ const sw=srcB.videoWidth||srcB.displayWi
   x.setTransform(1,0,0,1,0,0); x.globalCompositeOperation='source-over';
   let ga=op, mode=null;
   
-  if(OVS.ghost){ /* 3) Geist-Look: Hintergrund von B zurückhaltender, die Fahrer:in B mit einem weichen violetten Schein markiert (ohne harte Masken – die würden bei nicht ganz deckungsgleichem Hintergrund Flecken erzeugen) */
-    ga=clamp(op*0.85,0.08,0.85); const TB=typeof tagFused==='function'?tagFused('b'):null, qb=TB?trackSmoothAt(TB.T,GH.step,e,0.25):null;
-    if(qb){ let rW=GH.W0*0.03; const si=GH.S&&GH.S[clamp(Math.round(e/GH.step),0,GH.S.length-1)], L=si&&si.mb; if(L){ let bd=GH.W0*0.06,ba=0; for(const m of L){ const d=Math.hypot(m[0]-qb[0],m[1]-qb[1]); if(d<bd){ bd=d; ba=m[2]; } } if(ba) rW=clamp(Math.sqrt(ba)*1.2,GH.W0*0.018,GH.W0*0.05); }
-      const kk=Wt/GH.W0; S.halo={x:qb[0]*kk,y:qb[1]*kk,r:rW*kk*2.2}; } else S.halo=null; } else S.halo=null;
-  return {c,ga,halo:S.halo,mode}; }
-function ovsHalo(x,h,ox,oy,a){ return; /* violetter Schein entfernt (Wunsch Luca) */ if(!h||!(a>0.01)) return; x.save(); x.setTransform(1,0,0,1,0,0); const g=x.createRadialGradient(ox+h.x,oy+h.y,h.r*0.25,ox+h.x,oy+h.y,h.r); g.addColorStop(0,'rgba(139,92,246,0)'); g.addColorStop(0.45,'rgba(150,108,255,'+(0.34*a).toFixed(3)+')'); g.addColorStop(1,'rgba(139,92,246,0)'); x.fillStyle=g; x.globalCompositeOperation='screen'; x.fillRect(ox+h.x-h.r,oy+h.y-h.r,2*h.r,2*h.r); x.restore(); }
+  return {c,ga,mode}; }
 function ovsFade(e){ if(!OVS.fade) return 1; const a=clamp(e/0.6,0,1); return a*a*(3-2*a); }
 /* Ruhige Kamera: Kameraweg von A (Bildmitte in Pistenkoordinaten) über ±0.6 s glätten; Bild um die Differenz verschieben, leicht vergrössert (keine Ränder) */
 function ovStabBuild(){ const S=GH.S, n=S?S.length:0; if(n<3) return null; const key=GH.key+'|'+n+'|'+GH.step; if(GH._st&&GH._st.key===key) return GH._st;
@@ -6181,10 +6100,10 @@ function renderOv(){
   if(cv.width!==Wc||cv.height!==Hc){ cv.width=Wc; cv.height=Hc; }
   const x=cv.getContext('2d'); x.setTransform(1,0,0,1,0,0); x.clearRect(0,0,Wc,Hc); x.globalAlpha=+$('#opRange').value||0.5;
   preSync(); if((OV.hideB&&!OV.fix)||PRE.on){} else if(ovFollowOK()){ const e=ovE(), rf=ovRefAt(e); let M=affMul(ovDMat(ovDAt(e),GH.W0),affInv(ovMat(clamp(e,0,GH.eEnd)))); if(rf) M=affMul([1,0,rf[0],0,1,rf[1]],M); { const tf=ovTimeFix(e); if(tf) M=affMul([1,0,tf[0],0,1,tf[1]],M); } const sc=Wc/GH.W0, op=+$('#opRange').value||0.5;
-    const Mt=[sc*M[0],sc*M[1],sc*M[2],sc*M[3],sc*M[4],sc*M[5]], sb=(OVS.edge||OVS.color||OVS.ghost)&&B.v.readyState>=2&&A.v.readyState>=2?ovsB(B.v,A.v,e,op,Mt,Wc,Hc):null; x.globalAlpha=(sb?sb.ga:op)*ovsFade(e);
+    const Mt=[sc*M[0],sc*M[1],sc*M[2],sc*M[3],sc*M[4],sc*M[5]], sb=(OVS.edge||OVS.color)&&B.v.readyState>=2&&A.v.readyState>=2?ovsB(B.v,A.v,e,op,Mt,Wc,Hc):null; x.globalAlpha=(sb?sb.ga:op)*ovsFade(e);
     { const mb=sb&&sb.mode?sb.mode:''; if(cv.style.mixBlendMode!==mb) cv.style.mixBlendMode=mb; }
     
-    if(sb){ x.setTransform(1,0,0,1,0,0); x.drawImage(sb.c,0,0); ovsHalo(x,sb.halo,0,0,ovsFade(e)); } else { x.setTransform(sc*M[0],sc*M[3],sc*M[1],sc*M[4],sc*M[2],sc*M[5]); x.drawImage(B.v,0,0,GH.W0,GH.hB); } }
+    if(sb){ x.setTransform(1,0,0,1,0,0); x.drawImage(sb.c,0,0); } else { x.setTransform(sc*M[0],sc*M[3],sc*M[1],sc*M[4],sc*M[2],sc*M[5]); x.drawImage(B.v,0,0,GH.W0,GH.hB); } }
   else { if(cv.style.mixBlendMode) cv.style.mixBlendMode=''; const k=Wc/A.v.videoWidth, M=OV.fix?affMul(ovDMat(OV.fix,A.v.videoWidth),OV.T):OV.T; x.setTransform(k*M[0],k*M[3],k*M[1],k*M[4],k*M[2],k*M[5]); x.drawImage(B.v,0,0,B.v.videoWidth,B.v.videoHeight); }
   x.setTransform(1,0,0,1,0,0); x.globalAlpha=1;
   $('#viewCmp').classList.toggle('ov-fixing',!!OV.fix); A.stage.classList.toggle('ov-fixstage',!!OV.fix);
@@ -6834,7 +6753,6 @@ function gpsNow(){ const c=GD.clip, tr=trackOf(c); if(!tr||!GD.ready) return nul
 
 /* ---------- Farben ---------- */
 function speedCol(v,vmin,vmax){ const f=clamp((v-vmin)/Math.max(0.1,vmax-vmin),0,1); const stops=[[169,210,238],[106,174,221],[47,120,191],[26,79,150],[14,47,102]]; /* langsam hellblau → schnell dunkelblau (wie Tacho/Karte) */ const x=f*(stops.length-1), i=Math.min(stops.length-2,Math.floor(x)), u=x-i; const c=stops[i].map((v,k)=>Math.round(v+(stops[i+1][k]-v)*u)); return `rgb(${c})`; }
-function accCol(a,alpha=1){ const m=clamp(Math.abs(a)/0.4,0.25,1); return a>=0?`rgba(52,199,89,${alpha*m})`:`rgba(255,69,58,${alpha*m})`; }
 function fmtD(x,d=2){ return (x<=0?'−':'+')+Math.abs(x).toFixed(d); }
 
 /* ---------- Overlay auf dem Video ---------- */
@@ -7257,9 +7175,6 @@ function editNote(f){
   inp.addEventListener('keydown',e=>{ e.stopPropagation(); if(e.key==='Enter') fin(true); else if(e.key==='Escape') fin(false); });
   inp.addEventListener('blur',()=>fin(true));
 }
-function jumpMarker(d,dir){ if(!d||!d.ready) return; const m=d.clip.markers; if(!m.length){ toast('Noch keine Marker – mit m setzen.',1500); return; }
-  const f=dir>0?m.find(x=>x>d.frame):[...m].reverse().find(x=>x<d.frame); if(f==null){ toast(dir>0?'Letzter Marker':'Erster Marker',900); return; }
-  d.pause(); d.seekFrame(f,true); const n=markerNote(d.clip,f); toast('Marker F '+f+(n?' · '+n:''),1400); }
 
 /* ---------- Hilfsraster ---------- */
 function drawGrid(ctx,R){
@@ -7956,7 +7871,6 @@ async function ftRestore(){
 async function ftUnlock(r){ if(await ftPerm(r.h,true)){ r.ok=true; await ftLoad(r); ftRender(); } }
 function ftRemoveRoot(r){ FT.roots=FT.roots.filter(x=>x!==r); if(r.key) idbDel(r.key); ftRender(); toast('Ordner «'+r.name+'» getrennt (Dateien bleiben unverändert).'); }
 function ftFind(pred,nodes=FT.roots){ for(const n of nodes){ if(pred(n)) return n; if(n.children){ const r=ftFind(pred,n.children); if(r) return r; } } return null; }
-function ftPath(n){ const p=[]; while(n){ p.unshift(n.name); n=n.parent; } return p.join(' / '); }
 
 /* ---------- Öffnen ---------- */
 function clipOfNode(node){ return clips.find(c=>c._node===node)||null; }
@@ -8505,7 +8419,7 @@ if(false&&!LS.get('hint1',0)){ setTimeout(()=>{ toast(matchMedia('(pointer:coars
 
 /* Update-Hinweis: prüft version.json auf GitHub Pages; «Aktualisieren» lädt die Seite ohne Cache neu */
 (()=>{
-  const BUILD='20261103185154'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
+  const BUILD='20261103210717'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
   // nach einem Update die ?v=… aus der Adresse entfernen
   try{ const u=new URL(location.href); if(u.searchParams.has('v')){ u.searchParams.delete('v'); history.replaceState(null,'',u.pathname+(u.search||'')+u.hash); } }catch(e){}
   const el=$('#upd'); let latest=null, snoozed=null, busy=false;
@@ -8566,12 +8480,7 @@ async function preOvLoad(){ if(PRE_OV) return PRE_OV; try{ const r=await fetch('
     cur.classList.add('drag'); const t0=d.time(), n=Math.max(6,Math.round(ms/160));
     for(let k=1;k<=n&&!stopped();k++){ const f=k/n, e=f<.5?2*f*f:1-Math.pow(-2*f+2,2)/2; d.seekTime(t0+(t-t0)*e); if(d.onUserSeek&&G.linked) d.onUserSeek(d); cur.style.transition='none'; cur.style.left=(x0-r.width*0.22*e)+'px'; await sleep(ms/n); }
     d.seekTime(t); if(d.onUserSeek&&G.linked) d.onUserSeek(d); cur.classList.remove('drag'); await sleep(400); }
-  async function tapVideo(d,px,py){ // Punkt im Video antippen (Videopixel)
-    const r=d.stage.getBoundingClientRect(), R=d.rect(), z=d.z, x=r.left+z.x+(R.x+px/d.v.videoWidth*R.w)*z.s, y=r.top+z.y+(R.y+py/d.v.videoHeight*R.h)*z.s;
-    await moveTo(x,y,600); if(stopped()) return; await tap();
-    $('#cStages').dispatchEvent(new PointerEvent('pointerdown',{clientX:x,clientY:y,bubbles:true,cancelable:true,pointerId:1}));
-    await sleep(420); }
-  const stage='#cStages', tlA=()=>A.cv, tlB=()=>B.cv;
+    const stage='#cStages', tlA=()=>A.cv, tlB=()=>B.cv;
   const rectOf=(...els)=>()=>{ const rs=els.map(f=>(typeof f==='function'?f():$(f))).filter(Boolean).map(e=>e.getBoundingClientRect()); if(!rs.length) return null;
     const l=Math.min(...rs.map(r=>r.left)),t=Math.min(...rs.map(r=>r.top)),R=Math.max(...rs.map(r=>r.right)),b=Math.max(...rs.map(r=>r.bottom)); return {left:l,top:t,right:R,bottom:b,width:R-l,height:b-t}; };
 
