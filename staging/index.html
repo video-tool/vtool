@@ -72,7 +72,9 @@ padding:env(safe-area-inset-top,0px) env(safe-area-inset-right,0px) env(safe-are
 #gate .g-fi svg{width:18px;height:18px}
 #gate .g-feat b{display:block;font-size:13.5px;font-weight:650;letter-spacing:-.01em}
 #gate .g-feat span{display:block;font-size:12.5px;color:var(--muted);line-height:1.35;margin-top:2px}
-#gate .g-feat.g-small.g-loc{grid-column:span 6}
+#gate .g-feat.g-small.g-sm4{grid-column:span 4}
+#gate .g-feat.g-small b{white-space:nowrap}
+#gate .g-feat.g-small.g-loc{grid-column:span 5}
 #gate .g-feat.g-loc .g-fi{background:color-mix(in srgb,var(--good) 14%,transparent);color:var(--good)}
 #gate .g-card{background:var(--card);border:1px solid var(--line);border-radius:24px;box-shadow:var(--shadow);overflow:hidden}
 #gate .g-stage{position:relative;height:224px;background:#0f1216;overflow:hidden}
@@ -1208,6 +1210,9 @@ svg.ic{width:15px;height:15px;flex:none;vertical-align:-2px;margin-right:5px}
 .zoomer canvas.ovb{position:absolute;pointer-events:none}
 .zoomer video.ovpre{position:absolute;pointer-events:none;object-fit:fill;background:transparent}
 .zoomer video.ovpre[hidden]{display:none}
+.ctl.play.ov-pv{width:auto!important;min-width:132px!important;height:46px!important;border-radius:23px!important;padding:0 20px 0 16px!important;display:inline-flex!important;align-items:center;justify-content:center;gap:8px;font:inherit;font-size:14px;font-weight:700;color:#fff!important;white-space:nowrap}
+.ctl.play.ov-pv::after{border-radius:27px}
+.ctl.play.ov-pv svg{width:18px!important;height:18px!important}
 @media (max-width:600px){
   .ov-b span{display:none}
   .ov-b svg.ic{margin:0}
@@ -3070,13 +3075,12 @@ header .btn-cam svg circle:last-child{animation:camDot 2s ease-in-out infinite}
       <h1>Bild für Bild.<br><em>Jede Bewegung im Blick.</em></h1>
       <p class="g-lead">Ski-Videos verlangsamen, übereinanderlegen und vermessen – direkt im Browser, am Laptop und am Handy.</p>
       <ul class="g-feats">
-        <li class="g-feat g-main"><div class="g-fi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="13" height="11" rx="2"/><rect x="8" y="9" width="13" height="11" rx="2" fill="currentColor" fill-opacity=".18"/></svg></div><div><b>Overlay mit Rückstand</b><span>Zwei Läufe in einem Bild, Zeit an jedem Tor</span></div></li>
+        <li class="g-feat"><div class="g-fi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="13" height="11" rx="2"/><rect x="8" y="9" width="13" height="11" rx="2" fill="currentColor" fill-opacity=".18"/></svg></div><div><b>Overlay</b><span>Zwei Läufe in einem Bild</span></div></li>
         <li class="g-feat"><div class="g-fi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="9" height="12" rx="2"/><rect x="13" y="6" width="9" height="12" rx="2"/></svg></div><div><b>Side-by-Side</b><span>Synchron abspielen, Bild für Bild</span></div></li>
         <li class="g-feat"><div class="g-fi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M10 9l5 3-5 3z" fill="currentColor"/></svg></div><div><b>Einzelvideo</b><span>Zeitlupe und Bild für Bild</span></div></li>
         <li class="g-feat"><div class="g-fi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="5" cy="16" r="2"/><circle cx="10" cy="11.5" r="2" opacity=".75"/><circle cx="15" cy="9" r="2" opacity=".55"/><circle cx="20" cy="8" r="2" opacity=".35"/></svg></div><div><b>Strobo</b><span>Bewegungsfolge als ein Bild</span></div></li>
-        <li class="g-feat"><div class="g-fi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20l5-5"/><path d="M14.5 4.5l5 5L10 19H5v-5z"/><path d="M4 4h4M4 4v4"/></svg></div><div><b>Zeichnen und Messen</b><span>Linien, Winkel und Zeiten im Video</span></div></li>
+        <li class="g-feat g-small g-sm4"><div class="g-fi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20l5-5"/><path d="M14.5 4.5l5 5L10 19H5v-5z"/><path d="M4 4h4M4 4v4"/></svg></div><div><b>Zeichnen und Messen</b><span>Linien, Winkel und Zeiten im Video</span></div></li>
         <li class="g-feat g-small"><div class="g-fi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.2 7-11.5A7 7 0 0 0 5 9.5C5 14.8 12 21 12 21z"/><path d="M8.5 10.5l2.2-2 1.8 2.6 3-3.6"/></svg></div><div><b>GPS mit innove</b><span>Tempo und Zeitverlust zum Video</span></div></li>
-        <li class="g-feat g-small"><div class="g-fi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="3.6" fill="currentColor" stroke="none"/></svg></div><div><b>Feld-App</b><span>Am Hang filmen, sauber benannt</span></div></li>
         <li class="g-feat g-small g-loc"><div class="g-fi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></div><div><b>Videos bleiben auf dem Gerät</b><span>Kein Upload, keine Cloud – geöffnet wird nur lokal im Browser</span></div></li>
       </ul>
     </div>
@@ -4350,7 +4354,8 @@ function vpOpen(sel,title,badge,col,anchor){ const cur=sel.value, other=sel.id==
   sel.addEventListener('keydown',e=>{ if(VP_ON()&&(e.key===' '||e.key==='Enter')){ e.preventDefault(); vpOpen(sel,t,bd,col); } }); });
 $('#selA').addEventListener('change',e=>{ A.setClip(clips.find(c=>c.id==e.target.value)||null); CF.k=null; unlink(); renderLib(); });
 $('#selB').addEventListener('change',e=>{ B.setClip(clips.find(c=>c.id==e.target.value)||null); CF.k=null; unlink(); renderLib(); });
-function cmpPlayIcon(){ $('#viewCmp .ctl.play').innerHTML=(!A.v.paused||!B.v.paused)?ICON.pause:ICON.play; }
+function cmpPlayIcon(){ const b=$('#viewCmp .ctl.play'), pl=!A.v.paused||!B.v.paused, pv=typeof ovActive==='function'&&ovActive()&&ovFollowOK()&&!OV.fix; /* fertiges Overlay: «Vorschau» statt Play */
+  const lab=!pv?'':pl?'Pause':(OV.pvAt!=null&&Math.abs(A.time()-OV.pvAt)<0.05)?'Weiter':PRE.state==='run'?'Vorschau · '+Math.round(PRE.p*100)+' %':'Vorschau', h=(pl?ICON.pause:ICON.play)+(lab?'<span>'+lab+'</span>':''); if(b._h!==h){ b.innerHTML=h; b._h=h; b.classList.toggle('ov-pv',pv); b.title=pv?'Overlay so anschauen, wie es exportiert würde':''; } }
 A.onChange=B.onChange=()=>{ cmpPlayIcon(); cmpMeta(); updSync(); splitsUI(); fxUI(); if(typeof cfUI==='function') cfUI(); };
 function cfTlOwn(d){ /* Schloss zu → eine gemeinsame Zeitleiste bewegt A und B; einzeln verschieben nur mit offenem Schloss */ return false; }
 A.onUserSeek=d=>{ if(cfTlOwn(d)) return; if(G.linked&&B.ready) B.seekTime(d.time()+G.off); updSync(); splitsUI(); };
@@ -4395,7 +4400,7 @@ function cmpStep(n){ if(CF.k&&cfOk()){ (CF.k==='a'?A:B).step(n); updSync(); retu
 function cmpToggle(){
   const playing=!A.v.paused||!B.v.paused;
   if(!playing&&!OV.inPrev&&typeof ovFollowOK==='function'&&ovActive()&&ovFollowOK()) return ovPrevStart(); // fertiges Overlay: ab Start, Halt am Ende
-  if(playing){ A.pause(); B.pause(); G.playing=false; return; }
+  if(playing){ if(typeof ovActive==='function'&&ovActive()&&ovFollowOK()) OV.pvAt=A.time(); A.pause(); B.pause(); G.playing=false; return; }
   if(G.waitPlay){ G.waitPlay=false; demoPill(); return; } /* nochmals gedrückt = Warten abbrechen */
   { const pf=[A,B].map(d=>d.clip&&d.clip._pf&&d.clip._pct<100?d.clip._pf:null).filter(Boolean); if(pf.length){ G.waitPlay=true; toast('Videos werden geladen – startet automatisch, sobald beide bereit sind.',2600); Promise.all(pf).then(()=>{ const t0=performance.now(), go=()=>{ if(!G.waitPlay) return; if((A.v.readyState<3||B.v.readyState<3||A.v.seeking||B.v.seeking)&&performance.now()-t0<6000) return setTimeout(go,120); G.waitPlay=false; cmpToggle(); }; setTimeout(go,150); }); return; } } /* erst abspielen, wenn beide da sind */
   if(CF.k&&cfOk()){ (CF.k==='a'?A:B).play(); return; } /* nur das angeklickte Video */
@@ -5376,7 +5381,7 @@ function preSync(){ if(!PRE.on) return; if(A.v.paused||!preOK()){ if(!A.v.paused
 function ovPrevStart(){ // Overlay vom Start des Ausschnitts (bzw. der Berechnung) abspielen
   if(!A.v.paused||!B.v.paused){ cmpToggle(); cmpPlayIcon(); ovUI(); return; }
   const t0=OV.cut.a!=null?OV.cut.a:(GH.state==='ready'?GH.t0:ovT0()), t1=OV.cut.b!=null?OV.cut.b:(GH.state==='ready'?GH.t0+GH.eEnd:A.dur);
-  const now=A.time(), here=now>=t0-0.02&&now<t1-0.3, t=here?now:t0; // innerhalb von Start/Ende: dort weiter, sonst ab Start
+  const now=A.time(), here=OV.pvAt!=null&&Math.abs(now-OV.pvAt)<0.05&&now>=t0-0.02&&now<t1-0.3, t=here?now:t0; OV.pvAt=null; // nach Pause: «Weiter» an derselben Stelle, sonst die ganze Vorschau ab Start
   const go=()=>{ OV.inPrev=true; try{ cmpToggle(); }finally{ OV.inPrev=false; } cmpPlayIcon(); ovUI(); OV.prevEnd=t1; };
   if(here) return go(); A.seekTime(Math.max(0,t)); A.onUserSeek&&A.onUserSeek(A); setTimeout(go,160); }
 function ovBtn(id,label,icon,cls,title){ return `<button class="ov-b ${cls||''}" data-ov="${id}" ${title?`title="${title}"`:''}>${icon||''}<span>${label}</span></button>`; }
@@ -6303,7 +6308,7 @@ function renderOv(){
   document.addEventListener('keydown',e=>{ if(e.key==='Escape'&&(OV.more||OV.svm)){ OV.more=false; OV.svm=false; ovUI(); return; } if(e.key==='Escape'&&OV.pick){ e.stopPropagation(); ovStop(); } },true);
   document.addEventListener('pointerdown',e=>{ if((OV.more||OV.svm)&&!e.target.closest('.ov-morew')){ OV.more=false; OV.svm=false; ovUI(); } });
   addEventListener('resize',ovMarks);
-  setInterval(()=>{ if(ovActive()&&(OV.follow||!G.linked)) ovUI(); preTick(); },400);
+  setInterval(()=>{ if(ovActive()&&(OV.follow||!G.linked)) ovUI(); preTick(); if(mode==='cmp') cmpPlayIcon(); },400);
 
   setInterval(()=>{ if(OV.prevEnd==null) return; const pl=!A.v.paused||!B.v.paused; if(!pl){ OV.prevAt=A.time(); return; }
     if(OV.cut.b==null&&A.time()>=OV.prevEnd-0.02){ cmpToggle(); cmpPlayIcon(); OV.prevEnd=null; OV.prevAt=null; ovUI(); } },80);
@@ -8269,7 +8274,7 @@ const COACHES=[
   {id:'tools',sel:'#btnTools',when:()=>mode==='cmp'&&!$('#viewCmp').classList.contains('overlay'),t:'Zeitmessung, Abschnitte und Zeichnen findest du hier. A und B einzeln verschieben: ins Video klicken.'},
   {id:'ovnext',sel:'[data-ov="sync"]',when:()=>mode==='cmp',t:'A und B einzeln zum selben Tor ziehen, dann «Weiter».'},
   {id:'ovmake',sel:'[data-ov="make"]',when:()=>mode==='cmp'&&!(OV.follow&&GH.state==='busy'),t:'Ein Klick – B wird über A gelegt und folgt der Kamera.'},
-  {id:'ovprev',sel:'#viewCmp .ctl.play',when:()=>mode==='cmp'&&ovFollowOK(),t:'Abspielen läuft von Start bis Ende. Liegt B daneben: anhalten und «Korrigieren».'},
+  {id:'ovprev',sel:'#viewCmp .ctl.play',when:()=>mode==='cmp'&&ovFollowOK(),t:'«Vorschau» zeigt das Overlay von Start bis Ende, wie es exportiert würde. Liegt B daneben: anhalten und «Neu legen».'},
   {id:'ovleg',sel:'.vchip.has-eye .vc-eye',when:()=>mode==='cmp'&&ovFollowOK()&&!!LS.get('coach:ovprev',0),t:'Auge = Lauf ein- oder ausblenden. Gilt auch beim Speichern.'},
   {id:'ovsave',sel:'[data-ov="save"]',when:()=>mode==='cmp'&&ovFollowOK()&&!!LS.get('coach:ovleg',0),t:'Speichern: Video, nur Start/Ende, Standbild oder Aufnahme.'}
 ];
@@ -8516,7 +8521,7 @@ if(false&&!LS.get('hint1',0)){ setTimeout(()=>{ toast(matchMedia('(pointer:coars
 
 /* Update-Hinweis: prüft version.json auf GitHub Pages; «Aktualisieren» lädt die Seite ohne Cache neu */
 (()=>{
-  const BUILD='20261103061112'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
+  const BUILD='20261103062229'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
   // nach einem Update die ?v=… aus der Adresse entfernen
   try{ const u=new URL(location.href); if(u.searchParams.has('v')){ u.searchParams.delete('v'); history.replaceState(null,'',u.pathname+(u.search||'')+u.hash); } }catch(e){}
   const el=$('#upd'); let latest=null, snoozed=null, busy=false;
