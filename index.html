@@ -1211,6 +1211,7 @@ svg.ic{width:15px;height:15px;flex:none;vertical-align:-2px;margin-right:5px}
 .zoomer video.ovpre[hidden]{display:none}
 .ctl.play.ov-pv{width:auto!important;min-width:132px!important;height:46px!important;border-radius:23px!important;padding:0 20px 0 16px!important;display:inline-flex!important;align-items:center;justify-content:center;gap:8px;font:inherit;font-size:14px;font-weight:700;color:#fff!important;white-space:nowrap}
 .ctl.play.ov-pv::after{border-radius:27px}
+@media (max-width:760px){ .ctl.play.ov-pv{width:58px!important;min-width:58px!important;height:58px!important;border-radius:50%!important;padding:0!important} .ctl.play.ov-pv span{display:none} #viewCmp.overlay.ov-split.cf-b .strips>.tl:nth-child(1){display:none!important} #viewCmp.overlay.ov-split.cf-b .strips>.tl:nth-child(2){display:flex!important} }
 .ctl.play.ov-pv svg{width:18px!important;height:18px!important}
 @media (max-width:600px){
   .ov-b span{display:none}
@@ -4368,7 +4369,7 @@ function cfSet(k,quiet){ if(k===CF.k) return; A.pause(); B.pause(); G.playing=fa
   if(k&&!CF.k){ CF.wasLinked=!!G.linked; if(G.linked){ G.linked=false; linkBtn(); updSync(); } }
   if(!k&&CF.k&&A.ready&&B.ready&&(CF.wasLinked||!$('#viewCmp').classList.contains('overlay'))){ /* zurück auf beide: am aktuellen Bild verbinden (im Overlay nur, wenn vorher verbunden – «Weiter» bleibt dein Schritt) */ G.off=B.time()-A.time(); G.syncA=A.time(); G.linked=true; linkBtn(); updSync(); if(!quiet) toast('Wieder beide gemeinsam – gleicher Moment A '+A.time().toFixed(2)+' s ↔ B '+B.time().toFixed(2)+' s',2200); if(typeof ghostUI==='function') ghostUI(); }
   CF.k=k; cfUI(); if(typeof ovUI==='function'&&typeof ovActive==='function'&&ovActive()) ovUI(); /* Zeitleisten passen zum Schloss */ if(k&&!quiet) toast('Nur '+(k==='a'?'A':'B')+' wird gesteuert – Zeitleiste, Bild für Bild. Nochmals ins Video klicken = wieder beide.',2600); }
-function cfUI(){ const on=cfOk(); A.stage.style.setProperty('--k-cf','var(--a)'); B.stage.style.setProperty('--k-cf','var(--b)'); A.stage.classList.toggle('cf-on',on&&CF.k==='a'); B.stage.classList.toggle('cf-on',on&&CF.k==='b'); A.stage.classList.toggle('cf-off',on&&CF.k==='b'); B.stage.classList.toggle('cf-off',on&&CF.k==='a'); $('#cStages').classList.toggle('cf-both',on&&!CF.k); cfLock(on); }
+function cfUI(){ const on=cfOk(); A.stage.style.setProperty('--k-cf','var(--a)'); B.stage.style.setProperty('--k-cf','var(--b)'); A.stage.classList.toggle('cf-on',on&&CF.k==='a'); B.stage.classList.toggle('cf-on',on&&CF.k==='b'); A.stage.classList.toggle('cf-off',on&&CF.k==='b'); B.stage.classList.toggle('cf-off',on&&CF.k==='a'); $('#cStages').classList.toggle('cf-both',on&&!CF.k); $('#viewCmp').classList.toggle('cf-b',on&&CF.k==='b'); cfLock(on); }
 /* Schloss zwischen A und B: zu = beide gemeinsam, offen = nur das angeklickte Video (Farbe A/B). Klick aufs offene Schloss = wieder beide. */
 const LOCK_C='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="10.5" width="14" height="10" rx="2.4"/><path d="M8 10.5V7.8a4 4 0 0 1 8 0v2.7"/></svg>',
       LOCK_O='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="10.5" width="14" height="10" rx="2.4"/><path d="M8 10.5V7.8a4 4 0 0 1 7.6-1.8"/></svg>';
@@ -5413,7 +5414,7 @@ function ovUI(){ vchipPlace();
   else if(OV.fix&&!done){ ttl='Übereinanderlegen'; say=(OV.auto==='busy'?'B wird automatisch über A gelegt …':OV.auto==='ok'?'B liegt automatisch über A – prüfen, sonst ziehen':'B auf A schieben')+' '+FI; tip='Im Bild ziehen = verschieben. '+HT+' Das Overlay beginnt an diesem Bild. Ohne Schieben: «Automatisch» – die App legt B selbst über A.';
     acts=ovBtn('edit','Zurück',OVI.back,'ghost','Gleichen Moment neu wählen')+ovMore([matchMedia('(max-width:760px)').matches?['automk','Automatisch übereinanderlegen',OVI.go]:null,['pick','Referenzpunkte antippen',OVI.pin],['fixreset','Auf 0 setzen',OVI.reset]])+(matchMedia('(max-width:760px)').matches?'':ovBtn('automk','Automatisch','','ghost','Ohne Schieben – B selbst über A legen und rechnen'))+ovBtn('mkhand','Overlay erstellen',OVI.go,'pri','Mit dieser Lage rechnen – B folgt danach der Kamera'); }
   else if(OV.fix){ const near=OV.K.some(k=>Math.abs(k.e-ovE())<0.15); ttl='Korrigieren'; say='B auf die Tore ziehen '+FI; tip='Ab diesem Bild wird mit deiner Lage neu gerechnet – davor bleibt alles. '+HT;
-    acts=(near?ovBtn('fixdel','Korrektur löschen',OVI.trash,'ghost'):'')+ovBtn('fixreset','Auf 0',OVI.reset,'ghost','Handkorrektur zurücksetzen')+ovBtn('fixno','Abbrechen','','ghost')+ovBtn('fixok','Übernehmen & ab hier neu rechnen',OVI.ok,'pri','Ab diesem Bild wird mit deiner Lage neu berechnet – davor bleibt alles'); }
+    acts=(near?ovBtn('fixdel','Korrektur löschen',OVI.trash,'ghost'):'')+ovBtn('fixreset','Auf 0',OVI.reset,'ghost','Handkorrektur zurücksetzen')+ovBtn('fixno','Abbrechen','','ghost')+ovBtn('fixok','Übernehmen',OVI.ok,'pri','Ab diesem Bild wird mit deiner Lage neu berechnet – davor bleibt alles'); }
   else if(st===1&&OV.found&&!AS.busy){ const F=OV.found, o=F.r.off; ttl='Gleicher Moment';
     chips=`<span class="ov-found" title="Links A, rechts B am gefundenen Moment"><span><img src="${F.ia}" alt=""><i style="background:var(--a)">A</i></span><span><img src="${F.ib}" alt=""><i style="background:var(--b)">B</i></span></span>`;
     say=`Gefunden · B ${o>=0?'+':'−'}${Math.abs(o).toFixed(2)} s – passt das?`; tip='Links A, rechts B am gefundenen Moment. Gleiches Tor, gleiche Lage? Dann «Passt». Sonst «Nochmals suchen» (nächstbeste Stelle) oder «Von Hand».';
@@ -8520,7 +8521,7 @@ if(false&&!LS.get('hint1',0)){ setTimeout(()=>{ toast(matchMedia('(pointer:coars
 
 /* Update-Hinweis: prüft version.json auf GitHub Pages; «Aktualisieren» lädt die Seite ohne Cache neu */
 (()=>{
-  const BUILD='20261103062228'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
+  const BUILD='20261103082726'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
   // nach einem Update die ?v=… aus der Adresse entfernen
   try{ const u=new URL(location.href); if(u.searchParams.has('v')){ u.searchParams.delete('v'); history.replaceState(null,'',u.pathname+(u.search||'')+u.hash); } }catch(e){}
   const el=$('#upd'); let latest=null, snoozed=null, busy=false;
