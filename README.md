@@ -14,8 +14,7 @@ Beim Öffnen des Links sind Beispiel-Läufe geladen: Sölden (26.10.2025, Riesen
 
 - **Einzelvideo:** Zeitlupe, Bild für Bild, Zeitleiste mit Vorschaubildern, Loop-Bereich, Marker, Zeichnen & Winkel messen, Standbild (PNG).
 - **Vergleich:** A und B als **Side by Side** oder **Overlay**, an einem Moment synchronisieren und gemeinsam abspielen. «Anleitung» führt direkt im Tool mit den Beispiel-Läufen Schritt für Schritt durch Side by Side bzw. Overlay.
-  - **Overlay** in 3 Schritten: (1) beide Videos zum gleichen Moment schieben (z. B. erstes gemeinsames Tor) → «Gemeinsamer Punkt», optional Start/Ende des Ausschnitts setzen; danach springen beim Vorklicken beide mit (Vorsprung sehen). (2) Je 2 feste Referenzpunkte in A und B antippen. (3) «Overlay erstellen» – B wird auf A gelegt und folgt dem Kameraschwenk.
-  - **Ghost:** Zwei Läufe vom gleichen Kamerastandort in einem Bild. Die Kamerabewegung von B wird auf A umgerechnet (lokal im Browser), B erscheint als Geist, mit Zeitabstand live (nur dort gemessen, wo die Kamera der Fahrer:in folgt), Grafik «wo gewonnen/verloren» und MP4-Export.
+  - **Overlay:** Zwei Läufe vom gleichen Kamerastandort in einem Bild. (1) Beide Videos zum gleichen Moment schieben (z. B. erstes gemeinsames Tor), optional Start und Ende des Ausschnitts setzen. (2) B wird automatisch über A gelegt; passt es nicht, mit «Neu legen» oder «Zwei Punkte» korrigieren. (3) «Overlay erstellen»: B folgt dem Kameraschwenk (lokal im Browser berechnet), mit Rückstand live und MP4-Export.
 - **GPS:** GPS-Daten eines Laufs mit dem Video verknüpfen. Im Bild: Tempo & Beschleunigung, Fahrlinie (gefärbt nach Tempo, Beschleunigung oder Δ zur Referenz), Laufzeit und Differenz. Darunter das Profil über die Distanz.
 
 ## Bedienung

@@ -4204,11 +4204,10 @@ class Deck{
       ctx.save(); ctx.fillStyle='#1d1600'; ctx.font='800 9.5px Geist,-apple-system,Segoe UI,sans-serif'; ctx.textAlign=dir>0?'left':'right'; ctx.textBaseline='middle'; ctx.fillText(lab,x+dir*5,1+fh/2+0.5); ctx.restore(); };
     if(L&&L.a!=null) flag(X(L.a-0.5),1,'Start');
     if(L&&L.b!=null) flag(X(L.b+0.5),-1,'Ende');
-    { /* Tore: aus «Zeitmessen → Tor» (A/B) und im Overlay automatisch erkannte Tore (A) */ const GT=[]; if(typeof TIM!=='undefined'&&TIM.g&&mode==='cmp'&&(this===A||this===B)) TIM.g.forEach((g,i)=>GT.push({f:(this===A?g.a:g.b)*this.fps,lab:'T'+(i+1)}));
-      if(this===A&&typeof ovActive==='function'&&ovActive()&&typeof ovFollowOK==='function'&&ovFollowOK()&&GH.autoGates) GH.autoGates.forEach((g,i)=>GT.push({f:(GH.t0+g.tA)*this.fps,lab:'T'+(i+1),auto:1}));
+    { /* Tore: aus «Zeitmessen → Tor» (A/B) */ const GT=[]; if(typeof TIM!=='undefined'&&TIM.g&&mode==='cmp'&&(this===A||this===B)) TIM.g.forEach((g,i)=>GT.push({f:(this===A?g.a:g.b)*this.fps,lab:'T'+(i+1)}));
       ctx.save(); ctx.font='800 9px ui-monospace,Menlo,Consolas,monospace'; ctx.textAlign='center'; ctx.textBaseline='middle';
       for(const g of GT){ const x=X(g.f); if(x<-12||x>W+12) continue; ctx.fillStyle='rgba(255,255,255,.85)'; ctx.fillRect(Math.round(x)-0.5,TH-12,1.5,12);
-        ctx.beginPath(); ctx.moveTo(x,TH-19); ctx.lineTo(x+5,TH-14); ctx.lineTo(x,TH-9); ctx.lineTo(x-5,TH-14); ctx.closePath(); ctx.fillStyle=g.auto?'#e9edf2':'#DA291C'; ctx.fill(); ctx.strokeStyle='rgba(0,0,0,.45)'; ctx.lineWidth=1; ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(x,TH-19); ctx.lineTo(x+5,TH-14); ctx.lineTo(x,TH-9); ctx.lineTo(x-5,TH-14); ctx.closePath(); ctx.fillStyle='#DA291C'; ctx.fill(); ctx.strokeStyle='rgba(0,0,0,.45)'; ctx.lineWidth=1; ctx.stroke();
         if(ppf*fps>=40){ const tw=ctx.measureText(g.lab).width+7; ctx.fillStyle='rgba(12,15,20,.82)'; if(ctx.roundRect){ ctx.beginPath(); ctx.roundRect(x-tw/2,TH-33,tw,12,3); ctx.fill(); } else ctx.fillRect(x-tw/2,TH-33,tw,12); ctx.fillStyle='#fff'; ctx.fillText(g.lab,x,TH-26.5); } }
       ctx.restore();
        }
@@ -5205,10 +5204,7 @@ function trackViterbi(S,key,W,seeds){ // seeds: [{i,x,y}] – angetippte Ankerpu
 let TRK_REL=true, TRK_STATIC=true, TRK_VEL=true, TRK_CEN=1.7, TRK_SLOW=true; // Bahn-Stücke ohne verlässlichen Bezug ausblenden
 function trkAlFull(T,S,W){ const al=trkAlpha(T,S,W), C=T&&T.conf; if(C) for(let i=0;i<C.length;i++){ const c=C[i]; al[i]=Math.min(al[i],c<0.35?0:Math.min(1,(c-0.35)/0.35)); } return al; }
 function tracksBuild(){ if(!GH.S||!GH.S.length||!GH.S.some(s=>s.ma)) { GH.trk=null; return; } const seeds=GH.seeds||{};
-  GH.trk={a:trackViterbi(GH.S,'ma',GH.W0,seeds.a),b:trackViterbi(GH.S,'mb',GH.W0,seeds.b)}; GH.trkAl={a:trkAlFull(GH.trk.a,GH.S,GH.W0),b:trkAlFull(GH.trk.b,GH.S,GH.W0)}; TGD.f=-1; autoGates(); }
-/* Rückstand an jedem Tor ohne Marker: rote Tore in A über die Kamerakette in Pistenkoordinaten sammeln (nur, was ≥ 0.5 s am gleichen Ort steht = Tor),
-   dann für A und B den Moment der nächsten Vorbeifahrt bestimmen. Rückstand = Zeit B − Zeit A am selben Tor. */
-function autoGates(){ GH.autoGates=null; } /* automatische Torerkennung entfernt (zu unzuverlässig, Wunsch Luca) */
+  GH.trk={a:trackViterbi(GH.S,'ma',GH.W0,seeds.a),b:trackViterbi(GH.S,'mb',GH.W0,seeds.b)}; GH.trkAl={a:trkAlFull(GH.trk.a,GH.S,GH.W0),b:trkAlFull(GH.trk.b,GH.S,GH.W0)}; TGD.f=-1; }
 // Deckkraft je Bild: bei Sprüngen und am Rand von Lücken sanft aus- und wieder einblenden, statt quer übers Bild zu gleiten
 function trkAlpha(T,S,W){ const N=T?T.length:0, al=new Float32Array(N); if(!N) return al; const bad=new Uint8Array(N);
   for(let i=0;i<N;i++){ if(!T[i]){ bad[i]=1; continue; } if(i&&T[i-1]){ const q=S[i].q||[1,0,0,0,1,0], pp=affApply(q,T[i-1][0],T[i-1][1]); if(Math.hypot(T[i][0]-pp[0],T[i][1]-pp[1])>W*0.08){ bad[i]=1; bad[i-1]=Math.max(bad[i-1],2); } } }
@@ -5253,7 +5249,6 @@ function ghostGap(){
   /* glätten (gleitender Mittelwert über ±0,3 s) */ const H3=Math.max(1,Math.round(0.3/st)), sm=v.map((x,i)=>{ if(x==null) return null; let s2=0,n=0; for(let q=i-H3;q<=i+H3;q++) if(v[q]!=null){ s2+=v[q]; n++; } return s2/n; });
   for(let i=0;i<sm.length;){ if(sm[i]==null){ i++; continue; } let j=i; while(j<sm.length&&sm[j]!=null) j++; if(E[j-1]-E[i]<0.8) for(let q=i;q<j;q++) sm[q]=null; i=j; }
   GH.raw=raw; GH.gapE=E; GH.gapV=gapRobust(E,raw,sm,st); GH.PA=CA; GH.PB=CB; GH.tau=tau;
-  if(GH.trk&&!GH._agIn){ GH._agIn=true; try{ autoGates(); } finally{ GH._agIn=false; } } /* Tore mit dem neuen laufenden Rückstand bestätigen */
 }
 /* Laufender Rückstand robust: ein Rückstand ändert sich physikalisch langsam (selten mehr als ~0.15 s pro Sekunde).
    Einzelwerte, die nicht zu ihrer Umgebung (±2.5 s) passen, fallen weg; was bleibt, wird lokal linear geglättet.
@@ -5484,7 +5479,7 @@ function gapRow(cv,X,W,fps){ /* eigene schmale Zeile direkt unter der Zeitleiste
   if(rw.width!==Math.round(Wc*d)||rw.height!==Math.round(H*d)){ rw.width=Math.round(Wc*d); rw.height=Math.round(H*d); rw.style.width=Wc+'px'; rw.style.height=H+'px'; }
   const c=rw.getContext('2d'); c.setTransform(d,0,0,d,0,0); c.clearRect(0,0,Wc,H); const on=gapCurve(c,X,H-2,Wc,fps); rw.hidden=!on; }
 function gapCurve(ctx,X,yb,W,fps){ if(!OVGAP.on||OV.hideB) return false; const runs=[]; if(GH.gapE&&GH.gapE.length) runs.push({E:GH.gapE,V:GH.gapV,t0:GH.t0,col:'#8B5CF6',G:ovGapList().map(g=>({t:g.tA,g:g.g}))});
-  LAY.forEach(L=>{ if(!L.hide&&L.aClip===A.clip&&L.gapE&&L.gapE.length) runs.push({E:L.gapE,V:L.gapV,t0:L.t0,col:L.col,G:(L.autoGates||[]).map(g=>({t:L.t0+g.tA,g:g.gap}))}); });
+  LAY.forEach(L=>{ if(!L.hide&&L.aClip===A.clip&&L.gapE&&L.gapE.length) runs.push({E:L.gapE,V:L.gapV,t0:L.t0,col:L.col,G:[]}); });
   if(!runs.length) return false; let mx=0.25; runs.forEach(r=>{ r.V.forEach(v=>{ if(v!=null&&Math.abs(v)>mx) mx=Math.abs(v); }); r.G.forEach(g=>{ if(Math.abs(g.g)>mx) mx=Math.abs(g.g); }); }); mx=Math.min(3,Math.ceil(mx*10)/10);
   const top=3, hh=Math.max(14,yb-top), y0=top+hh/2, Y=v=>y0+clamp(v/mx,-1,1)*hh/2; /* oben = B vorne (−), unten = B hinten (+) */
   ctx.save(); ctx.fillStyle='rgba(8,10,14,.32)'; const xa=X(runs[0].t0*fps), xe=X((runs[0].t0+runs[0].E[runs[0].E.length-1])*fps); ctx.fillRect(Math.max(0,xa),top,Math.min(W,xe)-Math.max(0,xa),hh);
@@ -5723,13 +5718,13 @@ const OVT_READY=true;
 const OVGAP={on:LS.get('ovGap',1)!==0,v:null};
 /* Quelle 1: Tore (Marken) in A und B, paarweise nach Reihenfolge – wie eine Zwischenzeit im Fernsehen: gilt ab dem Tor, bis zum nächsten */
 function ovGapGates(t){ if(!A.clip||!B.clip||!G.linked) return null; const mA=[], mB=[], /* Marker entfernt: nur erkannte Tore */ n=Math.min(mA.length,mB.length);
-  if(!n){ const AG=GH.autoGates; if(!AG||!ovFollowOK()) return null; let last=null; AG.forEach((g,k)=>{ if(GH.t0+g.tA<=t+1e-3) last={g:g.gap,k:k+1,auto:true,t:GH.t0+g.tA}; }); return last; } /* ohne Marker: automatisch erkannte Tore */
+  if(!n) return null;
   const fa=A.fps||A.clip.fps||50, fb=B.fps||B.clip.fps||50; let last=null, k0=0;
   for(let k=0;k<n;k++){ const ta=(mA[k]+0.5)/fa, tb=(mB[k]+0.5)/fb; if(ta<G.syncA-0.02) continue; k0++; if(ta<=t+1e-3) last={g:(tb-G.off)-ta,k:k0}; else break; }
   return last; }
 function ovGapVal(){ OVGAP.src=null; if(!OVGAP.on||(typeof OVG!=='undefined'&&OVG.on&&typeof ovGpsPair==='function'&&ovGpsPair())||!ovFollowOK()||OV.hideB) return null;
   const t=ovTA(), gg=ovGapGates(t), run=(()=>{ if(!GH.gapE||!GH.gapE.length) return null; const e=t-(GH.t0||0); if(e<0||e>GH.eEnd) return null; let s=0,w=0; for(let k=-3;k<=3;k++){ const g=gapAt(e+k*0.06); if(g==null) continue; const ww=4-Math.abs(k); s+=g*ww; w+=ww; } return w?s/w:null; })();
-  if(gg&&(run==null||t-gg.t<4)){ OVGAP.src='Tor '+gg.k+(gg.auto?' (auto)':''); return gg.g; } /* Torwert 4 s zeigen, danach den laufenden Rückstand */
+  if(gg&&(run==null||t-gg.t<4)){ OVGAP.src='Tor '+gg.k; return gg.g; } /* Torwert 4 s zeigen, danach den laufenden Rückstand */
   if(run!=null){ OVGAP.src='ca.'; return run; }
   if(!GH.gapE||!GH.gapE.length) return null; const e=t-(GH.t0||0); if(e<0||e>GH.eEnd) return null; let s=0,w=0; for(let k=-3;k<=3;k++){ const g=gapAt(e+k*0.06); if(g==null) continue; const ww=4-Math.abs(k); s+=g*ww; w+=ww; } if(w) OVGAP.src='ca.'; return w?s/w:null; }
 function ovGapDraw(x,ox,oy,w,h){ ovGapDraw1(x,ox,oy,w,h,ovGapVal(),lastName(B.clip)||'B',OVGAP.src,'#8B5CF6',0); let row=ovGapVal()==null?0:1;
@@ -5743,12 +5738,10 @@ function ovGapDraw1(x,ox,oy,w,h,g,nm0,src,dot,row){ if(g==null) return; const k=
 function ovGapList(Ly){ /* Ly: Lauf C (D …) statt B */ if(!A.clip) return []; if(!Ly&&(!B.clip||!G.linked)) return [];
   const mA=[], mB=[], n=Math.min(mA.length,mB.length), out=[], off=Ly?Ly.off:G.off, sA=Ly?Ly.syncA:G.syncA;
   if(n){ const fa=A.fps||A.clip.fps||50, fb=Ly?Ly.fpsB:(B.fps||B.clip.fps||50); let k0=0; for(let k=0;k<n;k++){ const ta=(mA[k]+0.5)/fa, tb=(mB[k]+0.5)/fb; if(ta<sA-0.02) continue; k0++; out.push({k:k0,tA:ta,g:(tb-off)-ta}); } return out; }
-  if(Ly) return (Ly.autoGates||[]).map((g,k)=>({k:k+1,tA:Ly.t0+g.tA,g:g.gap,auto:true}));
-  const AG=GH.autoGates; if(!AG||!ovFollowOK()) return []; return AG.map((g,k)=>({k:k+1,tA:GH.t0+g.tA,g:g.gap,auto:true})); }
-function ovSectors(Ly){ const L=ovGapList(Ly); if(!L.length) return []; const pts=[{lab:'Start',tA:Ly?Ly.syncA:G.syncA,g:0}].concat(L.map(x=>({lab:'Tor '+x.k,tA:x.tA,g:x.g,auto:x.auto})));
-  if(L[0].auto){ const E_=Ly?Ly.gapE:GH.gapE, end=Ly?Ly.eEnd:GH.eEnd, t0=Ly?Ly.t0:GH.t0; if(E_&&E_.length&&end&&(Ly||ovFollowOK())){ const te=t0+end, ge=gapAt(end-0.05,Ly); if(ge!=null&&te-pts[pts.length-1].tA>0.4) pts.push({lab:'Ende',tA:te,g:ge,ca:true}); } }
+  return []; }
+function ovSectors(Ly){ const L=ovGapList(Ly); if(!L.length) return []; const pts=[{lab:'Start',tA:Ly?Ly.syncA:G.syncA,g:0}].concat(L.map(x=>({lab:'Tor '+x.k,tA:x.tA,g:x.g})));
   let P=pts; if(pts.length>13){ P=[pts[0]]; for(let i=5;i<pts.length-1;i+=5) P.push(pts[i]); P.push(pts[pts.length-1]); } /* viele Tore → je 5 zusammen */
-  const out=[]; for(let i=1;i<P.length;i++){ const a=P[i-1], b=P[i]; out.push({from:a.lab,to:b.lab,tA:a.tA,tB:b.tA,d:b.g-a.g,cum:b.g,ca:!!b.ca,auto:!!(a.auto||b.auto)}); } return out; }
+  const out=[]; for(let i=1;i<P.length;i++){ const a=P[i-1], b=P[i]; out.push({from:a.lab,to:b.lab,tA:a.tA,tB:b.tA,d:b.g-a.g,cum:b.g,ca:!!b.ca}); } return out; }
 function secRuns(){ const r=[]; if(B.clip&&ovSectors().length>=2) r.push({L:null,n:lastName(B.clip)||'B',col:'#8B5CF6'}); LAY.forEach(Ly=>{ if(!Ly.hide&&Ly.aClip===A.clip&&ovSectors(Ly).length>=2) r.push({L:Ly,n:Ly.name,col:Ly.col,let:Ly.let}); }); return r; }
 function secOpen(Ly){ secClose(); const L=ovSectors(Ly); if(L.length<2) return; const nb=Ly?Ly.name:(lastName(B.clip)||'B'), na=lastName(A.clip)||'A', mx=Math.max(0.05,...L.map(r=>Math.abs(r.d))), RU=secRuns();
   const el=document.createElement('div'); el.className='sec-pop'; const f=v=>(v>=0?'+':'−')+Math.abs(v).toFixed(2);
@@ -5783,10 +5776,9 @@ function secDrawTo(x,ox,oy,w,h){ /* Export: Abschlusskarte (Namen, Ziel) und Abs
   x.restore(); return true; }
 function secKey(ev){ if(ev.key==='Escape'){ ev.stopPropagation(); secClose(); } }
 function secClose(){ $$('.sec-pop').forEach(e=>e.remove()); document.removeEventListener('pointerdown',secOut,true); document.removeEventListener('keydown',secKey,true); }
-function layGap(L){ /* Rückstand von Lauf C (D …) gegenüber A an der Stelle von A: Tore (Marker), sonst erkannte Tore, sonst laufend */
+function layGap(L){ /* Rückstand von Lauf C (D …) gegenüber A an der Stelle von A: Tore (Marker), sonst laufend */
   const t=ovTA(), mA=[], mB=[], n=Math.min(mA.length,mB.length);
   if(n){ const fa=A.fps||A.clip.fps||50; let last=null,k0=0; for(let k=0;k<n;k++){ const ta=(mA[k]+0.5)/fa, tb=(mB[k]+0.5)/L.fpsB; if(ta<L.syncA-0.02) continue; k0++; if(ta<=t+1e-3) last={g:(tb-L.off)-ta,src:'Tor '+k0}; else break; } if(last) return last; }
-  if(L.autoGates){ let last=null; L.autoGates.forEach((g,k)=>{ if(L.t0+g.tA<=t+1e-3) last={g:g.gap,src:'Tor '+(k+1)+' (auto)'}; }); if(last) return last; }
   const e=t-L.t0; if(e<0||e>L.eEnd) return null; let s2=0,w=0; for(let k=-3;k<=3;k++){ const g=gapAt(e+k*0.06,L); if(g==null) continue; const ww=4-Math.abs(k); s2+=g*ww; w+=ww; } return w?{g:s2/w,src:'ca.'}:null; }
 function layGapRender(){ const on=OVGAP.on&&ovActive()&&!OV.fix&&!$('#viewCmp').classList.contains('ov-split'); const hasB=!!$('.gap-pill.on:not(.lay)',A.stage);
   LAY.forEach((L,i)=>{ let el=A.stage.querySelector('.gap-pill.lay[data-i="'+i+'"]'); const r=on&&!L.hide&&L.aClip===A.clip?layGap(L):null;
@@ -5966,7 +5958,7 @@ function layerAdd(){
   const L={aClip:A.clip,clip:B.clip,v,off:G.off,syncA:G.syncA,t0:GH.t0,step:GH.step,eEnd:GH.eEnd,W0:GH.W0,hA:GH.hA,hB:GH.hB,S:GH.S.map(s=>({e:s.e,p:ovKeep(s),pb:s.pb,cb:s.cb})),col:LCOL[LAY.length],let:LLET[LAY.length],name:lastName(B.clip)};
   L.trkB=GH.trk?GH.trk.b:null; L.alB=GH.trkAl&&GH.trkAl.b?Float32Array.from(GH.trkAl.b):null; { const sb=GH.seeds&&GH.seeds.b; L.seeds=Array.isArray(sb)?sb.map(q=>({...q})):sb?[{...sb}]:[]; } L.S.forEach((x,i)=>{ x.mb=GH.S[i].mb; x.q=GH.S[i].q; x.cut=GH.S[i].cut; });
   { const pr=typeof OVT!=='undefined'&&OVT.trk&&OVT.key===GH.key&&OVT.keys.b&&OVT.keys.b.length; L.trail=pr?OVT.trk.b.slice():(L.trkB?L.trkB.slice():null); L.trailAl=pr?OVT.al.b.slice():(L.alB?Array.from(L.alB):null); } /* Spur von C: angetippt, sonst automatisch */
-  L.gapE=GH.gapE?GH.gapE.slice():[]; L.gapV=GH.gapV?GH.gapV.slice():[]; L.autoGates=GH.autoGates?GH.autoGates.map(g=>({...g})):null; L.markB=(B.clip.markers||[]).slice(); L.fpsB=B.fps||B.clip.fps||50; /* Rückstand von C gegenüber A bleibt */
+  L.gapE=GH.gapE?GH.gapE.slice():[]; L.gapV=GH.gapV?GH.gapV.slice():[]; L.markB=(B.clip.markers||[]).slice(); L.fpsB=B.fps||B.clip.fps||50; /* Rückstand von C gegenüber A bleibt */
   LAY.push(L);
   // B frei machen für den nächsten Lauf – gleicher Ausschnitt, neue Synchronisierung
   A.pause(); B.pause(); G.playing=false; OV.T=null; OV.follow=false; OV.K=[]; OV.fix=null; OV.pick=null; OV.edit=false; OV.pa=[]; OV.pb=[]; GH.state='idle'; GH.key='';
@@ -7143,7 +7135,7 @@ function parseName(n){
     if(!m.cam&&/^V\d{1,2}$/.test(u)){ m.cam='Cam '+(+u.slice(1)); continue; }
     if(!m.cam&&/^(VGH|GH|CAMGH|GEGENHANG|VZ|VS|VST|VZI|VPI|PISTE|CAM\d*|CAM[A-Z]{1,3}|POS\d+)$/.test(u)){ m.cam=/^(VGH|GH|CAMGH|GEGENHANG)$/.test(u)?'Gegenhang':/^(VZ|VZI)$/.test(u)?'Ziel':/^(VS|VST)$/.test(u)?'Start':/^(VPI|PISTE)$/.test(u)?'Piste':/^CAM\d+$/.test(u)?'Cam '+(+u.slice(3)):u; continue; } /* CAM1 → Cam 1 (einheitlich) */
     if(/^(BEISPIEL|GHOST|VIDEO|CLIP|KAMERA|FIX|FPS|LAUF)$/.test(u)) continue;
-    if(/^[A-Za-zÄÖÜäöüéèàçñ]{2,}(-[A-Za-zÄÖÜäöüéèàçñ]{2,})*$/.test(t)) rest.push(t);
+    if(/^[A-Za-zÄÖÜäöüéèàçñ]{2,}(-[A-Za-zÄÖÜäöüéèàçñ]+)*$/.test(t)) rest.push(t);
   }
   if(rest[0]) m.athlete=capW(rest[0]); if(rest[1]){ m.place=capW(rest[1]); const PN={valdisere:"Val d'Isère",'val-disere':"Val d'Isère",soelden:'Sölden',solden:'Sölden',stmoritz:'St. Moritz','st-moritz':'St. Moritz',wengen:'Wengen',adelboden:'Adelboden',kitzbuehel:'Kitzbühel',garmisch:'Garmisch',cortina:'Cortina',crans:'Crans-Montana','crans-montana':'Crans-Montana',kranjskagora:'Kranjska Gora',alta_badia:'Alta Badia',altabadia:'Alta Badia',beavercreek:'Beaver Creek',lakelouise:'Lake Louise'}; const k=String(rest[1]).toLowerCase(); if(PN[k]) m.place=PN[k]; }
   m.ok=!!m.athlete&&!!(m.date||m.disc||m.run);
@@ -8336,7 +8328,7 @@ setInterval(()=>{ const now=performance.now(); decks.forEach(d=>{ const v=d.v, s
 setColor(LS.get('color',COLORS[0])); setTool('none');
 restoreSession();
 /* Beispiel-Rennvideos (Sölden 2025, RS Herren) – liegen neben der App im Ordner demo/ */
-const REAL_DEMO=[["Meillard_Soelden_251026_GS_M_L1.mp4",15594565,3941897,{"d":43.68,"w":1280,"h":720,"f":50,"p":1}],["Gratz_Soelden_251026_GS_M_L1.mp4",14564292,3733814,{"d":42.24,"w":1280,"h":720,"f":50,"p":1}],["Braathen_Soelden_251026_GS_M_L1.mp4",14949042,3776874,{"d":44.16,"w":1280,"h":720,"f":50,"p":1}],["monney_v1_sg_tr9_stelvio_261029.mp4",6591501,2704359,{"d":23.04,"w":1280,"h":720,"f":50,"p":1}],["monney_v2_sg_tr9_stelvio_261029.mp4",8210753,3229149,{"d":28.8,"w":1280,"h":720,"f":50,"p":1}],["monney_v4_sg_tr9_stelvio_261029.mp4",10912089,4602992,{"d":29.28,"w":1280,"h":720,"f":50,"p":1}],["rogentin_v1_sg_tr3_stelvio_261029.mp4",6865780,2694602,{"d":22.56,"w":1280,"h":720,"f":50,"p":1}],["rogentin_v2_sg_tr3_stelvio_261029.mp4",8499273,3385232,{"d":27.36,"w":1280,"h":720,"f":50,"p":1}],["rogentin_v4_sg_tr3_stelvio_261029.mp4",12637917,5406107,{"d":27.36,"w":1280,"h":720,"f":50,"p":1}],["flatscher_sl_schnals_261018_l4_cam1_111.mp4",9900339,1202605,{"d":17.76,"w":1280,"h":720,"f":50,"p":1}],["fournier_sl_schnals_261018_l4_cam1_114.mp4",22783033,3076566,{"d":40.8,"w":1280,"h":720,"f":50,"p":1}],["phillips_sl_schnals_261018_l5_cam1_123.mp4",9939143,1159148,{"d":17.76,"w":1280,"h":720,"f":50,"p":1}],["boisset_vgh_dh_tr1_courchevel_260311.mp4",21193253,6715452,{"d":59.059,"w":1280,"h":720,"f":29.97,"p":1}],["kriechmayr_vgh_dh_tr1_courchevel_260311.mp4",20048025,6825717,{"d":57.057,"w":1280,"h":720,"f":29.97,"p":1}],["allegre_vgh_dh_tr1_courchevel_260311.mp4",22408170,7158994,{"d":57.057,"w":1280,"h":720,"f":29.97,"p":1}],["moltzan_wc_gs_l2_camGH_hafjell_260325.mp4",20632437,6868870,{"d":67.935,"w":1280,"h":720,"f":29.97,"p":1}],["rast_wc_gs_l2_camGH_hafjell_260325.mp4",22233687,7236819,{"d":67.935,"w":1280,"h":720,"f":29.97,"p":1}],["holdener_wc_sl_l1_camGH_hafjell_260324.mp4",19428840,6751556,{"d":61.929,"w":1280,"h":720,"f":29.97,"p":1}],["shiffrin_wc_sl_l1_camGH_hafjell_260324.mp4",19594008,6715630,{"d":60.928,"w":1280,"h":720,"f":29.97,"p":1}],["odermatt lauf1 261025 GS soelden v1.mp4",2676704,0,{"d":24.0,"w":854,"h":480,"f":25,"p":1}],["braathen lauf1 261025 GS soelden v1.mp4",1935003,0,{"d":17.28,"w":854,"h":480,"f":25,"p":1}],["haechler lauf1 261025 GS soelden v1.mp4",2524449,0,{"d":22.56,"w":854,"h":480,"f":25,"p":1}],["shiffrin wc gs l1 cam1 soelden 261024.mp4",4025103,0,{"d":24.96,"w":854,"h":480,"f":50,"p":1}],["holdener wc gs l1 cam1 soelden 261024.mp4",4312801,0,{"d":26.4,"w":854,"h":480,"f":50,"p":1}],["allenbach wc gs l1 cam1 soelden 261024.mp4",4315846,0,{"d":26.4,"w":854,"h":480,"f":50,"p":1}],["brignone_wc_sg_camGH_cortina_260212.mp4",17302153,7045778,{"d":50.05,"w":1280,"h":720,"f":29.97,"p":1}],["blanc_wc_sg_camGH_cortina_260212.mp4",11442032,4645708,{"d":34.034,"w":1280,"h":720,"f":29.97,"p":1}],["schmitt_wc_sg_camGH_cortina_260212.mp4",16428581,6684837,{"d":45.045,"w":1280,"h":720,"f":29.97,"p":1}],["KENSCH_261031_261031_SBX_RUN3.mp4",29143774,5009013,{"d":39.0,"w":1280,"h":720,"f":30,"p":1}],["LARENG_261031_261031_SBX_RUN3.mp4",28795065,5099752,{"d":36.1,"w":1280,"h":720,"f":30,"p":1}],["LUCENG_261031_261031_SBX_RUN3.mp4",28840325,5016313,{"d":37.633,"w":1280,"h":720,"f":30,"p":1}],["curtoni_wc_dh_tr1_camGH_valdisere_251218.mp4",19536464,9005690,{"d":56.056,"w":1280,"h":720,"f":29.97,"p":1}],["delago_wc_dh_tr1_camGH_valdisere_251218.mp4",18695552,8380052,{"d":55.055,"w":1280,"h":720,"f":29.97,"p":1}],["durrer_wc_dh_tr1_camGH_valdisere_251218.mp4",19497247,8889099,{"d":57.057,"w":1280,"h":720,"f":29.97,"p":1}],["ming_wc_dh_tr1_camGH_valdisere_251218.mp4",20160965,9084157,{"d":59.059,"w":1280,"h":720,"f":29.97,"p":1}]];
+const REAL_DEMO=[["Meillard_Soelden_251026_GS_M_L1.mp4",15594565,3941897,{"d":43.68,"w":1280,"h":720,"f":50,"p":1}],["Gratz_Soelden_251026_GS_M_L1.mp4",14564292,3733814,{"d":42.24,"w":1280,"h":720,"f":50,"p":1}],["Braathen_Soelden_251026_GS_M_L1.mp4",14949042,3776874,{"d":44.16,"w":1280,"h":720,"f":50,"p":1}],["monney_v1_sg_tr9_stelvio_261029.mp4",6591501,2704359,{"d":23.04,"w":1280,"h":720,"f":50,"p":1}],["monney_v2_sg_tr9_stelvio_261029.mp4",8210753,3229149,{"d":28.8,"w":1280,"h":720,"f":50,"p":1}],["monney_v4_sg_tr9_stelvio_261029.mp4",10912089,4602992,{"d":29.28,"w":1280,"h":720,"f":50,"p":1}],["rogentin_v1_sg_tr3_stelvio_261029.mp4",6865780,2694602,{"d":22.56,"w":1280,"h":720,"f":50,"p":1}],["rogentin_v2_sg_tr3_stelvio_261029.mp4",8499273,3385232,{"d":27.36,"w":1280,"h":720,"f":50,"p":1}],["rogentin_v4_sg_tr3_stelvio_261029.mp4",12637917,5406107,{"d":27.36,"w":1280,"h":720,"f":50,"p":1}],["flatscher_sl_schnals_261018_l4_cam1_111.mp4",9900339,1202605,{"d":17.76,"w":1280,"h":720,"f":50,"p":1}],["fournier_sl_schnals_261018_l4_cam1_114.mp4",22783033,3076566,{"d":40.8,"w":1280,"h":720,"f":50,"p":1}],["phillips_sl_schnals_261018_l5_cam1_123.mp4",9939143,1159148,{"d":17.76,"w":1280,"h":720,"f":50,"p":1}],["boisset_vgh_dh_tr1_courchevel_260311.mp4",21193253,6715452,{"d":59.059,"w":1280,"h":720,"f":29.97,"p":1}],["kriechmayr_vgh_dh_tr1_courchevel_260311.mp4",20048025,6825717,{"d":57.057,"w":1280,"h":720,"f":29.97,"p":1}],["allegre_vgh_dh_tr1_courchevel_260311.mp4",22408170,7158994,{"d":57.057,"w":1280,"h":720,"f":29.97,"p":1}],["moltzan_wc_gs_l2_camGH_hafjell_260325.mp4",20632437,6868870,{"d":67.935,"w":1280,"h":720,"f":29.97,"p":1}],["rast_wc_gs_l2_camGH_hafjell_260325.mp4",22233687,7236819,{"d":67.935,"w":1280,"h":720,"f":29.97,"p":1}],["holdener_wc_sl_l1_camGH_hafjell_260324.mp4",19428840,6751556,{"d":61.929,"w":1280,"h":720,"f":29.97,"p":1}],["shiffrin_wc_sl_l1_camGH_hafjell_260324.mp4",19594008,6715630,{"d":60.928,"w":1280,"h":720,"f":29.97,"p":1}],["odermatt lauf1 261025 GS soelden v1.mp4",2676704,0,{"d":24.0,"w":854,"h":480,"f":25,"p":1}],["braathen lauf1 261025 GS soelden v1.mp4",1935003,0,{"d":17.28,"w":854,"h":480,"f":25,"p":1}],["haechler lauf1 261025 GS soelden v1.mp4",2524449,0,{"d":22.56,"w":854,"h":480,"f":25,"p":1}],["shiffrin wc gs l1 cam1 soelden 261024.mp4",4025103,0,{"d":24.96,"w":854,"h":480,"f":50,"p":1}],["holdener wc gs l1 cam1 soelden 261024.mp4",4312801,0,{"d":26.4,"w":854,"h":480,"f":50,"p":1}],["allenbach wc gs l1 cam1 soelden 261024.mp4",4315846,0,{"d":26.4,"w":854,"h":480,"f":50,"p":1}],["brignone_wc_sg_camGH_cortina_260212.mp4",17302153,7045778,{"d":50.05,"w":1280,"h":720,"f":29.97,"p":1}],["blanc_wc_sg_camGH_cortina_260212.mp4",11442032,4645708,{"d":34.034,"w":1280,"h":720,"f":29.97,"p":1}],["schmitt_wc_sg_camGH_cortina_260212.mp4",16428581,6684837,{"d":45.045,"w":1280,"h":720,"f":29.97,"p":1}],["KENSCH_261031_261031_SBX_RUN3.mp4",29143774,5009013,{"d":39.0,"w":1280,"h":720,"f":30,"p":1}],["LARENG_261031_261031_SBX_RUN3.mp4",28795065,5099752,{"d":36.1,"w":1280,"h":720,"f":30,"p":1}],["LUCENG_261031_261031_SBX_RUN3.mp4",28840325,5016313,{"d":37.633,"w":1280,"h":720,"f":30,"p":1}],["curtoni_wc_dh_tr1_camGH_valdisere_251218.mp4",19536464,9005690,{"d":56.056,"w":1280,"h":720,"f":29.97,"p":1}],["delago_wc_dh_tr1_camGH_valdisere_251218.mp4",18695552,8380052,{"d":55.055,"w":1280,"h":720,"f":29.97,"p":1}],["durrer_wc_dh_tr1_camGH_valdisere_251218.mp4",19497247,8889099,{"d":57.057,"w":1280,"h":720,"f":29.97,"p":1}],["ming_wc_dh_tr1_camGH_valdisere_251218.mp4",20160965,9084157,{"d":59.059,"w":1280,"h":720,"f":29.97,"p":1}],["Athletin-A_Saas-Fee_SG.mp4",7728160,2626692,{"d":29.28,"w":1280,"h":720,"f":50,"p":1}],["Athletin-B_Saas-Fee_SG.mp4",6815932,2177052,{"d":25.92,"w":1280,"h":720,"f":50,"p":1}],["Athletin-C_Saas-Fee_SG.mp4",7525312,2504440,{"d":28.8,"w":1280,"h":720,"f":50,"p":1}]];
 /* Beispielvideos auf Handy/Tablet: kleine Fassung, beim Wählen ganz herunterladen (mit %), danach lokal – Spulen und Abspielen ohne Warten */
 const DEMO_MOB=(()=>{ try{ return matchMedia('(pointer:coarse)').matches&&Math.min(screen.width,screen.height)<1100; }catch(e){ return false; } })();
 function demoPrefetch(c){ try{ if(!DEMO_MOB) return null; }catch(e){ return null; } if(!c||!c.demo||/^blob:/.test(c.url)) return null; if(c._pf) return c._pf; c._pct=0;
@@ -8464,7 +8456,7 @@ if(false&&!LS.get('hint1',0)){ setTimeout(()=>{ toast(matchMedia('(pointer:coars
 
 /* Update-Hinweis: prüft version.json auf GitHub Pages; «Aktualisieren» lädt die Seite ohne Cache neu */
 (()=>{
-  const BUILD='20261104103727'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
+  const BUILD='20261104130448'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
   // nach einem Update die ?v=… aus der Adresse entfernen
   try{ const u=new URL(location.href); if(u.searchParams.has('v')){ u.searchParams.delete('v'); history.replaceState(null,'',u.pathname+(u.search||'')+u.hash); } }catch(e){}
   const el=$('#upd'); let latest=null, snoozed=null, busy=false;
