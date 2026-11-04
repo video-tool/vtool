@@ -1955,6 +1955,7 @@ body.recording .rec-btn svg circle:last-child{color:#fff}
   .demo-cam{width:30px;height:30px;font-size:11px}
   #sideTree.names .ft-row.file.demo-row .ft-tx{grid-template-columns:minmax(0,1fr) 56px 100px}
 }
+.vl-pop .vp-use:disabled,.m-menu button:disabled{opacity:.4;cursor:default;background:none}
 @media (prefers-reduced-motion:reduce){
   .gate-pill.pop{animation:none}
 }
@@ -5570,7 +5571,9 @@ function ovDrawB(x,ox,oy,w,h){ // B ausgerichtet über ein A-Bild der Grösse w�
   x.restore(); x.save(); x.beginPath(); x.rect(ox,oy,w,h); x.clip(); layerDraw(x,ox,oy,w); x.restore(); tagsDrawTo(x,ox,oy,w,h); }
 /* Nutzungsanalyse (nur Admins): Passwort wird nochmals geprüft (Server: vlab_login + vlab_admins), Hash nur im Speicher dieser Seite */
 const USE={h:null,days:30,data:null,sort:'o'};
-function stgGo(){ location.href=window.VLAB_ENV==='staging'?'../':'staging/'; } /* Admins: zwischen Live- und Staging-Seite wechseln */
+const STG_ON=false; /* Staging-Seite noch nicht in Betrieb: Wechsel von der Live-Seite gesperrt. Zum Aktivieren auf true setzen. */
+const stgOff=()=>!STG_ON&&window.VLAB_ENV!=='staging';
+function stgGo(){ if(stgOff()) return; location.href=window.VLAB_ENV==='staging'?'../':'staging/'; } /* Admins: zwischen Live- und Staging-Seite wechseln */
 function useOpen(){ let m=$('#useModal'); if(!m){ m=document.createElement('div'); m.className='modal'; m.id='useModal'; document.body.appendChild(m);
     m.addEventListener('pointerdown',e=>{ if(e.target===m) m.classList.remove('on'); }); document.addEventListener('keydown',e=>{ if(e.key==='Escape'&&m.classList.contains('on')) m.classList.remove('on'); }); }
   m.classList.add('on'); if(USE.h) useLoad(); else usePw(); }
@@ -8303,7 +8306,7 @@ document.addEventListener('visibilitychange',async()=>{ if(SER.on&&!document.hid
   window.vlabUserUI=()=>{ const s=window.vlabAuth&&vlabAuth.get(), b=$('#btnOut'); if(!b) return; $('#btnOutAv').textContent=s?ini(s):'?'; b.title=s?(s.n||s.e):'Konto'; };
   $('#btnOut').addEventListener('click',e=>{ e.stopPropagation(); if(pop){ close(); return; } const s=window.vlabAuth&&vlabAuth.get()||{}, b=e.currentTarget;
     pop=document.createElement('div'); pop.className='vl-pop'; pop.setAttribute('role','menu');
-    pop.innerHTML='<div class="vp-h"><span class="vl-av"></span><div class="vp-t"><span class="vp-n"></span><span class="vp-e"></span>'+(ROLE[s.r]?'<span class="vp-r"></span>':'')+'</div></div><div class="vp-sep"></div>'+(window.vlabAuth&&vlabAuth.admin&&vlabAuth.admin()?'<button class="vp-use" role="menuitem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>Nutzungsanalyse</button><button class="vp-use vp-stg" role="menuitem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6M10 3v6L4.5 18.5A1.7 1.7 0 0 0 6 21h12a1.7 1.7 0 0 0 1.5-2.5L14 9V3"/><path d="M7 15h10"/></svg>'+(window.VLAB_ENV==='staging'?'Zur Live-Seite':'Zur Staging-Seite')+'</button><div class="vp-sep"></div>':'')+'<button class="vp-out" role="menuitem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3"/><path d="M10 17l5-5-5-5"/><path d="M15 12H3"/></svg>Abmelden</button>';
+    pop.innerHTML='<div class="vp-h"><span class="vl-av"></span><div class="vp-t"><span class="vp-n"></span><span class="vp-e"></span>'+(ROLE[s.r]?'<span class="vp-r"></span>':'')+'</div></div><div class="vp-sep"></div>'+(window.vlabAuth&&vlabAuth.admin&&vlabAuth.admin()?'<button class="vp-use" role="menuitem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>Nutzungsanalyse</button><button class="vp-use vp-stg" role="menuitem"'+(stgOff()?' disabled title="Noch nicht aktiv"':'')+'><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6M10 3v6L4.5 18.5A1.7 1.7 0 0 0 6 21h12a1.7 1.7 0 0 0 1.5-2.5L14 9V3"/><path d="M7 15h10"/></svg>'+(window.VLAB_ENV==='staging'?'Zur Live-Seite':'Zur Staging-Seite')+'</button><div class="vp-sep"></div>':'')+'<button class="vp-out" role="menuitem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3"/><path d="M10 17l5-5-5-5"/><path d="M15 12H3"/></svg>Abmelden</button>';
     $('.vl-av',pop).textContent=ini(s); $('.vp-n',pop).textContent=s.n||s.e||''; $('.vp-e',pop).textContent=s.n?s.e:''; if(ROLE[s.r]) $('.vp-r',pop).textContent=ROLE[s.r];
     $('.vp-out',pop).addEventListener('click',()=>{ close(); if(window.vlabAuth) vlabAuth.logout(); });
     { const u=$('.vp-use:not(.vp-stg)',pop); if(u) u.addEventListener('click',()=>{ close(); useOpen(); }); const g=$('.vp-stg',pop); if(g) g.addEventListener('click',()=>{ close(); stgGo(); }); }
@@ -8383,7 +8386,7 @@ setTimeout(fieldSync,600);
   let menu=null; const close=()=>{ if(menu){ menu.remove(); menu=null; } };
   window.mMenuClose=close; addEventListener('scroll',close,{passive:true});
   window.mMenu=(btn,items)=>{ if(menu){ close(); return; } menu=document.createElement('div'); menu.className='m-menu';
-    items.filter(Boolean).forEach(([l,ic,fn])=>{ const b=document.createElement('button'); b.innerHTML=ic+'<span>'+l+'</span>'; b.onclick=e=>{ e.stopPropagation(); close(); fn(); }; menu.appendChild(b); });
+    items.filter(Boolean).forEach(([l,ic,fn,off])=>{ const b=document.createElement('button'); b.disabled=!!off; b.innerHTML=ic+'<span>'+l+'</span>'; b.onclick=e=>{ e.stopPropagation(); close(); fn(); }; menu.appendChild(b); });
     document.body.appendChild(menu); const r=btn.getBoundingClientRect(), h=menu.offsetHeight; menu.style.top=(r.bottom+h+8<innerHeight?r.bottom+6:Math.max(8,r.top-h-6))+'px'; };
   document.addEventListener('pointerdown',e=>{ if(menu&&!e.target.closest('.m-menu,.hdr-more,.m-more')) close(); },true);
   // Kopfzeile
@@ -8392,7 +8395,7 @@ setTimeout(fieldSync,600);
     [invAuth()?'Von innove abmelden':'Bei innove anmelden',I('<path d="M12 21s7-6.2 7-11.5A7 7 0 0 0 5 9.5C5 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.4"/>'),()=>{ if(invAuth()){ LS.set('innove',null); invBtnUI(); toast('Von innove abgemeldet.'); } else invLoginUI().then(ok=>{ if(ok) toast('Bei innove angemeldet.',2500); }); }],
     ['Hell / Dunkel',I('<path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/>'),()=>$('#btnTheme').click()],
     window.vlabAuth&&vlabAuth.admin&&vlabAuth.admin()?['Nutzungsanalyse',I('<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>'),()=>useOpen()]:null,
-    window.vlabAuth&&vlabAuth.admin&&vlabAuth.admin()?[window.VLAB_ENV==='staging'?'Zur Live-Seite':'Zur Staging-Seite',I('<path d="M9 3h6M10 3v6L4.5 18.5A1.7 1.7 0 0 0 6 21h12a1.7 1.7 0 0 0 1.5-2.5L14 9V3"/><path d="M7 15h10"/>'),()=>stgGo()]:null,
+    window.vlabAuth&&vlabAuth.admin&&vlabAuth.admin()?[window.VLAB_ENV==='staging'?'Zur Live-Seite':'Zur Staging-Seite',I('<path d="M9 3h6M10 3v6L4.5 18.5A1.7 1.7 0 0 0 6 21h12a1.7 1.7 0 0 0 1.5-2.5L14 9V3"/><path d="M7 15h10"/>'),()=>stgGo(),stgOff()]:null,
     ['Abmelden',I('<path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3"/><path d="M10 17l5-5-5-5"/><path d="M15 12H3"/>'),()=>window.vlabAuth&&vlabAuth.logout()]]); });
   // Videoliste als Blatt
   const lc=$('.libcard'), bk=document.createElement('div'); bk.className='lib-back'; document.body.appendChild(bk);
@@ -8460,7 +8463,7 @@ if(false&&!LS.get('hint1',0)){ setTimeout(()=>{ toast(matchMedia('(pointer:coars
 
 /* Update-Hinweis: prüft version.json auf GitHub Pages; «Aktualisieren» lädt die Seite ohne Cache neu */
 (()=>{
-  const BUILD='20261104101934'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
+  const BUILD='20261104103727'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
   // nach einem Update die ?v=… aus der Adresse entfernen
   try{ const u=new URL(location.href); if(u.searchParams.has('v')){ u.searchParams.delete('v'); history.replaceState(null,'',u.pathname+(u.search||'')+u.hash); } }catch(e){}
   const el=$('#upd'); let latest=null, snoozed=null, busy=false;
