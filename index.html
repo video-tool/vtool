@@ -1310,7 +1310,6 @@ body.touring .toast{z-index:450}
   .tour-card{padding:12px 14px}
   .tour-p{font-size:12.5px}
 }
-.ft-demo .ft-demo-h:not(:first-child){margin-top:12px;padding-top:10px;border-top:1px solid var(--line)}
 /* ---------- «Geöffnet» als kompakte Liste ---------- */
 .lib.list{display:flex!important;flex-direction:column!important;gap:2px!important;overflow:visible!important;padding:0!important;scroll-snap-type:none}
 .lib.list .lib-grp{font-size:11px;font-weight:600;color:var(--muted);padding:10px 8px 4px;letter-spacing:.01em}
@@ -1931,6 +1930,31 @@ body.recording .rec-btn svg circle:last-child{color:#fff}
 .gate-pill[data-r="lose"] .gd{background:linear-gradient(180deg,#ff6b5c,#e2382a)}
 .gate-pill[data-r="win"] .gn{background:#1fa863}
 .gate-pill[data-r="lose"] .gn{background:#e2382a}
+.ft-demo{gap:0}
+.ft-demo-t{font-size:12.5px;font-weight:650;padding:0 8px 4px}
+.ft-demo-h{display:flex;flex-direction:row;align-items:center;gap:5px;width:100%;min-height:28px;padding:0 8px 0 4px;border:none;border-top:1px solid var(--line);background:none;color:var(--muted);font:inherit;font-size:11px;text-align:left;cursor:pointer}
+.ft-demo-t+.ft-demo-h{border-top:none}
+.ft-demo-h:hover{color:var(--ink);background:color-mix(in srgb,var(--ink) 4%,transparent)}
+.ft-demo-h[aria-expanded="true"]{color:var(--ink2);font-weight:600}
+.ft-demo-h .dh-t{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ft-demo-h .dh-d,.ft-demo-h .dh-n{flex:none;font:500 10px var(--mono);color:var(--muted)}
+.ft-demo-h .dh-n{min-width:12px;text-align:right}
+.ft-demo-h .ab-tags{margin-left:0;flex:none}
+.ft-demo-h .ab-tags em{width:15px;height:15px;font-size:9px;border-radius:5px}
+.ft-demo-h[aria-expanded="true"]+.demo-row{margin-top:0}
+#sideTree.names .ft-demo .ft-row.file{min-height:24px!important;padding-top:0;padding-bottom:0}
+.demo-cams{display:inline-flex;gap:3px;justify-content:flex-end;overflow:visible!important}
+.demo-cam{width:20px;height:18px;padding:0;border:1px solid var(--line2);border-radius:5px;background:none;color:var(--muted);font:600 10px var(--mono);cursor:pointer}
+.demo-cam:hover{color:var(--ink);border-color:var(--ink2)}
+.demo-cam.sel{background:var(--red);border-color:var(--red);color:#fff}
+.demo-cam.ta{background:var(--a,#FFC21A);border-color:var(--a,#FFC21A);color:var(--a-ink,#111)}
+.demo-cam.tb{background:var(--b,#8B5CF6);border-color:var(--b,#8B5CF6);color:#fff}
+@media (max-width:760px),(pointer:coarse){
+  .ft-demo-h{min-height:40px}
+  #sideTree.names .ft-demo .ft-row.file{min-height:38px!important}
+  .demo-cam{width:30px;height:30px;font-size:11px}
+  #sideTree.names .ft-row.file.demo-row .ft-tx{grid-template-columns:minmax(0,1fr) 56px 100px}
+}
 @media (prefers-reduced-motion:reduce){
   .gate-pill.pop{animation:none}
 }
@@ -7953,22 +7977,31 @@ function ftRender(){
   FT.roots.forEach(r=>row(r,0));
   renderDemoList();
 }
+const DL={open:null,closed:new Set(),act:''}; /* Beispiel-Läufe: offene Gruppe (null = noch nichts angetippt), von Hand zugeklappte Gruppen mit aktiven Videos */
 function renderDemoList(){
   const el=$('#ftDemo'); if(!el) return; const q=FT.q||''; const ds=clips.filter(c=>c.demo&&c.meta&&c.meta.ok&&(!q||[c.name,c.meta.athlete,c.meta.place,c.meta.disc,c.meta.date,c.meta.run,DISC_LONG[c.meta.disc]].join(' ').toLowerCase().includes(q)));
   const any=clips.some(c=>c.demo&&c.meta&&c.meta.ok), show=any&&!FT.roots.length; el.hidden=!show; if(show&&!ds.length){ if(el._sig!=='none:'+q){ el._sig='none:'+q; el.innerHTML='<div class="ft-none">Keine Treffer für «'+q.replace(/[<>&]/g,'')+'»</div>'; } return; } const em=$('#ftEmpty'); if(em) em.classList.toggle('compact',show); if(!show) return;
-  const sig=q+'|'+mode+'|'+[S,A,B,GD].map(d=>d.clip&&d.clip.id).join(',')+'|'+ds.map(c=>c.id+':'+(c.poster?1:0)).join(',');
+  const on=c=>mode==='single'?S.clip===c:mode==='gps'?GD.clip===c:(A.clip===c||B.clip===c);
+  const gk=c=>(c.meta.place||'')+'|'+(c.meta.disc||'')+'|'+(c.meta.date||''), groups=new Map(); ds.forEach(c=>{ const k=gk(c); if(!groups.has(k)) groups.set(k,[]); groups.get(k).push(c); });
+  const act=mode+':'+ds.filter(on).map(c=>c.id).join(','); if(act!==DL.act){ DL.act=act; DL.closed.clear(); } /* neue Auswahl: Gruppen mit aktiven Videos wieder offen */
+  const isOpen=(k,cs)=>{ if(q) return true; if(cs.some(on)) return !DL.closed.has(k); return DL.open===null?!ds.some(on)&&k===groups.keys().next().value:DL.open===k; };
+  const sig=q+'|'+mode+'|'+[S,A,B,GD].map(d=>d.clip&&d.clip.id).join(',')+'|'+ds.map(c=>c.id+':'+(c.poster?1:0)).join(',')+'|'+[...groups].filter(([k,cs])=>isOpen(k,cs)).map(([k])=>k).join(';');
   if(el._sig===sig) return; el.classList.toggle('first',!el._sig); el._sig=sig;
-  el.innerHTML=''; let grp=null;
-  ds.forEach(c=>{ const r=document.createElement('div'); const isOn=mode==='single'?S.clip===c:mode==='gps'?GD.clip===c:(A.clip===c||B.clip===c);
-    r.className='ft-row file demo-row'+(isOn?' on':''); r.dataset.ci=clips.indexOf(c); r.draggable=true; const m=c.meta||{};
-    r.innerHTML=`<span class="ft-th${c.poster?' has':''}" style="${c.poster?`background-image:url(${c.poster})`:''}"><i>${c.dur?fmtDur(c.dur):''}</i></span>`
-      +`<span class="ft-tx"><span class="ft-nm"></span><span class="ft-sub"></span></span>`
-      +(mode==='cmp'?`<span class="ab-tags">${A.clip===c?'<em class="ta">A</em>':''}${B.clip===c?'<em class="tb">B</em>':''}</span><span class="ft-acts"><button data-a="a" class="ab-a" title="Als Video A">A</button><button data-a="b" class="ab-b" title="Als Video B">B</button></span>`:'');
-    const gk2=x=>(x.meta.place||'')+'|'+(x.meta.disc||'')+'|'+(x.meta.date||''), mixCam=new Set(ds.filter(x=>gk2(x)===gk2(c)).map(x=>x.meta.cam||'')).size>1; // mehrere Kameras im selben Training → Kamera pro Video zeigen
-    $('.ft-nm',r).textContent=m.athlete||dispName(c); subCols($('.ft-sub',r),mixCam?[m.cam||m.run,m.run,m.date].filter((v,i,a)=>v&&a.indexOf(v)===i).slice(0,2):[m.run||DISC_LONG[m.disc]||m.cam,m.date]);
-    const g=(m.place||'')+'|'+(m.disc||'')+'|'+(m.date||''); if(g!==grp){ grp=g; const h=document.createElement('div'); h.className='ft-demo-h'; const yr=m.date?m.date.slice(-4):'';
-      h.innerHTML='<b>'+(grp===((ds[0].meta.place||'')+'|'+(ds[0].meta.disc||'')+'|'+(ds[0].meta.date||''))?'Beispiel-Läufe':'')+'</b><span></span>'; $('span',h).textContent=[[m.place,yr].filter(Boolean).join(' '),DISC_LONG[m.disc]||m.disc,mixCam?null:m.cam].filter(Boolean).join(' · '); if(!$('b',h).textContent) $('b',h).remove(); el.appendChild(h); }
-    el.appendChild(r); });
+  el.innerHTML='<div class="ft-demo-t">Beispiel-Läufe</div>';
+  groups.forEach((cs,k)=>{ const m0=cs[0].meta, open=isOpen(k,cs), h=document.createElement('button'); h.type='button'; h.className='ft-demo-h'; h.dataset.g=k; h.setAttribute('aria-expanded',open);
+    const rows=new Map(); cs.forEach(c=>{ const m=c.meta, rk=(m.athlete||c.id)+'|'+(m.run||''); if(!rows.has(rk)) rows.set(rk,[]); const L=rows.get(rk); if(L.some(x=>(x.meta.cam||'')===(m.cam||''))) rows.set(rk+'|'+c.id,[c]); else L.push(c); }); /* derselbe Lauf aus mehreren Kameras = eine Zeile */
+    const lbl=[m0.place,DISC_LONG[m0.disc]||m0.disc].filter(Boolean).join(' · ');
+    h.title=[lbl,m0.date].filter(Boolean).join(' · ');
+    h.innerHTML=`<span class="ft-chev${open?' open':''}">${ICN.chev}</span><span class="dh-t"></span>`+(!open&&mode==='cmp'&&cs.some(on)?`<span class="ab-tags">${cs.includes(A.clip)?'<em class="ta">A</em>':''}${cs.includes(B.clip)?'<em class="tb">B</em>':''}</span>`:'')+`<span class="dh-d"></span><span class="dh-n">${rows.size}</span>`;
+    $('.dh-t',h).textContent=lbl; $('.dh-d',h).textContent=m0.date||''; el.appendChild(h); if(!open) return;
+    rows.forEach(L=>{ const c=L.find(on)||L[0], m=c.meta, multi=L.length>1, r=document.createElement('div');
+      r.className='ft-row file demo-row'+(L.some(on)?' on':''); r.dataset.ci=clips.indexOf(c); r.dataset.cis=L.map(x=>clips.indexOf(x)).join(','); r.draggable=true;
+      r.innerHTML=`<span class="ft-th${c.poster?' has':''}" style="${c.poster?`background-image:url(${c.poster})`:''}"><i>${c.dur?fmtDur(c.dur):''}</i></span>`
+        +`<span class="ft-tx"><span class="ft-nm"></span><span class="ft-sub"></span></span>`
+        +(mode==='cmp'?`<span class="ab-tags">${multi?'':(A.clip===c?'<em class="ta">A</em>':'')+(B.clip===c?'<em class="tb">B</em>':'')}</span><span class="ft-acts"><button data-a="a" class="ab-a" title="Als Video A">A</button><button data-a="b" class="ab-b" title="Als Video B">B</button></span>`:'');
+      $('.ft-nm',r).textContent=m.athlete||dispName(c); subCols($('.ft-sub',r),[m.run||DISC_LONG[m.disc]||'',multi?'':m.cam||'']);
+      if(multi){ const box=$('.ft-sub .c1',r); box.classList.add('demo-cams'); L.forEach(x=>{ const b=document.createElement('button'), lb=x.meta.cam||'?'; b.type='button'; b.draggable=true; b.className='demo-cam'+(mode==='cmp'?(A.clip===x?' ta':B.clip===x?' tb':''):on(x)?' sel':''); b.dataset.c=clips.indexOf(x); b.title=lb; b.textContent=lb.replace(/^Cam\s*/i,'').slice(0,2); box.appendChild(b); }); }
+      el.appendChild(r); }); });
 }
 const DISC_LONG={GS:'Riesenslalom',SL:'Slalom',SG:'Super-G',DH:'Abfahrt',AC:'Kombination',PS:'Parallel',SBX:'Snowboardcross'};
 function nodeById(id){ return ftFind(n=>n.id===+id); }
@@ -8025,10 +8058,18 @@ function newDirDialog(parent){ ftDialog('Neuer Ordner',`<p class="ft-hint">In «
 function setSideTab(t){ FT.tab='tree'; $('#sideTree').hidden=false; sideOpenUI(); ftRender(); } // eine Liste: Geöffnet oben, Ordner und Beispiele darunter
 function sideOpenUI(){ const n=clips.filter(c=>!c.demo).length, el=$('#sideOpen'); if(!el) return; const rs=$('#libRestore'); el.hidden=!n&&(!rs||rs.hidden); const k=$('#openN'); if(k) k.textContent=n; }
 function ftWire(){
-  $('#ftDemo').addEventListener('click',e=>{ const r=e.target.closest('.demo-row'); if(!r) return; const c=clips[+r.dataset.ci]; if(!c) return; const a=e.target.closest('[data-a]');
+  $('#ftDemo').addEventListener('click',e=>{ const h=e.target.closest('.ft-demo-h');
+    if(h){ const k=h.dataset.g, opened=h.getAttribute('aria-expanded')==='true', cs=clips.filter(c=>c.demo&&c.meta&&c.meta.ok&&(c.meta.place||'')+'|'+(c.meta.disc||'')+'|'+(c.meta.date||'')===k), active=cs.some(c=>mode==='single'?S.clip===c:mode==='gps'?GD.clip===c:(A.clip===c||B.clip===c));
+      if(opened){ if(active) DL.closed.add(k); if(DL.open===k||DL.open===null) DL.open=''; } else { DL.closed.delete(k); DL.open=k; } renderDemoList(); return; }
+    const r=e.target.closest('.demo-row'); if(!r) return; let c=clips[+r.dataset.ci]; if(!c) return; const a=e.target.closest('[data-a]'), cam=e.target.closest('.demo-cam'), L=r.dataset.cis.split(',').map(i=>clips[+i]);
+    if(cam) c=clips[+cam.dataset.c];
     if(mode==='single'){ S.setClip(c); refreshSingleHead(); }
     else if(mode==='gps'){ GD.setClip(c); gpsSelects(); }
-    else { const d=a?(a.dataset.a==='a'?A:B):(A.clip===c||B.clip===c?null:B); if(d){ d.setClip(c); unlink(); syncSelects();
+    else { let d;
+      if(a){ d=a.dataset.a==='a'?A:B; const o=d===A?B:A; if(L.length>1) c=L.find(x=>x===d.clip)||L.find(x=>x!==o.clip)||c; } /* andere Kamera als im zweiten Video */
+      else if(cam){ const inA=L.includes(A.clip), inB=L.includes(B.clip); d=A.clip===c||B.clip===c?null:inA&&!inB?A:B; } /* Kamera wechseln im Video, das diesen Lauf zeigt */
+      else d=A.clip===c||B.clip===c?null:B;
+      if(d){ d.setClip(c); unlink(); syncSelects();
  } }
     renderLib(); });
   $('#sideTabs').addEventListener('click',e=>{ const b=e.target.closest('[data-st]'); if(b) setSideTab(b.dataset.st); });
@@ -8040,7 +8081,7 @@ function ftWire(){
   $('#ftOk').addEventListener('click',async()=>{ if(!FT.dlg) return; const b=$('#ftOk'); b.disabled=true; try{ const ok=await FT.dlg(); if(ok!==false) ftClose(); }finally{ b.disabled=false; } });
   $('#ftModal').addEventListener('keydown',e=>{ e.stopPropagation(); if(e.key==='Enter'&&e.target.tagName==='INPUT') $('#ftOk').click(); if(e.key==='Escape') ftClose(); });
   const tree=$('#ftree');
-  $('#ftDemo').addEventListener('dragstart',e=>{ const r=e.target.closest('.demo-row'); if(!r) return; vdStart(e,{clip:clips[+r.dataset.ci]},r); });
+  $('#ftDemo').addEventListener('dragstart',e=>{ const r=e.target.closest('.demo-row'); if(!r) return; const cm=e.target.closest('.demo-cam'); vdStart(e,{clip:clips[+(cm?cm.dataset.c:r.dataset.ci)]},r); });
   tree.addEventListener('dblclick',e=>{ const r=e.target.closest('.ft-row.file'); if(!r||r.classList.contains('demo-row')||!e.target.closest('.ft-nm')) return; const n=nodeById(r.dataset.id); if(n&&!n.ro){ e.preventDefault(); renDialog(n); } });
   tree.addEventListener('click',async e=>{ const r=e.target.closest('.ft-row'); if(!r) return; const n=nodeById(r.dataset.id); if(!n) return; const a=e.target.closest('[data-a]'); const act=a&&a.dataset.a;
     if(act==='unlock') return ftUnlock(n); if(act==='unroot') return ftRemoveRoot(n); if(act==='newdir') return newDirDialog(n);
@@ -8419,7 +8460,7 @@ if(false&&!LS.get('hint1',0)){ setTimeout(()=>{ toast(matchMedia('(pointer:coars
 
 /* Update-Hinweis: prüft version.json auf GitHub Pages; «Aktualisieren» lädt die Seite ohne Cache neu */
 (()=>{
-  const BUILD='20261103210717'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
+  const BUILD='20261104101934'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
   // nach einem Update die ?v=… aus der Adresse entfernen
   try{ const u=new URL(location.href); if(u.searchParams.has('v')){ u.searchParams.delete('v'); history.replaceState(null,'',u.pathname+(u.search||'')+u.hash); } }catch(e){}
   const el=$('#upd'); let latest=null, snoozed=null, busy=false;
