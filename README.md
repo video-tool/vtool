@@ -8,18 +8,19 @@ Videos werden nur im Browser geöffnet und **nie hochgeladen**. Alles steckt in 
 
 ## Beispiel-Videos
 
-Beim Öffnen des Links sind Beispiel-Läufe geladen: Sölden (26.10.2025, Riesenslalom Herren, Kamera auf der Piste: Meillard, Gratz, Braathen) Courchevel (11.03.2026, Abfahrtstraining, Gegenhang: Boisset, Kriechmayr, Allègre) und Hafjell (Weltcup März 2026, Gegenhang: Riesenslalom Moltzan, Rast; Slalom Holdener, Shiffrin). Sie liegen im Ordner `demo/` (720p) und werden direkt von GitHub Pages abgespielt. Eigene Videos bleiben weiterhin nur auf dem Gerät.
+Beim Öffnen des Links stehen in der Liste links Beispiel-Läufe aus mehreren Orten und Disziplinen, nach Rennen gruppiert. Sie liegen im Ordner `demo/` und werden direkt von GitHub Pages abgespielt. Sie dienen dem internen Test und werden vor der Abgabe an die Coaches entfernt. Eigene Videos bleiben nur auf dem Gerät.
 
 ## Modi
 
 - **Einzelvideo:** Zeitlupe, Bild für Bild, Zeitleiste mit Vorschaubildern, Loop-Bereich, Marker, Zeichnen & Winkel messen, Standbild (PNG).
 - **Vergleich:** A und B als **Side by Side** oder **Overlay**, an einem Moment synchronisieren und gemeinsam abspielen. «Anleitung» führt direkt im Tool mit den Beispiel-Läufen Schritt für Schritt durch Side by Side bzw. Overlay.
   - **Overlay:** Zwei Läufe vom gleichen Kamerastandort in einem Bild. (1) Beide Videos zum gleichen Moment schieben (z. B. erstes gemeinsames Tor), optional Start und Ende des Ausschnitts setzen. (2) B wird automatisch über A gelegt; passt es nicht, mit «Neu legen» oder «Zwei Punkte» korrigieren. (3) «Overlay erstellen»: B folgt dem Kameraschwenk (lokal im Browser berechnet), mit Rückstand live und MP4-Export.
+  - **Tore:** Der türkise Knopf in Side-by-Side misst sichere Tore automatisch in A und B (gleicher Kamerastandort nötig). Unsichere Tore werden ausgelassen, Slalomstangen noch nicht erkannt. Die Messung bleibt pro Videopaar im Browser gespeichert. Tor antippen oder ↑ ↓: beide Videos springen auf das Bild der Messung.
 - **GPS:** GPS-Daten eines Laufs mit dem Video verknüpfen. Im Bild: Tempo & Beschleunigung, Fahrlinie (gefärbt nach Tempo, Beschleunigung oder Δ zur Referenz), Laufzeit und Differenz. Darunter das Profil über die Distanz.
 
 ## Bedienung
 
-- **Links: «Dateien».** «Ordner wählen» verbindet einen Video-Ordner deines Geräts (Chrome/Edge). Du siehst die Ordnerstruktur, öffnest Videos per Klick, benennst sie um und verschiebst sie per Ziehen. **Brave:** Ohne Einstellung kann der Ordner angesehen und Videos geöffnet werden. Zum Umbenennen/Verschieben einmalig `brave://flags/#file-system-access-api` aktivieren und Brave neu starten. Unter «In Arbeit» stehen die aktuell geladenen Videos – nur diese stehen für A, B und GPS zur Wahl.
+- **Links: «Dateien».** «Ordner wählen» verbindet einen Video-Ordner deines Geräts (Chrome/Edge). Du siehst die Ordnerstruktur, öffnest Videos per Klick, benennst sie um und verschiebst sie per Ziehen. **Brave:** Ohne Einstellung kann der Ordner angesehen und Videos geöffnet werden. Zum Umbenennen/Verschieben einmalig `brave://flags/#file-system-access-api` aktivieren und Brave neu starten. Unter «Geöffnet» stehen die aktuell geladenen Videos. Mit «Ordner», «Tag», «Ort» und «Athlet:in» lässt sich die Liste über alle Unterordner ordnen.
 - **Unter dem Video:** links In / Out / Loop, in der Mitte Abspielen und Bild-für-Bild, daneben **ein Tempo-Knopf**: jeder Klick wechselt 1× → ½× → ¼× → 0,1× → 1×.
 - **Werkzeuge** (Zeichnen, Messen, Bildanpassung) öffnen sich per Klick auf den Stift neben dem Video und sind sonst eingeklappt.
 - **fps** stehen oben in der Kopfzeile und werden beim Laden gemessen; Klick darauf, um sie von Hand zu ändern.
@@ -67,7 +68,8 @@ VideoLab.link(trackId, "Datei.mp4", offset)
 Nach jedem Push erscheint in offenen Fenstern der Hinweis «Neue Version verfügbar»; «Aktualisieren» lädt die neue Version ohne Cache (`version.json` gehört zum Push dazu).
 
 - **fps** werden direkt aus der Datei gelesen (MP4/MOV), auch am Handy exakt.
-- **«In Arbeit»** (geladene Videos): kompakte Liste nach Rennen gruppiert, Umschalter auf «nur Dateinamen».
+- **«Geöffnet»** (geladene Videos): kompakte Liste nach Rennen gruppiert, Umschalter auf «nur Dateinamen».
+- **Einstellungen** (Profilbild oder «…»): Sprache Deutsch/Französisch, Hell/Dunkel, Standardtempo.
 - **Overlay exportieren**: Clip-Export und Standbild speichern im Overlay das ausgerichtete Bild.
 
 Tastenkürzel: in der App unter **?**.
