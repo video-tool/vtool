@@ -4571,7 +4571,20 @@ function fullscreen(){ const el=mode==='single'?$('#viewSingle'):mode==='gps'?$(
   if(document.body.classList.contains('pfs')){ pfsSet(false); return; }
   try{ if(document.fullscreenElement){ document.exitFullscreen(); return; } if(el.requestFullscreen&&document.fullscreenEnabled!==false){ el.requestFullscreen().catch(()=>pfsSet(true)); return; } if(el.webkitRequestFullscreen&&document.webkitFullscreenEnabled){ el.webkitRequestFullscreen(); return; } }catch(e){}
   pfsSet(true); } /* iPhone kann keine Seitenteile ins Vollbild nehmen → Ansicht füllt den Bildschirm */
-function pfsSet(on){ document.body.classList.toggle('pfs',on); scrollTo(0,0); setTimeout(()=>{ dispatchEvent(new Event('resize')); decks.forEach(d=>{ d.dirty=true; d.annDirty=true; }); if(typeof GPS!=='undefined') GPS.dirty=true; },60); }
+function pfsSet(on){ document.body.classList.toggle('pfs',on); scrollTo(0,0); setTimeout(()=>{ dispatchEvent(new Event('resize')); pfsFit(); decks.forEach(d=>{ d.dirty=true; d.annDirty=true; }); if(typeof GPS!=='undefined') GPS.dirty=true; },60); }
+/* Vollbild auf dem Handy: Video so weit verkleinern, dass Zeichenleiste, Zeitleiste und Knöpfe darunter Platz haben (Hochformat-Video war zu hoch) */
+function pfsFit(){ const pfs=document.body.classList.contains('pfs'), ph=matchMedia('(max-width:760px)').matches;
+  ['#sHost','#gHost'].forEach(h=>{ const host=$(h), st=host&&host.querySelector('.stage'); if(!st) return; st.style.removeProperty('height'); st.style.removeProperty('max-height');
+  const pl=host.closest('.player')||host.closest('.card'); if(!pl||pl.hidden||!pl.getClientRects().length) return; let over;
+  if(pfs) over=pl.scrollHeight-pl.clientHeight;
+  else { if(!ph||!st.classList.contains('portrait')) return; /* Handy, Hochformat-Video: ganze Ansicht samt Knöpfen über der Tab-Leiste */
+    const tb=$('.tabs'), tr=tb&&tb.getClientRects().length?tb.getBoundingClientRect():null, lim=tr&&tr.top>innerHeight/2?tr.top:(visualViewport?visualViewport.height:innerHeight), r=pl.getBoundingClientRect();
+    over=r.height-(lim-(r.top+scrollY))+6; }
+  if(over<=1) return; const nh=Math.max(160,Math.floor(st.getBoundingClientRect().height-over-2));
+  st.style.setProperty(st.classList.contains('portrait')?'height':'max-height',nh+'px','important'); }); }
+(()=>{ let q=0; const go=()=>{ if(q) return; q=requestAnimationFrame(()=>{ q=0; pfsFit(); }); }; addEventListener('resize',go); if(window.visualViewport) visualViewport.addEventListener('resize',go);
+  if(window.ResizeObserver){ const ro=new ResizeObserver(go); ['#sHost','#gHost'].forEach(h=>{ const host=$(h); if(!host) return; const pl=host.parentElement; [...pl.children,...host.children].forEach(c=>{ if(c!==host&&!c.classList.contains('stage')) ro.observe(c); }); }); }
+  const mo=new MutationObserver(go); ['#sHost','#gHost'].forEach(h=>{ const st=$(h+' .stage'); if(st) mo.observe(st,{attributes:true,attributeFilter:['class']}); }); })(); /* Hochformat erkannt → neu einpassen */
 document.addEventListener('fullscreenchange',()=>document.body.classList.toggle('rfs',!!document.fullscreenElement));
 document.addEventListener('click',e=>{ const b=e.target.closest('.st-fs'); if(!b) return; e.preventDefault(); e.stopPropagation(); fullscreen(); },true);
 ['pointerdown','pointerup','touchstart','touchend','mousedown','mouseup','dblclick'].forEach(t=>document.addEventListener(t,e=>{ if(e.target.closest&&e.target.closest('.st-fs')) e.stopPropagation(); },true)); /* Tippen auf Vollbild startet nicht das Video */
@@ -4589,7 +4602,7 @@ function setMode(m){
   [S,A,B,GD].forEach(d=>{ if(!(m==='single'&&d===S)&&!(m==='cmp'&&(d===A||d===B))&&!(m==='gps'&&d===GD)) d.pause(); });
   if(m==='gps'){ gpsSelects(); if(typeof invAuto==='function') setTimeout(invAuto,0); } GPS.dirty=true;
   setRateUI(); renderLib(); syncSelects(); updSync(); splitsUI(); fxUI(); if(typeof ftRender==='function') ftRender();
-  decks.forEach(d=>{ d.dirty=true; d.annDirty=true; }); LS.set('mode',m); if(window.placeChrome) placeChrome();
+  decks.forEach(d=>{ d.dirty=true; d.annDirty=true; }); LS.set('mode',m); if(window.placeChrome) placeChrome(); setTimeout(()=>window.pfsFit&&pfsFit(),80);
   try{ history.replaceState(null,'',m==='cmp'?'#vergleich':m==='gps'?'#gps':'#einzel'); }catch(e){}
 }
 // Seitenwechsel: weicher Übergang in Richtung des Tabs (View Transitions, sonst Einblenden)
@@ -8647,7 +8660,7 @@ if(false&&!LS.get('hint1',0)){ setTimeout(()=>{ toast(matchMedia('(pointer:coars
 
 /* Update-Hinweis: prüft version.json auf GitHub Pages; «Aktualisieren» lädt die Seite ohne Cache neu */
 (()=>{
-  const BUILD='20261106113810'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
+  const BUILD='20261108150558'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
   // nach einem Update die ?v=… aus der Adresse entfernen
   try{ const u=new URL(location.href); if(u.searchParams.has('v')){ u.searchParams.delete('v'); history.replaceState(null,'',u.pathname+(u.search||'')+u.hash); } }catch(e){}
   const el=$('#upd'); let latest=null, snoozed=null, busy=false;
