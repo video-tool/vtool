@@ -571,7 +571,7 @@ header{box-shadow:none}
 .logo{width:32px;height:32px;filter:none}
 .brand-sub{font-size:8.5px;letter-spacing:.14em;color:var(--muted)}
 .brand-beta{margin-left:5px;padding:0 4px;border:1px solid currentColor;border-radius:4px;font-size:.85em;letter-spacing:.1em;opacity:.6;vertical-align:1px} /* dezenter Beta-Hinweis neben dem Namen */
-html.no-gps #tabGps{display:none!important}
+html.no-gps #tabGps,html.no-gps #hdrInv,html.no-gps .inv-btn{display:none!important} /* GPS und innove nur auf Staging */
 .tabs{align-self:center;background:color-mix(in srgb,var(--ink) 6%,transparent);border-radius:12px;padding:4px;gap:2px}
 .tab{height:34px;border:none;border-radius:9px;padding:0 14px;font-size:13px;font-weight:600;color:var(--muted)}
 .tab svg{width:16px;height:16px;opacity:.85}
@@ -5021,6 +5021,8 @@ function blobs(m,w,h,minA){ const lab=new Int32Array(m.length); const all=[]; le
 function pickBlob(list,pred,scale){ if(!list.length) return null; let best=null,bs=-1; for(const b of list){ const dist=pred?Math.hypot(b.x-pred[0],b.y-pred[1]):0; const sc=b.a*Math.exp(-dist/scale); if(sc>bs){ bs=sc; best=b; } } return best; }
 
 /* ---------- Berechnung ---------- */
+/* wie ghostKey, aber ohne Start/Ende des Overlays: gleiche Videos, gleicher Abgleich, gleiche Korrekturpunkte */
+function ghostKeyBase(){ return (A.clip&&B.clip&&G.linked)?A.clip.id+'|'+B.clip.id+'|'+G.off.toFixed(4)+'|'+G.syncA.toFixed(4)+(typeof OV!=='undefined'&&ovActive()?'|ov|'+(OV.T?OV.T.map(x=>x.toFixed(2)).join(','):''):''):''; }
 function ghostKey(){ return (A.clip&&B.clip&&G.linked)?A.clip.id+'|'+B.clip.id+'|'+G.off.toFixed(4)+'|'+G.syncA.toFixed(4)+(typeof OV!=='undefined'&&ovActive()?'|ov'+OV.cut.a+'|'+OV.cut.b+'|'+(OV.T?OV.T.map(x=>x.toFixed(2)).join(','):''):''):''; }
 function seekV(v,t){ return new Promise(res=>{ let done=false; const h=()=>{ if(done) return; done=true; v.removeEventListener('seeked',h); res(); }; v.addEventListener('seeked',h); setTimeout(h,4000); v.currentTime=Math.max(0,t); }); }
 function loadV(url){ return new Promise((res,rej)=>{ const v=document.createElement('video'); v.muted=true; v.playsInline=true; v.preload='auto'; v.className='gen-vid'; document.body.appendChild(v);
@@ -5159,7 +5161,7 @@ async function ghostCompute(opt){ // opt.resume: ab Bild opt.j mit fester Lage o
   if(!A.ready||!B.ready||!G.linked){ toast('Zuerst den gleichen Moment von A und B setzen.'); return; }
   if(!bg){ A.pause(); B.pause(); }
   if(!bg) try{ ghostProgress(0,'Schritt 1 von 3 · Videos vorbereiten'); }catch(e){}
-  const key=ghostKey(); if(bg){ GH.bgAbort=false; GH.bg={p:0,k0:OV.K.length}; } else { GH.state='busy'; GH.abort=false; GH.key=key; GH.coarse=coarse; } ghostUI();
+  const key=ghostKey(); if(bg){ GH.bgAbort=false; GH.bg={p:0,k0:OV.K.length}; } else { GH.state='busy'; GH.abort=false; GH.key=key; GH.keyBase=ghostKeyBase(); GH.coarse=coarse; } ghostUI();
   const stop=()=>bg?(GH.bgAbort||ghostKey()!==key||GH.key!==key||GH.state!=='ready'):(GH.abort||ghostKey()!==key);
   const W0=GH.W0, wA=A.v.videoWidth, hA0=A.v.videoHeight, wB=B.v.videoWidth, hB0=B.v.videoHeight;
   const hA=Math.round(W0*hA0/wA)&~1, hB=Math.round(W0*hB0/wB)&~1; GH.hA=hA; GH.hB=hB;
@@ -5524,7 +5526,11 @@ function ovSim(pa,pb){ // Ähnlichkeits-Transformation B-Videopixel → A-Videop
   const [a1,a2]=pa,[b1,b2]=pb, dbx=b2[0]-b1[0], dby=b2[1]-b1[1], dax=a2[0]-a1[0], day=a2[1]-a1[1], den=dbx*dbx+dby*dby; if(den<4) return null;
   const re=(dax*dbx+day*dby)/den, im=(day*dbx-dax*dby)/den, sc=Math.hypot(re,im); if(sc<0.25||sc>4) return null;
   return [re,-im,a1[0]-(re*b1[0]-im*b1[1]),im,re,a1[1]-(im*b1[0]+re*b1[1])]; }
-function ovFollowOK(){ return OV.follow&&GH.state==='ready'&&ghostKey()===GH.key; }
+function ovFollowOK(){ if(!(OV.follow&&GH.state==='ready')) return false; const k=ghostKey(); if(k===GH.key) return true;
+  /* nur Start/Ende innerhalb des schon gerechneten Bereichs verschoben → fertiges Overlay weiter verwenden, nicht neu rechnen */
+  if(GH.keyBase&&GH.keyBase===ghostKeyBase()&&GH.t0!=null&&GH.eEnd>0){ const a=OV.cut.a!=null?OV.cut.a:GH.t0, b=OV.cut.b!=null?OV.cut.b:GH.t0+GH.eEnd;
+    if(a>=GH.t0-0.02&&b<=GH.t0+GH.eEnd+0.1&&b>a){ GH.key=k; return true; } }
+  return false; }
 
 const OVI={vid:`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="13" height="12" rx="2"/><path d="M16 10l5-3v10l-5-3z"/></svg>`,img:`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.6"/></svg>`,rec:`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4" fill="#ff4b3e" stroke="none"/></svg>`,cut:`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M8 4H5v16h3"/><path d="M16 4h3v16h-3"/><path d="M10 12h4"/></svg>`,info:`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 11v6"/><circle cx="12" cy="7.2" r=".6" fill="currentColor"/></svg>`,dots:`<svg class="ic" viewBox="0 0 24 24" fill="currentColor"><circle cx="5.5" cy="12" r="1.9"/><circle cx="12" cy="12" r="1.9"/><circle cx="18.5" cy="12" r="1.9"/></svg>`,dl:`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg>`,tag:`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12V5a2 2 0 0 1 2-2h7l9 9-9 9-9-9z"/><circle cx="8" cy="8" r="1.6"/></svg>`,plus:`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>`,reset:`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 1 0 2.3-5.6"/><path d="M4 4v4h4"/></svg>`,pause:`<svg class="ic" viewBox="0 0 24 24" fill="currentColor"><rect x="6.5" y="5" width="4" height="14" rx="1"/><rect x="13.5" y="5" width="4" height="14" rx="1"/></svg>`,play:`<svg class="ic" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>`,fix:`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M3 12h18"/><path d="M9 6l3-3 3 3M9 18l3 3 3-3M6 9l-3 3 3 3M18 9l3 3-3 3"/></svg>`,trash:`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg>`,side:`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="5" width="8.5" height="14" rx="2"/><rect x="13" y="5" width="8.5" height="14" rx="2"/></svg>`,cs:`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M8 4H5v16h3"/><path d="M11 12h8M16 9l3 3-3 3"/></svg>`,ce:`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h3v16h-3"/><path d="M13 12H5M8 9l-3 3 3 3"/></svg>`,ok:`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>`,pin:`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="10" r="3"/><path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0C18.5 15.4 12 21 12 21z"/></svg>`,go:`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/><path d="M19 16l.7 2 2 .7-2 .7-.7 2-.7-2-2-.7 2-.7z"/></svg>`,back:`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>`,x:`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"/></svg>`};
 function ovT0(){ return OV.cut.a!=null?Math.max(OV.cut.a,-G.off,0):G.syncA; }
@@ -6391,7 +6397,7 @@ function renderOv(){
     else if(a==='mkhand') return ovGo(true);
     else if(a==='automk') return ovGo(false);
     else if(a==='cancel') return ovStop();
-    else if(a==='make'){ OV.follow=true; OV.fix=null; if(!(GH.state==='ready'&&ghostKey()===GH.key)){ OV.K=[]; ovUI(); ghostCompute({}); return; } if(GH.coarse&&!GH.bg){ ghostCompute({bg:true}); } ovUI(); return; }
+    else if(a==='make'){ OV.follow=true; OV.fix=null; if(!ovFollowOK()){ OV.K=[]; ovUI(); ghostCompute({}); return; } if(GH.coarse&&!GH.bg){ ghostCompute({bg:true}); } ovUI(); return; }
     else if(a==='fix'){ A.pause(); B.pause(); G.playing=false; cmpPlayIcon(); const D=ovDAt(ovE()); OV.fix={...D}; OV.fix0={...D}; }
     else if(a==='hand') return ovAlign();
     else if(a==='ovtrail'){ OVT.on=!OVT.on; }
@@ -7294,7 +7300,7 @@ $('#gpsIn').addEventListener('change',e=>{ if(e.target.files&&e.target.files.len
    Ablauf wie in der innove-Anleitung (30.10.2026): Athlet:in → Zeitfenster zur Videomitte → Läufe des Zeitfensters → Lauf mit der grössten
    Überlappung (sonst der nächste innert 2 min) → Rohspur des Sensors ±5 s. Jede:r meldet sich mit dem eigenen innove-Zugang an; gespeichert wird nur das Token. */
 const INV={B:'https://api.innove.swiss/swissski/v1',TOL:120000,PAD:5000};
-const invAuth=()=>LS.get('innove',null);
+const invAuth=()=>GPS_ON?LS.get('innove',null):null; /* innove nur mit GPS-Seite (Staging) */
 async function invLogin(u,p){ p=String(p).trim()===p?p:p; /* Token statt Passwort (aus dem innove-Dashboard kopiert) */
   if(/^eyJ[\w-]+\.[\w-]+\.[\w-]+$/.test(String(p).trim())){ LS.set('innove',{token:String(p).trim(),refresh:null,user:u||'Token'}); gpsTabUI(); if(typeof invBtnUI==='function') invBtnUI(); return true; }
   try{ return await invLogin1(u,p); }catch(e){ if(/\[innove: 401/.test(e.message)&&u.includes('@')){ try{ return await invLogin1(u.split('@')[0],p); }catch(e2){} } throw e; } } /* manche Zugänge haben den Namen ohne @… */
@@ -9001,7 +9007,7 @@ setTimeout(fieldSync,600);
   // Kopfzeile
   $('#hdrMore').addEventListener('click',e=>{ e.stopPropagation(); mMenu(e.currentTarget,[
     ['Videos',I('<rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M3 10h18"/>'),()=>libOpen(true)],
-    [invAuth()?'Von innove abmelden':'Bei innove anmelden',I('<path d="M12 21s7-6.2 7-11.5A7 7 0 0 0 5 9.5C5 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.4"/>'),()=>{ if(invAuth()){ LS.set('innove',null); invBtnUI(); toast('Von innove abgemeldet.'); } else invLoginUI().then(ok=>{ if(ok) toast('Bei innove angemeldet.',2500); }); }],
+    GPS_ON?[invAuth()?'Von innove abmelden':'Bei innove anmelden',I('<path d="M12 21s7-6.2 7-11.5A7 7 0 0 0 5 9.5C5 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.4"/>'),()=>{ if(invAuth()){ LS.set('innove',null); invBtnUI(); toast('Von innove abgemeldet.'); } else invLoginUI().then(ok=>{ if(ok) toast('Bei innove angemeldet.',2500); }); }]:null,
     window.trnOn&&trnOn()?['Training-Aktivität',I('<path d="M7 18a4.5 4.5 0 0 1-.6-8.96A6 6 0 0 1 18 9.5a4 4 0 0 1-.5 8.5H7z"/><path d="M12 15v-5M9.5 12.5 12 10l2.5 2.5"/>'),()=>trnOpen()]:null,
     ['Einstellungen',I('<circle cx="12" cy="12" r="3"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1"/>'),()=>settingsOpen()],
     window.vlabAuth&&vlabAuth.admin&&vlabAuth.admin()?['Nutzungsanalyse',I('<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>'),()=>useOpen()]:null,
@@ -9073,7 +9079,7 @@ if(false&&!LS.get('hint1',0)){ setTimeout(()=>{ toast(matchMedia('(pointer:coars
 
 /* Update-Hinweis: prüft version.json auf GitHub Pages; «Aktualisieren» lädt die Seite ohne Cache neu */
 (()=>{
-  const BUILD='20261109183926'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
+  const BUILD='20261109192717'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
   // nach einem Update die ?v=… aus der Adresse entfernen
   try{ const u=new URL(location.href); if(u.searchParams.has('v')){ u.searchParams.delete('v'); history.replaceState(null,'',u.pathname+(u.search||'')+u.hash); } }catch(e){}
   const el=$('#upd'); let latest=null, snoozed=null, busy=false;
