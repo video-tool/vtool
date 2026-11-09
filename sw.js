@@ -4,7 +4,7 @@ self.addEventListener('install',e=>{ e.waitUntil(caches.open(C).then(c=>c.addAll
 self.addEventListener('activate',e=>{ e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k.startsWith('vlab-app')&&k!==C).map(k=>caches.delete(k)))).then(()=>self.clients.claim())); });
 self.addEventListener('fetch',e=>{
   const r=e.request; if(r.method!=='GET') return; const u=new URL(r.url); if(u.origin!==location.origin) return;
-  if(u.pathname.includes('/staging/')||u.pathname.includes('/field/')) return; // eigene Bereiche, nicht hier zwischenspeichern
+  if(u.pathname.includes('/staging/')||u.pathname.includes('/field/')||u.pathname.includes('/s/')) return; // eigene Bereiche, nicht hier zwischenspeichern
   if(r.headers.has('range')||/\.(mp4|mov|m4v|webm|mkv)$/i.test(u.pathname)||/version\.json$/.test(u.pathname)) return; // Videos & Update-Prüfung direkt
   const nav=r.mode==='navigate', key=nav?'index.html':r;
   // Zuerst Netz (immer die neuste Version), offline aus dem Speicher
