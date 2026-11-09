@@ -2599,6 +2599,7 @@ canvas.gap-row[hidden]{display:none}
 #useModal .st b{display:block;font:700 18px/1.2 var(--font);font-variant-numeric:tabular-nums}
 #useModal .st span{font-size:11.5px;color:var(--muted)}
 #useModal .use-tw{border:1px solid var(--line);border-radius:16px;overflow:auto;max-height:290px}
+#useModal .use>*{flex-shrink:0} /* Handy: Personen-Tabelle wurde in der scrollenden Spalte auf 2 px zusammengedrückt */
 #useModal .use-tw h4{margin:0;padding:13px 16px 4px;font:650 13.5px var(--font);display:flex;gap:8px;align-items:baseline}
 #useModal .use-tw h4 span{color:var(--muted);font:500 12px var(--font)}
 #useModal table{width:100%;border-collapse:collapse;font-size:13px;min-width:760px}
@@ -7377,7 +7378,7 @@ function trnRemember(p){ const s=trnNames(); if(!s.some(x=>x.n.toLowerCase()===p
 async function trnLoadPeople(e){ try{ const r=await vlabAuth.rpc('vlab_people_get',{p_e:e}); const j=await r.json().catch(()=>null);
   if(r.ok&&j&&j.ok){ TRN.people={acc:(j.accounts||[]).filter(x=>x&&x.n),own:(j.own||[]).filter(x=>x&&x.n)}; return; } }catch(x){} if(!TRN.people) TRN.people={acc:[],own:[]}; }
 function trnPool(kind){ const P=TRN.people||{acc:[],own:[]}, out=[], seen=new Set(), add=(n,src)=>{ const k=n.toLowerCase(); if(seen.has(k)) return; seen.add(k); out.push({n,src}); };
-  if(kind==='c') P.acc.filter(a=>a.r!=='athlete').forEach(a=>add(a.n,'acc')); else P.acc.filter(a=>a.r==='athlete').forEach(a=>add(a.n,'acc'));
+  if(kind==='c') P.acc.forEach(a=>add(a.n,'acc')); /* Konten nur bei den Coaches – Athletinnen und Athleten haben kein Login, sie werden mit «Neu» erstellt */
   P.own.filter(o=>o.k===kind).forEach(o=>add(o.n,'own')); trnNames().filter(o=>o.k===kind).forEach(o=>add(o.n,'own'));
   return out.sort((a,b)=>a.n.localeCompare(b.n,'de')); }
 function trnPicker(box,list,kind){ const pool=$('.trn-pool',box), inp=$('input',box), nb=$('.trn-new',box);
@@ -8877,7 +8878,7 @@ if(false&&!LS.get('hint1',0)){ setTimeout(()=>{ toast(matchMedia('(pointer:coars
 
 /* Update-Hinweis: prüft version.json auf GitHub Pages; «Aktualisieren» lädt die Seite ohne Cache neu */
 (()=>{
-  const BUILD='20261109152949'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
+  const BUILD='20261109154158'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
   // nach einem Update die ?v=… aus der Adresse entfernen
   try{ const u=new URL(location.href); if(u.searchParams.has('v')){ u.searchParams.delete('v'); history.replaceState(null,'',u.pathname+(u.search||'')+u.hash); } }catch(e){}
   const el=$('#upd'); let latest=null, snoozed=null, busy=false;
