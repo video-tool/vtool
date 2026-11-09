@@ -3094,7 +3094,16 @@ header .btn-cam{animation:camPulse 2s ease-out infinite}
 header .btn-cam svg circle:last-child{animation:camDot 2s ease-in-out infinite}
 @keyframes camDot{50%{opacity:.45}}
 /* Training-Aktivität (Cloud) */
-.help.trn{max-width:540px}
+.help.trn{max-width:560px;padding:0!important;overflow:hidden;display:flex;flex-direction:column;max-height:min(88vh,860px)}
+.trn-top{display:flex;align-items:center;gap:12px;padding:18px 20px 14px;border-bottom:1px solid var(--line)}
+.trn-badge{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;flex:none;color:#fff;background:linear-gradient(140deg,#e2392b,#a8180e);box-shadow:0 8px 18px -10px rgba(218,41,28,.9)}
+.trn-badge svg{width:23px;height:23px}
+.trn-tt{flex:1;min-width:0}
+.trn-top .trn-h{margin:0;font:700 18px/1.2 var(--font);letter-spacing:-.01em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.trn-hs{display:block;margin-top:3px;font-size:12.5px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.trn-body{padding:16px 20px 18px;overflow:auto;display:flex;flex-direction:column;gap:12px}
+.trn-body>*{flex-shrink:0} /* Liste nicht zusammendrücken, der Dialog scrollt */
+.trn-intro{margin:0;font-size:13px;line-height:1.5;color:var(--muted)}
 .trn-f{display:flex;flex-direction:column;gap:2px}
 .trn-2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px}
 .trn-2>.inv-l{min-width:0}
@@ -3113,28 +3122,74 @@ header .btn-cam svg circle:last-child{animation:camDot 2s ease-in-out infinite}
 .trn-opt.acc::after{content:"";display:inline-block;width:6px;height:6px;border-radius:3px;background:currentColor;opacity:.35;margin-left:7px;vertical-align:1px}
 .trn-opt.on{background:var(--red);border-color:var(--red);color:#fff}
 .trn-none{font-size:12.5px;font-weight:500;color:var(--muted)}
-.trn-sub{margin:0 0 10px;font-size:13px;color:var(--muted);line-height:1.45}
-.trn-link{display:flex;gap:6px}
-.trn-link input{flex:1;min-width:0;height:40px;border-radius:10px;border:1px solid var(--line);background:var(--field);color:var(--ink);padding:0 10px;font:500 13px var(--mono,ui-monospace,monospace)}
-.trn-link button,.trn .inv-row button{height:40px;padding:0 14px;border-radius:10px;font-weight:650;white-space:nowrap}
-.trn-link .pri{background:var(--red);color:#fff;border:none}
-.trn-link .ghost{background:transparent;border:1px solid var(--line);color:var(--ink)}
-.trn-auto{display:flex;align-items:center;gap:8px;margin:12px 0 6px;font-size:13px;font-weight:600}
-.trn-list{display:flex;flex-direction:column;gap:2px;max-height:36vh;overflow:auto;margin-top:4px}
-.trn-row{display:flex;justify-content:space-between;gap:10px;padding:8px 10px;border-radius:9px;background:var(--field);font-size:13px}
-.trn-row .n{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.trn-row .s{color:var(--muted);white-space:nowrap;font-variant-numeric:tabular-nums}
-.trn-row.ok .s{color:#2fa36b} .trn-row.err .s{color:#e5484d}
-.trn-empty{margin:6px 0;font-size:13px;color:var(--muted)}
+.trn .inv-row{margin-top:6px}
+.trn .inv-row button,.trn-link button{height:40px;padding:0 15px;border-radius:10px;font:650 13.5px var(--font);white-space:nowrap;cursor:pointer}
+.trn .pri{background:var(--red);color:#fff;border:1px solid var(--red)}
+.trn .pri:disabled{opacity:.6}
+.trn .ghost{background:transparent;border:1px solid var(--line);color:var(--ink)}
+.trn-crumb{align-self:flex-start;border:0;background:none;color:var(--muted);font:600 13px var(--font);padding:0;cursor:pointer}
+.trn-ppl{display:flex;flex-wrap:wrap;gap:6px}
+.trn-ppl span{height:26px;padding:0 10px;border-radius:13px;display:inline-flex;align-items:center;font:600 12.5px var(--font);background:var(--field);border:1px solid var(--line)}
+.trn-ppl span.c{color:var(--muted)}
+.trn-ppl span.c::before{content:"Coach ·";margin-right:4px;font-weight:500;opacity:.8}
+.trn-link{display:flex;gap:6px;padding:6px;border-radius:13px;background:var(--field);border:1px solid var(--line)}
+.trn-link input{flex:1;min-width:0;height:40px;border:0;background:transparent;color:var(--ink);padding:0 8px;font:500 13px var(--mono,ui-monospace,monospace)}
+.trn-link .ghost{background:var(--card)}
+.trn-auto{display:flex;align-items:center;gap:10px;font-size:13px;font-weight:600;cursor:pointer}
+.trn-auto input{width:18px;height:18px;accent-color:var(--red)}
+.trn-mk{align-self:flex-start;height:36px;padding:0 14px;border-radius:10px;border:1px dashed var(--red);background:transparent;color:var(--red);font:650 13px var(--font);cursor:pointer}
+.trn-lh{display:flex;align-items:baseline;justify-content:space-between;margin-top:4px}
+.trn-lh b{font:700 14px var(--font)}
+.trn-lc{font-size:12.5px;color:var(--muted)}
+.trn-list{display:flex;flex-direction:column;gap:6px;min-height:40px}
+.trn-row{display:flex;align-items:center;gap:10px;padding:7px;border-radius:12px;background:var(--field);border:1px solid var(--line)}
+.trn-row .th{width:58px;height:40px;border-radius:8px;flex:none;background:linear-gradient(135deg,var(--line),transparent);overflow:hidden;display:grid;place-items:center}
+.trn-row .th img{width:100%;height:100%;object-fit:cover}
+.trn-row.pend .th::after{content:"";width:16px;height:16px;border-radius:50%;border:2px solid var(--muted);border-top-color:transparent;animation:trnSpin 1s linear infinite}
+.trn-row.err .th::after,.trn-row.off .th::after,.trn-row.retry .th::after{animation:none;border-top-color:var(--muted)}
+@keyframes trnSpin{to{transform:rotate(360deg)}}
+.trn-row .m{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.trn-row b{font:650 13.5px var(--font);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.trn-row small{font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+.trn-row.ok small{color:#2fa36b}
+.trn-row.err small{color:#e5484d}
+.trn-row .bar{display:block;height:3px;border-radius:2px;background:var(--line);overflow:hidden;margin-top:3px}
+.trn-row .bar s{display:block;height:100%;width:0;background:var(--red);transition:width .3s}
+.trn-who{flex:none;max-width:150px;height:32px;border-radius:9px;border:1px solid var(--line);background:var(--card);color:var(--ink);font:600 12.5px var(--font);padding:0 8px}
+.trn-empty{margin:4px 0;font-size:13px;color:var(--muted);line-height:1.5}
 .trn-del{color:#e5484d!important}
-.trn-pick{margin-top:10px;border-top:1px solid var(--line);padding-top:10px}
+.trn-pick{border-top:1px solid var(--line);padding-top:10px}
 .trn-pl{display:flex;flex-direction:column;gap:2px;max-height:34vh;overflow:auto}
 .trn-pl label{display:flex;align-items:center;gap:8px;padding:7px 6px;font-size:13px;font-weight:550;border-radius:8px}
-.trn-pill{position:fixed;left:24px;bottom:72px;z-index:150;display:inline-flex;align-items:center;gap:6px;height:30px;padding:0 12px 0 9px;border-radius:15px;border:1px solid rgba(255,255,255,.16);background:rgba(10,13,18,.82);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);color:#fff;font:650 12px var(--font);cursor:pointer;box-shadow:0 8px 20px -10px rgba(0,0,0,.7)}
-.trn-pill svg{width:16px;height:16px}
+.trn-cards{display:flex;flex-direction:column;gap:8px}
+.trn-card{display:flex;flex-direction:column;align-items:flex-start;gap:3px;text-align:left;padding:14px 16px;border-radius:14px;border:1px solid var(--line);background:var(--field);color:var(--ink);cursor:pointer;position:relative;font:inherit}
+.trn-card.cur{border-color:var(--red);box-shadow:inset 0 0 0 1px var(--red)}
+.trn-card .t{font:700 15px var(--font)}
+.trn-card .u{font-size:12.5px;color:var(--muted)}
+.trn-card .f{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.trn-card .f i{font:600 11.5px var(--font);font-style:normal;padding:3px 8px;border-radius:9px;background:var(--card);border:1px solid var(--line);color:var(--muted)}
+.trn-card .f i.on{background:var(--red);border-color:var(--red);color:#fff}
+.trn-card.offer{cursor:default;border-style:dashed}
+.trn-card.offer .pri{position:absolute;right:14px;top:50%;transform:translateY(-50%);height:36px;padding:0 14px;border-radius:10px;font:650 13px var(--font);cursor:pointer}
+.trn-newbtn{height:46px;border-radius:12px;border:1px dashed var(--line2,var(--line));background:transparent;color:var(--ink);font:650 14px var(--font);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px}
+.trn-newbtn span{font-size:18px;color:var(--red)}
+.trn-pill{position:fixed;left:24px;bottom:72px;z-index:150;display:inline-flex;align-items:center;gap:7px;min-height:32px;max-width:min(360px,calc(100vw - 32px));padding:0 13px 0 10px;border-radius:16px;border:1px solid rgba(255,255,255,.16);background:rgba(10,13,18,.86);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);color:#fff;font:650 12.5px var(--font);cursor:pointer;box-shadow:0 10px 24px -12px rgba(0,0,0,.75)}
+.trn-pill span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.trn-pill svg{width:17px;height:17px;flex:none}
 .trn-pill.busy svg{animation:trnPulse 1.2s ease-in-out infinite}
+.trn-pill.off svg{color:#f5a524;animation:none}
+.trn-pill.offer b{margin-left:4px;padding:3px 9px;border-radius:10px;background:var(--red);font-size:12px}
+.trn-pill.ask{z-index:400;flex-direction:column;align-items:stretch;gap:8px;padding:10px;border-radius:16px;cursor:default;width:min(360px,calc(100vw - 32px))}
+.trn-askh{display:flex;align-items:center;gap:10px}
+.trn-askh img{width:44px;height:32px;border-radius:6px;object-fit:cover;flex:none}
+.trn-askh>span{flex:1;min-width:0;display:flex;flex-direction:column}
+.trn-askh i{font-style:normal;font-weight:500;font-size:11.5px;opacity:.7;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.trn-askh .x{border:0;background:rgba(255,255,255,.12);color:#fff;height:28px;padding:0 10px;border-radius:9px;font:600 12px var(--font);cursor:pointer}
+.trn-askc{display:flex;flex-wrap:wrap;gap:6px}
+.trn-askc button{height:34px;padding:0 13px;border-radius:17px;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.08);color:#fff;font:650 13px var(--font);cursor:pointer}
+.trn-askc button:active{background:var(--red)}
 @keyframes trnPulse{50%{opacity:.35}}
-@media (max-width:760px){ .trn-pill{left:50%;transform:translateX(-50%);bottom:calc(var(--tabsH,64px) + 10px)} .trn-link{flex-wrap:wrap} .trn-link input{flex:1 0 100%} .trn-link button{flex:1} }
+@media (max-width:760px){ .trn-pill{left:50%;transform:translateX(-50%);bottom:calc(var(--tabsH,64px) + 10px)} .trn-pill.ask{bottom:calc(var(--tabsH,64px) + 74px)} .trn-foot{flex-wrap:wrap} .trn-foot>button{flex:1 1 auto} .trn-foot>span{display:none} .trn-link{flex-wrap:wrap} .trn-link input{flex:1 0 100%} .trn-link button{flex:1} .help.trn{max-height:92vh} .trn-who{max-width:118px} .trn-card.offer .pri{position:static;transform:none;margin-top:8px} }
 body.pfs .trn-pill{display:none}
 @media (prefers-reduced-motion:reduce){ header .btn-cam,header .btn-cam svg circle:last-child{animation:none} }
 @media (max-width:600px){
@@ -5770,8 +5825,9 @@ function useRender(){ const D=USE.data, U=D.users||[], S=D.series||[], esc=t=>St
    +'<div class="use-c"><h4>Wo und wie<span></span></h4><div class="cs">App-Starts, Overlays und Exporte zusammen</div><div class="sh"><div class="sh-bar">'+(tot?'<i style="width:'+(lab/tot*100)+'%;background:var(--red)"></i><i style="width:'+(fld/tot*100)+'%;background:#3b82c4"></i>':'')+'</div>'
    +'<div class="sh-leg"><span style="--sc:var(--red)">Video-Lab <b>'+(tot?Math.round(lab/tot*100):0)+' %</b></span><span style="--sc:#3b82c4">Field <b>'+(tot?Math.round(fld/tot*100):0)+' %</b></span></div>'
    +'<div class="st"><div><b>'+fmt(dv)+'</b><span>Geräte (Browser)</span></div><div><b>'+(act.length?(oS/act.length).toFixed(1):'0')+'</b><span>Overlays pro aktive Person</span></div><div><b>'+(oS?(xS/oS).toFixed(2):'–')+'</b><span>Exporte pro Overlay</span></div><div><b>'+fmt(U.filter(u=>+u.om>=80).length)+'</b><span>nahe Basic-Grenze (≥ 80)</span></div></div></div></div></div>'
+   +(window.trnOn&&trnOn()?'<div class="use-c use-cloud"><h4>Training-Cloud<span>Cloudflare R2 · Gratis bis 10 GB</span></h4><div class="cs">Laufende Aktivitäten (Videos werden nach 3 Tagen gelöscht)</div><div class="st"><div><b data-c="s">–</b><span>Aktivitäten</span></div><div><b data-c="v">–</b><span>Videos</span></div><div><b data-c="b">–</b><span>belegt</span></div></div><div class="sh"><div class="sh-bar"><i data-c="bar" style="width:0;background:var(--red)"></i></div></div></div>':'')
    +'<div class="use-ft"><span>Gezählt: App-Starts, Anmeldungen, neu berechnete Overlays, Exporte. Keine Videos, keine Dateinamen.</span><span>Geräte = verschiedene Browser (Video-Lab / Field)</span></div>';
-  const m=useShell(html); if(!U.length) $('.use-tw',m).outerHTML='<div class="use-empty">Noch keine Nutzung erfasst.</div>';
+  const m=useShell(html); if(window.trnStats) trnStats($('.use-cloud',m)); if(!U.length) $('.use-tw',m).outerHTML='<div class="use-empty">Noch keine Nutzung erfasst.</div>';
   m.querySelectorAll('.use-c[data-k]').forEach(c=>useChart(c,S,c.dataset.k));
   m.querySelectorAll('svg[data-sp]').forEach(sv=>useSpark(sv,S,{p:'u',z:'z',o:'o',x:'x'}[sv.dataset.sp]));
   const AVC=['#DA291C','#3b82c4','#0f8b8d','#8B5CF6','#d98a00','#5b6472'], ini=u=>{ const w=String(u.n||'').trim().split(/\s+/).filter(Boolean); return (w.length?w[0][0]+(w.length>1?w[w.length-1][0]:''):String(u.e)[0]).toUpperCase(); }, hc=t=>{ let h=0; for(const c of String(t)) h=(h*31+c.charCodeAt(0))|0; return AVC[Math.abs(h)%AVC.length]; };
@@ -7355,23 +7411,73 @@ window.VideoLab={
 };
 addEventListener('message',e=>{ const d=e.data; if(d&&d.type==='vlab:gps'&&d.payload) try{ window.VideoLab.loadGps(d.payload,d.options||{}); }catch(err){ console.error(err); } });
 
+/* ---------- Training-Cloud: Warteschlange zum Hochladen (gemeinsam für Video-Lab und Field) ----------
+   Die Einträge liegen in IndexedDB «vlab-trnq», damit nichts verloren geht, wenn das Netz am Hang abbricht oder die App geschlossen wird.
+   Laufende Aktivitäten dieses Geräts stehen in localStorage «vlab:trn:list» (id, edit-Kennung, exp, up{k:vid}).
+   Bei Netzfehlern wird mit wachsender Pause neu versucht (5 s … 1 min) und sofort, wenn das Gerät wieder online ist. */
+const TQ={api:'',busy:false,me:Math.random().toString(36).slice(2),cb:null,timer:0};
+function tqDb(){ return new Promise((res,rej)=>{ const r=indexedDB.open('vlab-trnq',1); r.onupgradeneeded=()=>{ r.result.createObjectStore('q',{keyPath:'k'}); }; r.onsuccess=()=>res(r.result); r.onerror=()=>rej(r.error); }); }
+async function tqTx(mode,fn){ const db=await tqDb(); try{ return await new Promise((res,rej)=>{ const tx=db.transaction('q',mode), st=tx.objectStore('q'); let out; const q=fn(st); if(q) q.onsuccess=()=>{ out=q.result; }; tx.oncomplete=()=>res(out); tx.onerror=()=>rej(tx.error); tx.onabort=()=>rej(tx.error); }); } finally{ db.close(); } }
+const tqAll=()=>tqTx('readonly',st=>st.getAll()).then(r=>r||[]).catch(()=>[]);
+const tqGet=k=>tqTx('readonly',st=>st.get(k)).catch(()=>null);
+const tqPut=it=>tqTx('readwrite',st=>st.put(it));
+const tqDel=k=>tqTx('readwrite',st=>st.delete(k)).catch(()=>{});
+function tqList(){ try{ return JSON.parse(localStorage.getItem('vlab:trn:list')||'[]').filter(s=>s&&s.id); }catch(e){ return []; } }
+function tqSetList(L){ try{ localStorage.setItem('vlab:trn:list',JSON.stringify(L)); }catch(e){} }
+function tqEmit(k,s,p,x){ try{ TQ.cb&&TQ.cb(k,s,p||0,x); }catch(e){} }
+function tqUp(it,s){ return new Promise((res,rej)=>{ const x=new XMLHttpRequest(), q=new URLSearchParams({name:it.name||'Video.mp4',w:it.w||0,h:it.h||0,dur:(+it.dur||0).toFixed(2)}); if(it.p) q.set('p',it.p);
+  x.open('PUT',TQ.api+'/api/s/'+s.id+'/v?'+q); x.setRequestHeader('X-Edit',s.edit); x.setRequestHeader('Content-Type',it.blob.type&&/^video\//.test(it.blob.type)?it.blob.type:'video/mp4'); x.timeout=15*60e3;
+  x.upload.onprogress=e=>{ if(e.lengthComputable) tqEmit(it.k,'up',e.loaded/e.total); };
+  x.onload=()=>{ let j={}; try{ j=JSON.parse(x.responseText); }catch(e){} if(x.status>=200&&x.status<300) res(j); else rej(Object.assign(new Error(j.err||String(x.status)),{code:j.err,status:x.status})); };
+  x.onerror=x.ontimeout=()=>rej(Object.assign(new Error('net'),{code:'net'})); x.send(it.blob); }); }
+/* Person (wer fährt) nachträglich setzen: noch in der Warteschlange → Eintrag ändern, schon oben → beim Server */
+async function tqPerson(sid,k,p){ const it=await tqGet(k); if(it){ it.p=p; await tqPut(it); return true; }
+  const s=tqList().find(x=>x.id===sid), vid=s&&s.up&&s.up[k]; if(!vid) return false;
+  try{ const r=await fetch(TQ.api+'/api/s/'+sid+'/v/'+vid,{method:'PATCH',headers:{'X-Edit':s.edit,'Content-Type':'application/json'},body:JSON.stringify({p})}); return r.ok; }catch(e){ return false; } }
+async function tqRun(){ if(TQ.busy||!TQ.api||!window.indexedDB) return; TQ.busy=true; clearTimeout(TQ.timer); let left=0;
+  try{ for(;;){ const L=(await tqAll()).sort((a,b)=>a.t-b.t); let did=false; left=0;
+      for(const it of L){ const S=tqList(), s=S.find(x=>x.id===it.sid);
+        if(!s||s.exp<Date.now()){ await tqDel(it.k); tqEmit(it.k,'gone'); continue; }
+        if(it.lock&&it.lock.by!==TQ.me&&Date.now()-it.lock.t<30e3){ left++; continue; } /* lädt gerade die andere App (Sperre wird alle 10 s erneuert) */
+        if(it.wait&&it.wait>Date.now()){ left++; continue; }
+        if(!navigator.onLine){ left++; tqEmit(it.k,'off'); continue; }
+        it.lock={by:TQ.me,t:Date.now()}; await tqPut(it); tqEmit(it.k,'up',0);
+        const keep=setInterval(()=>{ it.lock.t=Date.now(); tqGet(it.k).then(x=>{ if(x){ x.lock=it.lock; tqPut(x); } }); },10e3);
+        try{ const v=await tqUp(it,s).finally(()=>clearInterval(keep));
+          if(it.poster) try{ await fetch(TQ.api+'/api/s/'+s.id+'/v/'+v.id+'/p',{method:'PUT',headers:{'X-Edit':s.edit,'Content-Type':'image/jpeg'},body:it.poster}); }catch(e){}
+          await tqDel(it.k); const S2=tqList(), s2=S2.find(x=>x.id===it.sid); if(s2){ s2.up=s2.up||{}; s2.up[it.k]=v.id; s2.n=(s2.n||0)+1; tqSetList(S2); }
+          tqEmit(it.k,'ok',1,{v,it}); did=true;
+        }catch(e){ const fatal=e.status===403||e.status===404||e.status===410||e.status===413;
+          if(fatal){ await tqDel(it.k); tqEmit(it.k,'err',0,{code:e.code||e.status,it}); }
+          else { it.tries=(it.tries||0)+1; it.wait=Date.now()+Math.min(60e3,5e3*Math.pow(2,it.tries-1)); it.lock=null; await tqPut(it); left++; tqEmit(it.k,'retry',0,{tries:it.tries}); } } }
+      if(!did) break; } }
+  finally{ TQ.busy=false; if(left) TQ.timer=setTimeout(tqRun,6000); } }
+addEventListener('online',()=>tqRun());
+document.addEventListener('visibilitychange',()=>{ if(!document.hidden) tqRun(); });
 /* ---------- Training-Aktivität: Videos über die Cloud (Cloudflare R2) 72 h lang per Link teilen ----------
-   Ablauf: Aktivität anlegen (Login nochmals bestätigen) → Link verschicken → neue Videos werden auf 720p verkleinert hochgeladen.
-   Ansehen ohne Login unter s/#<id>; nach 72 h sperrt der Worker die Aktivität und löscht die Dateien. Bearbeiten nur mit der Kennung auf diesem Gerät. */
+   Ablauf: Aktivität anlegen → Link verschicken → neue Videos werden auf 720p verkleinert und über die Warteschlange (34_trnq.js) hochgeladen.
+   Eingetragene Coaches mit Konto sehen laufende Aktivitäten und können beitreten (eigene Kennung, dürfen hochladen, nicht löschen).
+   Ansehen ohne Login unter s/#<id>; nach 72 h sperrt der Worker die Aktivität und löscht die Dateien. */
 const TRN_API=(()=>{ try{ if(/^(localhost|127\.0\.0\.1)$/.test(location.hostname)){ const o=localStorage.getItem('vlab:cloudApi'); if(o) return o; } }catch(e){} return 'https://vlab-cloud.swiss-ski-club.workers.dev'.indexOf('%%')===0?'':'https://vlab-cloud.swiss-ski-club.workers.dev'; })().replace(/\/+$/,'');
-const TRN={cur:LS.get('trn:cur',null),q:[],busy:false,st:{},people:null};
+TQ.api=TRN_API;
+const TRN={st:{},people:null,offers:[],prep:[],busy:false,ask:null,view:null,poll:0};
 const trnOn=()=>!!TRN_API;
-const trnLive=()=>!!(TRN.cur&&TRN.cur.exp>Date.now());
+const trnL=()=>tqList().filter(s=>s.exp>Date.now());
+const trnCur=()=>{ const id=LS.get('trn:cur2',null); return trnL().find(s=>s.id===id)||null; };
+const trnLive=()=>!!trnCur();
+function trnUpd(id,f){ const L=tqList(), s=L.find(x=>x.id===id); if(s){ f(s); tqSetList(L); } return s; }
 const trnLink=id=>location.origin+location.pathname.replace(/[^/]*$/,'')+'s/#'+id;
-const trnSave=()=>LS.set('trn:cur',TRN.cur);
-const trnLeft=()=>{ const ms=TRN.cur?TRN.cur.exp-Date.now():0; if(ms<=0) return 'abgelaufen'; const h=Math.floor(ms/36e5); return h>=1?'noch '+h+' h':'noch '+Math.max(1,Math.round(ms/6e4))+' min'; };
+const trnLeft=s=>{ const ms=s?s.exp-Date.now():0; if(ms<=0) return 'abgelaufen'; const h=Math.floor(ms/36e5); return h>=1?'noch '+h+' h':'noch '+Math.max(1,Math.round(ms/6e4))+' min'; };
 const trnKey=c=>clipKey(c);
+const trnQK=(s,c)=>s.id+'|'+trnKey(c);
+const trnSub=me=>[me.place,me.date&&me.date.split('-').reverse().join('.'),me.disc].filter(Boolean).join(' · ');
 const trnIco='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M7 18a4.5 4.5 0 0 1-.6-8.96A6 6 0 0 1 18 9.5a4 4 0 0 1-.5 8.5H7z"/><path d="M12 15v-5M9.5 12.5 12 10l2.5 2.5"/></svg>';
-async function trnApi(path,opt={}){ const h=Object.assign({},opt.headers||{}); if(opt.edit&&TRN.cur) h['X-Edit']=TRN.cur.edit; if(opt.json!==undefined){ h['Content-Type']='application/json'; opt.body=JSON.stringify(opt.json); }
+async function trnApi(path,opt={}){ const h=Object.assign({},opt.headers||{}); if(opt.s) h['X-Edit']=opt.s.edit; if(opt.json!==undefined){ h['Content-Type']='application/json'; opt.body=JSON.stringify(opt.json); }
   const r=await fetch(TRN_API+'/api/s'+path,{method:opt.method||'GET',headers:h,body:opt.body,cache:'no-store'}); const j=await r.json().catch(()=>({})); return {ok:r.ok,status:r.status,j}; }
+/* frühere Version (eine Aktivität in vlab:trn:cur) übernehmen */
+(()=>{ const o=LS.get('trn:cur',null); if(o&&o.id&&o.exp>Date.now()&&!tqList().some(s=>s.id===o.id)){ const L=tqList(); L.push({id:o.id,edit:o.edit,exp:o.exp,own:true,meta:o.meta,up:o.up||{},n:o.n||0,auto:o.auto!==false,t0:o.t0||Date.now()}); tqSetList(L); LS.set('trn:cur2',o.id); }
+  try{ localStorage.removeItem('vlab:trn:cur'); }catch(e){} tqSetList(tqList().filter(s=>s.exp>Date.now()-36e5)); })();
 
-/* Personen: frei eingetippt oder aus den Video-Lab-Konten (falls der Server die Liste liefert) */
-/* Personen: Auswahl aus den Video-Lab-Konten und aus eigenen, neu erstellten Personen (Server: vlab_people_get / vlab_people_add; ohne Server nur auf diesem Gerät) */
 function trnNames(){ return LS.get('trn:names',[]); }
 function trnRemember(p){ const s=trnNames(); if(!s.some(x=>x.n.toLowerCase()===p.n.toLowerCase()&&x.k===p.k)) s.unshift(p); LS.set('trn:names',s.slice(0,150)); }
 async function trnLoadPeople(e){ try{ const r=await vlabAuth.rpc('vlab_people_get',{p_e:e}); const j=await r.json().catch(()=>null);
@@ -7416,41 +7522,102 @@ async function trnShrink(c,prog){
     const blob=new Blob([mux.target.buffer],{type:'video/mp4'}); if(blob.size>=c.size&&c.size<=TRN_MAX) return orig(); return {blob,w:W,h:H,small:true};
   }catch(e){ console.warn('Verkleinern fehlgeschlagen',e); return orig(); }
   finally{ try{ v.close(); }catch(e){} } }
+/* Vorschaubild (Bild bei ca. 1 s) für die Ansichtsseite */
+function trnPoster(c){ return new Promise(res=>{ const v=document.createElement('video'); v.muted=true; v.playsInline=true; v.preload='auto'; let done=false;
+  const fin=b=>{ if(done) return; done=true; try{ v.removeAttribute('src'); v.load(); }catch(e){} res(b||null); };
+  v.onloadedmetadata=()=>{ try{ v.currentTime=Math.min(1,(v.duration||3)/3); }catch(e){ fin(null); } };
+  v.onseeked=()=>{ const W=v.videoWidth,H=v.videoHeight; if(!W) return fin(null); const s=Math.min(1,480/Math.max(W,H)), cv=document.createElement('canvas'); cv.width=Math.round(W*s); cv.height=Math.round(H*s);
+    try{ cv.getContext('2d').drawImage(v,0,0,cv.width,cv.height); cv.toBlob(b=>fin(b),'image/jpeg',.72); }catch(e){ fin(null); } };
+  v.onerror=()=>fin(null); setTimeout(()=>fin(null),8000); v.src=c.url; }); }
 
-function trnUp(blob,q){ return new Promise((res,rej)=>{ const x=new XMLHttpRequest(); x.open('PUT',TRN_API+'/api/s/'+TRN.cur.id+'/v?'+new URLSearchParams(q)); x.setRequestHeader('X-Edit',TRN.cur.edit); x.setRequestHeader('Content-Type','video/mp4');
-  x.upload.onprogress=e=>{ if(e.lengthComputable) trnSet(q._k,'up',e.loaded/e.total); }; x.onload=()=>{ let j={}; try{ j=JSON.parse(x.responseText); }catch(e){} if(x.status<300) res(j); else rej(Object.assign(new Error(j.err||x.status),{code:j.err,status:x.status})); }; x.onerror=()=>rej(new Error('net')); x.send(blob); }); }
+/* Wer fährt? Aus dem Dateinamen bzw. den Angaben raten, bei nur einer Person diese */
+function trnGuess(s,c){ const A=((s.meta||{}).athletes||[]).map(a=>a.n).filter(Boolean); if(A.length===1) return A[0];
+  const hay=((c.meta&&c.meta.athlete)||'')+' '+(c.name||'').replace(/[_-]+/g,' '); const low=hay.toLowerCase();
+  return A.find(n=>low.includes(n.toLowerCase()))||A.find(n=>n.split(/\s+/).some(w=>w.length>2&&low.includes(w.toLowerCase())))||''; }
+
 function trnSet(k,s,p){ TRN.st[k]={s,p:p||0}; trnUI(); }
-function trnNew(list){ if(!trnLive()||TRN.cur.auto===false) return; list.filter(c=>c&&!c.demo&&!c.err).forEach(c=>trnQueue(c)); }
-function trnQueue(c){ const k=trnKey(c); if(!trnLive()||(TRN.cur.up||{})[k]||TRN.q.includes(c)) return; TRN.q.push(c); trnSet(k,'wait'); trnRun(); }
-async function trnRun(){ if(TRN.busy) return; TRN.busy=true;
-  try{ while(TRN.q.length&&trnLive()){ const c=TRN.q[0], k=trnKey(c);
-      try{ trnSet(k,'prep',0); const r=await trnShrink(c,p=>trnSet(k,'prep',p)); if(!trnLive()) break;
-        const nm=base(c.name)+'.mp4', v=await trnUp(r.blob,{name:nm,w:r.w||0,h:r.h||0,dur:(c.dur||0).toFixed(2),_k:k});
-        TRN.cur.up=TRN.cur.up||{}; TRN.cur.up[k]=v.id; TRN.cur.n=(TRN.cur.n||0)+1; trnSave(); trnSet(k,'ok'); toast('In der Cloud: '+metaTitle(c),2200); if(window.vlabTrack) vlabTrack('trn_up');
-      }catch(e){ trnSet(k,'err'); const why=e.code==='size'||e.message==='size'?'zu gross':e.code==='full'?'Aktivität ist voll':e.status===410?'Aktivität abgelaufen':'kein Netz?'; toast('Hochladen nicht möglich ('+why+'): '+metaTitle(c),4200); }
-      TRN.q.shift(); } }
+function trnNew(list){ const s=trnCur(); if(!s||s.auto===false) return; list.filter(c=>c&&!c.demo&&!c.err).forEach(c=>trnQueue(c,s)); }
+async function trnQueue(c,s){ s=s||trnCur(); if(!s) return; const k=trnQK(s,c); if((s.up||{})[k]||TRN.prep.some(x=>x.k===k)||(TRN.st[k]&&TRN.st[k].s!=='err')) return;
+  TRN.prep.push({k,c,sid:s.id}); trnSet(k,'wait'); trnPrep(); }
+async function trnPrep(){ if(TRN.busy) return; TRN.busy=true;
+  try{ while(TRN.prep.length){ const {k,c,sid}=TRN.prep[0], s=trnL().find(x=>x.id===sid);
+      if(s) try{ trnSet(k,'prep',0); const r=await trnShrink(c,p=>trnSet(k,'prep',p)); const poster=await trnPoster(c);
+        const p=trnGuess(s,c); await tqPut({k,sid,blob:r.blob,name:base(c.name)+'.mp4',w:r.w||0,h:r.h||0,dur:c.dur||0,p,poster,t:Date.now(),title:metaTitle(c),src:'lab'});
+        trnSet(k,'wait'); if(!p&&((s.meta||{}).athletes||[]).length>1) trnAsk(sid,k,metaTitle(c),poster); tqRun();
+      }catch(e){ trnSet(k,'err'); toast('Hochladen nicht möglich ('+(e.message==='size'?'Video zu gross':'Fehler beim Verkleinern')+'): '+metaTitle(c),4200); }
+      TRN.prep.shift(); } }
   finally{ TRN.busy=false; trnUI(); } }
+TQ.cb=(k,s,p,x)=>{
+  if(s==='ok'){ delete TRN.st[k]; toast('In der Cloud: '+((x&&x.it&&x.it.title)||(x&&x.v&&x.v.name)||'Video'),2200); if(window.vlabTrack) vlabTrack('trn_up'); trnRefresh(k.split('|')[0]); }
+  else if(s==='gone') delete TRN.st[k];
+  else if(s==='err'){ TRN.st[k]={s:'err',p:0}; const c=x&&x.code; toast('Hochladen nicht möglich ('+(c==='size'||c===413?'zu gross oder Aktivität voll':c===410||c===404?'Aktivität abgelaufen':c==='edit'||c===403?'keine Berechtigung':'Fehler')+')',4200); }
+  else TRN.st[k]={s,p}; trnUI(); };
+/* Beim Start: Einträge, die noch in der Warteschlange liegen, anzeigen und weiter hochladen */
+async function trnBoot(){ const L=await tqAll(); L.forEach(it=>{ if(!TRN.st[it.k]) TRN.st[it.k]={s:it.tries?'retry':'wait',p:0}; }); trnUI(); tqRun(); trnMine(); }
 
-/* Anzeige: kleine Pille oben, solange eine Aktivität läuft */
-function trnUI(){ let p=$('#trnPill'); const on=trnOn()&&trnLive();
-  if(!on){ if(p) p.remove(); if(TRN.cur&&!trnLive()){ TRN.cur=null; trnSave(); } trnDlgList(); return; }
-  if(!p){ p=document.createElement('button'); p.id='trnPill'; p.className='trn-pill'; p.title='Training-Aktivität'; p.addEventListener('click',()=>trnOpen()); document.body.appendChild(p); }
-  const run=Object.values(TRN.st).filter(s=>s.s==='prep'||s.s==='up'||s.s==='wait').length;
-  p.innerHTML=trnIco+'<span></span>'; $('span',p).textContent=run?'Lädt hoch · '+run:'Training · '+(TRN.cur.n||0); p.classList.toggle('busy',!!run); trnDlgList(); }
+/* Nachfragen, wer im Video fährt (unten in der Leiste, ohne den Dialog zu öffnen) */
+function trnAsk(sid,k,title,poster){ TRN.ask={sid,k,title,img:poster?URL.createObjectURL(poster):''}; trnUI(); }
+async function trnSetPerson(sid,k,p,vid){ let ok=false;
+  if(vid){ const s=trnL().find(x=>x.id===sid); if(s){ const r=await trnApi('/'+sid+'/v/'+vid,{method:'PATCH',s,json:{p}}).catch(()=>({ok:false})); ok=r.ok; } }
+  else ok=await tqPerson(sid,k,p);
+  if(!ok) toast('Zuordnen nicht möglich – kein Netz?'); return ok; }
+
+/* Andere Coaches: laufende Aktivitäten, in denen ich eingetragen bin */
+async function trnMine(){ const a=window.vlabAuth&&vlabAuth.get(); if(!trnOn()||!a||!a.e) return;
+  try{ const r=await fetch(TRN_API+'/api/mine?e='+encodeURIComponent(a.e),{cache:'no-store'}), j=await r.json();
+    if(r.ok&&Array.isArray(j.list)){ const have=new Set(trnL().map(s=>s.id)); TRN.offers=j.list.filter(o=>!have.has(o.id)&&o.exp>Date.now()); trnUI(); if(TRN.view==='home') trnViewHome(trnDlg()); } }catch(e){} }
+async function trnJoin(o){ const a=vlabAuth.get(); const r=await trnApi('/'+o.id+'/join',{method:'POST',json:{e:a.e}}).catch(()=>({ok:false,j:{}}));
+  if(!r.ok){ toast(r.j&&r.j.err==='not_coach'?'Du bist in dieser Aktivität nicht als Coach eingetragen.':'Beitreten nicht möglich – kein Netz?'); return false; }
+  const L=tqList(); L.push({id:o.id,edit:r.j.token,exp:r.j.exp,own:!!o.own,joined:1,meta:r.j.meta,up:{},n:0,auto:true,t0:Date.now()}); tqSetList(L); LS.set('trn:cur2',o.id);
+  TRN.offers=TRN.offers.filter(x=>x.id!==o.id); if(window.vlabTrack) vlabTrack('trn_join'); toast('Beigetreten – deine neuen Videos gehen in «'+(r.j.meta.title||'Training')+'».',3200); trnUI(); return true; }
+async function trnRefresh(id){ const s=trnL().find(x=>x.id===id); if(!s) return; const r=await trnApi('/'+id).catch(()=>null); if(!r) return;
+  if(r.status===410||r.status===404){ trnUpd(id,x=>{ x.exp=0; }); trnUI(); if(TRN.view===id) trnOpen(); return; }
+  if(r.ok){ trnUpd(id,x=>{ x.meta=r.j; x.n=(r.j.videos||[]).length; }); if(TRN.view===id) trnDlgList(); trnUI(); } }
+
+/* Leiste unten: Status der laufenden Aktivität, Nachfrage «Wer fährt?» oder Einladung zum Beitreten */
+function trnUI(){ let p=$('#trnPill'); const s=trnOn()?trnCur():null, off=trnOn()?TRN.offers[0]:null;
+  if(!s&&!off&&!TRN.ask){ if(p) p.remove(); trnDlgList(); return; }
+  if(!p){ p=document.createElement('div'); p.id='trnPill'; p.className='trn-pill'; document.body.appendChild(p); }
+  const pend=s?Object.entries(TRN.st).filter(([k,v])=>k.startsWith(s.id+'|')&&v.s!=='err'):[], offl=pend.some(([,v])=>v.s==='off'||v.s==='retry');
+  if(TRN.ask){ const A=(((trnL().find(x=>x.id===TRN.ask.sid)||{}).meta||{}).athletes||[]);
+    p.className='trn-pill ask'; p.innerHTML='<div class="trn-askh">'+(TRN.ask.img?'<img alt="">':'')+'<span><b>Wer fährt?</b><i></i></span><button class="x" aria-label="Später">Später</button></div><div class="trn-askc"></div>';
+    if(TRN.ask.img) $('img',p).src=TRN.ask.img; $('i',p).textContent=TRN.ask.title||''; $('.x',p).onclick=()=>{ TRN.ask=null; trnUI(); };
+    A.forEach(a=>{ const b=document.createElement('button'); b.textContent=a.n; b.onclick=async()=>{ const q=TRN.ask; TRN.ask=null; trnUI(); if(await trnSetPerson(q.sid,q.k,a.n)) toast(a.n+' zugeordnet.',1500); trnDlgList(); }; $('.trn-askc',p).appendChild(b); });
+    return; }
+  p.className='trn-pill'+(pend.length?' busy':'')+(offl?' off':''); p.onclick=null;
+  if(s){ p.innerHTML=trnIco+'<span></span>'; $('span',p).textContent=pend.length?(offl?'Wartet auf Netz · '+pend.length:'Lädt hoch · '+pend.length):((s.meta&&s.meta.title)||'Training')+' · '+(s.n||0); p.onclick=()=>trnOpen(s.id); }
+  else { p.innerHTML=trnIco+'<span></span><b>Beitreten</b>'; $('span',p).textContent='Training «'+(off.title||'Training')+'» läuft'; p.classList.add('offer'); p.onclick=()=>trnOpen(); }
+  trnDlgList(); }
 
 /* Dialog */
 function trnDlg(){ let m=$('#trnModal'); if(m) return m; m=document.createElement('div'); m.className='modal'; m.id='trnModal';
-  m.innerHTML='<div class="help trn" role="dialog" aria-label="Training-Aktivität"><h3><span class="trn-h">Training-Aktivität</span> <button class="hdr-ico" id="trnX" title="Schliessen">✕</button></h3><div class="trn-body"></div></div>';
-  document.body.appendChild(m); $('#trnX',m).onclick=()=>m.classList.remove('on'); m.addEventListener('click',e=>{ if(e.target===m) m.classList.remove('on'); }); return m; }
-function trnOpen(){ if(!trnOn()){ toast('Die Cloud ist noch nicht eingerichtet.'); return; } const m=trnDlg(); trnUI(); trnLive()?trnViewLive(m):trnViewNew(m); m.classList.add('on'); }
+  m.innerHTML='<div class="help trn" role="dialog" aria-label="Training-Aktivität"><div class="trn-top"><span class="trn-badge">'+trnIco+'</span><div class="trn-tt"><h3 class="trn-h">Training-Aktivität</h3><span class="trn-hs"></span></div><button class="hdr-ico" id="trnX" title="Schliessen">✕</button></div><div class="trn-body"></div></div>';
+  document.body.appendChild(m); const close=()=>{ m.classList.remove('on'); TRN.view=null; clearInterval(TRN.poll); };
+  $('#trnX',m).onclick=close; m.addEventListener('click',e=>{ if(e.target===m) close(); }); return m; }
+function trnHead(m,t,sub){ $('.trn-h',m).textContent=t; $('.trn-hs',m).textContent=sub||''; }
+function trnOpen(id){ if(!trnOn()){ toast('Die Cloud ist noch nicht eingerichtet.'); return; } const m=trnDlg(); clearInterval(TRN.poll);
+  const L=trnL(); if(id&&L.some(s=>s.id===id)) trnViewLive(m,id); else if(L.length===1&&!TRN.offers.length&&!id) trnViewLive(m,L[0].id); else if(L.length||TRN.offers.length) trnViewHome(m); else trnViewNew(m);
+  m.classList.add('on'); trnMine(); }
+function trnViewHome(m){ TRN.view='home'; trnHead(m,'Training-Aktivitäten','Laufende Aktivitäten auf diesem Gerät und Einladungen'); const b=$('.trn-body',m), cur=trnCur();
+  b.innerHTML='<div class="trn-cards"></div><button class="trn-newbtn" type="button"><span>+</span> Neue Aktivität starten</button>';
+  const C=$('.trn-cards',b);
+  trnL().forEach(s=>{ const me=s.meta||{}, d=document.createElement('button'); d.type='button'; d.className='trn-card'+(cur&&cur.id===s.id?' cur':'');
+    d.innerHTML='<span class="t"></span><span class="u"></span><span class="f"><i class="lft"></i><i class="n"></i>'+(cur&&cur.id===s.id?'<i class="on">Aktiv</i>':'')+(s.own?'':'<i>Beigetreten</i>')+'</span>';
+    $('.t',d).textContent=me.title||'Training'; $('.u',d).textContent=trnSub(me)||' '; $('.lft',d).textContent=trnLeft(s); $('.n',d).textContent=(s.n||0)+' Videos'; d.onclick=()=>trnViewLive(m,s.id); C.appendChild(d); });
+  TRN.offers.forEach(o=>{ const d=document.createElement('div'); d.className='trn-card offer';
+    d.innerHTML='<span class="t"></span><span class="u"></span><span class="f"><i class="lft"></i><i></i></span><button type="button" class="pri">Beitreten</button>';
+    $('.t',d).textContent=o.title||'Training'; $('.u',d).textContent=trnSub(o)||' '; $('.lft',d).textContent=trnLeft(o); $$('.f i',d)[1].textContent=o.own?'Von dir, anderes Gerät':'Von '+(o.by||'Coach');
+    $('.pri',d).onclick=async e=>{ e.target.disabled=true; if(await trnJoin(o)) trnViewLive(m,o.id); else e.target.disabled=false; }; C.appendChild(d); });
+  $('.trn-newbtn',b).onclick=()=>trnViewNew(m); }
 function trnViewNew(m){ const s=window.vlabAuth&&vlabAuth.get()||{}, b=$('.trn-body',m), today=new Date(), iso=today.getFullYear()+'-'+String(today.getMonth()+1).padStart(2,'0')+'-'+String(today.getDate()).padStart(2,'0');
-  $('.trn-h',m).textContent='Neue Training-Aktivität';
-  b.innerHTML='<p class="inv-p">Alle Videos, die du während der Aktivität filmst oder hinzufügst, werden verkleinert (720p) in die Cloud geladen. Wer den Link hat, kann sie 3 Tage lang ansehen und herunterladen – danach werden sie gelöscht.</p>'+
+  TRN.view='new'; trnHead(m,'Neue Training-Aktivität','Videos 3 Tage lang per Link teilen');
+  b.innerHTML='<p class="trn-intro">Alle Videos, die du während der Aktivität filmst oder hinzufügst, werden verkleinert (720p) in die Cloud geladen. Wer den Link hat, kann sie 3 Tage lang ansehen und herunterladen – danach werden sie gelöscht.</p>'+
    '<form class="trn-f" autocomplete="off"><div class="trn-2"><label class="inv-l">Ort<input name="place" placeholder="z. B. Saas-Fee"></label><label class="inv-l">Datum<input name="date" type="date" value="'+iso+'"></label></div>'+
    '<div class="trn-2"><label class="inv-l">Disziplin<select name="disc" class="inv-q"><option value="">–</option><option>Slalom</option><option>Riesenslalom</option><option>Super-G</option><option>Abfahrt</option><option>Freies Fahren</option><option>Andere</option></select></label><label class="inv-l">Titel<input name="title" placeholder="Training"></label></div>'+[
    ['a','Athletinnen und Athleten'],['c','Coaches']].map(([k,l])=>'<div class="inv-l trn-pp" data-k="'+k+'"><span class="trn-lab">'+l+' <i class="trn-cnt"></i></span><div class="trn-find"><input placeholder="Suchen oder neu eintippen" autocomplete="off"><button type="button" class="trn-new">Neu</button></div><div class="trn-pool"></div></div>').join('')+
-   '<p class="inv-err" hidden></p><div class="inv-row"><span style="flex:1"></span><button type="submit" class="pri">Aktivität starten</button></div></form>';
+   '<p class="inv-err" hidden></p><div class="inv-row">'+(trnL().length||TRN.offers.length?'<button type="button" class="ghost trn-back">← Zurück</button>':'')+'<span style="flex:1"></span><button type="submit" class="pri">Aktivität starten</button></div></form>';
   const f=$('form',b), A=[], C=s.n?[{n:s.n}]:[], ca=trnPicker($('[data-k=a]',b),A,'a'), cc=trnPicker($('[data-k=c]',b),C,'c'), er=$('.inv-err',b);
+  const bk=$('.trn-back',b); if(bk) bk.onclick=()=>trnViewHome(m);
   $('[name=place]',f).addEventListener('input',e=>{ $('[name=title]',f).placeholder=e.target.value.trim()?'Training '+e.target.value.trim():'Training'; });
   if(s.e) trnLoadPeople(s.e).then(()=>{ ca.refresh(); cc.refresh(); });
   f.onsubmit=async e=>{ e.preventDefault(); const go=$('.pri',f); er.hidden=true;
@@ -7460,44 +7627,73 @@ function trnViewNew(m){ const s=window.vlabAuth&&vlabAuth.get()||{}, b=$('.trn-b
     try{
       const place=$('[name=place]',f).value.trim(), body={e:s.e,place,date:$('[name=date]',f).value,disc:$('[name=disc]',f).value,title:$('[name=title]',f).value.trim()||('Training'+(place?' '+place:'')),athletes:A,coaches:C};
       const r=await trnApi('',{method:'POST',json:body});
-      if(!r.ok){ return fail(r.j.err==='login'?'Dieses Konto ist für die Cloud nicht freigeschaltet.':r.j.err==='locked'?'Zu viele Fehlversuche – bitte später nochmals.':'Cloud nicht erreichbar ('+r.status+').'); }
-      TRN.cur={id:r.j.id,edit:r.j.edit,exp:r.j.exp,meta:r.j.meta,up:{},n:0,auto:true,t0:Date.now()}; trnSave(); if(window.vlabTrack) vlabTrack('trn_new');
-      trnViewLive(m); trnUI(); trnShare();
+      if(!r.ok){ return fail(r.j.err==='login'?'Dieses Konto ist für die Cloud nicht freigeschaltet.':'Cloud nicht erreichbar ('+r.status+').'); }
+      const L=tqList(); L.push({id:r.j.id,edit:r.j.edit,exp:r.j.exp,own:true,meta:r.j.meta,up:{},n:0,auto:true,t0:Date.now()}); tqSetList(L); LS.set('trn:cur2',r.j.id); if(window.vlabTrack) vlabTrack('trn_new');
+      trnViewLive(m,r.j.id); trnUI(); trnShare(r.j.id);
     }catch(x){ fail('Keine Verbindung zur Cloud.'); } };
   setTimeout(()=>{ if(innerWidth>760) $('[name=place]',f).focus(); },60); }
-function trnViewLive(m){ const b=$('.trn-body',m), c=TRN.cur, me=c.meta||{}; $('.trn-h',m).textContent=me.title||'Training';
-  const who=[...(me.athletes||[]).map(p=>p.n)], co=(me.coaches||[]).map(p=>p.n);
-  b.innerHTML='<p class="trn-sub"></p><div class="trn-link"><input readonly><button class="ghost" data-a="copy">Kopieren</button><button class="pri" data-a="share">Link teilen</button></div>'+
-   '<label class="trn-auto"><input type="checkbox"> Neue Videos automatisch hochladen</label><div class="trn-list"></div>'+
-   '<div class="inv-row"><button class="ghost" data-a="add">Videos aus der Liste …</button><span style="flex:1"></span><button class="ghost trn-del" data-a="del">Aktivität löschen</button></div>';
-  $('.trn-sub',b).textContent=[me.place,me.date&&me.date.split('-').reverse().join('.'),me.disc].filter(Boolean).join(' · ')+(who.length?' — '+who.join(', '):'')+(co.length?' · Coaches: '+co.join(', '):'')+' · Link '+trnLeft();
-  $('.trn-link input',b).value=trnLink(c.id); const au=$('.trn-auto input',b); au.checked=c.auto!==false; au.onchange=()=>{ c.auto=au.checked; trnSave(); };
+function trnViewLive(m,id){ const s=trnL().find(x=>x.id===id); if(!s){ trnOpen(); return; } TRN.view=id; const me=s.meta||{}, cur=trnCur(), isCur=cur&&cur.id===id, b=$('.trn-body',m);
+  trnHead(m,me.title||'Training',[trnSub(me),trnLeft(s)].filter(Boolean).join(' · '));
+  const who=(me.athletes||[]).map(p=>p.n), co=(me.coaches||[]).map(p=>p.n);
+  b.innerHTML=(trnL().length>1||TRN.offers.length?'<button type="button" class="trn-crumb">← Alle Aktivitäten</button>':'')+
+   '<div class="trn-ppl"></div>'+
+   '<div class="trn-link"><input readonly aria-label="Link"><button class="ghost" data-a="copy">Kopieren</button><button class="pri" data-a="share">Link teilen</button></div>'+
+   (isCur?'<label class="trn-auto"><input type="checkbox"><span>Neue Videos automatisch hochladen</span></label>':'<button type="button" class="trn-mk">Neue Videos in diese Aktivität laden</button>')+
+   '<div class="trn-lh"><b>Videos</b><span class="trn-lc"></span></div><div class="trn-list"></div>'+
+   '<div class="inv-row trn-foot"><button class="ghost" data-a="add">Videos aus der Liste …</button><span style="flex:1"></span>'+(s.own&&!s.joined?'<button class="ghost trn-del" data-a="del">Aktivität löschen</button>':'<button class="ghost trn-del" data-a="leave">Verlassen</button>')+'</div>';
+  const P=$('.trn-ppl',b); who.forEach(n=>{ const x=document.createElement('span'); x.className='a'; x.textContent=n; P.appendChild(x); }); co.forEach(n=>{ const x=document.createElement('span'); x.className='c'; x.textContent=n; P.appendChild(x); }); if(!who.length&&!co.length) P.remove();
+  const ck=$('.trn-crumb',b); if(ck) ck.onclick=()=>trnViewHome(m);
+  $('.trn-link input',b).value=trnLink(id);
+  const au=$('.trn-auto input',b); if(au){ au.checked=s.auto!==false; au.onchange=()=>trnUpd(id,x=>{ x.auto=au.checked; }); }
+  const mk=$('.trn-mk',b); if(mk) mk.onclick=()=>{ LS.set('trn:cur2',id); trnUI(); trnViewLive(m,id); toast('Neue Videos gehen jetzt in «'+(me.title||'Training')+'».'); };
   $('[data-a=copy]',b).onclick=()=>{ const i=$('.trn-link input',b); i.select(); (navigator.clipboard?navigator.clipboard.writeText(i.value):Promise.reject()).then(()=>toast('Link kopiert.'),()=>{ document.execCommand('copy'); toast('Link kopiert.'); }); };
-  $('[data-a=share]',b).onclick=()=>trnShare();
-  $('[data-a=add]',b).onclick=()=>trnPick();
-  $('[data-a=del]',b).onclick=async()=>{ if(!confirm('Aktivität und alle Videos in der Cloud jetzt löschen? Der Link funktioniert danach nicht mehr. Die Videos auf diesem Gerät bleiben.')) return;
-    const r=await trnApi('/'+c.id,{method:'DELETE',edit:true}).catch(()=>({ok:false})); if(r.ok||r.status===404||r.status===410){ TRN.cur=null; TRN.q=[]; TRN.st={}; trnSave(); trnUI(); m.classList.remove('on'); toast('Aktivität gelöscht.'); } else toast('Löschen nicht möglich – kein Netz?'); };
-  trnDlgList(); }
-function trnDlgList(){ const L=$('#trnModal.on .trn-list'); if(!L||!TRN.cur) return; const up=TRN.cur.up||{}, keys=new Set([...Object.keys(up),...Object.keys(TRN.st)]);
-  if(!keys.size){ L.innerHTML='<p class="trn-empty">Noch keine Videos. Filme mit «Filmen» oder füge Videos mit «+» hinzu.</p>'; return; }
-  L.innerHTML=''; keys.forEach(k=>{ const c=clips.find(x=>trnKey(x)===k), st=up[k]?{s:'ok'}:TRN.st[k]||{s:'wait'}, row=document.createElement('div'); row.className='trn-row '+st.s;
-    const lab={ok:'In der Cloud',wait:'Wartet',prep:'Verkleinern '+Math.round(st.p*100)+' %',up:'Hochladen '+Math.round(st.p*100)+' %',err:'Fehler – nochmals'}[st.s];
-    row.innerHTML='<span class="n"></span><span class="s"></span>'; $('.n',row).textContent=c?metaTitle(c):k.replace(/^clip:|\|\d+$/g,''); $('.s',row).textContent=lab;
-    if(st.s==='err'&&c){ row.style.cursor='pointer'; row.onclick=()=>{ delete TRN.st[k]; trnQueue(c); }; } L.appendChild(row); }); }
-function trnPick(){ const own=clips.filter(c=>!c.demo&&!c.err&&!(TRN.cur.up||{})[trnKey(c)]); if(!own.length){ toast('Keine eigenen Videos in der Liste.'); return; }
-  const b=$('#trnModal .trn-body'), box=document.createElement('div'); box.className='trn-pick'; box.innerHTML='<div class="trn-pl"></div><div class="inv-row"><span style="flex:1"></span><button class="ghost" data-a="x">Abbrechen</button><button class="pri" data-a="ok">Hochladen</button></div>';
-  own.slice().sort((a,b)=>(b.mod||b.added)-(a.mod||a.added)).forEach(c=>{ const l=document.createElement('label'); l.innerHTML='<input type="checkbox"><span></span>'; $('span',l).textContent=metaTitle(c)+(c.meta&&c.meta.ok&&c.meta.place?' · '+c.meta.place:''); l._c=c; $('.trn-pl',box).appendChild(l); });
-  $('[data-a=x]',box).onclick=()=>box.remove(); $('[data-a=ok]',box).onclick=()=>{ $$('label',box).filter(l=>$('input',l).checked).forEach(l=>trnQueue(l._c)); box.remove(); };
-  b.appendChild(box); }
-async function trnShare(){ if(!TRN.cur) return; const me=TRN.cur.meta||{}, url=trnLink(TRN.cur.id), txt=(me.title||'Training')+' – Videos (3 Tage verfügbar)';
+  $('[data-a=share]',b).onclick=()=>trnShare(id);
+  $('[data-a=add]',b).onclick=()=>trnPick(id);
+  const del=$('[data-a=del]',b); if(del) del.onclick=async()=>{ if(!confirm('Aktivität und alle Videos in der Cloud jetzt löschen? Der Link funktioniert danach nicht mehr. Die Videos auf diesem Gerät bleiben.')) return;
+    const r=await trnApi('/'+id,{method:'DELETE',s}).catch(()=>({ok:false})); if(r.ok||r.status===404||r.status===410){ tqSetList(tqList().filter(x=>x.id!==id)); (await tqAll()).filter(it=>it.sid===id).forEach(it=>tqDel(it.k)); Object.keys(TRN.st).forEach(k=>{ if(k.startsWith(id+'|')) delete TRN.st[k]; }); trnUI(); toast('Aktivität gelöscht.'); trnOpen(); } else toast('Löschen nicht möglich – kein Netz?'); };
+  const lv=$('[data-a=leave]',b); if(lv) lv.onclick=()=>{ if(!confirm('Aktivität auf diesem Gerät verlassen? Sie läuft für die anderen weiter.')) return; tqSetList(tqList().filter(x=>x.id!==id)); trnUI(); trnMine(); trnOpen(); };
+  trnDlgList(); trnRefresh(id); clearInterval(TRN.poll); TRN.poll=setInterval(()=>{ if(TRN.view===id&&!document.hidden) trnRefresh(id); },20e3); }
+/* Liste: Videos in der Cloud (auch von anderen Coaches) und noch wartende von diesem Gerät */
+function trnDlgList(){ const id=TRN.view, L=$('#trnModal.on .trn-list'); if(!L||!id||id==='home'||id==='new') return; const s=trnL().find(x=>x.id===id); if(!s) return;
+  const me=s.meta||{}, A=(me.athletes||[]).map(a=>a.n), V=(me.videos||[]).slice().reverse(), up=new Set(Object.values(s.up||{}));
+  const pend=Object.entries(TRN.st).filter(([k,v])=>k.startsWith(id+'|')&&!(v.s==='ok'));
+  $('#trnModal .trn-lc').textContent=V.length+(V.length===1?' Video':' Videos')+(pend.length?' · '+pend.length+' am Hochladen':'');
+  const sel=(v,on)=>{ const x=document.createElement('select'); x.className='trn-who'; x.innerHTML='<option value="">Wer fährt?</option>'+A.map(n=>'<option></option>').join(''); [...x.options].slice(1).forEach((o,i)=>{ o.value=o.textContent=A[i]; }); if(v&&!A.includes(v)){ const o=new Option(v,v); x.add(o); } x.value=v||''; x.onchange=()=>on(x.value); return x; };
+  L.innerHTML=''; if(!V.length&&!pend.length){ L.innerHTML='<p class="trn-empty">Noch keine Videos. Filme mit «Filmen» oder füge Videos mit «+» hinzu – sie erscheinen hier und auf der Link-Seite.</p>'; return; }
+  pend.forEach(([k,st])=>{ const c=clips.find(x=>id+'|'+trnKey(x)===k), row=document.createElement('div'); row.className='trn-row pend '+st.s;
+    const lab={wait:'Wartet',prep:'Verkleinern '+Math.round(st.p*100)+' %',up:'Hochladen '+Math.round(st.p*100)+' %',retry:'Kein Netz – neuer Versuch gleich',off:'Offline – lädt, sobald Netz da ist',err:'Fehler – antippen für neuen Versuch'}[st.s]||'Wartet';
+    row.innerHTML='<span class="th"></span><span class="m"><b></b><small></small><i class="bar"><s></s></i></span>'; $('b',row).textContent=c?metaTitle(c):'Video'; $('small',row).textContent=lab;
+    $('s',row).style.width=Math.round((st.s==='prep'?st.p*.5:st.s==='up'?.5+st.p*.5:0)*100)+'%';
+    if(st.s==='err'&&c){ row.style.cursor='pointer'; row.onclick=()=>{ delete TRN.st[k]; trnQueue(c,s); }; }
+    tqGet(k).then(it=>{ if(!it||!A.length) return; row.querySelector('.m').after(sel(it.p,p=>trnSetPerson(id,k,p))); });
+    L.appendChild(row); });
+  V.forEach(v=>{ const row=document.createElement('div'); row.className='trn-row ok'; row.innerHTML='<span class="th"></span><span class="m"><b></b><small></small></span>';
+    if(v.poster){ const im=new Image(); im.alt=''; im.loading='lazy'; im.src=TRN_API+'/api/s/'+id+'/v/'+v.id+'/p'; $('.th',row).appendChild(im); }
+    $('b',row).textContent=String(v.name||'Video').replace(/\.[^.]+$/,'').replace(/_/g,' '); $('small',row).textContent=[v.dur?v.dur.toFixed(0)+' s':'',v.by&&!up.has(v.id)?'von '+v.by:'In der Cloud'].filter(Boolean).join(' · ');
+    if(A.length||v.p) row.appendChild(sel(v.p,async p=>{ if(await trnSetPerson(id,null,p,v.id)){ v.p=p; trnUpd(id,x=>{ const w=(x.meta.videos||[]).find(y=>y.id===v.id); if(w) w.p=p; }); } }));
+    L.appendChild(row); }); }
+function trnPick(id){ const s=trnL().find(x=>x.id===id); if(!s) return; const own=clips.filter(c=>!c.demo&&!c.err&&!(s.up||{})[trnQK(s,c)]&&!TRN.st[trnQK(s,c)]); if(!own.length){ toast('Keine weiteren eigenen Videos in der Liste.'); return; }
+  const b=$('#trnModal .trn-body'); $$('.trn-pick',b).forEach(x=>x.remove()); const box=document.createElement('div'); box.className='trn-pick'; box.innerHTML='<div class="trn-pl"></div><div class="inv-row"><span style="flex:1"></span><button class="ghost" data-a="x">Abbrechen</button><button class="pri" data-a="ok">Hochladen</button></div>';
+  own.slice().sort((a,b)=>(b.mod||b.added||0)-(a.mod||a.added||0)).forEach(c=>{ const l=document.createElement('label'); l.innerHTML='<input type="checkbox"><span></span>'; $('span',l).textContent=metaTitle(c); l._c=c; $('.trn-pl',box).appendChild(l); });
+  $('[data-a=x]',box).onclick=()=>box.remove(); $('[data-a=ok]',box).onclick=()=>{ $$('label',box).filter(l=>$('input',l).checked).forEach(l=>trnQueue(l._c,s)); box.remove(); trnDlgList(); };
+  $('.trn-foot',b).before(box); box.scrollIntoView({block:'nearest',behavior:'smooth'}); }
+async function trnShare(id){ const s=trnL().find(x=>x.id===id); if(!s) return; const me=s.meta||{}, url=trnLink(id), txt=(me.title||'Training')+(me.place?' – '+me.place:'')+': Videos (3 Tage verfügbar)';
   if(navigator.share&&matchMedia('(pointer:coarse)').matches){ try{ await navigator.share({title:txt,text:txt,url}); return; }catch(e){ if(e&&e.name==='AbortError') return; } }
   try{ await navigator.clipboard.writeText(url); toast('Link kopiert – jetzt verschicken.',3000); }catch(e){} }
 
 /* Menü-Einträge (Handy «…» und Konto-Menü am Computer) */
-window.trnMenuItem=(pop,close)=>{ if(!trnOn()) return; const b=document.createElement('button'); b.className='vp-use vp-trn'; b.setAttribute('role','menuitem'); b.innerHTML=trnIco+(trnLive()?'Training-Aktivität · '+trnLeft():'Training-Aktivität'); b.onclick=()=>{ close(); trnOpen(); }; const sep=$('.vp-sep',pop); sep?sep.after(b):pop.appendChild(b); };
-window.trnOn=trnOn; window.trnOpen=trnOpen; window.trnNew=trnNew; window.trnStart=()=>TRN.cur&&TRN.cur.t0||0;
-setInterval(()=>{ if(TRN.cur&&!trnLive()){ toast('Training-Aktivität abgelaufen – die Cloud-Videos sind gelöscht.',4000); TRN.cur=null; TRN.q=[]; TRN.st={}; trnSave(); } trnUI(); },60e3);
-setTimeout(trnUI,800);
+window.trnMenuItem=(pop,close)=>{ if(!trnOn()) return; const b=document.createElement('button'); b.className='vp-use vp-trn'; b.setAttribute('role','menuitem'); const s=trnCur();
+  b.innerHTML=trnIco+(s?'Training-Aktivität · '+trnLeft(s):TRN.offers.length?'Training-Aktivität · beitreten':'Training-Aktivität'); b.onclick=()=>{ close(); trnOpen(); }; const sep=$('.vp-sep',pop); sep?sep.after(b):pop.appendChild(b); };
+window.trnOn=trnOn; window.trnOpen=trnOpen; window.trnNew=trnNew;
+/* Nutzungsanalyse: wie voll ist die Cloud? */
+window.trnStats=async el=>{ if(!el||!trnOn()) return; try{ const r=await fetch(TRN_API+'/api/stats',{cache:'no-store'}), j=await r.json(); if(!r.ok) throw 0;
+  const gb=j.bytes/1024**3, lim=(j.limit||10*1024**3)/1024**3, set=(k,v)=>{ const x=el.querySelector('[data-c='+k+']'); if(x) x.textContent=v; };
+  set('s',j.sessions); set('v',j.videos); set('b',(gb<1?Math.round(j.bytes/1024**2)+' MB':gb.toFixed(1)+' GB')+' / '+lim.toFixed(0)+' GB');
+  const bar=el.querySelector('[data-c=bar]'); if(bar){ bar.style.width=Math.min(100,gb/lim*100).toFixed(1)+'%'; if(gb/lim>.8) bar.style.background='#e5484d'; } }catch(e){ const x=el.querySelector('.cs'); if(x) x.textContent='Cloud gerade nicht erreichbar.'; } };
+setInterval(()=>{ const was=LS.get('trn:cur2',null), L=tqList(); if(was&&!L.some(s=>s.id===was&&s.exp>Date.now())&&L.some(s=>s.id===was)) toast('Training-Aktivität abgelaufen – die Cloud-Videos sind gelöscht.',4000);
+  tqSetList(L.filter(s=>s.exp>Date.now()-36e5)); trnUI(); },60e3);
+setInterval(()=>{ if(!document.hidden) trnMine(); },5*60e3);
+setTimeout(()=>{ if(trnOn()) trnBoot(); },900);
 
 /* Aus der Ansichtsseite «In Video-Lab übernehmen»: Videos liegen in der Datenbank vlab-cloud und erscheinen in der Liste */
 async function cloudSync(){ if(!window.indexedDB) return; let db;
@@ -8784,7 +8980,7 @@ async function fieldSync(){ if(!window.indexedDB) return; let db;
     const nm=f.fname||(String(f.name||'Lauf').replace(/[^\wäöüÄÖÜéèà\- ]+/g,'').trim().replace(/\s+/g,'_')+'.'+(/webm/.test(f.mime||f.blob.type)?'webm':'mp4'));
     let c=clips.find(x=>x.field===f.id);
     if(c){ if(c.name!==nm){ c.name=nm; c.meta=parseName(nm); ch=true; } continue; } // in der Field-App umbenannt
-    c=addClip({name:nm,size:f.blob.size,mod:f.t0||f.created,url:URL.createObjectURL(f.blob)}); c.field=f.id; if(f.t0) c.fieldT0=f.t0; n++; if(window.trnNew&&(f.created||0)>=trnStart()) trnNew([c]);
+    c=addClip({name:nm,size:f.blob.size,mod:f.t0||f.created,url:URL.createObjectURL(f.blob)}); c.field=f.id; if(f.t0) c.fieldT0=f.t0; n++;
     if(false&&f.marks&&f.marks.length&&!c.markers.length){ /* Marker aus der Feld-App: Funktion entfernt */ const mk=f.marks; c.whenFps.then(()=>{ const fps=c.fps||30; c.markers=[...new Set(mk.map(t=>Math.round(t*fps)))].sort((a,b)=>a-b); c.markers.forEach(fr=>{ if(!(c.notes||{})[fr]) setNote(c,fr,'Beim Filmen'); }); saveClip(c); renderLib(); decks.forEach(d=>{ if(d.clip===c){ d.dirty=true; } }); if(typeof renderMarks==='function') renderMarks(); }); } }
   clips.filter(c=>c.field&&!seen.has(c.field)&&!decks.some(d=>d.clip===c)).forEach(c=>{ removeClip(c,true); ch=true; }); // in der Field-App gelöscht
   if(n||ch){ renderLib(); syncSelects(); }
@@ -8877,7 +9073,7 @@ if(false&&!LS.get('hint1',0)){ setTimeout(()=>{ toast(matchMedia('(pointer:coars
 
 /* Update-Hinweis: prüft version.json auf GitHub Pages; «Aktualisieren» lädt die Seite ohne Cache neu */
 (()=>{
-  const BUILD='20261109154158'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
+  const BUILD='20261109183926'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
   // nach einem Update die ?v=… aus der Adresse entfernen
   try{ const u=new URL(location.href); if(u.searchParams.has('v')){ u.searchParams.delete('v'); history.replaceState(null,'',u.pathname+(u.search||'')+u.hash); } }catch(e){}
   const el=$('#upd'); let latest=null, snoozed=null, busy=false;

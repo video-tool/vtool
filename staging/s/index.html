@@ -5,95 +5,149 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex,nofollow">
 <meta name="referrer" content="no-referrer">
+<meta name="theme-color" content="#0b0d10">
 <title>Training · Video-Lab</title>
 <link rel="icon" href="../icon-192.png">
 <link rel="apple-touch-icon" href="../icon-192.png">
 <style>
-:root{--bg:#f4f5f7;--card:#fff;--ink:#0f1216;--muted:#6b7380;--line:#e3e6ea;--field:#f1f3f5;--red:#DA291C;--ok:#2fa36b;color-scheme:light dark}
-@media (prefers-color-scheme:dark){:root{--bg:#0b0d10;--card:#14181d;--ink:#eef2f6;--muted:#8f98a5;--line:#252b33;--field:#1b2026}}
+:root{--bg:#f3f4f6;--card:#fff;--ink:#0f1216;--muted:#687180;--line:#e2e5ea;--field:#eef0f3;--red:#DA291C;--ok:#2fa36b;--shadow:0 1px 2px rgba(15,18,22,.05),0 10px 30px -18px rgba(15,18,22,.25);color-scheme:light dark}
+@media (prefers-color-scheme:dark){:root{--bg:#0b0d10;--card:#14181d;--ink:#eef2f6;--muted:#8f98a5;--line:#242a32;--field:#1a1f25;--shadow:0 12px 30px -18px rgba(0,0,0,.8)}}
 *{box-sizing:border-box}
 html,body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;-webkit-text-size-adjust:100%}
-.wrap{max-width:1100px;margin:0 auto;padding:max(16px,env(safe-area-inset-top)) 16px calc(32px + env(safe-area-inset-bottom))}
-.brand{display:flex;align-items:center;gap:10px;margin-bottom:18px}
-.brand i{width:30px;height:30px;border-radius:8px;background:var(--red);display:grid;place-items:center}
+.hero{background:linear-gradient(160deg,#1b0f0e 0%,#0b0d10 55%,#0b0d10 100%);color:#fff;padding:max(18px,env(safe-area-inset-top)) 0 26px;position:relative;overflow:hidden}
+.hero::after{content:"";position:absolute;right:-120px;top:-140px;width:380px;height:380px;border-radius:50%;background:radial-gradient(circle,rgba(218,41,28,.45),transparent 65%);pointer-events:none}
+.wrap{max-width:1120px;margin:0 auto;padding:0 16px}
+.brand{display:flex;align-items:center;gap:10px;margin-bottom:22px;position:relative;z-index:1}
+.brand i{width:32px;height:32px;border-radius:9px;background:var(--red);display:grid;place-items:center;box-shadow:0 6px 16px -8px rgba(218,41,28,.9)}
 .brand i svg{width:18px;height:18px}
-.brand b{font-size:13px;letter-spacing:.02em}.brand b span{color:var(--red)}
-.brand small{display:block;font-size:9px;font-weight:700;letter-spacing:.14em;color:var(--muted);text-transform:uppercase}
-.brand .beta{margin-left:5px;padding:0 4px;border:1px solid currentColor;border-radius:4px;opacity:.7}
-h1{margin:0 0 4px;font-size:clamp(22px,4.5vw,30px);letter-spacing:-.02em}
-.sub{color:var(--muted);font-size:14px}
-.ppl{display:flex;flex-wrap:wrap;gap:6px;margin:12px 0 4px}
-.ppl span{height:26px;padding:0 10px;border-radius:13px;background:var(--field);border:1px solid var(--line);font-size:13px;font-weight:600;display:inline-flex;align-items:center}
-.ppl span.c{color:var(--muted)}
+.brand b{font-size:14px;letter-spacing:.01em}.brand b span{color:#ff5a4c;font-style:italic}
+.brand small{display:block;font-size:9.5px;font-weight:700;letter-spacing:.16em;color:rgba(255,255,255,.6);text-transform:uppercase}
+.brand .beta{margin-left:6px;padding:0 4px;border:1px solid currentColor;border-radius:4px}
+.lang{margin-left:auto;display:flex;gap:2px;background:rgba(255,255,255,.08);border-radius:9px;padding:2px}
+.lang button{height:26px;min-width:34px;border:0;border-radius:7px;background:transparent;color:rgba(255,255,255,.7);font:700 11.5px inherit;font-family:inherit;cursor:pointer}
+.lang button.on{background:#fff;color:#111}
+h1{margin:0 0 6px;font-size:clamp(24px,5vw,34px);line-height:1.1;letter-spacing:-.02em;position:relative;z-index:1}
+.sub{color:rgba(255,255,255,.72);font-size:14px;position:relative;z-index:1}
+.left{display:inline-flex;align-items:center;gap:6px;margin-top:12px;height:26px;padding:0 10px;border-radius:13px;background:rgba(255,255,255,.1);font-size:12.5px;font-weight:650;position:relative;z-index:1}
+.left::before{content:"";width:7px;height:7px;border-radius:50%;background:#3ddc84}
+.left.warn::before{background:#f5a524}
 .bar{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:18px 0 14px}
-.left{font-size:13px;font-weight:650;color:var(--muted);margin-right:auto}
-.left.warn{color:#d97706}
-button,.btn{height:42px;padding:0 16px;border-radius:11px;border:1px solid var(--line);background:var(--card);color:var(--ink);font:650 14px inherit;font-family:inherit;cursor:pointer;display:inline-flex;align-items:center;gap:8px;text-decoration:none}
-button.pri{background:var(--red);border-color:var(--red);color:#fff}
-button:disabled{opacity:.5;cursor:default}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px}
-.v{background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden;display:flex;flex-direction:column}
-.v video{width:100%;aspect-ratio:16/9;background:#000;display:block;object-fit:contain}
-.v.port video{aspect-ratio:9/16;max-height:62vh}
+.chips{display:flex;flex-wrap:wrap;gap:6px;flex:1;min-width:0}
+.chip{height:34px;padding:0 13px;border-radius:17px;border:1px solid var(--line);background:var(--card);color:var(--ink);font:650 13px inherit;font-family:inherit;cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+.chip em{font-style:normal;font-weight:600;color:var(--muted);font-size:12px}
+.chip.on{background:var(--ink);border-color:var(--ink);color:var(--card)}
+.chip.on em{color:inherit;opacity:.7}
+.coach{height:34px;padding:0 11px;border-radius:17px;display:inline-flex;align-items:center;font-size:12.5px;color:var(--muted)}
+.acts{display:flex;gap:8px;flex-wrap:wrap}
+button.b{height:42px;padding:0 16px;border-radius:11px;border:1px solid var(--line);background:var(--card);color:var(--ink);font:650 14px inherit;font-family:inherit;cursor:pointer;display:inline-flex;align-items:center;gap:8px;box-shadow:var(--shadow)}
+button.b.pri{background:var(--red);border-color:var(--red);color:#fff}
+button.b:disabled{opacity:.5;cursor:default}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px}
+.v{background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden;display:flex;flex-direction:column;box-shadow:var(--shadow)}
+.v .pv{position:relative;aspect-ratio:16/10;background:#000;cursor:pointer}
+.v.port .pv{aspect-ratio:4/5}
+.v .pv img,.v .pv video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background:#000}
+.v .pv video{object-fit:contain}
+.v .pv .play{position:absolute;left:50%;top:50%;width:54px;height:54px;margin:-27px 0 0 -27px;border-radius:50%;background:rgba(10,13,18,.55);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);display:grid;place-items:center;border:1px solid rgba(255,255,255,.3)}
+.v .pv .play svg{width:22px;height:22px;margin-left:3px}
+.v .pv .dur{position:absolute;right:8px;bottom:8px;padding:2px 7px;border-radius:7px;background:rgba(0,0,0,.6);color:#fff;font:650 11.5px inherit;font-variant-numeric:tabular-nums}
+.v .pv .new{position:absolute;left:8px;top:8px;padding:3px 8px;border-radius:8px;background:var(--red);color:#fff;font:800 10.5px inherit;letter-spacing:.06em;text-transform:uppercase}
 .v .m{display:flex;align-items:center;gap:8px;padding:10px 12px}
-.v .m b{flex:1;min-width:0;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.v .m small{color:var(--muted);font-size:12px;white-space:nowrap}
-.v .m a{width:34px;height:34px;padding:0;justify-content:center;border-radius:9px}
+.v .m .tx{flex:1;min-width:0}
+.v .m b{display:block;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.v .m small{display:block;color:var(--muted);font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.v .m a{width:36px;height:36px;border-radius:10px;border:1px solid var(--line);display:grid;place-items:center;color:var(--ink);flex:none}
 .v .m a svg{width:17px;height:17px}
-.msg{margin:40px auto;max-width:460px;text-align:center;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:28px 22px}
+.msg{margin:48px auto;max-width:460px;text-align:center;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:30px 22px;box-shadow:var(--shadow)}
 .msg h2{margin:0 0 6px;font-size:20px}.msg p{margin:0;color:var(--muted)}
-.empty{color:var(--muted);padding:30px 0;text-align:center}
-.prog{position:fixed;left:50%;bottom:calc(16px + env(safe-area-inset-bottom));transform:translateX(-50%);background:rgba(10,13,18,.9);color:#fff;border-radius:14px;padding:10px 16px;font-size:13px;font-weight:650;min-width:260px;text-align:center;box-shadow:0 10px 30px -10px rgba(0,0,0,.6)}
+.empty{color:var(--muted);padding:34px 0;text-align:center}
+.prog{position:fixed;left:50%;bottom:calc(16px + env(safe-area-inset-bottom));transform:translateX(-50%);background:rgba(10,13,18,.92);color:#fff;border-radius:14px;padding:11px 16px;font-size:13px;font-weight:650;min-width:270px;text-align:center;box-shadow:0 10px 30px -10px rgba(0,0,0,.6);z-index:9}
 .prog i{display:block;height:4px;border-radius:2px;background:rgba(255,255,255,.18);margin-top:7px;overflow:hidden}
 .prog i b{display:block;height:100%;width:0;background:var(--red);transition:width .2s}
-.note{font-size:12px;color:var(--muted);margin-top:22px}
+.note{font-size:12px;color:var(--muted);margin:26px 0 30px}
+main.wrap{padding-bottom:calc(10px + env(safe-area-inset-bottom))}
+@media (max-width:560px){ .grid{grid-template-columns:1fr 1fr;gap:10px} .v .m{padding:8px 9px} .v .m b{font-size:13px} .v .m a{width:32px;height:32px} .acts{width:100%} .acts button.b{flex:1;justify-content:center;padding:0 10px;font-size:13px} }
 </style>
 </head>
 <body>
-<div class="wrap">
-  <div class="brand"><i><svg viewBox="0 0 24 24" fill="#fff"><path d="M9 7.5v9l7.5-4.5z"/></svg></i><div><b><span>swiss</span>ski</b><small>Video-Lab<span class="beta">Beta</span></small></div></div>
-  <div id="app"><p class="empty">Wird geladen …</p></div>
-  <p class="note">Die Videos sind nur über diesen Link erreichbar und werden 3 Tage nach dem Training automatisch gelöscht. Wer sie behalten will, lädt sie vorher herunter.</p>
-</div>
+<header class="hero"><div class="wrap">
+  <div class="brand"><i><svg viewBox="0 0 24 24" fill="#fff"><path d="M9 7.5v9l7.5-4.5z"/></svg></i><div><b><span>swiss</span>ski</b><small>Video-Lab<span class="beta">Beta</span></small></div>
+    <div class="lang"><button data-l="de">DE</button><button data-l="fr">FR</button></div></div>
+  <div id="hd"><h1>&nbsp;</h1></div>
+</div></header>
+<main class="wrap"><div id="app"><p class="empty" data-t="load"></p></div><p class="note" data-t="note"></p></main>
 <script>
 (function(){
 var API=(function(){ try{ if(/^(localhost|127\.0\.0\.1)$/.test(location.hostname)){ var o=localStorage.getItem('vlab:cloudApi'); if(o) return o; } }catch(e){} var a='https://vlab-cloud.swiss-ski-club.workers.dev'; return a.indexOf('%%')===0?'':a; })().replace(/\/+$/,'');
-var id=(location.hash||'').replace(/^#/,'').trim(), M=null, $=function(s,r){ return (r||document).querySelector(s); }, app=$('#app');
+var T={de:{load:'Wird geladen …',note:'Die Videos sind nur über diesen Link erreichbar und werden 3 Tage nach dem Training automatisch gelöscht. Wer sie behalten will, lädt sie vorher herunter.',
+  left_h:'Noch {n} h verfügbar',left_m:'Noch {n} min verfügbar',all:'Alle',zip:'Alle herunterladen (ZIP)',zipf:'{p} herunterladen (ZIP)',lab:'In Video-Lab übernehmen',coach:'Coach',by:'von {n}',dl:'Herunterladen',
+  none:'Noch keine Videos – sobald der Coach filmt, erscheinen sie hier automatisch.',nonef:'Noch keine Videos von {p}.',neu:'Neu',
+  exp_t:'Link abgelaufen',exp_p:'Die Videos dieses Trainings sind nicht mehr verfügbar – sie werden nach 3 Tagen gelöscht.',bad_t:'Link unvollständig',bad_p:'Bitte den ganzen Link öffnen, so wie er verschickt wurde.',
+  off_t:'Keine Verbindung',off_p:'Bitte Internet prüfen und die Seite neu laden.',na_t:'Noch nicht eingerichtet',na_p:'Die Cloud für Trainings-Videos ist noch nicht aktiv.',
+  ld:'Video {i} von {n} wird geladen',mk:'ZIP wird erstellt',tk:'Video {i} von {n} wird übernommen',dlerr:'Herunterladen fehlgeschlagen. Bitte Internet prüfen und nochmals versuchen.',laberr:'Übernehmen fehlgeschlagen – zu wenig Speicher oder kein Netz.',videos:'Videos'},
+ fr:{load:'Chargement …',note:'Les vidéos ne sont accessibles que via ce lien et sont supprimées automatiquement 3 jours après l’entraînement. Pour les garder, télécharge-les avant.',
+  left_h:'Encore {n} h disponible',left_m:'Encore {n} min disponible',all:'Tous',zip:'Tout télécharger (ZIP)',zipf:'Télécharger {p} (ZIP)',lab:'Reprendre dans Video-Lab',coach:'Coach',by:'par {n}',dl:'Télécharger',
+  none:'Pas encore de vidéos – elles apparaissent ici dès que le coach filme.',nonef:'Pas encore de vidéos de {p}.',neu:'Nouveau',
+  exp_t:'Lien expiré',exp_p:'Les vidéos de cet entraînement ne sont plus disponibles – elles sont supprimées après 3 jours.',bad_t:'Lien incomplet',bad_p:'Merci d’ouvrir le lien complet, tel qu’il a été envoyé.',
+  off_t:'Pas de connexion',off_p:'Vérifie la connexion Internet et recharge la page.',na_t:'Pas encore configuré',na_p:'Le cloud pour les vidéos d’entraînement n’est pas encore actif.',
+  ld:'Chargement de la vidéo {i} sur {n}',mk:'Création du ZIP',tk:'Reprise de la vidéo {i} sur {n}',dlerr:'Le téléchargement a échoué. Vérifie la connexion et réessaie.',laberr:'La reprise a échoué – mémoire insuffisante ou pas de réseau.',videos:'vidéos'}};
+var L=(function(){ try{ var s=localStorage.getItem('vlab:lang'); if(s){ s=JSON.parse(s); if(T[s]) return s; } }catch(e){} return /^fr/i.test(navigator.language||'')?'fr':'de'; })();
+function t(k,o){ var s=(T[L]||T.de)[k]||T.de[k]||k; for(var x in o||{}) s=s.replace('{'+x+'}',o[x]); return s; }
+var DISC={fr:{'Slalom':'Slalom','Riesenslalom':'Slalom géant','Super-G':'Super-G','Abfahrt':'Descente','Freies Fahren':'Ski libre','Andere':'Autre'}};
+var id=(location.hash||'').replace(/^#/,'').trim(), M=null, F='', seen=0, $=function(s,r){ return (r||document).querySelector(s); }, app=$('#app');
+try{ seen=+localStorage.getItem('vlab:seen:'+id)||0; }catch(e){}
 function esc(s){ return String(s==null?'':s).replace(/[&<>"]/g,function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
 function mb(n){ return n>=1048576?(n/1048576).toFixed(n>=1e8?0:1)+' MB':Math.max(1,Math.round(n/1024))+' KB'; }
 function vurl(v,dl){ return API+'/api/s/'+id+'/v/'+v.id+(dl?'?dl=1':''); }
 function nice(n){ return String(n||'Video').replace(/\.[^.]+$/,'').replace(/_/g,' '); }
-function left(){ var ms=M.exp-Date.now(); if(ms<=0) return 'abgelaufen'; var h=Math.floor(ms/36e5); return h>=1?'Noch '+h+' h verfügbar':'Noch '+Math.max(1,Math.round(ms/6e4))+' min verfügbar'; }
-function gone(t,p){ app.innerHTML='<div class="msg"><h2>'+esc(t)+'</h2><p>'+esc(p)+'</p></div>'; document.title='Video-Lab'; }
+function left(){ var ms=M.exp-Date.now(), h=Math.floor(ms/36e5); return h>=1?t('left_h',{n:h}):t('left_m',{n:Math.max(1,Math.round(ms/6e4))}); }
+function texts(){ document.documentElement.lang=L; [].forEach.call(document.querySelectorAll('[data-t]'),function(e){ e.textContent=t(e.getAttribute('data-t')); }); [].forEach.call(document.querySelectorAll('.lang button'),function(b){ b.classList.toggle('on',b.getAttribute('data-l')===L); }); }
+function gone(tk,pk){ $('#hd').innerHTML=''; app.innerHTML='<div class="msg"><h2>'+esc(t(tk))+'</h2><p>'+esc(t(pk))+'</p></div>'; document.title='Video-Lab'; M=null; }
 function load(first){
-  if(!API) return gone('Noch nicht eingerichtet','Die Cloud für Trainings-Videos ist noch nicht aktiv.');
-  if(!/^[\w-]{20,40}$/.test(id)) return gone('Link unvollständig','Bitte den ganzen Link öffnen, so wie er verschickt wurde.');
-  fetch(API+'/api/s/'+id,{cache:'no-store'}).then(function(r){ if(r.status===410||r.status===404){ gone('Link abgelaufen','Die Videos dieses Trainings sind nicht mehr verfügbar – sie werden nach 3 Tagen gelöscht.'); return null; } if(!r.ok) throw 0; return r.json(); })
-  .then(function(j){ if(!j) return; if(!first&&M&&j.videos.length!==M.videos.length&&[].some.call(document.querySelectorAll('video'),function(v){ return !v.paused; })) return; /* läuft gerade ein Video: später neu zeichnen */ var n0=M?M.videos.length:-1; M=j; if(first||n0!==M.videos.length) render(); else $('.left').textContent=left(); })
-  .catch(function(){ if(first) gone('Keine Verbindung','Bitte Internet prüfen und die Seite neu laden.'); });
+  if(!API) return gone('na_t','na_p');
+  if(!/^[\w-]{20,40}$/.test(id)) return gone('bad_t','bad_p');
+  fetch(API+'/api/s/'+id,{cache:'no-store'}).then(function(r){ if(r.status===410||r.status===404){ gone('exp_t','exp_p'); return null; } if(!r.ok) throw 0; return r.json(); })
+  .then(function(j){ if(!j) return; if(!first&&M&&j.videos.length===M.videos.length&&JSON.stringify(j.videos.map(function(v){ return v.p; }))===JSON.stringify(M.videos.map(function(v){ return v.p; }))){ $('.left').textContent=left(); return; }
+    if(!first&&M&&[].some.call(document.querySelectorAll('video'),function(v){ return !v.paused; })) return; /* läuft gerade ein Video: später neu zeichnen */
+    M=j; render(); })
+  .catch(function(){ if(first) gone('off_t','off_p'); });
 }
+function vis(){ return M.videos.filter(function(v){ return !F||v.p===F; }); }
 function render(){
-  document.title=(M.title||'Training')+' · Video-Lab';
-  var sub=[M.place,M.date?M.date.split('-').reverse().join('.'):'',M.disc].filter(Boolean).join(' · ');
-  var ppl=(M.athletes||[]).map(function(p){ return '<span>'+esc(p.n)+'</span>'; }).join('')+(M.coaches||[]).map(function(p){ return '<span class="c">Coach · '+esc(p.n)+'</span>'; }).join('');
+  texts(); document.title=(M.title||'Training')+' · Video-Lab';
+  var disc=L==='fr'&&DISC.fr[M.disc]?DISC.fr[M.disc]:M.disc, sub=[M.place,M.date?M.date.split('-').reverse().join('.'):'',disc].filter(Boolean).join(' · ');
+  $('#hd').innerHTML='<h1>'+esc(M.title||'Training')+'</h1><div class="sub">'+esc(sub)+'</div><span class="left'+(M.exp-Date.now()<12*36e5?' warn':'')+'">'+esc(left())+'</span>';
+  var cnt={}; M.videos.forEach(function(v){ if(v.p) cnt[v.p]=(cnt[v.p]||0)+1; });
+  var names=(M.athletes||[]).map(function(p){ return p.n; }); Object.keys(cnt).forEach(function(n){ if(names.indexOf(n)<0) names.push(n); });
+  if(F&&names.indexOf(F)<0) F='';
+  var chips=names.length?'<button class="chip'+(F?'':' on')+'" data-f="">'+esc(t('all'))+' <em>'+M.videos.length+'</em></button>'+names.map(function(n){ return '<button class="chip'+(F===n?' on':'')+'" data-f="'+esc(n)+'">'+esc(n)+(cnt[n]?' <em>'+cnt[n]+'</em>':'')+'</button>'; }).join(''):'';
+  chips+=(M.coaches||[]).map(function(p){ return '<span class="coach">'+esc(t('coach'))+' · '+esc(p.n)+'</span>'; }).join('');
   var auth=null; try{ auth=JSON.parse(localStorage.getItem('vlab:auth')||'null'); }catch(e){}
-  var h='<h1>'+esc(M.title||'Training')+'</h1><div class="sub">'+esc(sub)+'</div>'+(ppl?'<div class="ppl">'+ppl+'</div>':'')+
-    '<div class="bar"><span class="left'+(M.exp-Date.now()<12*36e5?' warn':'')+'">'+left()+'</span>'+
-    (M.videos.length?'<button id="zip">'+ic('dl')+'Alle herunterladen (ZIP)</button>'+(auth&&auth.exp>Date.now()?'<button class="pri" id="lab">'+ic('lab')+'In Video-Lab übernehmen</button>':''):'')+'</div>';
-  h+=M.videos.length?'<div class="grid">'+M.videos.map(function(v){ var port=v.h>v.w; return '<div class="v'+(port?' port':'')+'"><video controls playsinline preload="metadata" src="'+esc(vurl(v))+'#t=0.2"></video><div class="m"><b title="'+esc(nice(v.name))+'">'+esc(nice(v.name))+'</b><small>'+(v.dur?v.dur.toFixed(0)+' s · ':'')+mb(v.size)+'</small><a class="btn" href="'+esc(vurl(v,1))+'" download="'+esc(v.name)+'" aria-label="Herunterladen">'+ic('dl')+'</a></div></div>'; }).join('')+'</div>'
-    :'<p class="empty">Noch keine Videos – sobald der Coach filmt, erscheinen sie hier automatisch.</p>';
+  var V=vis();
+  var h='<div class="bar"><div class="chips">'+chips+'</div><div class="acts">'+(V.length?'<button class="b" id="zip">'+ic('dl')+esc(F?t('zipf',{p:F}):t('zip'))+'</button>'+(auth&&auth.exp>Date.now()?'<button class="b pri" id="lab">'+ic('lab')+esc(t('lab'))+'</button>':''):'')+'</div></div>';
+  h+=V.length?'<div class="grid">'+V.slice().reverse().map(function(v){ var port=v.h>v.w, nw=seen&&v.t>seen;
+    return '<div class="v'+(port?' port':'')+'" data-id="'+esc(v.id)+'"><div class="pv">'+(v.poster?'<img loading="lazy" alt="" src="'+esc(vurl(v)+'/p')+'">':'')+'<span class="play">'+ic('play')+'</span>'+(v.dur?'<span class="dur">'+fmtDur(v.dur)+'</span>':'')+(nw?'<span class="new">'+esc(t('neu'))+'</span>':'')+'</div>'+
+      '<div class="m"><div class="tx"><b title="'+esc(nice(v.name))+'">'+esc(v.p||nice(v.name))+'</b><small>'+esc([v.p?nice(v.name):'',v.by?t('by',{n:v.by}):'',mb(v.size)].filter(Boolean).join(' · '))+'</small></div><a href="'+esc(vurl(v,1))+'" download="'+esc(v.name)+'" aria-label="'+esc(t('dl'))+'">'+ic('dl')+'</a></div></div>'; }).join('')+'</div>'
+    :'<p class="empty">'+esc(F?t('nonef',{p:F}):t('none'))+'</p>';
   app.innerHTML=h;
+  [].forEach.call(document.querySelectorAll('.chip'),function(b){ b.onclick=function(){ F=b.getAttribute('data-f'); render(); }; });
+  [].forEach.call(document.querySelectorAll('.v .pv'),function(pv){ pv.onclick=function(){ if(pv.querySelector('video')) return; var v=M.videos.filter(function(x){ return x.id===pv.parentNode.getAttribute('data-id'); })[0]; if(!v) return;
+    var el=document.createElement('video'); el.controls=true; el.playsInline=true; el.setAttribute('playsinline',''); el.preload='auto'; el.src=vurl(v); pv.innerHTML=''; pv.appendChild(el); el.play().catch(function(){}); }; });
   var z=$('#zip'); if(z) z.onclick=zip; var l=$('#lab'); if(l) l.onclick=toLab;
+  try{ localStorage.setItem('vlab:seen:'+id,String(Date.now())); }catch(e){}
 }
-function ic(k){ return k==='dl'?'<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg>':'<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="M10 9.5v5l4-2.5z"/></svg>'; }
-function prog(t,f){ var p=$('.prog'); if(t==null){ if(p) p.remove(); return; } if(!p){ p=document.createElement('div'); p.className='prog'; p.innerHTML='<span></span><i><b></b></i>'; document.body.appendChild(p); } $('span',p).textContent=t; $('b',p).style.width=Math.round((f||0)*100)+'%'; }
-function getAll(each){ var vs=M.videos.slice(), tot=vs.reduce(function(s,v){ return s+v.size; },0)||1, done=0, out=[];
+function fmtDur(s){ s=Math.round(s); return Math.floor(s/60)+':'+String(s%60).padStart(2,'0'); }
+function ic(k){ return k==='dl'?'<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg>'
+  :k==='play'?'<svg viewBox="0 0 24 24" fill="#fff"><path d="M7 4.5v15l12.5-7.5z"/></svg>'
+  :'<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="M10 9.5v5l4-2.5z"/></svg>'; }
+function prog(s,f){ var p=$('.prog'); if(s==null){ if(p) p.remove(); return; } if(!p){ p=document.createElement('div'); p.className='prog'; p.innerHTML='<span></span><i><b></b></i>'; document.body.appendChild(p); } $('span',p).textContent=s; $('b',p).style.width=Math.round((f||0)*100)+'%'; }
+function getAll(each){ var vs=vis(), tot=vs.reduce(function(s,v){ return s+v.size; },0)||1, done=0, out=[];
   return vs.reduce(function(pr,v,i){ return pr.then(function(){ return fetch(vurl(v),{cache:'no-store'}).then(function(r){ if(!r.ok) throw 0; var rd=r.body&&r.body.getReader?r.body.getReader():null, parts=[], got=0;
       if(!rd) return r.blob().then(function(b){ done+=v.size; each(i,vs.length,done/tot); return b; });
-      function pump(){ return rd.read().then(function(x){ if(x.done) return new Blob(parts,{type:v.type||'video/mp4'}); parts.push(x.value); got+=x.value.length; each(i,vs.length,(done+got)/tot); return pump(); }); }
+      function pump(){ return rd.read().then(function(x){ if(x.done) return new Blob(parts,{type:'video/mp4'}); parts.push(x.value); got+=x.value.length; each(i,vs.length,(done+got)/tot); return pump(); }); }
       return pump().then(function(b){ done+=v.size; return b; }); }).then(function(b){ out.push({v:v,b:b}); }); }); },Promise.resolve()).then(function(){ return out; }); }
 /* ZIP ohne Kompression (Videos sind schon komprimiert) */
-var CRC=(function(){ var t=new Uint32Array(256); for(var n=0;n<256;n++){ var c=n; for(var k=0;k<8;k++) c=c&1?0xEDB88320^(c>>>1):c>>>1; t[n]=c>>>0; } return t; })();
+var CRC=(function(){ var tb=new Uint32Array(256); for(var n=0;n<256;n++){ var c=n; for(var k=0;k<8;k++) c=c&1?0xEDB88320^(c>>>1):c>>>1; tb[n]=c>>>0; } return tb; })();
 function crc(u){ var c=0xFFFFFFFF; for(var i=0;i<u.length;i++) c=CRC[(c^u[i])&255]^(c>>>8); return (c^0xFFFFFFFF)>>>0; }
 function zipBlob(files){ var enc=new TextEncoder(), parts=[], cen=[], off=0, used={};
   files.forEach(function(f){ var nm=f.name, k=1; while(used[nm]) nm=f.name.replace(/(\.[^.]+)?$/,'_'+(++k)+'$1'); used[nm]=1; var n=enc.encode(nm), d=f.data, c=crc(d), h=new DataView(new ArrayBuffer(30));
@@ -102,19 +156,21 @@ function zipBlob(files){ var enc=new TextEncoder(), parts=[], cen=[], off=0, use
     cen.push(e.buffer,n); off+=30+n.length+d.length; });
   var cs=cen.reduce(function(s,b){ return s+(b.byteLength||b.length); },0), end=new DataView(new ArrayBuffer(22)); end.setUint32(0,0x06054b50,true); end.setUint16(8,files.length,true); end.setUint16(10,files.length,true); end.setUint32(12,cs,true); end.setUint32(16,off,true);
   return new Blob(parts.concat(cen,[end.buffer]),{type:'application/zip'}); }
+function fname(x){ return x.v.p?x.v.p.replace(/[^\wäöüÄÖÜéèàç\- ]+/g,'').trim().replace(/\s+/g,'_')+'_'+x.v.name:x.v.name; }
 function zip(){ var b=this; b.disabled=true;
-  getAll(function(i,n,f){ prog('Video '+(i+1)+' von '+n+' wird geladen',f); }).then(function(L){ prog('ZIP wird erstellt',1);
-    return Promise.all(L.map(function(x){ return x.b.arrayBuffer().then(function(a){ return {name:x.v.name,data:new Uint8Array(a)}; }); })); })
-  .then(function(fs){ var z=zipBlob(fs), a=document.createElement('a'), nm=((M.title||'Training')+(M.date?'_'+M.date:'')).replace(/[^\wäöüÄÖÜ\-]+/g,'_')+'.zip'; a.href=URL.createObjectURL(z); a.download=nm; document.body.appendChild(a); a.click(); a.remove(); setTimeout(function(){ URL.revokeObjectURL(a.href); },60e3); prog(null); b.disabled=false; })
-  .catch(function(){ prog(null); b.disabled=false; alert('Herunterladen fehlgeschlagen. Bitte Internet prüfen und nochmals versuchen.'); }); }
+  getAll(function(i,n,f){ prog(t('ld',{i:i+1,n:n}),f); }).then(function(L){ prog(t('mk'),1);
+    return Promise.all(L.map(function(x){ return x.b.arrayBuffer().then(function(a){ return {name:fname(x),data:new Uint8Array(a)}; }); })); })
+  .then(function(fs){ var z=zipBlob(fs), a=document.createElement('a'), nm=((M.title||'Training')+(F?'_'+F:'')+(M.date?'_'+M.date:'')).replace(/[^\wäöüÄÖÜéèàç\-]+/g,'_')+'.zip'; a.href=URL.createObjectURL(z); a.download=nm; document.body.appendChild(a); a.click(); a.remove(); setTimeout(function(){ URL.revokeObjectURL(a.href); },60e3); prog(null); b.disabled=false; })
+  .catch(function(){ prog(null); b.disabled=false; alert(t('dlerr')); }); }
 /* In Video-Lab übernehmen: gleiche Adresse → Datenbank vlab-cloud, Video-Lab zeigt sie in der Liste */
 function toLab(){ var b=this; b.disabled=true;
-  getAll(function(i,n,f){ prog('Video '+(i+1)+' von '+n+' wird übernommen',f); }).then(function(L){ return new Promise(function(res,rej){ var r=indexedDB.open('vlab-cloud',1); r.onupgradeneeded=function(){ r.result.createObjectStore('clips',{keyPath:'id'}); }; r.onerror=function(){ rej(r.error); };
-      r.onsuccess=function(){ var db=r.result, tx=db.transaction('clips','readwrite'), st=tx.objectStore('clips'); L.forEach(function(x){ st.put({id:id+'/'+x.v.id,name:x.v.name,blob:x.b,t:x.v.t,s:id,title:M.title}); }); tx.oncomplete=function(){ db.close(); res(); }; tx.onerror=function(){ rej(tx.error); }; }; }); })
+  getAll(function(i,n,f){ prog(t('tk',{i:i+1,n:n}),f); }).then(function(L2){ return new Promise(function(res,rej){ var r=indexedDB.open('vlab-cloud',1); r.onupgradeneeded=function(){ r.result.createObjectStore('clips',{keyPath:'id'}); }; r.onerror=function(){ rej(r.error); };
+      r.onsuccess=function(){ var db=r.result, tx=db.transaction('clips','readwrite'), st=tx.objectStore('clips'); L2.forEach(function(x){ st.put({id:id+'/'+x.v.id,name:fname(x),blob:x.b,t:x.v.t,s:id,title:M.title}); }); tx.oncomplete=function(){ db.close(); res(); }; tx.onerror=function(){ rej(tx.error); }; }; }); })
   .then(function(){ prog(null); try{ navigator.storage&&navigator.storage.persist&&navigator.storage.persist(); }catch(e){} location.href='../'; })
-  .catch(function(){ prog(null); b.disabled=false; alert('Übernehmen fehlgeschlagen – zu wenig Speicher oder kein Netz.'); }); }
-load(true); setInterval(function(){ if(M&&!document.hidden) load(false); },20e3);
-addEventListener('hashchange',function(){ id=(location.hash||'').replace(/^#/,''); M=null; load(true); });
+  .catch(function(){ prog(null); b.disabled=false; alert(t('laberr')); }); }
+[].forEach.call(document.querySelectorAll('.lang button'),function(b){ b.onclick=function(){ L=b.getAttribute('data-l'); try{ localStorage.setItem('vlab:lang',JSON.stringify(L)); }catch(e){} texts(); if(M) render(); }; });
+texts(); load(true); setInterval(function(){ if(M&&!document.hidden) load(false); },20e3);
+addEventListener('hashchange',function(){ id=(location.hash||'').replace(/^#/,''); M=null; F=''; load(true); });
 })();
 </script>
 </body>
