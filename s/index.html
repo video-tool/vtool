@@ -57,7 +57,7 @@ button:disabled{opacity:.5;cursor:default}
 </div>
 <script>
 (function(){
-var API=(function(){ try{ if(/^(localhost|127\.0\.0\.1)$/.test(location.hostname)){ var o=localStorage.getItem('vlab:cloudApi'); if(o) return o; } }catch(e){} var a=''; return a.indexOf('%%')===0?'':a; })().replace(/\/+$/,'');
+var API=(function(){ try{ if(/^(localhost|127\.0\.0\.1)$/.test(location.hostname)){ var o=localStorage.getItem('vlab:cloudApi'); if(o) return o; } }catch(e){} var a='https://vlab-cloud.swiss-ski-club.workers.dev'; return a.indexOf('%%')===0?'':a; })().replace(/\/+$/,'');
 var id=(location.hash||'').replace(/^#/,'').trim(), M=null, $=function(s,r){ return (r||document).querySelector(s); }, app=$('#app');
 function esc(s){ return String(s==null?'':s).replace(/[&<>"]/g,function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
 function mb(n){ return n>=1048576?(n/1048576).toFixed(n>=1e8?0:1)+' MB':Math.max(1,Math.round(n/1024))+' KB'; }

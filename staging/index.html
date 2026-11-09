@@ -7358,7 +7358,7 @@ addEventListener('message',e=>{ const d=e.data; if(d&&d.type==='vlab:gps'&&d.pay
 /* ---------- Training-Aktivität: Videos über die Cloud (Cloudflare R2) 72 h lang per Link teilen ----------
    Ablauf: Aktivität anlegen (Login nochmals bestätigen) → Link verschicken → neue Videos werden auf 720p verkleinert hochgeladen.
    Ansehen ohne Login unter s/#<id>; nach 72 h sperrt der Worker die Aktivität und löscht die Dateien. Bearbeiten nur mit der Kennung auf diesem Gerät. */
-const TRN_API=(()=>{ try{ if(/^(localhost|127\.0\.0\.1)$/.test(location.hostname)){ const o=localStorage.getItem('vlab:cloudApi'); if(o) return o; } }catch(e){} return ''.indexOf('%%')===0?'':''; })().replace(/\/+$/,'');
+const TRN_API=(()=>{ try{ if(/^(localhost|127\.0\.0\.1)$/.test(location.hostname)){ const o=localStorage.getItem('vlab:cloudApi'); if(o) return o; } }catch(e){} return 'https://vlab-cloud.swiss-ski-club.workers.dev'.indexOf('%%')===0?'':'https://vlab-cloud.swiss-ski-club.workers.dev'; })().replace(/\/+$/,'');
 const TRN={cur:LS.get('trn:cur',null),q:[],busy:false,st:{},people:null};
 const trnOn=()=>!!TRN_API;
 const trnLive=()=>!!(TRN.cur&&TRN.cur.exp>Date.now());
@@ -8877,7 +8877,7 @@ if(false&&!LS.get('hint1',0)){ setTimeout(()=>{ toast(matchMedia('(pointer:coars
 
 /* Update-Hinweis: prüft version.json auf GitHub Pages; «Aktualisieren» lädt die Seite ohne Cache neu */
 (()=>{
-  const BUILD='20261109150207'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
+  const BUILD='20261109152949'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
   // nach einem Update die ?v=… aus der Adresse entfernen
   try{ const u=new URL(location.href); if(u.searchParams.has('v')){ u.searchParams.delete('v'); history.replaceState(null,'',u.pathname+(u.search||'')+u.hash); } }catch(e){}
   const el=$('#upd'); let latest=null, snoozed=null, busy=false;
