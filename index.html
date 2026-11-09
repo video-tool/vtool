@@ -2870,8 +2870,8 @@ canvas.gap-row[hidden]{display:none}
   /* Stift nicht im Bild: im «Ein Video» über die Knopfleiste, in GPS nicht nötig */
   #sHost .rail.collapsed,#gHost .rail.collapsed{display:none!important}
   #sHost .rail:not(.collapsed) .rail-tg{display:inline-flex!important}
-  /* nur die wichtigsten Werkzeuge: Linie, Pfeil, Winkel, Kreis, Farbe, Rückgängig */
-  .rail [data-tool="none"],.rail [data-tool="free"],.rail [data-rail="fx"],.rail [data-rail="grid"],.rail [data-rail="clear"]{display:none!important}
+  /* nur die wichtigsten Werkzeuge: Linie, Pfeil, Winkel, Kreis, Freihand, Farbe, Rückgängig */
+  .rail [data-tool="none"],.rail [data-rail="fx"],.rail [data-rail="grid"],.rail [data-rail="clear"]{display:none!important}
   html,body{touch-action:manipulation} /* kein Zoomen der Seite per Doppeltipp */
   html,body{overflow-x:hidden;overscroll-behavior-x:none;max-width:100vw} /* Seite lässt sich nicht seitlich verschieben (Hintergrund-Leuchten ragt sonst hinaus) */
   .aurora{display:none!important}
@@ -8659,7 +8659,7 @@ if(false&&!LS.get('hint1',0)){ setTimeout(()=>{ toast(matchMedia('(pointer:coars
 
 /* Update-Hinweis: prüft version.json auf GitHub Pages; «Aktualisieren» lädt die Seite ohne Cache neu */
 (()=>{
-  const BUILD='20261108150558'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
+  const BUILD='20261109130337'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
   // nach einem Update die ?v=… aus der Adresse entfernen
   try{ const u=new URL(location.href); if(u.searchParams.has('v')){ u.searchParams.delete('v'); history.replaceState(null,'',u.pathname+(u.search||'')+u.hash); } }catch(e){}
   const el=$('#upd'); let latest=null, snoozed=null, busy=false;
