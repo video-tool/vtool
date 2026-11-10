@@ -34,3 +34,6 @@ demo/m/haechler lauf1 261025 GS soelden v1.mp4
 demo/m/shiffrin wc gs l1 cam1 soelden 261024.mp4
 demo/m/holdener wc gs l1 cam1 soelden 261024.mp4
 demo/m/allenbach wc gs l1 cam1 soelden 261024.mp4
+
+# Beispiel-Videos liegen in der Cloud (R2 demo/), lokal nur für den Build
+demo/
