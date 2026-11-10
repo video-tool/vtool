@@ -2346,6 +2346,7 @@ button.lg-it:hover{background:rgba(12,15,20,.8);border-color:rgba(255,255,255,.3
 .lg-x svg{width:10px;height:10px}
 #viewCmp.ov-leg .stage:first-child .tag-ab{display:none}
 #viewCmp.overlay.ov-fin .cmp-tools>.save-w{display:none!important}
+body:not(.recording) #viewCmp.overlay.ov-fin .cmp-tools>.rec-btn{display:none!important} /* «Aufnahme» steht in der Overlay-Leiste neben «Speichern» */
 .ov-svmenu{min-width:270px}
 .ov-svmenu button{height:auto!important;padding:8px 10px!important;align-items:center}
 .ov-svmenu button>span{display:flex;flex-direction:column;gap:1px}
@@ -2409,7 +2410,7 @@ button.lg-it:hover{background:rgba(12,15,20,.8);border-color:rgba(255,255,255,.3
 @keyframes vlPop{from{opacity:0;transform:translateY(4px) scale(.98)}}
 .str-bar .btn-pri:disabled{opacity:.4;cursor:default} .str-acts{display:flex;align-items:center;gap:10px;margin-left:auto} #strEv{width:52px;height:32px;border-radius:9px;border:1px solid var(--line2,#cfd4db);background:var(--field,#f6f7f9);color:inherit;font:600 14px var(--mono);text-align:center;padding:0 4px} #strEv.on{border-color:var(--red);box-shadow:0 0 0 2px var(--red-soft)} .str-ev{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--muted)}
 #strReset{display:inline-flex;align-items:center;justify-content:center;width:44px;min-width:44px!important;padding:0!important} #strReset svg{width:18px;height:18px}
-@media (min-width:761px){ body:not(.pfs):not(.rfs) #viewCmp .st-fs{display:none!important} } /* Vergleich am Computer: Vollbild nur oben rechts in der Kopfleiste */
+.card.player .ctl[data-act="fs"]{display:none!important} /* Vollbild nur über das Symbol oben rechts im Video (.st-fs) und die Taste f */
 .hang-chip{position:absolute;left:50%;top:12px;transform:translate(-50%,-6px);z-index:30;display:none;align-items:center;gap:10px;max-width:calc(100% - 24px);padding:7px 8px 7px 12px;border-radius:12px;background:rgba(12,15,20,.86);border:1px solid rgba(255,209,102,.5);color:#fff;font:500 12px var(--font);box-shadow:0 10px 26px -10px rgba(0,0,0,.7);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
 .hang-chip.on{display:flex;transform:translate(-50%,0)}
 .hang-chip i{flex:none;width:9px;height:9px;border-radius:50%;background:#ffd166;animation:vcPulse 1.6s ease-out infinite;--k:#ffd166}
@@ -7669,18 +7670,20 @@ async function trnRefresh(id){ const s=trnL().find(x=>x.id===id); if(!s) return;
 /* Leiste unten: Status der laufenden Aktivität, Nachfrage «Wer fährt?» oder Einladung zum Beitreten */
 /* Weggeklickte Einladungen (pro Aktivität) – bleiben ausgeblendet, bis die Aktivität abläuft */
 function trnHid(){ try{ return JSON.parse(localStorage.getItem('vlab:trnHide')||'[]'); }catch(e){ return []; } }
-function trnHide(id){ const h=trnHid().filter(x=>TRN.offers.concat(TRN.views).some(o=>o.id===x)); h.push(id); try{ localStorage.setItem('vlab:trnHide',JSON.stringify(h)); }catch(e){} }
-function trnUI(){ let p=$('#trnPill'); const hid=trnHid(), s=trnOn()?trnCur():null, off=trnOn()?TRN.offers.concat(TRN.views).find(o=>!hid.includes(o.id)):null;
+function trnHide(id){ const h=trnHid().filter(x=>TRN.offers.concat(TRN.views,trnL()).some(o=>o.id===x)); h.push(id); try{ localStorage.setItem('vlab:trnHide',JSON.stringify(h)); }catch(e){} }
+function trnUI(){ let p=$('#trnPill'); const hid=trnHid(), off=trnOn()?TRN.offers.concat(TRN.views).find(o=>!hid.includes(o.id)):null; let s=trnOn()?trnCur():null;
+  const pend=s?Object.entries(TRN.st).filter(([k,v])=>k.startsWith(s.id+'|')&&v.s!=='err'):[], offl=pend.some(([,v])=>v.s==='off'||v.s==='retry');
+  if(s&&!pend.length&&hid.includes(s.id)) s=null; /* weggeklickt: erscheint wieder, sobald etwas hochlädt (Aktivität bleibt im Menü) */
   if(!s&&!off&&!TRN.ask){ if(p) p.remove(); trnDlgList(); return; }
   if(!p){ p=document.createElement('div'); p.id='trnPill'; p.className='trn-pill'; document.body.appendChild(p); }
-  const pend=s?Object.entries(TRN.st).filter(([k,v])=>k.startsWith(s.id+'|')&&v.s!=='err'):[], offl=pend.some(([,v])=>v.s==='off'||v.s==='retry');
   if(TRN.ask){ const A=(((trnL().find(x=>x.id===TRN.ask.sid)||{}).meta||{}).athletes||[]);
     p.className='trn-pill ask'; p.innerHTML='<div class="trn-askh">'+(TRN.ask.img?'<img alt="">':'')+'<span><b>Wer fährt?</b><i></i></span><button class="x" aria-label="Später">Später</button></div><div class="trn-askc"></div>';
     if(TRN.ask.img) $('img',p).src=TRN.ask.img; $('i',p).textContent=TRN.ask.title||''; $('.x',p).onclick=()=>{ TRN.ask=null; trnUI(); };
     A.forEach(a=>{ const b=document.createElement('button'); b.textContent=a.n; b.onclick=async()=>{ const q=TRN.ask; TRN.ask=null; trnUI(); if(await trnSetPerson(q.sid,q.k,a.n)) toast(a.n+' zugeordnet.',1500); trnDlgList(); }; $('.trn-askc',p).appendChild(b); });
     return; }
   p.className='trn-pill'+(pend.length?' busy':'')+(offl?' off':''); p.onclick=null;
-  if(s){ p.innerHTML=trnIco+'<span></span>'; $('span',p).textContent=pend.length?(offl?'Wartet auf Netz · '+pend.length:'Lädt hoch · '+pend.length):((s.meta&&s.meta.title)||'Training')+' · '+(s.n||0); p.onclick=()=>trnOpen(s.id); }
+  if(s){ p.innerHTML=trnIco+'<span></span>'+(pend.length?'':'<button type="button" class="trn-px" aria-label="Ausblenden" title="Ausblenden">✕</button>'); $('span',p).textContent=pend.length?(offl?'Wartet auf Netz · '+pend.length:'Lädt hoch · '+pend.length):((s.meta&&s.meta.title)||'Training')+' · '+(s.n||0); p.onclick=()=>trnOpen(s.id);
+    const px=$('.trn-px',p); if(px) px.onclick=e=>{ e.stopPropagation(); trnHide(s.id); trnUI(); }; }
   else { p.innerHTML=trnIco+'<span></span><b></b><button type="button" class="trn-px" aria-label="Ausblenden" title="Ausblenden">✕</button>'; $('span',p).textContent='Training «'+(off.title||'Training')+'» läuft'; $('b',p).textContent=off.ath?'Ansehen':'Beitreten'; p.classList.add('offer');
     p.onclick=off.ath?()=>window.open(trnLink(off.id),'_blank','noopener'):()=>trnOpen();
     $('.trn-px',p).onclick=e=>{ e.stopPropagation(); trnHide(off.id); trnUI(); }; }
@@ -8182,7 +8185,7 @@ addEventListener('unhandledrejection',e=>{ FB.errs.push('Promise: '+String(e.rea
 function fbOn(){ return !!(typeof TRN_API!=='undefined'&&TRN_API); }
 const fbIco='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v12H8l-4 4z"/><path d="M12 7.5v4M12 14h.01"/></svg>';
 function fbInfo(){ const D=mode==='cmp'?A:mode==='gps'?GD:S, c=D&&D.clip, n=x=>x?(x.alias||x.name||'').slice(0,90):'';
-  return {build:'20261110140202'.startsWith('%%')?'dev':'20261110140202',env:window.VLAB_ENV||'live',url:location.pathname,lang:(window.vlabLang&&vlabLang.get())||'de',ua:navigator.userAgent.slice(0,240),
+  return {build:'20261110161254'.startsWith('%%')?'dev':'20261110161254',env:window.VLAB_ENV||'live',url:location.pathname,lang:(window.vlabLang&&vlabLang.get())||'de',ua:navigator.userAgent.slice(0,240),
     scr:screen.width+'×'+screen.height+' @'+(devicePixelRatio||1)+' · Fenster '+innerWidth+'×'+innerHeight,mem:navigator.deviceMemory||null,cpu:navigator.hardwareConcurrency||null,net:navigator.onLine?'online':'offline',
     view:mode+(mode==='cmp'&&$('#viewCmp').classList.contains('overlay')?' · overlay':''),clip:n(c),clipB:mode==='cmp'?n(B.clip):'',
     t:D&&D.ready?+(D.frame/D.fps).toFixed(2):null,fps:c&&c.fps||null,size:c?[c.w,c.h].join('×'):'',n:clips.length,errs:FB.errs.slice()}; }
@@ -9285,7 +9288,7 @@ if(false&&!LS.get('hint1',0)){ setTimeout(()=>{ toast(matchMedia('(pointer:coars
 
 /* Update-Hinweis: prüft version.json auf GitHub Pages; «Aktualisieren» lädt die Seite ohne Cache neu */
 (()=>{
-  const BUILD='20261110140202'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
+  const BUILD='20261110161254'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
   // nach einem Update die ?v=… aus der Adresse entfernen
   try{ const u=new URL(location.href); if(u.searchParams.has('v')){ u.searchParams.delete('v'); history.replaceState(null,'',u.pathname+(u.search||'')+u.hash); } }catch(e){}
   const el=$('#upd'); let latest=null, snoozed=null, busy=false;
