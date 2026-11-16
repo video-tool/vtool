@@ -3314,6 +3314,19 @@ body.pfs .trn-pill{display:none}
 .use-fb .fb-tx{margin:0;white-space:pre-wrap;font-size:14px}.use-fb .fb-det img{max-width:100%;max-height:360px;object-fit:contain;align-self:flex-start;border-radius:8px}
 .use-fb dl{display:grid;grid-template-columns:auto 1fr;gap:3px 10px;margin:0;font-size:12px}.use-fb dt{color:var(--muted)}.use-fb dd{margin:0;word-break:break-word;white-space:pre-wrap}
 .use-fb .fb-det a.ghost{display:inline-flex;align-items:center;height:32px;padding:0 12px;border-radius:9px;border:1px solid var(--line);color:var(--ink);text-decoration:none;font:650 13px var(--font)}
+/* Handy «Ein Video»: Knöpfe etwas grösser (dicke Finger), das Video gibt die Höhe ab */
+@media (max-width:600px){
+  #viewSingle .dock .dz-c .ctl:not(.play):not(.rate-btn){width:48px!important;min-width:48px!important;height:48px!important}
+  #viewSingle .dock .ctl.play{width:58px!important;height:58px!important;min-width:58px!important}
+  #viewSingle .dock .rate-btn{height:40px!important;min-width:44px!important}
+  #viewSingle .dock.dock3 .dz-l .ctl,#viewSingle .dock.dock3 .dz-r .ctl,#viewSingle .dock .rec-btn{width:36px!important;min-width:36px!important;height:36px!important}
+  #viewSingle .dock.dock3 .dz-l .ctl svg,#viewSingle .dock.dock3 .dz-r .ctl svg{width:17px!important;height:17px!important}
+  #sHost .stage.portrait{height:calc(100svh - 342px)!important}
+  /* Werkzeugleiste: Freihand und Rückgängig als grössere Pillen */
+  .rail [data-tool="free"],.rail [data-rail="undo"]{min-width:52px!important;height:38px!important;padding:0 12px!important;border-radius:19px!important;background:rgba(255,255,255,.14)!important}
+  .rail [data-tool="free"].on{background:#fff!important;color:#0f1216!important}
+  .rail [data-tool="free"] svg,.rail [data-rail="undo"] svg{width:20px!important;height:20px!important}
+}
 </style>
 </head>
 <body class="m-single">
@@ -4382,13 +4395,13 @@ class Deck{
       cv.addEventListener('pointerdown',e=>{ if(e.pointerType!=='touch') return; tp.set(e.pointerId,e.clientX); if(tp.size===2){ const [a,b]=[...tp.values()]; pz={d:Math.max(20,Math.abs(a-b)),p:this.ppf}; drag=null; e.stopImmediatePropagation(); } },true);
       cv.addEventListener('pointermove',e=>{ if(!tp.has(e.pointerId)) return; tp.set(e.pointerId,e.clientX); if(pz&&tp.size===2){ const [a,b]=[...tp.values()]; this.setPpf(pz.p*Math.max(20,Math.abs(a-b))/pz.d); e.stopImmediatePropagation(); } },true);
       const tu=e=>{ tp.delete(e.pointerId); if(tp.size<2){ if(pz) e.stopImmediatePropagation(); pz=null; } }; cv.addEventListener('pointerup',tu,true); cv.addEventListener('pointercancel',tu,true); }
-    cv.addEventListener('pointerdown',e=>{ if(!this.ready) return; cv.setPointerCapture(e.pointerId); this.pause(); const hit=this.cutHit?this.cutHit(e):null; drag={x:e.clientX,f:this.frame,moved:false,cut:hit,cf:hit?this.clip.loop[hit]:0}; cv.focus({preventScroll:true}); this.vcLock=this.vc(); if(!hit){ this._tl=performance.now(); this.seekFrame(this.fAt(e.clientX),true); } $('#hov').classList.remove('on'); });
+    cv.addEventListener('pointerdown',e=>{ if(!this.ready) return; cv.setPointerCapture(e.pointerId); this.pause(); const hit=this.cutHit?this.cutHit(e):null; drag={x:e.clientX,f:this.frame,moved:false,cut:hit,cf:hit?this.clip.loop[hit]:0,hold:!hit&&typeof holdHit==='function'?holdHit(this,e):null}; cv.focus({preventScroll:true}); this.vcLock=this.vc(); if(!hit){ this._tl=performance.now(); this.seekFrame(this.fAt(e.clientX),true); } $('#hov').classList.remove('on'); });
     cv.addEventListener('pointermove',e=>{ if(!drag){ if(this.cutHit) cv.style.cursor=this.cutHit(e)?'ew-resize':''; if(this.ready&&e.pointerType!=='touch') showHov(this,this.fAt(e.clientX),e.clientX,cv.getBoundingClientRect().top); return; }
       { const r=cv.getBoundingClientRect(), ex=e.clientX-r.left, half=(r.width/2-8)/this.ppf; if(this.nF>2*half&&(ex<24||ex>r.width-24)){ this.vcLock=clamp(this.vcLock+(ex<24?-1:1)*Math.max(1,6/this.ppf),half-0.5,this.nF-0.5-half); } } const dx=e.clientX-drag.x; if(Math.abs(dx)>3) drag.moved=true;
       if(drag.cut&&drag.moved){ const L=this.clip.loop, nf=clamp(Math.round(drag.cf+dx/this.ppf),0,this.nF-1); if(drag.cut==='a'&&(L.b==null||nf<L.b)) L.a=nf; if(drag.cut==='b'&&(L.a==null||nf>L.a)) L.b=nf; this.seekFrame(nf,true); saveClip(this.clip); this.dirty=true; return; }
       if(drag.moved){ this._tl=performance.now(); this.seekFrame(this.fAt(e.clientX),true); } });
     cv.addEventListener('pointerleave',()=>{ if(!drag) $('#hov').classList.remove('on'); });
-    const cup=e=>{ if(!drag) return; drag=null; this.vcLock=null; this.dirty=true; };
+    const cup=e=>{ if(!drag) return; const hh=e.type==='pointerup'&&!drag.moved&&drag.hold; drag=null; if(hh){ this.seekFrame(hh.f,true); holdPop(cv,hh); } this.vcLock=null; this.dirty=true; };
     cv.addEventListener('pointerup',cup); cv.addEventListener('pointercancel',cup);
     cv.addEventListener('wheel',e=>{ if(!this.ready) return; e.preventDefault();
       if(e.ctrlKey){ this.setPpf(this.ppf*Math.exp(-e.deltaY*0.01)); return; }
@@ -8174,6 +8187,9 @@ function holdOsd(){ const st=S.stage; let el=$('.holdpill',st); const h=S.ready&
   const t='Standbild · '+h.d+' s'+(h.anns.length?' · '+h.anns.length+' Zeichnung'+(h.anns.length>1?'en':''):''); if(el.textContent!==t) el.textContent=t; el.hidden=false; el.classList.toggle('run',HOLD.play===h);
   $$('[data-act="hold"]').forEach(b=>b.classList.add('on')); }
 /* Zeitleiste: blaue Fahne mit Dauer */
+/* Tipp auf die Fahne: dorthin springen, Dauer ändern oder entfernen */
+function holdHit(d,e){ if(d!==S||!d.clip||!d.clip.holds||!d.clip.holds.length) return null; const r=d.cv.getBoundingClientRect(), x=e.clientX-r.left, cx=r.width/2, vc=d.vc();
+  return d.clip.holds.find(h=>{ const hx=cx+(h.f-vc)*d.ppf; return x>=hx-8&&x<=hx+46; })||null; }
 function holdStrip(ctx,X,TH,W,d){ ctx.save(); ctx.font='800 9px ui-monospace,Menlo,Consolas,monospace'; ctx.textAlign='left'; ctx.textBaseline='middle';
   for(const h of d.clip.holds){ const x=X(h.f); if(x<-40||x>W+10) continue; ctx.fillStyle='#2f8fd8'; ctx.fillRect(Math.round(x)-1,0,2.5,TH);
     const lab='❚❚ '+h.d+'s', tw=ctx.measureText(lab).width+8; ctx.beginPath(); if(ctx.roundRect) ctx.roundRect(x+2,TH-16,tw,13,3); else ctx.rect(x+2,TH-16,tw,13); ctx.fill(); ctx.fillStyle='#fff'; ctx.fillText(lab,x+6,TH-9); ctx.fillStyle='#2f8fd8'; }
@@ -8185,7 +8201,7 @@ addEventListener('unhandledrejection',e=>{ FB.errs.push('Promise: '+String(e.rea
 function fbOn(){ return !!(typeof TRN_API!=='undefined'&&TRN_API); }
 const fbIco='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v12H8l-4 4z"/><path d="M12 7.5v4M12 14h.01"/></svg>';
 function fbInfo(){ const D=mode==='cmp'?A:mode==='gps'?GD:S, c=D&&D.clip, n=x=>x?(x.alias||x.name||'').slice(0,90):'';
-  return {build:'20261110161254'.startsWith('%%')?'dev':'20261110161254',env:window.VLAB_ENV||'live',url:location.pathname,lang:(window.vlabLang&&vlabLang.get())||'de',ua:navigator.userAgent.slice(0,240),
+  return {build:'20261116070855'.startsWith('%%')?'dev':'20261116070855',env:window.VLAB_ENV||'live',url:location.pathname,lang:(window.vlabLang&&vlabLang.get())||'de',ua:navigator.userAgent.slice(0,240),
     scr:screen.width+'×'+screen.height+' @'+(devicePixelRatio||1)+' · Fenster '+innerWidth+'×'+innerHeight,mem:navigator.deviceMemory||null,cpu:navigator.hardwareConcurrency||null,net:navigator.onLine?'online':'offline',
     view:mode+(mode==='cmp'&&$('#viewCmp').classList.contains('overlay')?' · overlay':''),clip:n(c),clipB:mode==='cmp'?n(B.clip):'',
     t:D&&D.ready?+(D.frame/D.fps).toFixed(2):null,fps:c&&c.fps||null,size:c?[c.w,c.h].join('×'):'',n:clips.length,errs:FB.errs.slice()}; }
@@ -9288,7 +9304,7 @@ if(false&&!LS.get('hint1',0)){ setTimeout(()=>{ toast(matchMedia('(pointer:coars
 
 /* Update-Hinweis: prüft version.json auf GitHub Pages; «Aktualisieren» lädt die Seite ohne Cache neu */
 (()=>{
-  const BUILD='20261110161254'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
+  const BUILD='20261116070855'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
   // nach einem Update die ?v=… aus der Adresse entfernen
   try{ const u=new URL(location.href); if(u.searchParams.has('v')){ u.searchParams.delete('v'); history.replaceState(null,'',u.pathname+(u.search||'')+u.hash); } }catch(e){}
   const el=$('#upd'); let latest=null, snoozed=null, busy=false;
