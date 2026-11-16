@@ -8206,7 +8206,7 @@ addEventListener('unhandledrejection',e=>{ FB.errs.push('Promise: '+String(e.rea
 function fbOn(){ return !!(typeof TRN_API!=='undefined'&&TRN_API); }
 const fbIco='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v12H8l-4 4z"/><path d="M12 7.5v4M12 14h.01"/></svg>';
 function fbInfo(){ const D=mode==='cmp'?A:mode==='gps'?GD:S, c=D&&D.clip, n=x=>x?(x.alias||x.name||'').slice(0,90):'';
-  return {build:'20261116134730'.startsWith('%%')?'dev':'20261116134730',env:window.VLAB_ENV||'live',url:location.pathname,lang:(window.vlabLang&&vlabLang.get())||'de',ua:navigator.userAgent.slice(0,240),
+  return {build:'20261116142108'.startsWith('%%')?'dev':'20261116142108',env:window.VLAB_ENV||'live',url:location.pathname,lang:(window.vlabLang&&vlabLang.get())||'de',ua:navigator.userAgent.slice(0,240),
     scr:screen.width+'×'+screen.height+' @'+(devicePixelRatio||1)+' · Fenster '+innerWidth+'×'+innerHeight,mem:navigator.deviceMemory||null,cpu:navigator.hardwareConcurrency||null,net:navigator.onLine?'online':'offline',
     view:mode+(mode==='cmp'&&$('#viewCmp').classList.contains('overlay')?' · overlay':''),clip:n(c),clipB:mode==='cmp'?n(B.clip):'',
     t:D&&D.ready?+(D.frame/D.fps).toFixed(2):null,fps:c&&c.fps||null,size:c?[c.w,c.h].join('×'):'',n:clips.length,errs:FB.errs.slice()}; }
@@ -9225,6 +9225,11 @@ setTimeout(fieldSync,600);
   const go=()=>{ if(mq.matches){ if(!document.body.classList.contains('pfs')&&!$('.modal.on')&&!(mode==='cmp'&&$('#viewCmp').classList.contains('overlay'))){ auto=true; pfsSet(true); } } else if(auto){ auto=false; if(document.body.classList.contains('pfs')) pfsSet(false); } };
   window.pfsAutoCheck=()=>{ if(mq.matches) go(); }; try{ mq.addEventListener('change',go); }catch(e){ mq.addListener(go); } setTimeout(go,300); } /* Handy quer drehen = Player bildschirmfüllend */ document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='visible') fieldSync(); });
 
+/* «Ein Video» am Desktop: Speichern und Aufnahme oben rechts wie in Side-by-Side und Overlay; am Handy bleiben sie unten in der Leiste */
+(function(){ const v=$('#viewSingle'), pb=v&&$('.pbar',v), w=v&&$('.save-w',v), rc=v&&$('[data-act="rec"]',v); if(!pb||!w) return;
+  const home=document.createComment('save'); w.before(home); const box=document.createElement('div'); box.className='cmp-tools s-tools'; pb.append(box);
+  const mq=matchMedia('(min-width:761px)'), put=()=>{ const up=mq.matches; (up?box:home.parentNode).insertBefore(w,up?null:home.nextSibling); if(rc) w.after(rc); w.classList.toggle('up',!up); box.hidden=!up; };
+  put(); mq.addEventListener('change',put); })();
 /* ---- Handy kompakt: «…» oben, Videoliste als Blatt, Speichern/«…» unten im Vergleich, Zoom der Zeitleiste mit zwei Fingern ---- */
 (()=>{ const MQ=matchMedia('(max-width:600px)'), I=(d)=>'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">'+d+'</svg>';
   let menu=null; const close=()=>{ if(menu){ menu.remove(); menu=null; } };
@@ -9309,7 +9314,7 @@ if(false&&!LS.get('hint1',0)){ setTimeout(()=>{ toast(matchMedia('(pointer:coars
 
 /* Update-Hinweis: prüft version.json auf GitHub Pages; «Aktualisieren» lädt die Seite ohne Cache neu */
 (()=>{
-  const BUILD='20261116134730'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
+  const BUILD='20261116142108'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
   // nach einem Update die ?v=… aus der Adresse entfernen
   try{ const u=new URL(location.href); if(u.searchParams.has('v')){ u.searchParams.delete('v'); history.replaceState(null,'',u.pathname+(u.search||'')+u.hash); } }catch(e){}
   const el=$('#upd'); let latest=null, snoozed=null, busy=false;
