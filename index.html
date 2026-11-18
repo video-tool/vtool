@@ -1068,7 +1068,7 @@ body::before{background:transparent!important}
 .pill{-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.1)!important;border-radius:10px!important;font-variant-numeric:tabular-nums}
 /* Ansicht wechseln: weich einblenden */
 .card.player.view-in{animation:viewIn .42s cubic-bezier(.22,1,.36,1) both}
-@keyframes viewIn{from{opacity:0;transform:translateY(8px) scale(.99)}to{opacity:1;transform:none}}
+@keyframes viewIn{from{opacity:0}to{opacity:1}}
 .libcard{animation:sideIn .6s var(--ease-out) both}
 @keyframes sideIn{from{opacity:0;transform:translateX(-14px)}to{opacity:1;transform:none}}
 header .head-in{animation:hdrIn .6s var(--ease-out) both}
@@ -1527,17 +1527,16 @@ body.touring .toast{top:calc(12px + env(safe-area-inset-top,0px))!important;bott
   .ov-txt{font-size:13.5px!important;padding:8px 11px}
 }
 /* Seitenwechsel */
-.card.player:not([hidden]){view-transition-name:mainview}
+/* Jede Ansicht eigener Name: kein Umformen vom kleinen Einzelvideo-Rahmen zum grösseren Vergleichs-Rahmen (verzog den schwarzen Rahmen). Nur weich überblenden, nicht schieben. */
+#viewSingle:not([hidden]){view-transition-name:v-single}
+#viewCmp:not([hidden]){view-transition-name:v-cmp}
+#viewGps:not([hidden]){view-transition-name:v-gps}
 html.vt-mode::view-transition-old(root),html.vt-mode::view-transition-new(root){animation:none}
-::view-transition-group(mainview){animation-duration:.45s;animation-timing-function:cubic-bezier(.22,1,.36,1)}
-html.vt-fwd::view-transition-old(mainview){animation:vtOutL .2s cubic-bezier(.4,0,1,1) both}
-html.vt-fwd::view-transition-new(mainview){animation:vtInR .45s cubic-bezier(.22,1,.36,1) .05s both}
-html.vt-back::view-transition-old(mainview){animation:vtOutR .2s cubic-bezier(.4,0,1,1) both}
-html.vt-back::view-transition-new(mainview){animation:vtInL .45s cubic-bezier(.22,1,.36,1) .05s both}
-@keyframes vtOutL{to{opacity:0;transform:translateX(-32px) scale(.985)}}
-@keyframes vtOutR{to{opacity:0;transform:translateX(32px) scale(.985)}}
-@keyframes vtInR{from{opacity:0;transform:translateX(40px) scale(.985)}}
-@keyframes vtInL{from{opacity:0;transform:translateX(-40px) scale(.985)}}
+html.vt-mode::view-transition-group(v-single),html.vt-mode::view-transition-group(v-cmp),html.vt-mode::view-transition-group(v-gps){animation:none}
+html.vt-mode::view-transition-old(v-single),html.vt-mode::view-transition-old(v-cmp),html.vt-mode::view-transition-old(v-gps){animation:vtOut .3s linear both} /* alte Ansicht bleibt deckend darunter, bis die neue da ist – kein heller Schleier */
+html.vt-mode::view-transition-new(v-single),html.vt-mode::view-transition-new(v-cmp),html.vt-mode::view-transition-new(v-gps){animation:vtIn .26s ease-out both}
+@keyframes vtOut{0%,96%{opacity:1}to{opacity:0}}
+@keyframes vtIn{from{opacity:0}}
 /* Tabs: kein harter Fokusrahmen */
 .tabs .tab:focus-visible{outline:none!important;box-shadow:0 0 0 2px rgba(218,41,28,.28)!important}
 .tabs .tab:focus:not(:focus-visible){outline:none!important}
@@ -2139,7 +2138,8 @@ body .player .dock .ctl.io-btn:not(.on){color:#ffe08a!important;background:rgba(
 /* Vergleich: Werkzeug-Leiste */
 #viewCmp .dock .dz-more{grid-column:1/-1;display:none;align-items:center;justify-content:center;gap:10px 22px;flex-wrap:wrap;padding:8px 0 2px;margin-top:2px;border-top:1px solid rgba(255,255,255,.07)}
 #viewCmp .dock.tools-open .dz-more{display:flex}
-#viewCmp .dm-grp{display:flex;align-items:center;gap:6px}
+#viewCmp .dm-grp{display:flex;align-items:center;gap:6px;flex-wrap:wrap;justify-content:center;row-gap:6px;max-width:100%} /* Zeitmessen mit A/B-Messpunkt: bei schmalem Fenster umbrechen statt überstehen */
+#viewCmp .dz-more{max-width:100%;min-width:0}
 #viewCmp .dm-lab{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.42);margin-right:2px}
 #viewCmp .dz-more #cTools{display:flex}
 #viewCmp .dz-more .rail .rail-tg,#viewCmp .dz-more .rail .rail-sep0{display:none!important}
@@ -2672,11 +2672,8 @@ canvas.gap-row[hidden]{display:none}
 .tim-pill .tn[hidden]{display:none}
 .tim-pill .tn button{width:22px;height:22px;border-radius:7px;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.08);color:#fff;font:700 14px/1 var(--font);cursor:pointer;padding:0}
 .tim-pill .tn button:hover{background:rgba(255,255,255,.2)}
-.gate-btn{gap:6px!important;width:auto!important;padding:0 11px!important}
-.gate-btn[hidden]{display:none!important}
-.gate-btn span{font:650 12px var(--font)}
-.gate-btn b{font:800 11px var(--mono);background:#DA291C;color:#fff;border-radius:999px;min-width:17px;height:17px;display:inline-grid;place-items:center;padding:0 4px}
-.gate-btn b:empty{display:none}
+.mp-acts .mpn{font:800 10px var(--mono);font-style:normal;background:#DA291C;color:#fff;border-radius:999px;min-width:16px;height:16px;display:inline-grid;place-items:center;padding:0 4px}
+.mp-acts .mpn:empty{display:none}
 /* Einheitliche Knopfsprache (Player): gleiche Höhe je Leiste, Radius 12, gleiche Fläche/Kante, gleiche Bewegung beim Drücken, sichtbarer Fokus */
 .card.player .ctl,.card.player .tut-open,.tl-zoom button,.st-fs,#cfLock,.ovq,.vl-user,.hdr-ico{transition:background-color .15s ease,border-color .15s ease,color .15s ease,box-shadow .15s ease,transform .1s ease!important}
 .card.player .ctl:active:not(:disabled),.card.player .tut-open:active,.tl-zoom button:active,.st-fs:active,#cfLock:active,.ovq:active{transform:scale(.94)!important}
@@ -3719,7 +3716,7 @@ setTimeout(function(){ if(de.classList.contains('vgate')&&matchMedia('(min-width
     <div class="strips" id="cStrips"></div>
     <div class="dock dock3">
       <div class="dz dz-l"><button class="ctl m-sync" data-act="msync" title="Gleicher Moment: A und B an diesem Bild verbinden"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/></svg><span>Gleicher Moment</span></button><button class="ctl link" id="btnLink" title="A und B gemeinsam steuern (l)">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/></svg><span>Getrennt</span></button><button class="ctl" id="btnSync" title="Aktuelle Bilder von A und B als gleichen Moment setzen und verknüpfen (Enter)"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2.2"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg>Gleicher Moment</button><span class="sync-chip" id="syncChip"></span><div class="ctl-sep"></div><button class="ctl tim-btn" id="btnTime" title="Stoppuhr: Zeiten von A und B vergleichen – Anleitung erscheint darunter"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="7.2"/><path d="M12 13V9.6M9.6 3h4.8M12 3v2.8M18.2 6.6l1.2-1.2"/></svg><span class="tim-l">Stoppuhr</span></button><span class="tim-acts" id="timActs" hidden><button class="ctl" data-tim="a" title="Ziel A = aktuelles Bild von A"><b class="tb-a">A</b><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 21V4"/><path d="M5 4h11l-2 4 2 4H5"/></svg><span>Ziel</span></button><button class="ctl" data-tim="b" title="Ziel B = aktuelles Bild von B"><b class="tb-b">B</b><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 21V4"/><path d="M5 4h11l-2 4 2 4H5"/></svg><span>Ziel</span></button><button class="ctl" data-tim="x" title="Ziele und Tore löschen – Messung neu beginnen">Löschen</button></span><button class="ctl gate-btn" id="btnGate" hidden title="Tor: A und B stehen am selben Tor → Tor 1 = Start, weitere Tore = Zwischenzeit"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M7 21V4M17 21V4"/><path d="M7 5h10v6H7z"/></svg><span>Tor</span><b id="gateN"></b></button><button class="ctl" id="btnSplits" title="Abschnittszeiten: Tore in A (m) und B (n) markieren"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 9-7 9-7-9z"/></svg>Tore<b class="nb" id="splitsN"></b></button></div>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/></svg><span>Getrennt</span></button><button class="ctl" id="btnSync" title="Aktuelle Bilder von A und B als gleichen Moment setzen und verknüpfen (Enter)"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2.2"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg>Gleicher Moment</button><span class="sync-chip" id="syncChip"></span><div class="ctl-sep"></div><button class="ctl tim-btn" id="btnTime" title="Stoppuhr: Zeiten von A und B vergleichen – Anleitung erscheint darunter"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="7.2"/><path d="M12 13V9.6M9.6 3h4.8M12 3v2.8M18.2 6.6l1.2-1.2"/></svg><span class="tim-l">Stoppuhr</span></button><span class="tim-acts" id="timActs" hidden><button class="ctl" data-tim="a" title="Ziel A = aktuelles Bild von A"><b class="tb-a">A</b><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 21V4"/><path d="M5 4h11l-2 4 2 4H5"/></svg><span>Ziel</span></button><button class="ctl" data-tim="b" title="Ziel B = aktuelles Bild von B"><b class="tb-b">B</b><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 21V4"/><path d="M5 4h11l-2 4 2 4H5"/></svg><span>Ziel</span></button><button class="ctl" data-tim="x" title="Ziele und Messpunkte löschen – Messung neu beginnen">Löschen</button></span><span class="tim-acts mp-acts" id="btnGate" hidden><button class="ctl" data-mp="a" title="Messpunkt A = aktuelles Bild von A (z. B. A am Tor) – Zwischenzeit ab Start"><b class="tb-a">A</b><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-6-5.6-6-10.5a6 6 0 0 1 12 0C18 15.4 12 21 12 21z"/><circle cx="12" cy="10.5" r="2.2"/></svg><span>Messpunkt</span><i class="mpn"></i></button><button class="ctl" data-mp="b" title="Messpunkt B = aktuelles Bild von B an derselben Stelle wie A"><b class="tb-b">B</b><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-6-5.6-6-10.5a6 6 0 0 1 12 0C18 15.4 12 21 12 21z"/><circle cx="12" cy="10.5" r="2.2"/></svg><span>Messpunkt</span><i class="mpn"></i></button></span><button class="ctl" id="btnSplits" title="Abschnittszeiten: Tore in A (m) und B (n) markieren"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 9-7 9-7-9z"/></svg>Tore<b class="nb" id="splitsN"></b></button></div>
       <div class="dz dz-c"><div class="grp">
         <button class="ctl" data-act="step" data-n="-10" title="10 Bilder zurück"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M11.5 17l-5-5 5-5"/><path d="M18 17l-5-5 5-5"/></svg></button>
         <button class="ctl" data-act="step" data-n="-1" title="1 Bild zurück"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/><path d="M6 6v12" opacity=".55"/></svg></button>
@@ -4568,7 +4565,7 @@ class Deck{
       ctx.save(); ctx.fillStyle='#1d1600'; ctx.font='800 9.5px Geist,-apple-system,Segoe UI,sans-serif'; ctx.textAlign=dir>0?'left':'right'; ctx.textBaseline='middle'; ctx.fillText(lab,x+dir*5,1+fh/2+0.5); ctx.restore(); };
     if(L&&L.a!=null) flag(X(L.a-0.5),1,'Start');
     if(L&&L.b!=null) flag(X(L.b+0.5),-1,'Ende');
-    { /* Tore: aus «Zeitmessen → Tor» (A/B) */ const GT=[]; if(typeof TIM!=='undefined'&&TIM.g&&mode==='cmp'&&(this===A||this===B)) TIM.g.forEach((g,i)=>GT.push({f:(this===A?g.a:g.b)*this.fps,lab:'T'+(i+1)}));
+    { /* Messpunkte aus «Zeitmessen» (A/B) */ const GT=[]; if(typeof TIM!=='undefined'&&TIM.g&&mode==='cmp'&&(this===A||this===B)) TIM.g.forEach((g,i)=>{ const v=this===A?g.a:g.b; if(v!=null) GT.push({f:v*this.fps,lab:'M'+(i+1)}); });
       ctx.save(); ctx.font='800 9px ui-monospace,Menlo,Consolas,monospace'; ctx.textAlign='center'; ctx.textBaseline='middle';
       for(const g of GT){ const x=X(g.f); if(x<-12||x>W+12) continue; ctx.fillStyle='rgba(255,255,255,.85)'; ctx.fillRect(Math.round(x)-0.5,TH-12,1.5,12);
         ctx.beginPath(); ctx.moveTo(x,TH-19); ctx.lineTo(x+5,TH-14); ctx.lineTo(x,TH-9); ctx.lineTo(x-5,TH-14); ctx.closePath(); ctx.fillStyle='#DA291C'; ctx.fill(); ctx.strokeStyle='rgba(0,0,0,.45)'; ctx.lineWidth=1; ctx.stroke();
@@ -4897,12 +4894,13 @@ function setMode(m){
   if(m==='cmp'&&mode==='single'&&S.clip&&!A.clip&&typeof A!=='undefined'){ const c=S.clip, t=S.time(); A.setClip(c); let n=0; const w=setInterval(()=>{ if(A.clip!==c||++n>50){ clearInterval(w); return; } if(A.ready){ clearInterval(w); A.seekTime(t); } },100); } /* vom Einzelvideo: das offene Video wird A */
   if(mode==='cmp'&&m!=='cmp'&&typeof cfReset==='function') cfReset(); mode=m; setTimeout(()=>{ if(typeof cfUI==='function') cfUI(); },0); document.body.classList.toggle('m-cmp',m==='cmp'); document.body.classList.toggle('m-single',m==='single');
   tabsUI();
-  $('#viewSingle').hidden=m!=='single'; $('#viewCmp').hidden=m!=='cmp'; $('#viewGps').hidden=m!=='gps'; viewIn(m==='single'?'#viewSingle':m==='cmp'?'#viewCmp':'#viewGps');
+  $('#viewSingle').hidden=m!=='single'; $('#viewCmp').hidden=m!=='cmp'; $('#viewGps').hidden=m!=='gps'; if(!document.documentElement.classList.contains('vt-mode')) viewIn(m==='single'?'#viewSingle':m==='cmp'?'#viewCmp':'#viewGps'); /* beim Seitenwechsel blendet schon der Übergang über */
   [S,A,B,GD].forEach(d=>{ if(!(m==='single'&&d===S)&&!(m==='cmp'&&(d===A||d===B))&&!(m==='gps'&&d===GD)) d.pause(); });
   if(m==='gps'){ gpsSelects(); if(typeof invAuto==='function') setTimeout(invAuto,0); } GPS.dirty=true;
   setRateUI(); renderLib(); syncSelects(); updSync(); splitsUI(); fxUI(); if(typeof ftRender==='function') ftRender();
   decks.forEach(d=>{ d.dirty=true; d.annDirty=true; }); LS.set('mode',m); if(window.placeChrome) placeChrome(); setTimeout(()=>window.pfsFit&&pfsFit(),80);
   try{ history.replaceState(null,'',m==='cmp'?'#vergleich':m==='gps'?'#gps':'#einzel'); }catch(e){}
+  if(m==='cmp'&&typeof cmpAutoLink==='function') cmpAutoLink(); /* gleich verbinden (sonst erst beim nächsten Takt: kurz zwei Zeitleisten) */
 }
 // Seitenwechsel: weicher Übergang in Richtung des Tabs (View Transitions, sonst Einblenden)
 const MODES=GPS_ON?['single','cmp','gps']:['single','cmp'];
@@ -6752,7 +6750,7 @@ function nameSetEnd(){ OV.nameQ=null; $('#viewCmp').classList.remove('ov-nameset
 
 /* ---------- Zeitmessung (Basic): Start = Sync-Punkt, Ziel je Lauf, Zeit im Bild ---------- */
 const TIM={on:false,a:null,b:null,na:0,nb:0,s:null,g:[],key:''};
-/* Zeitmessung auf 1/100 s: Start = gleicher Moment bzw. Tor 1, Ziel = erstes Bild nach der Linie.
+/* Zeitmessung auf 1/100 s: Start = gleicher Moment (Schloss zu), Messpunkte = Zwischenzeiten, Ziel = erstes Bild nach der Linie.
    Feinjustierung in ¼-Bild-Schritten (‹ ›) = zwischen zwei Bildern interpolieren. ± = 95-%-Bereich aus der Bildrate (½ Bild je Ereignis, nach Feinjustierung ¼). */
 function timStart(d){ if(TIM.s) return d===A?TIM.s.a:TIM.s.b; return d===A?G.syncA:G.syncA+G.off; }
 function timKey(){ return (A.clip&&A.clip.id)+'|'+(B.clip&&B.clip.id)+'|'+(TIM.s?TIM.s.a.toFixed(3)+'|'+TIM.s.b.toFixed(3):G.syncA.toFixed(3)+'|'+G.off.toFixed(3)); }
@@ -6764,7 +6762,7 @@ function timVal(d){ const k=d===A?'a':'b', st=timStart(d), t=d.time(), end=timEn
 function timDiff(d){ if(TIM.a==null||TIM.b==null) return null; const da=timEnd(A)-timStart(A), db=timEnd(B)-timStart(B), x=d===A?da-db:db-da; return {x,txt:(x<=0?'−':'+')+Math.abs(x).toFixed(2)+' s',pm:timPM([[A,false],[A,!!TIM.na],[B,false],[B,!!TIM.nb]])}; }
 function timUI(){ const v=$('#viewCmp'), on=TIM.on&&mode==='cmp'&&!v.classList.contains('overlay')&&G.linked&&A.ready&&B.ready;
   if(TIM.key&&TIM.key!==timKey()){ TIM.a=TIM.b=null; TIM.na=TIM.nb=0; } TIM.key=timKey();
-  $('#btnTime').classList.toggle('on',TIM.on); $('#timActs').hidden=!TIM.on; { const gb=$('#btnGate'); if(gb){ gb.hidden=!TIM.on; const n=$('#gateN'); if(n) n.textContent=TIM.g.length?String(TIM.g.length):''; } }
+  $('#btnTime').classList.toggle('on',TIM.on); $('#timActs').hidden=!TIM.on; { const gb=$('#btnGate'); if(gb){ gb.hidden=!TIM.on; for(const k of ['a','b']){ const n=$(`[data-mp="${k}"] .mpn`,gb), c=TIM.g.filter(g=>g[k]!=null).length; if(n) n.textContent=c?String(c):''; } } }
   for(const d of [A,B]){ let el=$('.tim-pill',d.stage); if(!el){ el=document.createElement('div'); el.className='tim-pill'; el.innerHTML='<i></i><b></b><small class="pm"></small><em></em><span class="tn"><button data-n="-1" title="Ziel ¼ Bild früher">‹</button><button data-n="1" title="Ziel ¼ Bild später">›</button></span>'; d.stage.appendChild(el);
       el.addEventListener('pointerdown',e=>e.stopPropagation()); el.addEventListener('click',e=>{ e.stopPropagation(); const bt=e.target.closest('[data-n]'); if(!bt) return; const k=d===A?'a':'b'; if(TIM[k]==null) return; TIM['n'+k]=clamp((TIM['n'+k]||0)+(+bt.dataset.n),-2,2); timUI(); toast('Ziel '+k.toUpperCase()+': '+(TIM['n'+k]?(TIM['n'+k]>0?'+':'−')+Math.abs(TIM['n'+k])+'/4 Bild':'genau auf dem Bild')+' → '+(timEnd(d)-timStart(d)).toFixed(2)+' s',1600); }); }
     if(!on){ el.classList.remove('on'); continue; } const r=timVal(d); el.classList.add('on'); el.dataset.st=r.state;
@@ -6775,29 +6773,29 @@ function timUI(){ const v=$('#viewCmp'), on=TIM.on&&mode==='cmp'&&!v.classList.c
   timHint(); gateUI(); }
 /* Schritt-für-Schritt-Hinweis unter «Zeitmessen»: zeigt immer den nächsten Schritt */
 function timHint(){ const h=$('#timHint'); if(!h) return; if(!TIM.on||mode!=='cmp'){ h.hidden=true; return; } h.hidden=false;
-  const st=(n,t,cur,done)=>`<span class="th-s${cur?' cur':''}${done?' done':''}"><b>${done?'✓':n}</b>${t}</span>`, lk=!!G.linked, a=TIM.a!=null, b=TIM.b!=null, g=TIM.g.length;
+  const st=(n,t,cur,done)=>`<span class="th-s${cur?' cur':''}${done?' done':''}"><b>${done?'✓':n}</b>${t}</span>`, lk=!!G.linked, a=TIM.a!=null, b=TIM.b!=null, g=TIM.g.filter(x=>x.a!=null&&x.b!=null).length, gp=TIM.g.find(x=>(x.a==null)!==(x.b==null));
   let msg;
   if(!lk) msg='Schloss ist offen: A und B einzeln auf den Startmoment stellen (z. B. Startbügel oder erstes Tor), dann Schloss schliessen.';
-  else if(!a&&!b) msg='Start = Moment, in dem A und B verbunden sind'+(g?' (Tor 1)':'')+'. Jetzt abspielen, bis A im Ziel ist, und «A Ziel» drücken.';
+  else if(!a&&!b) msg='Start = Moment, in dem A und B verbunden sind. Jetzt abspielen, bis A im Ziel ist, und «A Ziel» drücken.';
   else if(a&&!b) msg='Ziel A gesetzt. Weiter abspielen, bis B im Ziel ist, und «B Ziel» drücken.';
   else if(!a&&b) msg='Ziel B gesetzt. Weiter abspielen, bis A im Ziel ist, und «A Ziel» drücken.';
   else msg='Fertig: Laufzeiten und Differenz stehen im Bild. Mit ‹ › im Bild das Ziel auf ¼ Bild genau setzen. «Löschen» = neu messen.';
-  const html=`<div class="th-steps">${st(1,'Start: Schloss zu',lk&&!a&&!b?false:!lk,lk)}${st(2,'A Ziel',lk&&!a,a)}${st(3,'B Ziel',lk&&a&&!b,b)}</div><div class="th-msg">${msg}</div><div class="th-tor"><b>Tor</b> für Zwischenzeiten: Schloss öffnen, A und B je ans gleiche Tor stellen, «Tor» drücken. Tor 1 = Start${g?' · bisher '+g+' Tor'+(g>1?'e':''):''}.</div>`;
+  const html=`<div class="th-steps">${st(1,'Start: Schloss zu',lk&&!a&&!b?false:!lk,lk)}${st(2,'A Ziel',lk&&!a,a)}${st(3,'B Ziel',lk&&a&&!b,b)}</div><div class="th-msg">${msg}</div><div class="th-tor"><b>Messpunkt</b> für Zwischenzeiten (z. B. ein Tor): wenn A dort ist «A Messpunkt», wenn B an derselben Stelle ist «B Messpunkt»${gp?' · <b>M'+(TIM.g.indexOf(gp)+1)+': noch '+(gp.a==null?'A':'B')+' setzen</b>':''}${g?' · bisher '+g+' Messpunkt'+(g>1?'e':''):''}.</div>`;
   if(h.innerHTML!==html) h.innerHTML=html; }
-$('#btnTime').addEventListener('click',()=>{ TIM.on=!TIM.on; if(TIM.on&&!G.linked) toast('A und B sind noch nicht verbunden – ins Video klicken, beide zum Start bringen, nochmals klicken. Oder «Tor» drücken.',3800); timUI(); });
-$('#btnGate').addEventListener('click',gateAdd);
+$('#btnTime').addEventListener('click',()=>{ TIM.on=!TIM.on; if(TIM.on&&!G.linked) toast('A und B sind noch nicht verbunden – ins Video klicken, beide zum Start bringen, nochmals klicken.',3800); timUI(); });
+$('#btnGate').addEventListener('click',e=>{ const b=e.target.closest('[data-mp]'); if(b) mpSet(b.dataset.mp); });
 $('#timActs').addEventListener('click',e=>{ const b=e.target.closest('[data-tim]'); if(!b) return; const k=b.dataset.tim;
-  if(k==='x'){ TIM.a=TIM.b=null; TIM.na=TIM.nb=0; TIM.g=[]; TIM.s=null; toast('Ziele und Tore gelöscht.',1400); } else { const d=k==='a'?A:B, t=d.time(); if(t<=timStart(d)){ toast('Das Ziel muss nach dem Start liegen.'); return; } TIM[k]=t; TIM['n'+k]=0; toast('Ziel '+k.toUpperCase()+': '+(t-timStart(d)).toFixed(2)+' s – mit ‹ › im Bild auf ¼ Bild genau',2200); } timUI(); });
-/* Tore als Fixpunkte: A und B am selben Tor → «Tor». Tor 1 = Start (A und B dort verbunden), jedes weitere Tor = Zwischenzeit; danach an diesem Tor neu verbunden. */
-function gateAdd(){ if(!A.ready||!B.ready){ toast('Zuerst Video A und B wählen.'); return; } A.pause(); B.pause(); G.playing=false; if(typeof cmpPlayIcon==='function') cmpPlayIcon();
-  const ta=A.time(), tb=B.time(), L=TIM.g; if(L.length&&ta<=L[L.length-1].a+1e-4){ toast('Das Tor muss in A nach dem letzten Tor liegen.'); return; }
-  if(typeof CF!=='undefined'&&CF.k) cfSet(null,true); G.off=tb-ta; G.syncA=ta; G.linked=true; linkBtn(); updSync();
-  if(!L.length){ TIM.s={a:ta,b:tb}; TIM.a=TIM.b=null; TIM.na=TIM.nb=0; }
-  L.push({a:ta,b:tb}); TIM.on=true; const n=L.length;
-  if(n===1) toast('Tor 1 = Start: A und B hier verbunden. Nächstes Tor: ins Video klicken, zum Tor schieben, «Tor».',3600);
-  else { const g=gateGap(n-1); toast('Tor '+n+': B '+(g.x<=0?'−':'+')+Math.abs(g.x).toFixed(2)+' s gegenüber A ('+fmtPM(g.pm)+')',3000); }
+  if(k==='x'){ TIM.a=TIM.b=null; TIM.na=TIM.nb=0; TIM.g=[]; TIM.s=null; toast('Ziele und Messpunkte gelöscht.',1400); } else { const d=k==='a'?A:B, t=d.time(); if(t<=timStart(d)){ toast('Das Ziel muss nach dem Start liegen.'); return; } TIM[k]=t; TIM['n'+k]=0; toast('Ziel '+k.toUpperCase()+': '+(t-timStart(d)).toFixed(2)+' s – mit ‹ › im Bild auf ¼ Bild genau',2200); } timUI(); });
+/* Messpunkte (Zwischenzeiten) wie das Ziel: «A Messpunkt», wenn A an der Stelle ist (z. B. ein Tor), «B Messpunkt», wenn B dort ist – Zeit ab Start, A und B getrennt, Schloss bleibt zu.
+   TIM.g[i] = {a,b} (Videozeit je Lauf, null = noch nicht gesetzt); der i-te Messpunkt von A gehört zum i-ten von B. */
+function mpSet(k){ if(!A.ready||!B.ready){ toast('Zuerst Video A und B wählen.'); return; } const d=k==='a'?A:B, t=d.time(), K=k.toUpperCase(), L=TIM.g, i=L.filter(g=>g[k]!=null).length;
+  if(t<=timStart(d)+1e-4){ toast('Der Messpunkt muss nach dem Start liegen.'); return; }
+  if(i>0&&t<=L[i-1][k]+1e-4){ toast('Messpunkt '+K+' muss nach dem letzten Messpunkt von '+K+' liegen.'); return; }
+  if(i<L.length) L[i][k]=t; else L.push({a:null,b:null,[k]:t}); TIM.on=true; const g=L[i], o=k==='a'?'b':'a';
+  if(g[o]==null) toast('M'+(i+1)+' '+K+': '+(t-timStart(d)).toFixed(2)+' s – jetzt '+o.toUpperCase()+' an dieselbe Stelle bringen und «'+o.toUpperCase()+' Messpunkt»',3000);
+  else { const x=gateGap(i); toast('M'+(i+1)+': A '+x.a.toFixed(2)+' s · B '+(x.x<=0?'−':'+')+Math.abs(x.x).toFixed(2)+' s ('+fmtPM(x.pm)+')',3000); }
   timUI(); A.dirty=B.dirty=true; }
-function gateGap(k){ const L=TIM.g, a=L[k].a-L[0].a, b=L[k].b-L[0].b; return {x:b-a,a,b,pm:timPM([[A,false],[A,false],[B,false],[B,false]])}; }
+function gateGap(k){ const g=TIM.g[k], a=g.a-timStart(A), b=g.b-timStart(B); return {x:b-a,a,b,pm:timPM([[A,false],[A,false],[B,false],[B,false]])}; }
 function timDrawTo(x,d,ox,oy,w,h){ if(!(TIM.on&&G.linked&&!$('#viewCmp').classList.contains('overlay'))) return; const r=timVal(d), k=h/540, fs=Math.round(24*k), ph=Math.round(fs*1.6);
   let dl=''; if(r.state==='done'){ const D=timDiff(d); if(D) dl=D.txt; }
   x.save(); x.font=`800 ${fs}px "Geist Mono",ui-monospace,Menlo,monospace`; const tw=x.measureText(r.txt).width, dw=dl?x.measureText(dl).width+fs*0.8:0, W=tw+dw+fs*1.3, bx=ox+w-W-14*k, by=oy+14*k;
@@ -7017,19 +7015,20 @@ async function catRun(){
 
 /* ---------- Tor zu Tor: beim Durchfahren eines markierten Tores springt eine Pille mit Zwischenzeit und Abstand auf ---------- */
 const GATE_HOLD=2.4;
-function gateAt(d){ if(mode!=='cmp'||!A.ready||!B.ready||!A.clip||!B.clip||$('#viewCmp').classList.contains('overlay')) return null;
-  const L=(typeof TIM!=='undefined'&&TIM.g)||[], mA=L.map(g=>Math.round(g.a*A.fps)), mB=L.map(g=>Math.round(g.b*B.fps)), n=L.length; if(n<2) return null; /* Tore aus «Zeitmessen → Tor» */
-  const m=d===A?mA:mB; let k=-1; for(let j=1;j<n;j++){ if(m[j]<=d.frame) k=j; else break; } if(k<1) return null;
+function gateAt(d){ if(mode!=='cmp'||!A.ready||!B.ready||!A.clip||!B.clip||$('#viewCmp').classList.contains('overlay')||typeof TIM==='undefined') return null;
+  const L=(TIM.g||[]).filter(g=>g.a!=null&&g.b!=null), n=L.length; if(!n) return null; /* Messpunkte aus «Zeitmessen», ab Start */
+  const sA=Math.round(timStart(A)*A.fps), sB=Math.round(timStart(B)*B.fps), mA=L.map(g=>Math.round(g.a*A.fps)), mB=L.map(g=>Math.round(g.b*B.fps));
+  const m=d===A?mA:mB; let k=-1; for(let j=0;j<n;j++){ if(m[j]<=d.frame) k=j; else break; } if(k<0) return null;
   const age=(d.frame-m[k])/d.fps; if(age>GATE_HOLD) return null;
-  const tA=(mA[k]-mA[0])/A.fps, tB=(mB[k]-mB[0])/B.fps, pA=(mA[k-1]-mA[0])/A.fps, pB=(mB[k-1]-mB[0])/B.fps;
+  const tA=(mA[k]-sA)/A.fps, tB=(mB[k]-sB)/B.fps, pA=k?(mA[k-1]-sA)/A.fps:0, pB=k?(mB[k-1]-sB)/B.fps:0;
   const dd=d===A?tA-tB:tB-tA, sec=dd-(d===A?pA-pB:pB-pA);
-  return {k,age,t:d===A?tA:tB,dd,sec,first:k===1}; }
+  return {k,age,t:d===A?tA:tB,dd,sec,first:k===0}; }
 const sgn=v=>(v<=0?'−':'+')+Math.abs(v).toFixed(2);
 function gateUI(){ for(const d of [A,B]){ if(!d.stage) continue; let el=$('.gate-pill',d.stage);
     const g=gateAt(d); if(!el){ if(!g) continue; el=document.createElement('div'); el.className='gate-pill'; el.innerHTML='<span class="gn"></span><span class="gt"></span><span class="gd"></span><span class="gs"></span>'; d.stage.appendChild(el); }
     if(!g){ el.classList.remove('on'); el._k=null; continue; }
     const Rr=d.rect(); el.style.left=(Rr.x+Rr.w/2)+'px'; el.style.top=(Rr.y+12)+'px';
-    if(el._k!==g.k){ el._k=g.k; $('.gn',el).textContent='Tor '+(g.k+1); $('.gt',el).textContent=g.t.toFixed(2)+' s'; $('.gd',el).textContent=sgn(g.dd)+' s';
+    if(el._k!==g.k){ el._k=g.k; $('.gn',el).textContent='M'+(g.k+1); $('.gt',el).textContent=g.t.toFixed(2)+' s'; $('.gd',el).textContent=sgn(g.dd)+' s';
       $('.gs',el).textContent=g.first?'':'Abschn. '+sgn(g.sec); el.dataset.r=g.dd<=0?'win':'lose'; el.classList.remove('pop'); void el.offsetWidth; el.classList.add('pop'); }
     el.classList.add('on'); } }
 setInterval(()=>{ if(mode==='cmp') gateUI(); },90);
@@ -8329,7 +8328,7 @@ addEventListener('unhandledrejection',e=>{ FB.errs.push('Promise: '+String(e.rea
 function fbOn(){ return !!(typeof TRN_API!=='undefined'&&TRN_API); }
 const fbIco='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v12H8l-4 4z"/><path d="M12 7.5v4M12 14h.01"/></svg>';
 function fbInfo(){ const D=mode==='cmp'?A:mode==='gps'?GD:S, c=D&&D.clip, n=x=>x?(x.alias||x.name||'').slice(0,90):'';
-  return {build:'20261118165949'.startsWith('%%')?'dev':'20261118165949',env:window.VLAB_ENV||'live',url:location.pathname,lang:(window.vlabLang&&vlabLang.get())||'de',ua:navigator.userAgent.slice(0,240),
+  return {build:'20261118173307'.startsWith('%%')?'dev':'20261118173307',env:window.VLAB_ENV||'live',url:location.pathname,lang:(window.vlabLang&&vlabLang.get())||'de',ua:navigator.userAgent.slice(0,240),
     scr:screen.width+'×'+screen.height+' @'+(devicePixelRatio||1)+' · Fenster '+innerWidth+'×'+innerHeight,mem:navigator.deviceMemory||null,cpu:navigator.hardwareConcurrency||null,net:navigator.onLine?'online':'offline',
     view:mode+(mode==='cmp'&&$('#viewCmp').classList.contains('overlay')?' · overlay':''),clip:n(c),clipB:mode==='cmp'?n(B.clip):'',
     t:D&&D.ready?+(D.frame/D.fps).toFixed(2):null,fps:c&&c.fps||null,size:c?[c.w,c.h].join('×'):'',n:clips.length,errs:FB.errs.slice()}; }
@@ -9520,7 +9519,7 @@ if(false&&!LS.get('hint1',0)){ setTimeout(()=>{ toast(matchMedia('(pointer:coars
 
 /* Update-Hinweis: prüft version.json auf GitHub Pages; «Aktualisieren» lädt die Seite ohne Cache neu */
 (()=>{
-  const BUILD='20261118165949'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
+  const BUILD='20261118173307'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
   // nach einem Update die ?v=… aus der Adresse entfernen
   try{ const u=new URL(location.href); if(u.searchParams.has('v')){ u.searchParams.delete('v'); history.replaceState(null,'',u.pathname+(u.search||'')+u.hash); } }catch(e){}
   const el=$('#upd'); let latest=null, snoozed=null, busy=false;
