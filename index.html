@@ -3351,7 +3351,7 @@ body #viewSingle .pbar #sTitle{font-size:13px!important;line-height:17px!importa
 body #viewSingle .pbar #sTitle::after{font-size:12px}
 @media (max-width:600px){ body #viewSingle .pbar #sTitle{font-size:12.5px!important} body #viewSingle .pbar #sTitle::after{font-size:11.5px} }
 /* Benutzerverwaltung (46_admin.js) – Computer: Fenster, Handy: ganzer Bildschirm */
-#admModal .adm{width:min(760px,100%);max-height:min(88vh,900px);background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:20px;box-shadow:0 24px 60px -20px rgba(10,14,20,.45);padding:20px 22px 16px;display:flex;flex-direction:column;gap:14px;font-family:var(--font);overflow:hidden}
+#admModal .adm{width:min(1180px,96vw);height:min(92vh,1040px);max-height:none;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:20px;box-shadow:0 24px 60px -20px rgba(10,14,20,.45);padding:20px 22px 16px;display:flex;flex-direction:column;gap:14px;font-family:var(--font);overflow:hidden}
 #admModal .adm-hd{display:flex;align-items:center;gap:12px}
 #admModal .use-ic{width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,#DA291C,#9f1a12);color:#fff;display:grid;place-items:center;flex:none}
 #admModal .use-ic svg{width:20px;height:20px}
@@ -3410,12 +3410,55 @@ body #viewSingle .pbar #sTitle::after{font-size:12px}
 #admModal .adm-done dd.p{font-family:ui-monospace,Menlo,monospace;font-size:16px}
 #admModal .adm-done p{margin:0;font-size:12.5px;color:var(--muted)}
 .vl-pop .vp-adm svg{width:16px;height:16px}
+/* Übersicht: gross, nach Typ gruppiert, leere Verbände als Kacheln, Benutzer in festen Spalten */
+#admModal .adm:has(.adm-pw),#admModal .adm:has(.adm-done){height:auto;width:min(560px,96vw)}
+#admModal .adm:has(.adm-new){height:auto;width:min(620px,96vw)}
+#admModal .adm-bar{align-items:center}
+#admModal .adm-seg{display:inline-flex;flex:none;padding:3px;border-radius:12px;background:var(--field);border:1px solid var(--line)}
+#admModal .adm-seg button{height:34px;padding:0 12px;border:0;border-radius:9px;background:none;color:var(--ink2);font:600 13px var(--font);cursor:pointer;white-space:nowrap}
+#admModal .adm-seg button.on{background:var(--card);color:var(--ink);box-shadow:0 1px 3px rgba(10,14,20,.15)}
+#admModal .adm-stats{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:12.5px;color:var(--muted);margin-top:-4px}
+#admModal .adm-stats b{color:var(--ink);font-weight:700;font-variant-numeric:tabular-nums}
+#admModal .adm-stats .r b{color:var(--red)}
+#admModal .adm-body{gap:18px;flex:1;min-height:0}
+#admModal .adm-g h4{display:flex;align-items:baseline;gap:8px;margin:0 0 8px;font:700 12px var(--font);text-transform:uppercase;letter-spacing:.06em;color:var(--ink2)}
+#admModal .adm-g h4 span{font-weight:600;text-transform:none;letter-spacing:0;color:var(--muted)}
+#admModal .adm-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:8px;align-items:start}
+#admModal .adm-o.has{grid-column:1/-1}
+#admModal .adm-o.nil .adm-oh{background:var(--card);padding:9px 10px 9px 12px}
+#admModal .adm-o.nil .adm-oh b{font-size:13.5px}
+#admModal .adm-o.nil .adm-plus{width:30px;height:30px;font-size:18px}
+#admModal .adm-o.has>.adm-oh{border-bottom:1px solid var(--line)}
+#admModal .adm-meter{display:block;height:3px;margin-top:6px;width:72px;border-radius:2px;background:color-mix(in srgb,var(--ink) 10%,transparent);overflow:hidden}
+#admModal .adm-meter>i{display:block;height:100%;background:var(--good,#2fa36b);border-radius:2px}
+#admModal .adm-o.full .adm-meter>i{background:var(--red)}
+#admModal .adm-ul .adm-u:first-child{border-top:0}
+#admModal .adm-um{gap:0}
+#admModal .adm-um>*{flex:none}
+#admModal .adm-role{font-style:normal;width:84px;color:var(--ink2)}
+#admModal .adm-um .adm-dv{width:80px}
+#admModal .adm-ago{width:92px;text-align:right}
+#admModal .adm-uchev{font-style:normal;width:24px;text-align:right;color:var(--muted);font-size:13px}
+#admModal .adm-um{font-size:12.5px}
+#admModal .adm-ux label{max-width:380px}
+#admModal .adm-ux{padding:10px 12px 14px}
+#admModal .adm-tag{margin-right:10px}
+#admModal .adm-un{flex-direction:row;align-items:baseline;gap:10px}
+#admModal .adm-un b{flex:0 1 auto;max-width:45%}
+#admModal .adm-un small{flex:1 1 0;min-width:0}
 @media (max-width:600px){
   #admModal{padding:0}
   #admModal .adm{width:100%;height:100%;max-height:none;border-radius:0;border:0;padding:max(14px,env(safe-area-inset-top)) 14px max(12px,env(safe-area-inset-bottom))}
   #admModal .adm-bar{flex-direction:column}
   #admModal .adm-bar .btn-pri{width:100%}
   #admModal .adm-um small{display:none}
+  #admModal .adm-role{display:none}
+  #admModal .adm-un{flex-direction:column;align-items:stretch;gap:0}
+  #admModal .adm-un b{max-width:none}
+  #admModal .adm-seg{width:100%}
+  #admModal .adm-seg button{flex:1}
+  #admModal .adm-grid{grid-template-columns:1fr}
+  #admModal .adm:has(.adm-pw),#admModal .adm:has(.adm-done),#admModal .adm:has(.adm-new){height:100%;width:100%}
   #admModal .adm-btns button{flex:1 1 calc(50% - 4px)}
 }
 </style>
@@ -8344,7 +8387,7 @@ addEventListener('unhandledrejection',e=>{ FB.errs.push('Promise: '+String(e.rea
 function fbOn(){ return !!(typeof TRN_API!=='undefined'&&TRN_API); }
 const fbIco='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v12H8l-4 4z"/><path d="M12 7.5v4M12 14h.01"/></svg>';
 function fbInfo(){ const D=mode==='cmp'?A:mode==='gps'?GD:S, c=D&&D.clip, n=x=>x?(x.alias||x.name||'').slice(0,90):'';
-  return {build:'20261118192736'.startsWith('%%')?'dev':'20261118192736',env:window.VLAB_ENV||'live',url:location.pathname,lang:(window.vlabLang&&vlabLang.get())||'de',ua:navigator.userAgent.slice(0,240),
+  return {build:'20261118205131'.startsWith('%%')?'dev':'20261118205131',env:window.VLAB_ENV||'live',url:location.pathname,lang:(window.vlabLang&&vlabLang.get())||'de',ua:navigator.userAgent.slice(0,240),
     scr:screen.width+'×'+screen.height+' @'+(devicePixelRatio||1)+' · Fenster '+innerWidth+'×'+innerHeight,mem:navigator.deviceMemory||null,cpu:navigator.hardwareConcurrency||null,net:navigator.onLine?'online':'offline',
     view:mode+(mode==='cmp'&&$('#viewCmp').classList.contains('overlay')?' · overlay':''),clip:n(c),clipB:mode==='cmp'?n(B.clip):'',
     t:D&&D.ready?+(D.frame/D.fps).toFixed(2):null,fps:c&&c.fps||null,size:c?[c.w,c.h].join('×'):'',n:clips.length,errs:FB.errs.slice()}; }
@@ -8396,7 +8439,7 @@ async function fbAdmin(el){ if(!el||!fbOn()||!USE.h) return; const s=vlabAuth.ge
 /* Benutzerverwaltung (nur Admins, Profil-Menü › Benutzer verwalten). Der Server prüft Sitzung, Admin-Liste und Admin-Passwort
    (vlab_adm_list / vlab_adm_add / vlab_adm_set). Das Admin-Passwort bleibt nur im Speicher dieser Seite. Pro Verband höchstens
    so viele aktive Zugänge wie vlab_orgs.max (Swiss-Ski unbegrenzt) – der Server blockiert, die Anzeige warnt vorher. */
-const ADM={pw:null,d:null,open:'',q:'',none:false,busy:false};
+const ADM={pw:null,d:null,open:'',q:'',none:false,busy:false,f:'all'};
 const ADMI={x:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>',
   ppl:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7M18 14a6 6 0 0 1 3.5 6"/></svg>',
   desk:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/></svg>',
@@ -8426,23 +8469,34 @@ function admAgo(t){ if(!t) return 'nie'; const d=new Date(t), n=Math.floor((Date
 function admUserRow(u){ const dv=u.dev||[], nd=dv.filter(x=>x.kind!=='mobile').length, nm=dv.length-nd, op=ADM.open===u.e;
   const orgs=ADM.d.orgs.map(o=>'<option value="'+esc(o.id)+'"'+(o.id===u.org?' selected':'')+(o.id!==u.org&&admFull(o)&&admAct(u)?' disabled':'')+'>'+esc(o.name)+(o.id!==u.org&&admFull(o)&&admAct(u)?' (voll)':'')+'</option>').join('');
   return '<div class="adm-u'+(admAct(u)?'':' off')+(op?' op':'')+'" data-e="'+esc(u.e)+'"><button class="adm-ur" data-a="tog"><span class="adm-un"><b>'+esc(u.n||u.e)+'</b><small>'+esc(u.n?u.e:'')+'</small></span>'
-    +'<span class="adm-um">'+(admAct(u)?'':'<em class="adm-tag">inaktiv</em>')+'<span class="adm-dv" title="Computer / Handys">'+ADMI.desk+nd+ADMI.mob+nm+'</span><small>'+esc(admAgo(u.last))+'</small></span></button>'
+    +'<span class="adm-um">'+(admAct(u)?'':'<em class="adm-tag">inaktiv</em>')+'<em class="adm-role">'+(u.r==='athlete'?'Athlet:in':'Coach')+'</em><span class="adm-dv" title="Computer / Handys">'+ADMI.desk+nd+ADMI.mob+nm+'</span><small class="adm-ago" title="Zuletzt angemeldet">'+esc(admAgo(u.last))+'</small><i class="adm-uchev">'+(op?'▾':'▸')+'</i></span></button>'
     +(op?'<div class="adm-ux"><label>Verband<select data-a="org"><option value="">– ohne Verband –</option>'+orgs+'</select></label>'
       +'<div class="adm-devs">'+(dv.length?dv.map(x=>'<div class="adm-d">'+(x.kind==='mobile'?ADMI.mob:ADMI.desk)+'<span>'+esc(x.label||'Gerät')+'<small>zuletzt '+esc(admAgo(x.seen))+'</small></span><button data-a="dev" data-v="'+esc(x.dev)+'">Freigeben</button></div>').join(''):'<small>Keine Geräte angemeldet.</small>')+'</div>'
       +'<div class="adm-btns"><button data-a="pw">Neues Passwort</button><button data-a="akt">'+(admAct(u)?'Deaktivieren':'Aktivieren')+'</button><button class="danger" data-a="del">Löschen</button></div></div>':'')+'</div>'; }
 function admMatch(u){ const q=ADM.q.trim().toLowerCase(); return !q||(u.n||'').toLowerCase().includes(q)||u.e.includes(q); }
-function admRender(){ const D=ADM.d, m=$('#admModal'), sc=m.querySelector('.adm-body'), top=sc?sc.scrollTop:0, q=ADM.q.trim();
-  const box=o=>{ const U=D.users.filter(u=>u.org===o.id&&admMatch(u)), c=admCnt(o); if(q&&!U.length) return '';
-    return '<section class="adm-o'+(admFull(o)?' full':'')+'"><div class="adm-oh"><span><b>'+esc(o.name)+'</b><small>'+esc(o.typ)+'</small></span><em class="adm-cap">'+(o.max==null?c+' · unbegrenzt':c+' / '+o.max)+'</em>'
-      +'<button class="adm-plus" data-new="'+esc(o.id)+'"'+(admFull(o)?' disabled title="Verband voll"':'')+' aria-label="Zugang anlegen">+</button></div>'+(U.length?U.map(admUserRow).join(''):'<div class="adm-empty">Noch kein Zugang.</div>')+'</section>'; };
+function admRender(){ const D=ADM.d, m=$('#admModal'), sc=m.querySelector('.adm-body'), top=sc?sc.scrollTop:0, q=ADM.q.trim(), F=q?'all':ADM.f;
+  const bar=o=>{ const c=admCnt(o); return o.max==null?'':'<i class="adm-meter"><i style="width:'+Math.min(100,Math.round(c/o.max*100))+'%"></i></i>'; };
+  const box=o=>{ const U=D.users.filter(u=>u.org===o.id&&admMatch(u)), all=D.users.filter(u=>u.org===o.id).length, c=admCnt(o); if(q&&!U.length) return '';
+    if(F==='used'&&!all||F==='empty'&&all) return '';
+    return '<section class="adm-o'+(admFull(o)?' full':'')+(all?' has':' nil')+'"><div class="adm-oh"><span><b>'+esc(o.name)+'</b><small>'+(all?esc(o.typ):'noch kein Zugang')+'</small>'+(all?bar(o):'')+'</span><em class="adm-cap">'+(o.max==null?c+' · unbegrenzt':c+' / '+o.max)+'</em>'
+      +'<button class="adm-plus" data-new="'+esc(o.id)+'"'+(admFull(o)?' disabled title="Verband voll"':' title="Zugang anlegen"')+' aria-label="Zugang anlegen">+</button></div>'+(U.length?'<div class="adm-ul">'+U.map(admUserRow).join('')+'</div>':'')+'</section>'; };
+  const typs=[]; D.orgs.forEach(o=>{ if(!typs.includes(o.typ||'')) typs.push(o.typ||''); });
+  const grp=typs.map(t=>{ const os=D.orgs.filter(o=>(o.typ||'')===t), hasU=o=>D.users.some(u=>u.org===o.id), h=os.filter(hasU).concat(os.filter(o=>!hasU(o))).map(box).join(''); if(!h) return '';
+    const nu=D.users.filter(u=>os.some(o=>o.id===u.org)&&admAct(u)).length;
+    return '<div class="adm-g"><h4>'+esc(t||'Weitere')+'<span>'+os.length+' · '+nu+' aktiv</span></h4><div class="adm-grid">'+h+'</div></div>'; }).join('');
   const none=D.users.filter(u=>!u.org||!D.orgs.some(o=>o.id===u.org)), noneM=none.filter(admMatch), showNone=ADM.none||q;
-  const body='<div class="adm-bar"><input type="search" class="adm-q" placeholder="Name oder E-Mail suchen" value="'+esc(ADM.q)+'"><button class="btn-pri" data-new="">+ Neuer Zugang</button></div>'
-    +'<div class="adm-body">'+D.orgs.map(box).join('')
-    +(none.length&&(!q||noneM.length)?'<section class="adm-o adm-none"><button class="adm-oh" data-a="none"><span><b>Ohne Verband</b><small>ältere Zugänge – einem Verband zuordnen oder löschen</small></span><em class="adm-cap">'+none.length+'</em><span class="adm-chev">'+(showNone?'▾':'▸')+'</span></button>'
-      +(showNone?noneM.slice(0,q?200:80).map(admUserRow).join('')+(!q&&none.length>80?'<div class="adm-empty">… weitere über die Suche finden</div>':''):'')+'</section>':'')+'</div>';
-  admShell(body,'Zugänge pro Verband · '+D.users.filter(admAct).length+' aktiv · angemeldet als '+(D.me||''));
+  const nAct=D.users.filter(admAct).length, nFull=D.orgs.filter(admFull).length, nEmpty=D.orgs.filter(o=>!D.users.some(u=>u.org===o.id)).length;
+  const seg=[['all','Alle'],['used','Mit Zugängen'],['empty','Leer']].map(([k,l])=>'<button data-f="'+k+'" class="'+(ADM.f===k?'on':'')+'">'+l+'</button>').join('');
+  const body='<div class="adm-bar"><input type="search" class="adm-q" placeholder="Name oder E-Mail suchen" value="'+esc(ADM.q)+'"><div class="adm-seg" role="group" aria-label="Filter">'+seg+'</div><button class="btn-pri" data-new="">+ Neuer Zugang</button></div>'
+    +'<div class="adm-stats"><span><b>'+D.orgs.length+'</b> Verbände</span><span><b>'+nAct+'</b> aktive Zugänge</span><span><b>'+nEmpty+'</b> ohne Zugang</span>'+(nFull?'<span class="r"><b>'+nFull+'</b> voll</span>':'')+(none.length?'<span><b>'+none.length+'</b> ohne Verband</span>':'')+'</div>'
+    +'<div class="adm-body">'+grp
+    +(none.length&&(!q||noneM.length)&&F!=='empty'?'<section class="adm-o adm-none has"><button class="adm-oh" data-a="none"><span><b>Ohne Verband</b><small>ältere Zugänge – einem Verband zuordnen oder löschen</small></span><em class="adm-cap">'+none.length+'</em><span class="adm-chev">'+(showNone?'▾':'▸')+'</span></button>'
+      +(showNone?'<div class="adm-ul">'+noneM.slice(0,q?200:80).map(admUserRow).join('')+'</div>'+(!q&&none.length>80?'<div class="adm-empty">… weitere über die Suche finden</div>':''):'')+'</section>':'')
+    +(grp||none.length?'':'<div class="adm-empty">Nichts gefunden.</div>')+'</div>';
+  admShell(body,'Zugänge pro Verband · '+nAct+' aktiv · angemeldet als '+(D.me||''));
   const nb=m.querySelector('.adm-body'); nb.scrollTop=top;
   const qi=$('.adm-q',m); qi.oninput=()=>{ ADM.q=qi.value; const p=qi.selectionStart; admRender(); const n=$('#admModal .adm-q'); n.focus(); try{ n.setSelectionRange(p,p); }catch(e){} };
+  m.querySelectorAll('[data-f]').forEach(b=>b.onclick=()=>{ ADM.f=b.dataset.f; admRender(); });
   m.querySelectorAll('[data-new]').forEach(b=>b.onclick=()=>admNew(b.dataset.new));
   m.querySelectorAll('.adm-u').forEach(el=>{ const u=D.users.find(x=>x.e===el.dataset.e); el.querySelectorAll('[data-a]').forEach(b=>{ const a=b.dataset.a; if(a==='org') b.onchange=()=>admDo(u,'org',b.value); else b.onclick=()=>admUserAct(u,a,b); }); });
   const nn=$('[data-a="none"]',m); if(nn) nn.onclick=()=>{ ADM.none=!ADM.none; admRender(); }; }
@@ -9535,7 +9589,7 @@ if(false&&!LS.get('hint1',0)){ setTimeout(()=>{ toast(matchMedia('(pointer:coars
 
 /* Update-Hinweis: prüft version.json auf GitHub Pages; «Aktualisieren» lädt die Seite ohne Cache neu */
 (()=>{
-  const BUILD='20261118192736'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
+  const BUILD='20261118205131'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
   // nach einem Update die ?v=… aus der Adresse entfernen
   try{ const u=new URL(location.href); if(u.searchParams.has('v')){ u.searchParams.delete('v'); history.replaceState(null,'',u.pathname+(u.search||'')+u.hash); } }catch(e){}
   const el=$('#upd'); let latest=null, snoozed=null, busy=false;
