@@ -5328,8 +5328,8 @@ class FrameSrc{
       for(let guard=0;guard<6000;guard++){ if(this.dead) throw new Error('abgebrochen'); fr=this.cache.get(ts); if(fr){ this.need=null; return this._hold(fr); } if(this.err) throw this.err;
         const ahead=this.pos-i; /* wie weit über das Zielbild hinaus schon gefüttert */
         if(this.pos<S.length&&ahead<LOOK){ await feed(); continue; }
-        if(this.dec.decodeQueueSize>0){ await this._wait(800); continue; } /* Decoder arbeitet noch – Bilder kommen */
-        if(this.pos<S.length&&ahead<MAXL){ await feed(); await this._wait(300); continue; } /* Decoder hält Bilder zurück (Umsortierung) → eines mehr geben */
+        if(this.dec.decodeQueueSize>0){ await Promise.race([this._wait(800),this._waitDq(800)]); continue; } /* Decoder arbeitet noch – Bilder kommen */
+        if(this.pos<S.length&&ahead<MAXL){ await feed(); await this._wait(8); continue; } /* Decoder hält Bilder zurück (Umsortierung; Baseline-Videos vom Handy geben Schlüsselbilder erst nach ein paar weiteren heraus) → gleich eines mehr geben statt warten */
         await this.dec.flush(); this.needKey=true; this.pend.clear(); fr=this.cache.get(ts)||this._near(ts); this.need=null; if(fr) return this._hold(fr); throw new Error('Bild fehlt'); }
       throw new Error('Decoder hängt'); }
     catch(e){ throw e; } }
@@ -5913,17 +5913,19 @@ function ovAlign(){ if(!A.ready||!B.ready) return; A.pause(); B.pause(); G.playi
   const fresh=!OV.T; if(!OV.T){ OV.T=[A.v.videoWidth/B.v.videoWidth,0,0,0,A.v.videoHeight/B.v.videoHeight,0]; } OV.handNew=false; OV.fix={dx:0,dy:0,s:1,r:0}; OV.auto=fresh?'busy':OV.auto; ovUI();
   if(fresh){ let n=0; const tk=OV.autoTk=(OV.autoTk||0)+1, go=async()=>{ if(!OV.fix||tk!==OV.autoTk){ if(tk===OV.autoTk) OV.auto=null; return; } if(++n<100&&(A.v.readyState<2||B.v.readyState<2||A.v.seeking||B.v.seeking)){ setTimeout(go,40); return; } /* erst rechnen, wenn beide Bilder da sind */
     let ok=false; try{ ok=await ovAutoPose(tk); }catch(e){ console.warn('ovAutoPose',e); } if(tk!==OV.autoTk) return; OV.auto=ok?'ok':'no'; A.dirty=true; ovUI(); if(OV.autoGo){ OV.autoGo=false; ovGo(true); } }; setTimeout(go,30); } }
-/* Schritt 2: B gleich automatisch über A legen (Zoom und leichte Drehung inklusive). Wahl über Kanten (c, kleiner = besser). Ist das aktuelle Bild nicht eindeutig (z. B. Kameras unterschiedlich gezoomt, wenig Struktur), bis 10 s weiter vorne suchen und die Lage über die Kamerakette zurück zum Start tragen. */
+/* Schritt 2: B gleich automatisch über A legen (Zoom und leichte Drehung inklusive). Wahl über Kanten (c, kleiner = besser). Ist das aktuelle Bild nicht eindeutig (z. B. Kameras unterschiedlich gezoomt, wenig Struktur), bis 20 s weiter vorne suchen und die Lage über die Kamerakette zurück zum Start tragen. */
 async function ovAutoPose(tk){ const W0=GH.W0, wA=A.v.videoWidth, wB=B.v.videoWidth, hA=Math.round(W0*A.v.videoHeight/wA)&~1, hB=Math.round(W0*B.v.videoHeight/wB)&~1, t0=A.time(), off=G.off, sA=W0/wA, sB=W0/wB;
   const mk=h=>{ const c=document.createElement('canvas'); c.width=W0; c.height=h; return c.getContext('2d',{willReadFrequently:true}); }, xa=mk(hA), xb=mk(hB), g=(im,x,h)=>{ x.drawImage(im,0,0,W0,h); return pyramid(grayN(x.getImageData(0,0,W0,h)),W0,h); };
   const sure=r=>r&&r.ok&&r.inl>=0.4&&(r.c<=-0.85||(r.gates>=3&&r.c<=-0.7)), done=(p)=>{ OV.T=affInv(affMul(affMul([1/sB,0,0,0,1/sB,0],simToAff(p,W0,hA,W0,hB)),[sA,0,0,0,sA,0])); OV.Tt=t0; return true; };
   let r0=null; try{ r0=alignWide(g(A.v,xa,hA),g(B.v,xb,hB)); }catch(e){} if(sure(r0)) return done(r0.p);
   let va,vb; try{ va=await FrameSrc.open(A.clip); vb=await FrameSrc.open(B.clip); }catch(e){ return false; }
   try{ let best=r0&&r0.ok&&r0.inl>=0.4?{r:r0,t:t0}:null; const tMax=Math.min(A.dur,B.dur-off)-0.2, tEnd=OV.cut.b!=null?Math.min(OV.cut.b,tMax):tMax;
-    for(let k=1;k<=10;k++){ const t=t0+k; if(t>tEnd) break; if(tk!==OV.autoTk) return false; const r=alignWide(g(await va.at(t),xa,hA),g(await vb.at(t+off),xb,hB)); await new Promise(z=>setTimeout(z,0)); if(r&&r.ok&&r.inl>=0.4&&(!best||r.c<best.r.c)) best={r,t}; if(sure(r)&&r.c<=-0.9) break; }
+    for(const k of [1,2,3,4,5,6,7,8,9,10,12,14,16,18,20]){ const t=t0+k; if(t>tEnd||(k>10&&best&&best.r.c<=-0.72)) break; /* bis 10 s jede Sekunde; nur ohne brauchbare Lage weiter, alle 2 s bis 20 s (strukturarme Starts, z. B. Training im Hochformat) */ if(tk!==OV.autoTk) return false; const r=alignWide(g(await va.at(t),xa,hA),g(await vb.at(t+off),xb,hB)); await new Promise(z=>setTimeout(z,0)); if(r&&r.ok&&r.inl>=0.4&&(!best||r.c<best.r.c)) best={r,t}; if(sure(r)&&r.c<=-0.9) break; }
     if(!best||best.r.c>-0.72){ console.warn('ovAutoPose: keine sichere Lage',best&&best.r.c); return false; } if(best.t===t0) return done(best.r.p);
-    const d=t0-best.t, ns=Math.max(1,Math.ceil(Math.abs(d)/0.1)); let M=simToAff(best.r.p,W0,hA,W0,hB), qa=[0,0,0,0,0], qb=[0,0,0,0,0], pA=g(await va.at(best.t),xa,hA), pB=g(await vb.at(best.t+off),xb,hB);
-    for(let k=1;k<=ns;k++){ if(tk!==OV.autoTk) return false; const t=best.t+d*k/ns, nA=g(await va.at(t),xa,hA), nB=g(await vb.at(t+off),xb,hB), ra=align(pA,nA,qa,false,1,true), rb=align(pB,nB,qb,false,1,true); if(!ra.ok||!rb.ok||ra.inl<0.3||rb.inl<0.3){ console.warn('ovAutoPose: Kette unterbrochen'); return false; } M=affMul(affMul(simToAff(rb.p,W0,hB,W0,hB),M),affInv(simToAff(ra.p,W0,hA,W0,hA))); qa=ra.p.slice(); qa[4]=0; qb=rb.p.slice(); qb[4]=0; pA=nA; pB=nB; if(k%5===0) await new Promise(z=>setTimeout(z,0)); }
+    /* Kamerakette vorwärts von t0 zur sicheren Stelle (rückwärts müsste der Decoder für jedes Bild vom Schlüsselbild neu anfangen): Bewegung A und B aufsummieren, dann M zurück auf t0 */
+    const d=best.t-t0, ns=Math.max(1,Math.ceil(Math.abs(d)/0.1)), I=[1,0,0,0,1,0]; let CA=I, CB=I, qa=[0,0,0,0,0], qb=[0,0,0,0,0], pA=g(await va.at(t0),xa,hA), pB=g(await vb.at(t0+off),xb,hB);
+    for(let k=1;k<=ns;k++){ if(tk!==OV.autoTk) return false; const t=t0+d*k/ns, nA=g(await va.at(t),xa,hA), nB=g(await vb.at(t+off),xb,hB), ra=align(pA,nA,qa,false,1,true), rb=align(pB,nB,qb,false,1,true); if(!ra.ok||!rb.ok||ra.inl<0.3||rb.inl<0.3){ console.warn('ovAutoPose: Kette unterbrochen'); return false; } CA=affMul(simToAff(ra.p,W0,hA,W0,hA),CA); CB=affMul(simToAff(rb.p,W0,hB,W0,hB),CB); qa=ra.p.slice(); qa[4]=0; qb=rb.p.slice(); qb[4]=0; pA=nA; pB=nB; if(k%5===0) await new Promise(z=>setTimeout(z,0)); }
+    const M=affMul(affInv(CB),affMul(simToAff(best.r.p,W0,hA,W0,hB),CA));
     return done(affToSim(M,W0,hA,W0,hB)); }
   finally{ try{ va.close(); vb.close(); }catch(e){} } }
 function ovGo(hand){ // Schritt 2 → 3: mit der geschobenen Lage (oder ohne: automatisch) rechnen
@@ -8327,7 +8329,7 @@ addEventListener('unhandledrejection',e=>{ FB.errs.push('Promise: '+String(e.rea
 function fbOn(){ return !!(typeof TRN_API!=='undefined'&&TRN_API); }
 const fbIco='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v12H8l-4 4z"/><path d="M12 7.5v4M12 14h.01"/></svg>';
 function fbInfo(){ const D=mode==='cmp'?A:mode==='gps'?GD:S, c=D&&D.clip, n=x=>x?(x.alias||x.name||'').slice(0,90):'';
-  return {build:'20261118134432'.startsWith('%%')?'dev':'20261118134432',env:window.VLAB_ENV||'live',url:location.pathname,lang:(window.vlabLang&&vlabLang.get())||'de',ua:navigator.userAgent.slice(0,240),
+  return {build:'20261118165949'.startsWith('%%')?'dev':'20261118165949',env:window.VLAB_ENV||'live',url:location.pathname,lang:(window.vlabLang&&vlabLang.get())||'de',ua:navigator.userAgent.slice(0,240),
     scr:screen.width+'×'+screen.height+' @'+(devicePixelRatio||1)+' · Fenster '+innerWidth+'×'+innerHeight,mem:navigator.deviceMemory||null,cpu:navigator.hardwareConcurrency||null,net:navigator.onLine?'online':'offline',
     view:mode+(mode==='cmp'&&$('#viewCmp').classList.contains('overlay')?' · overlay':''),clip:n(c),clipB:mode==='cmp'?n(B.clip):'',
     t:D&&D.ready?+(D.frame/D.fps).toFixed(2):null,fps:c&&c.fps||null,size:c?[c.w,c.h].join('×'):'',n:clips.length,errs:FB.errs.slice()}; }
@@ -9518,7 +9520,7 @@ if(false&&!LS.get('hint1',0)){ setTimeout(()=>{ toast(matchMedia('(pointer:coars
 
 /* Update-Hinweis: prüft version.json auf GitHub Pages; «Aktualisieren» lädt die Seite ohne Cache neu */
 (()=>{
-  const BUILD='20261118134432'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
+  const BUILD='20261118165949'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
   // nach einem Update die ?v=… aus der Adresse entfernen
   try{ const u=new URL(location.href); if(u.searchParams.has('v')){ u.searchParams.delete('v'); history.replaceState(null,'',u.pathname+(u.search||'')+u.hash); } }catch(e){}
   const el=$('#upd'); let latest=null, snoozed=null, busy=false;
