@@ -6478,22 +6478,44 @@ function ovStabLive(){ const z=A.zoomer; if(!z) return; const s=mode==='cmp'&&$(
 const REF={key:null,E:null,X:null,Y:null};
 function ovRefAt(e){ if(!REF.E||REF.key!==GH.key) return null; const E=REF.E, n=E.length; if(!n) return null; if(e<=E[0]) return [REF.X[0],REF.Y[0]]; if(e>=E[n-1]) return [REF.X[n-1],REF.Y[n-1]];
   let lo=0,hi=n-1; while(hi-lo>1){ const m=(lo+hi)>>1; if(E[m]<=e) lo=m; else hi=m; } const f=(e-E[lo])/(E[hi]-E[lo]); return [REF.X[lo]+(REF.X[hi]-REF.X[lo])*f,REF.Y[lo]+(REF.Y[hi]-REF.Y[lo])*f]; }
+/* Feinabgleich eines Bildpaars: Versatz von B gegenüber A über die Kanten suchen (±6 px um den letzten Versatz cx/cy). Reine Rechnung ohne DOM –
+   läuft in einem Web Worker (eigener Rechenkern), sonst direkt. Gleiches Ergebnis wie zuvor, Bild für Bild. */
+function ovRefPick(gA,gB,okB,W,H,cx,cy,SPA){ const R=6, N=2*R+1, NS=SPA.length, sA=new Float32Array(NS), cost=[]; for(let i=0;i<NS;i++) sA[i]=gA[SPA[i]];
+  for(let sy=-R;sy<=R;sy++) for(let sx=-R;sx<=R;sx++){ const o=-(sy+cy)*W-(sx+cx); let s=0,n=0; for(let i=0;i<NS;i++){ const j=SPA[i]+o; if(!okB[j]) continue; s+=Math.abs(sA[i]-gB[j]); n++; } cost.push(n>W*H*0.04?s/n:1e9); }
+  let bi=0; for(let i=1;i<cost.length;i++) if(cost[i]<cost[bi]) bi=i; const bx=bi%N-R, by=Math.floor(bi/N)-R, c0=cost[bi];
+  const sub=(cm,c,cp)=>{ const d=cm-2*c+cp; return d>1e-6?Math.min(0.5,Math.max(-0.5,0.5*(cm-cp)/d)):0; }, at=(x,y)=>(Math.abs(x)>R||Math.abs(y)>R)?null:cost[(y+R)*N+(x+R)];
+  const cxm=at(bx-1,by), cxp=at(bx+1,by), cym=at(bx,by-1), cyp=at(bx,by+1); const mean=cost.filter(v=>v<1e9).reduce((a,b)=>a+b,0)/Math.max(1,cost.filter(v=>v<1e9).length);
+  const conf=c0<1e9&&Math.abs(bx)<R&&Math.abs(by)<R?(mean-c0)/Math.max(1e-3,mean):0; const sx=cx+bx+(cxm!=null&&cxp!=null?sub(cxm,c0,cxp):0), sy=cy+by+(cym!=null&&cyp!=null?sub(cym,c0,cyp):0);
+  /* Passen die Kanten von A und B an der besten Stelle? Unabhängig von der Berechnung, darum das Mass für «unsicher» */
+  let n1=0,s1=0,s2=0,s11=0,s22=0,s12=0; const o=-(by+cy)*W-(bx+cx); for(let i=0;i<NS;i++){ const j=SPA[i]+o; if(!okB[j]) continue; const p=sA[i], q=gB[j]; s1+=p; s2+=q; s11+=p*p; s22+=q*q; s12+=p*q; n1++; }
+  const q=n1>W*H*0.05?(s12-s1*s2/n1)/Math.sqrt(Math.max(1e-6,(s11-s1*s1/n1)*(s22-s2*s2/n1))):null; return {sx,sy,conf,q}; }
+const OVRW={off:false}; /* je Aufruf ein eigener Worker (Vorschau-Video und Export können gleichzeitig abgleichen) */
+function ovRefWorker(){ if(OVRW.off||typeof Worker==='undefined') return null; try{ const src=ovRefPick.toString()+';onmessage=e=>{ const d=e.data; postMessage(ovRefPick(d.gA,d.gB,d.okB,d.W,d.H,d.cx,d.cy,d.SPA)); };';
+    const u=URL.createObjectURL(new Blob([src],{type:'text/javascript'})), w=new Worker(u); URL.revokeObjectURL(u); return w; }catch(e){ OVRW.off=true; return null; } }
 async function ovRefineBuild(srcA,srcB,e0,e1,prog,withRef){ const W=320, H=Math.max(2,Math.round(W*GH.hA/GH.W0)), ca=document.createElement('canvas'), cb=document.createElement('canvas'); ca.width=cb.width=W; ca.height=cb.height=H;
   const xa=ca.getContext('2d',{willReadFrequently:true}), xb=cb.getContext('2d',{willReadFrequently:true}), k=W/GH.W0, fps=A.fps, E=[], X=[], Y=[], C=[], Q=[]; let cx=0, cy=0; /* Suchfenster folgt dem letzten Versatz: so reicht es auch für grosse Rucke */
   const grad=d=>{ const g=new Float32Array(W*H); for(let y=1;y<H-1;y++) for(let x=1;x<W-1;x++){ const i=(y*W+x)*4, l=j=>d[j]*0.3+d[j+1]*0.59+d[j+2]*0.11; g[y*W+x]=Math.abs(l(i+4)-l(i-4))+Math.abs(l(i+W*4)-l(i-W*4)); } return g; };
-  /* Jedes einzelne Bild, genau das Bildpaar der Vorschau: Handkamera-Rucke dauern nur wenige Bilder, dazwischen liegt die Berechnung (0.1 s) daneben */
+  /* Jedes einzelne Bild, genau das Bildpaar der Vorschau: Handkamera-Rucke dauern nur wenige Bilder, dazwischen liegt die Berechnung (0.1 s) daneben.
+     Schneller: A und B werden gleichzeitig dekodiert, das nächste Paar lädt schon, und der Vergleich läuft im Worker, während das nächste Paar vorbereitet wird. */
   const f0=Math.max(0,Math.ceil((GH.t0+Math.max(0,e0))*fps)), f1=Math.min(A.nF-1,Math.floor((GH.t0+Math.min(GH.eEnd,e1))*fps));
-  for(let f=f0;f<=f1;f++){ const e=(f+0.5)/fps-GH.t0, tB=(f+0.5)/fps+GH.off; if(tB<0||tB>=B.dur) continue; let fa,fb; try{ fa=await srcA.at(A.tOf(f)); fb=await srcB.at(B.tOf(clamp(Math.floor(tB*B.fps),0,B.nF-1))); }catch(err){ continue; } if(!fa||!fb) continue;
+  const pair=f=>{ const tB=(f+0.5)/fps+GH.off; if(tB<0||tB>=B.dur) return null; const ta=A.tOf(f), tb=B.tOf(clamp(Math.floor(tB*B.fps),0,B.nF-1));
+    /* Liefert der Decoder unter Last nur ein Nachbarbild (falscher Zeitstempel), das Paar auslassen – sonst entsteht ein Ruck */
+    const exact=(src,t,fr)=>!src.fast||!fr||fr.timestamp==null||!src.T||fr.timestamp===src.T.S[src._idx(t)].ts;
+    return Promise.all([srcA.at(ta),srcB.at(tb)]).then(r=>exact(srcA,ta,r[0])&&exact(srcB,tb,r[1])?r:(ovRefineBuild.skip=(ovRefineBuild.skip||0)+1,null)).catch(()=>null); };
+  const m=Math.round(W*0.08), SP=[]; for(let y=m;y<H-m;y+=2) for(let x=m;x<W-m;x+=2) SP.push(y*W+x); const SPA=Int32Array.from(SP); let wk=ovRefWorker();
+  const pick=(gA,gB,okB)=>{ if(!wk) return Promise.resolve(ovRefPick(gA,gB,okB,W,H,cx,cy,SPA)); const c0=cx, c1=cy;
+    return new Promise(res=>{ const fb=()=>{ try{ wk&&wk.terminate(); }catch(e){} wk=null; res(ovRefPick(gA,gB,okB,W,H,c0,c1,SPA)); }; wk.onmessage=e=>res(e.data); wk.onerror=ev=>{ ev.preventDefault&&ev.preventDefault(); OVRW.off=true; fb(); }; wk.onmessageerror=fb;
+      try{ wk.postMessage({gA,gB,okB,W,H,cx:c0,cy:c1,SPA}); }catch(err){ OVRW.off=true; fb(); } }); };
+  let run=null; const take=async()=>{ if(!run) return; const {e,p}=run; run=null; const r=await p; E.push(e); X.push(r.sx/k); Y.push(r.sy/k); C.push(r.conf); Q.push(r.q);
+    if(r.conf>0.06){ cx=clamp(Math.round(r.sx),-16,16); cy=clamp(Math.round(r.sy),-16,16); } if(prog&&E.length%5===0) prog((e-e0)/Math.max(0.01,e1-e0)); if(E.length%6===0) await new Promise(r=>setTimeout(r,0)); };
+  let nx=f0<=f1?pair(f0):null;
+  for(let f=f0;f<=f1;f++){ const e=(f+0.5)/fps-GH.t0; const pr=nx?await nx:null; nx=null; if(!pr||!pr[0]||!pr[1]){ if(f<f1) nx=pair(f+1); continue; } const fa=pr[0], fb=pr[1];
     const aw=fa.displayWidth||fa.videoWidth||fa.width, ah=fa.displayHeight||fa.videoHeight||fa.height; xa.drawImage(fa,0,0,aw,ah,0,0,W,H);
     let M=affMul(ovDMat(ovDAt(e),GH.W0),affInv(ovMat(clamp(e,0,GH.eEnd)))); if(withRef){ const rf=ovRefAt(e); if(rf) M=affMul([1,0,rf[0],0,1,rf[1]],M); } xb.setTransform(1,0,0,1,0,0); xb.clearRect(0,0,W,H); xb.setTransform(k*M[0],k*M[3],k*M[1],k*M[4],k*M[2],k*M[5]); const bw=fb.displayWidth||fb.videoWidth||fb.width, bh=fb.displayHeight||fb.videoHeight||fb.height; xb.drawImage(fb,0,0,bw,bh,0,0,GH.W0,GH.hB); xb.setTransform(1,0,0,1,0,0);
-    const dA=xa.getImageData(0,0,W,H).data, dB=xb.getImageData(0,0,W,H).data, gA=grad(dA), gB=grad(dB), R=6, m=Math.round(W*0.08), cost=[];
-    for(let sy=-R;sy<=R;sy++) for(let sx=-R;sx<=R;sx++){ let s=0,n=0; for(let y=m;y<H-m;y+=2) for(let x=m;x<W-m;x+=2){ const j=(y-sy-cy)*W+x-sx-cx; if(dB[j*4+3]<250) continue; const a=gA[y*W+x], b=gB[j]; s+=Math.abs(a-b); n++; } cost.push(n>W*H*0.04?s/n:1e9); }
-    const N=2*R+1; let bi=0; for(let i=1;i<cost.length;i++) if(cost[i]<cost[bi]) bi=i; const bx=bi%N-R, by=Math.floor(bi/N)-R, c0=cost[bi];
-    const sub=(cm,c,cp)=>{ const d=cm-2*c+cp; return d>1e-6?clamp(0.5*(cm-cp)/d,-0.5,0.5):0; }, at=(x,y)=>(Math.abs(x)>R||Math.abs(y)>R)?null:cost[(y+R)*N+(x+R)];
-    const cxm=at(bx-1,by), cxp=at(bx+1,by), cym=at(bx,by-1), cyp=at(bx,by+1); const mean=cost.filter(v=>v<1e9).reduce((a,b)=>a+b,0)/Math.max(1,cost.filter(v=>v<1e9).length);
-    const conf=c0<1e9&&Math.abs(bx)<R&&Math.abs(by)<R?(mean-c0)/Math.max(1e-3,mean):0; const sx=cx+bx+(cxm!=null&&cxp!=null?sub(cxm,c0,cxp):0), sy=cy+by+(cym!=null&&cyp!=null?sub(cym,c0,cyp):0);
-    { /* Passen die Kanten von A und B an der besten Stelle? Unabhängig von der Berechnung, darum das Mass für «unsicher» */ let n1=0,s1=0,s2=0,s11=0,s22=0,s12=0; for(let y=m;y<H-m;y+=2) for(let x=m;x<W-m;x+=2){ const j=(y-by-cy)*W+x-bx-cx; if(dB[j*4+3]<250) continue; const p=gA[y*W+x], q=gB[j]; s1+=p; s2+=q; s11+=p*p; s22+=q*q; s12+=p*q; n1++; } Q.push(n1>W*H*0.05?(s12-s1*s2/n1)/Math.sqrt(Math.max(1e-6,(s11-s1*s1/n1)*(s22-s2*s2/n1))):null); }
-    E.push(e); X.push(sx/k); Y.push(sy/k); C.push(conf); if(conf>0.06){ cx=clamp(Math.round(sx),-16,16); cy=clamp(Math.round(sy),-16,16); } if(prog&&E.length%5===0) prog((e-e0)/Math.max(0.01,e1-e0)); if(E.length%6===0) await new Promise(r=>setTimeout(r,0)); }
+    const dA=xa.getImageData(0,0,W,H).data, dB=xb.getImageData(0,0,W,H).data; if(f<f1) nx=pair(f+1); /* Bilder sind kopiert → nächstes Paar schon dekodieren */
+    const gA=grad(dA), gB=grad(dB), okB=new Uint8Array(W*H); for(let i=0;i<W*H;i++) okB[i]=dB[i*4+3]>=250?1:0;
+    await take(); /* Suchfenster braucht den Versatz des vorigen Bildes */ run={e,p:pick(gA,gB,okB)}; }
+  await take(); try{ wk&&wk.terminate(); }catch(e){}
   /* Unsichere Messungen und Ausreisser durch den Median der Nachbarn ersetzen, nur ganz leicht glätten (sonst wären die Rucke wieder da); höchstens 5 % der Breite */
   const n=E.length, ok=C.map(c=>c>0.06), lim=GH.W0*0.05, out=GH.W0*0.02, med=(A,i)=>{ const w=[]; for(let j=Math.max(0,i-3);j<=Math.min(n-1,i+3);j++) if(ok[j]) w.push(A[j]); if(!w.length) return 0; w.sort((a,b)=>a-b); return w[w.length>>1]; };
   const cl=A=>A.map((v,i)=>{ const q=med(A,i); return ok[i]&&Math.abs(v-q)<=out?v:q; }), mX=cl(X), mY=cl(Y), g=A=>A.map((v,i)=>clamp((0.2*(A[i-1]??v)+0.6*v+0.2*(A[i+1]??v)),-lim,lim));
@@ -8286,7 +8308,7 @@ addEventListener('unhandledrejection',e=>{ FB.errs.push('Promise: '+String(e.rea
 function fbOn(){ return !!(typeof TRN_API!=='undefined'&&TRN_API); }
 const fbIco='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v12H8l-4 4z"/><path d="M12 7.5v4M12 14h.01"/></svg>';
 function fbInfo(){ const D=mode==='cmp'?A:mode==='gps'?GD:S, c=D&&D.clip, n=x=>x?(x.alias||x.name||'').slice(0,90):'';
-  return {build:'20261118101251'.startsWith('%%')?'dev':'20261118101251',env:window.VLAB_ENV||'live',url:location.pathname,lang:(window.vlabLang&&vlabLang.get())||'de',ua:navigator.userAgent.slice(0,240),
+  return {build:'20261118114130'.startsWith('%%')?'dev':'20261118114130',env:window.VLAB_ENV||'live',url:location.pathname,lang:(window.vlabLang&&vlabLang.get())||'de',ua:navigator.userAgent.slice(0,240),
     scr:screen.width+'×'+screen.height+' @'+(devicePixelRatio||1)+' · Fenster '+innerWidth+'×'+innerHeight,mem:navigator.deviceMemory||null,cpu:navigator.hardwareConcurrency||null,net:navigator.onLine?'online':'offline',
     view:mode+(mode==='cmp'&&$('#viewCmp').classList.contains('overlay')?' · overlay':''),clip:n(c),clipB:mode==='cmp'?n(B.clip):'',
     t:D&&D.ready?+(D.frame/D.fps).toFixed(2):null,fps:c&&c.fps||null,size:c?[c.w,c.h].join('×'):'',n:clips.length,errs:FB.errs.slice()}; }
@@ -9477,7 +9499,7 @@ if(false&&!LS.get('hint1',0)){ setTimeout(()=>{ toast(matchMedia('(pointer:coars
 
 /* Update-Hinweis: prüft version.json auf GitHub Pages; «Aktualisieren» lädt die Seite ohne Cache neu */
 (()=>{
-  const BUILD='20261118101251'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
+  const BUILD='20261118114130'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
   // nach einem Update die ?v=… aus der Adresse entfernen
   try{ const u=new URL(location.href); if(u.searchParams.has('v')){ u.searchParams.delete('v'); history.replaceState(null,'',u.pathname+(u.search||'')+u.hash); } }catch(e){}
   const el=$('#upd'); let latest=null, snoozed=null, busy=false;
