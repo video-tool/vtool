@@ -3410,54 +3410,106 @@ body #viewSingle .pbar #sTitle::after{font-size:12px}
 #admModal .adm-done dd.p{font-family:ui-monospace,Menlo,monospace;font-size:16px}
 #admModal .adm-done p{margin:0;font-size:12.5px;color:var(--muted)}
 .vl-pop .vp-adm svg{width:16px;height:16px}
-/* Übersicht: gross, nach Typ gruppiert, leere Verbände als Kacheln, Benutzer in festen Spalten */
+/* Übersicht: links Navigation, rechts Tabelle */
 #admModal .adm:has(.adm-pw),#admModal .adm:has(.adm-done){height:auto;width:min(560px,96vw)}
 #admModal .adm:has(.adm-new){height:auto;width:min(620px,96vw)}
 #admModal .adm-bar{align-items:center}
-#admModal .adm-seg{display:inline-flex;flex:none;padding:3px;border-radius:12px;background:var(--field);border:1px solid var(--line)}
-#admModal .adm-seg button{height:34px;padding:0 12px;border:0;border-radius:9px;background:none;color:var(--ink2);font:600 13px var(--font);cursor:pointer;white-space:nowrap}
-#admModal .adm-seg button.on{background:var(--card);color:var(--ink);box-shadow:0 1px 3px rgba(10,14,20,.15)}
-#admModal .adm-stats{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:12.5px;color:var(--muted);margin-top:-4px}
-#admModal .adm-stats b{color:var(--ink);font-weight:700;font-variant-numeric:tabular-nums}
-#admModal .adm-stats .r b{color:var(--red)}
-#admModal .adm-body{gap:18px;flex:1;min-height:0}
-#admModal .adm-g h4{display:flex;align-items:baseline;gap:8px;margin:0 0 8px;font:700 12px var(--font);text-transform:uppercase;letter-spacing:.06em;color:var(--ink2)}
-#admModal .adm-g h4 span{font-weight:600;text-transform:none;letter-spacing:0;color:var(--muted)}
-#admModal .adm-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:8px;align-items:start}
-#admModal .adm-o.has{grid-column:1/-1}
-#admModal .adm-o.nil .adm-oh{background:var(--card);padding:9px 10px 9px 12px}
-#admModal .adm-o.nil .adm-oh b{font-size:13.5px}
-#admModal .adm-o.nil .adm-plus{width:30px;height:30px;font-size:18px}
-#admModal .adm-o.has>.adm-oh{border-bottom:1px solid var(--line)}
-#admModal .adm-meter{display:block;height:3px;margin-top:6px;width:72px;border-radius:2px;background:color-mix(in srgb,var(--ink) 10%,transparent);overflow:hidden}
-#admModal .adm-meter>i{display:block;height:100%;background:var(--good,#2fa36b);border-radius:2px}
-#admModal .adm-o.full .adm-meter>i{background:var(--red)}
-#admModal .adm-ul .adm-u:first-child{border-top:0}
-#admModal .adm-um{gap:0}
-#admModal .adm-um>*{flex:none}
-#admModal .adm-role{font-style:normal;width:84px;color:var(--ink2)}
-#admModal .adm-um .adm-dv{width:80px}
-#admModal .adm-ago{width:92px;text-align:right}
-#admModal .adm-uchev{font-style:normal;width:24px;text-align:right;color:var(--muted);font-size:13px}
-#admModal .adm-um{font-size:12.5px}
-#admModal .adm-ux label{max-width:380px}
-#admModal .adm-ux{padding:10px 12px 14px}
-#admModal .adm-tag{margin-right:10px}
-#admModal .adm-un{flex-direction:row;align-items:baseline;gap:10px}
-#admModal .adm-un b{flex:0 1 auto;max-width:45%}
-#admModal .adm-un small{flex:1 1 0;min-width:0}
+#admModal .adm-main{flex:1;min-height:0;display:grid;grid-template-columns:272px minmax(0,1fr);gap:0;border:1px solid var(--line);border-radius:16px;overflow:hidden;background:var(--card)}
+#admModal .adm-nav{overflow:auto;overscroll-behavior:contain;background:var(--field);border-right:1px solid var(--line);padding:10px 8px 14px;display:flex;flex-direction:column;gap:2px}
+#admModal .adm-nh{margin:14px 10px 4px;font:700 10.5px var(--font);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+#admModal .adm-nv{display:flex;align-items:center;gap:8px;width:100%;min-height:40px;padding:6px 8px 6px 12px;border:0;border-radius:10px;background:none;color:var(--ink);font:inherit;text-align:left;cursor:pointer;position:relative;flex:none}
+#admModal .adm-nv:hover{background:var(--hover)}
+#admModal .adm-nv.on{background:var(--card);box-shadow:0 1px 3px rgba(10,14,20,.12),inset 0 0 0 1px var(--line)}
+#admModal .adm-nv.on::before{content:"";position:absolute;left:3px;top:10px;bottom:10px;width:3px;border-radius:2px;background:var(--red)}
+#admModal .adm-nl{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+#admModal .adm-nl b{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#admModal .adm-nv.on .adm-nl b{font-weight:700}
+#admModal .adm-nl small{font-size:11px;color:var(--muted)}
+#admModal .adm-n{font:650 11.5px var(--font);font-style:normal;padding:2px 8px;border-radius:999px;background:var(--card);color:var(--ink2);font-variant-numeric:tabular-nums;flex:none}
+#admModal .adm-n.warn{background:color-mix(in srgb,#f59e0b 18%,transparent);color:#b45309}
+#admModal .adm-cap{font:600 11.5px var(--font);font-style:normal;color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap;flex:none}
+#admModal .adm-cap.some{color:var(--ink)}
+#admModal .adm-cap.full{color:var(--red)}
+#admModal .adm-meter{display:block;height:3px;width:56px;border-radius:2px;background:color-mix(in srgb,var(--ink) 10%,transparent);overflow:hidden}
+#admModal .adm-meter>i{display:block;height:100%;background:#2fa36b;border-radius:2px}
+#admModal .adm-cap.full+.adm-meter>i,#admModal .adm-nv:has(.adm-cap.full) .adm-meter>i{background:var(--red)}
+#admModal .adm-pane{display:flex;flex-direction:column;min-width:0;min-height:0}
+#admModal .adm-nsel{display:none}
+#admModal .adm-ph{display:flex;align-items:center;gap:16px;padding:16px 18px 14px;border-bottom:1px solid var(--line)}
+#admModal .adm-pt{flex:1;min-width:0}
+#admModal .adm-pt h4{margin:0;font:700 17px/1.25 var(--font)}
+#admModal .adm-pt span{font-size:12.5px;color:var(--muted)}
+#admModal .adm-pcap{display:flex;flex-direction:column;align-items:flex-end;gap:5px}
+#admModal .adm-pcap .adm-cap{font-size:15px;font-weight:700;color:var(--ink)}
+#admModal .adm-pcap .adm-cap.full{color:var(--red)}
+#admModal .adm-pcap .adm-meter{width:72px;height:4px}
+#admModal .adm-add{height:38px;padding:0 14px;white-space:nowrap}
+#admModal .adm-add:disabled{opacity:.4;cursor:default}
+#admModal .adm-bulk{display:flex;align-items:center;gap:8px;padding:9px 12px 9px 18px;background:color-mix(in srgb,var(--red) 7%,var(--card));border-bottom:1px solid var(--line)}
+#admModal .adm-bulk .adm-bn{font-size:13px;margin-right:auto;white-space:nowrap}
+#admModal .adm-bulk select{width:auto;min-width:220px;height:36px;font-size:13.5px}
+#admModal .adm-bulk button{height:36px;padding:0 14px;white-space:nowrap}
+#admModal .adm-bx{border:1px solid var(--line2);border-radius:10px;background:var(--card);color:var(--ink2);font:600 13px var(--font);cursor:pointer}
+#admModal .adm-bgo:disabled{opacity:.45}
+#admModal .adm-body{flex:1;min-height:0;overflow:auto;margin:0;padding:0;display:block;gap:0}
+#admModal .adm-th,#admModal .adm-ur{display:grid;grid-template-columns:var(--cols);align-items:center;column-gap:12px;padding:0 14px 0 12px}
+#admModal .adm-th{position:sticky;top:0;z-index:1;height:34px;background:var(--card);border-bottom:1px solid var(--line);font:700 10.5px var(--font);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+#admModal .adm-th .r,#admModal .adm-ago{text-align:right}
+#admModal .adm-u{border-top:0;border-bottom:1px solid var(--line)}
+#admModal .adm-ur{min-height:50px;width:100%;cursor:pointer;font-size:13px}
+#admModal .adm-ur:focus-visible{outline:2px solid var(--red);outline-offset:-2px}
+#admModal .adm-ur:hover,#admModal .adm-u.op .adm-ur{background:var(--hover)}
+#admModal .adm-u.sel .adm-ur{background:color-mix(in srgb,var(--red) 6%,transparent)}
+#admModal .adm-ck{display:flex;align-items:center;justify-content:center;height:100%}
+#admModal .adm-ck input{width:16px;height:16px;min-width:0;padding:0;margin:0;accent-color:var(--red);cursor:pointer}
+#admModal .adm-av{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:color-mix(in srgb,var(--ink) 8%,transparent);color:var(--ink2);font:700 11px var(--font);letter-spacing:.02em}
+#admModal .adm-u:not(.off) .adm-av{background:color-mix(in srgb,var(--red) 12%,transparent);color:var(--red)}
+#admModal .adm-un{display:flex;align-items:center;gap:8px;min-width:0;flex-direction:row}
+#admModal .adm-un b{font-size:13.5px;font-weight:650;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:none}
+#admModal .adm-ue,#admModal .adm-uo{color:var(--ink2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+#admModal .adm-uo i{font-style:normal;color:var(--muted)}
+#admModal .adm-role{color:var(--ink2)}
+#admModal .adm-dv{display:inline-flex;align-items:center;gap:3px;font-variant-numeric:tabular-nums;color:var(--ink2)}
+#admModal .adm-dv svg{width:14px;height:14px;margin-left:2px}
+#admModal .adm-dv svg:nth-of-type(2){margin-left:8px}
+#admModal .adm-ago{color:var(--muted);font-size:12px;white-space:nowrap}
+#admModal .adm-uchev{display:grid;place-items:center;color:var(--muted)}
+#admModal .adm-uchev svg{width:14px;height:14px;transition:transform .15s}
+#admModal .adm-u.op .adm-uchev svg{transform:rotate(90deg)}
+#admModal .adm-tag{font-style:normal;font-size:10.5px;font-weight:700;padding:2px 7px;border-radius:999px;background:var(--field);color:var(--muted);flex:none}
+#admModal .adm-u.off .adm-un b,#admModal .adm-u.off .adm-ue{opacity:.55}
+#admModal .adm-ux{padding:12px 14px 16px 88px;display:grid;grid-template-columns:minmax(200px,320px) minmax(0,1fr);gap:14px 24px;background:var(--hover);border-top:1px dashed var(--line)}
+#admModal .adm-ux label{max-width:none}
+#admModal .adm-ux .adm-btns{grid-column:1/-1}
+#admModal .adm-xh{font-size:12px;font-weight:600;color:var(--ink2)}
+#admModal .adm-more{padding:14px 18px;font-size:12.5px;color:var(--muted)}
+#admModal .adm-zero{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:8px;padding:56px 24px;min-height:100%;color:var(--muted);font-size:13px}
+#admModal .adm-zero b{color:var(--ink);font-size:15px}
+#admModal .adm-zero small{max-width:360px;font-size:12.5px;line-height:1.45}
+#admModal .adm-zero .use-ic{width:52px;height:52px;border-radius:16px;margin-bottom:4px}
+#admModal .adm-zero .use-ic svg{width:24px;height:24px}
+#admModal .adm-zero .btn-pri{margin-top:6px;height:40px;padding:0 16px}
+@media (max-width:1100px){ #admModal .adm-main{grid-template-columns:230px minmax(0,1fr)} }
+@media (max-width:760px){
+  #admModal .adm-main{grid-template-columns:1fr;border:0;border-radius:0;background:none}
+  #admModal .adm-nav{display:none}
+  #admModal .adm-nsel{display:block;margin:0 0 4px;font-weight:600}
+  #admModal .adm-ph{padding:10px 2px;gap:10px}
+  #admModal .adm-th{display:none}
+  #admModal .adm-ur{grid-template-columns:26px 30px minmax(0,1fr) auto 18px!important;grid-template-areas:"ck av nm dv ch" "ck av em ag ch";row-gap:1px;padding:8px 4px;min-height:58px}
+  #admModal .adm-ck{grid-area:ck} #admModal .adm-av{grid-area:av} #admModal .adm-un{grid-area:nm} #admModal .adm-ue{grid-area:em;font-size:12px} #admModal .adm-dv{grid-area:dv;justify-content:flex-end} #admModal .adm-ago{grid-area:ag;font-size:11px} #admModal .adm-uchev{grid-area:ch}
+  #admModal .adm-uo,#admModal .adm-role{display:none}
+  #admModal .adm-ux{grid-template-columns:1fr;padding:12px 6px 14px}
+  #admModal .adm-bulk{flex-wrap:wrap;padding:8px}
+  #admModal .adm-bulk select{flex:1 1 100%;min-width:0}
+  #admModal .adm-bulk .adm-bn{flex:1 1 100%}
+  #admModal .adm-bulk button{flex:1}
+}
 @media (max-width:600px){
   #admModal{padding:0}
   #admModal .adm{width:100%;height:100%;max-height:none;border-radius:0;border:0;padding:max(14px,env(safe-area-inset-top)) 14px max(12px,env(safe-area-inset-bottom))}
   #admModal .adm-bar{flex-direction:column}
   #admModal .adm-bar .btn-pri{width:100%}
-  #admModal .adm-um small{display:none}
-  #admModal .adm-role{display:none}
-  #admModal .adm-un{flex-direction:column;align-items:stretch;gap:0}
-  #admModal .adm-un b{max-width:none}
-  #admModal .adm-seg{width:100%}
-  #admModal .adm-seg button{flex:1}
-  #admModal .adm-grid{grid-template-columns:1fr}
   #admModal .adm:has(.adm-pw),#admModal .adm:has(.adm-done),#admModal .adm:has(.adm-new){height:100%;width:100%}
   #admModal .adm-btns button{flex:1 1 calc(50% - 4px)}
 }
@@ -8387,7 +8439,7 @@ addEventListener('unhandledrejection',e=>{ FB.errs.push('Promise: '+String(e.rea
 function fbOn(){ return !!(typeof TRN_API!=='undefined'&&TRN_API); }
 const fbIco='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v12H8l-4 4z"/><path d="M12 7.5v4M12 14h.01"/></svg>';
 function fbInfo(){ const D=mode==='cmp'?A:mode==='gps'?GD:S, c=D&&D.clip, n=x=>x?(x.alias||x.name||'').slice(0,90):'';
-  return {build:'20261118205131'.startsWith('%%')?'dev':'20261118205131',env:window.VLAB_ENV||'live',url:location.pathname,lang:(window.vlabLang&&vlabLang.get())||'de',ua:navigator.userAgent.slice(0,240),
+  return {build:'20261118214100'.startsWith('%%')?'dev':'20261118214100',env:window.VLAB_ENV||'live',url:location.pathname,lang:(window.vlabLang&&vlabLang.get())||'de',ua:navigator.userAgent.slice(0,240),
     scr:screen.width+'×'+screen.height+' @'+(devicePixelRatio||1)+' · Fenster '+innerWidth+'×'+innerHeight,mem:navigator.deviceMemory||null,cpu:navigator.hardwareConcurrency||null,net:navigator.onLine?'online':'offline',
     view:mode+(mode==='cmp'&&$('#viewCmp').classList.contains('overlay')?' · overlay':''),clip:n(c),clipB:mode==='cmp'?n(B.clip):'',
     t:D&&D.ready?+(D.frame/D.fps).toFixed(2):null,fps:c&&c.fps||null,size:c?[c.w,c.h].join('×'):'',n:clips.length,errs:FB.errs.slice()}; }
@@ -8439,7 +8491,7 @@ async function fbAdmin(el){ if(!el||!fbOn()||!USE.h) return; const s=vlabAuth.ge
 /* Benutzerverwaltung (nur Admins, Profil-Menü › Benutzer verwalten). Der Server prüft Sitzung, Admin-Liste und Admin-Passwort
    (vlab_adm_list / vlab_adm_add / vlab_adm_set). Das Admin-Passwort bleibt nur im Speicher dieser Seite. Pro Verband höchstens
    so viele aktive Zugänge wie vlab_orgs.max (Swiss-Ski unbegrenzt) – der Server blockiert, die Anzeige warnt vorher. */
-const ADM={pw:null,d:null,open:'',q:'',none:false,busy:false,f:'all'};
+const ADM={pw:null,d:null,open:'',q:'',busy:false,v:'all',sel:new Set()};
 const ADMI={x:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>',
   ppl:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7M18 14a6 6 0 0 1 3.5 6"/></svg>',
   desk:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/></svg>',
@@ -8466,40 +8518,85 @@ const admAct=u=>u.aktiv!==false;
 function admCnt(o){ return ADM.d.users.filter(u=>u.org===o.id&&admAct(u)).length; }
 function admFull(o){ return o.max!=null&&admCnt(o)>=o.max; }
 function admAgo(t){ if(!t) return 'nie'; const d=new Date(t), n=Math.floor((Date.now()-d)/864e5); return n<=0?'heute':n===1?'gestern':n<31?'vor '+n+' Tagen':d.toLocaleDateString('de-CH',{day:'numeric',month:'short',year:'2-digit'}); }
-function admUserRow(u){ const dv=u.dev||[], nd=dv.filter(x=>x.kind!=='mobile').length, nm=dv.length-nd, op=ADM.open===u.e;
-  const orgs=ADM.d.orgs.map(o=>'<option value="'+esc(o.id)+'"'+(o.id===u.org?' selected':'')+(o.id!==u.org&&admFull(o)&&admAct(u)?' disabled':'')+'>'+esc(o.name)+(o.id!==u.org&&admFull(o)&&admAct(u)?' (voll)':'')+'</option>').join('');
-  return '<div class="adm-u'+(admAct(u)?'':' off')+(op?' op':'')+'" data-e="'+esc(u.e)+'"><button class="adm-ur" data-a="tog"><span class="adm-un"><b>'+esc(u.n||u.e)+'</b><small>'+esc(u.n?u.e:'')+'</small></span>'
-    +'<span class="adm-um">'+(admAct(u)?'':'<em class="adm-tag">inaktiv</em>')+'<em class="adm-role">'+(u.r==='athlete'?'Athlet:in':'Coach')+'</em><span class="adm-dv" title="Computer / Handys">'+ADMI.desk+nd+ADMI.mob+nm+'</span><small class="adm-ago" title="Zuletzt angemeldet">'+esc(admAgo(u.last))+'</small><i class="adm-uchev">'+(op?'▾':'▸')+'</i></span></button>'
+/* Aufbau: links Navigation (Alle · Ohne Verband · Verbände nach Typ), rechts die gewählte Liste als Tabelle. Auswählen → mehrere Zugänge auf einmal einem Verband zuordnen. */
+const ADMCH='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>';
+function admIni(u){ const s=String(u.n||u.e.split('@')[0]).trim().split(/[\s._-]+/).filter(Boolean); return ((s[0]||'?')[0]+((s[1]||'')[0]||'')).toUpperCase(); }
+const admIsOrg=v=>ADM.d.orgs.some(o=>o.id===v);
+function admCapTxt(o){ return o.max==null?admCnt(o)+' / ∞':admCnt(o)+' / '+o.max; }
+function admMeter(o){ return o.max==null?'':'<i class="adm-meter"><i style="width:'+Math.min(100,Math.round(admCnt(o)/o.max*100))+'%"></i></i>'; }
+function admFree(o){ return o.max==null?Infinity:Math.max(0,o.max-admCnt(o)); }
+function admCols(showOrg){ return '30px 34px minmax(130px,1.1fr) minmax(160px,1.4fr)'+(showOrg?' minmax(110px,1fr)':'')+' 82px 74px 86px 22px'; }
+function admUserRow(u,showOrg){ const dv=u.dev||[], nd=dv.filter(x=>x.kind!=='mobile').length, nm=dv.length-nd, op=ADM.open===u.e, on=admAct(u), og=ADM.d.orgs.find(o=>o.id===u.org);
+  const orgs=ADM.d.orgs.map(o=>'<option value="'+esc(o.id)+'"'+(o.id===u.org?' selected':'')+(o.id!==u.org&&admFull(o)&&on?' disabled':'')+'>'+esc(o.name)+(o.id!==u.org&&admFull(o)&&on?' (voll)':'')+'</option>').join('');
+  return '<div class="adm-u'+(on?'':' off')+(op?' op':'')+(ADM.sel.has(u.e)?' sel':'')+'" data-e="'+esc(u.e)+'"><div class="adm-ur" data-a="tog" role="button" tabindex="0" aria-expanded="'+op+'">'
+    +'<span class="adm-ck"><input type="checkbox" aria-label="Auswählen"'+(ADM.sel.has(u.e)?' checked':'')+'></span>'
+    +'<span class="adm-av">'+esc(admIni(u))+'</span>'
+    +'<span class="adm-un"><b>'+esc(u.n||u.e.split('@')[0])+'</b>'+(on?'':'<em class="adm-tag">inaktiv</em>')+'</span>'
+    +'<span class="adm-ue">'+esc(u.e)+'</span>'
+    +(showOrg?'<span class="adm-uo">'+(og?esc(og.name):'<i>ohne Verband</i>')+'</span>':'')
+    +'<span class="adm-role">'+(u.r==='athlete'?'Athlet:in':'Coach')+'</span>'
+    +'<span class="adm-dv" title="Computer / Handys">'+ADMI.desk+nd+ADMI.mob+nm+'</span>'
+    +'<span class="adm-ago" title="Zuletzt angemeldet">'+esc(admAgo(u.last))+'</span>'
+    +'<i class="adm-uchev">'+ADMCH+'</i></div>'
     +(op?'<div class="adm-ux"><label>Verband<select data-a="org"><option value="">– ohne Verband –</option>'+orgs+'</select></label>'
-      +'<div class="adm-devs">'+(dv.length?dv.map(x=>'<div class="adm-d">'+(x.kind==='mobile'?ADMI.mob:ADMI.desk)+'<span>'+esc(x.label||'Gerät')+'<small>zuletzt '+esc(admAgo(x.seen))+'</small></span><button data-a="dev" data-v="'+esc(x.dev)+'">Freigeben</button></div>').join(''):'<small>Keine Geräte angemeldet.</small>')+'</div>'
-      +'<div class="adm-btns"><button data-a="pw">Neues Passwort</button><button data-a="akt">'+(admAct(u)?'Deaktivieren':'Aktivieren')+'</button><button class="danger" data-a="del">Löschen</button></div></div>':'')+'</div>'; }
+      +'<div class="adm-devs"><span class="adm-xh">Geräte</span>'+(dv.length?dv.map(x=>'<div class="adm-d">'+(x.kind==='mobile'?ADMI.mob:ADMI.desk)+'<span>'+esc(x.label||'Gerät')+'<small>zuletzt '+esc(admAgo(x.seen))+'</small></span><button data-a="dev" data-v="'+esc(x.dev)+'">Freigeben</button></div>').join(''):'<small>Keine Geräte angemeldet.</small>')+'</div>'
+      +'<div class="adm-btns"><button data-a="pw">Neues Passwort</button><button data-a="akt">'+(on?'Deaktivieren':'Aktivieren')+'</button><button class="danger" data-a="del">Löschen</button></div></div>':'')+'</div>'; }
 function admMatch(u){ const q=ADM.q.trim().toLowerCase(); return !q||(u.n||'').toLowerCase().includes(q)||u.e.includes(q); }
-function admRender(){ const D=ADM.d, m=$('#admModal'), sc=m.querySelector('.adm-body'), top=sc?sc.scrollTop:0, q=ADM.q.trim(), F=q?'all':ADM.f;
-  const bar=o=>{ const c=admCnt(o); return o.max==null?'':'<i class="adm-meter"><i style="width:'+Math.min(100,Math.round(c/o.max*100))+'%"></i></i>'; };
-  const box=o=>{ const U=D.users.filter(u=>u.org===o.id&&admMatch(u)), all=D.users.filter(u=>u.org===o.id).length, c=admCnt(o); if(q&&!U.length) return '';
-    if(F==='used'&&!all||F==='empty'&&all) return '';
-    return '<section class="adm-o'+(admFull(o)?' full':'')+(all?' has':' nil')+'"><div class="adm-oh"><span><b>'+esc(o.name)+'</b><small>'+(all?esc(o.typ):'noch kein Zugang')+'</small>'+(all?bar(o):'')+'</span><em class="adm-cap">'+(o.max==null?c+' · unbegrenzt':c+' / '+o.max)+'</em>'
-      +'<button class="adm-plus" data-new="'+esc(o.id)+'"'+(admFull(o)?' disabled title="Verband voll"':' title="Zugang anlegen"')+' aria-label="Zugang anlegen">+</button></div>'+(U.length?'<div class="adm-ul">'+U.map(admUserRow).join('')+'</div>':'')+'</section>'; };
+function admRender(){ const D=ADM.d, m=$('#admModal'), q=ADM.q.trim(); if(!ADM.sel) ADM.sel=new Set(); if(!ADM.v) ADM.v='all';
+  if(ADM.v!=='all'&&ADM.v!=='none'&&!admIsOrg(ADM.v)) ADM.v='all';
+  const sc=m.querySelector('.adm-body'), top=sc&&ADM._lv===(q?'q':ADM.v)?sc.scrollTop:0;
+  const none=D.users.filter(u=>!u.org||!admIsOrg(u.org)), V=q?'q':ADM.v, org=admIsOrg(V)?D.orgs.find(o=>o.id===V):null;
+  ADM._lv=V; [...ADM.sel].forEach(e=>{ if(!D.users.some(u=>u.e===e)) ADM.sel.delete(e); });
+  let U=V==='q'?D.users.filter(admMatch):V==='all'?D.users:V==='none'?none:D.users.filter(u=>u.org===V);
+  U=U.slice().sort((a,b)=>(admAct(b)-admAct(a))||String(b.last||'').localeCompare(String(a.last||''))||String(a.n||a.e).localeCompare(String(b.n||b.e),'de',{numeric:true}));
+  const nAct=D.users.filter(admAct).length;
+  /* Navigation */
+  const nv=(v,label,sub,right,cls)=>'<button class="adm-nv'+(V===v?' on':'')+(cls?' '+cls:'')+'" data-v="'+esc(v)+'"><span class="adm-nl"><b>'+label+'</b>'+(sub?'<small>'+sub+'</small>':'')+'</span>'+right+'</button>';
   const typs=[]; D.orgs.forEach(o=>{ if(!typs.includes(o.typ||'')) typs.push(o.typ||''); });
-  const grp=typs.map(t=>{ const os=D.orgs.filter(o=>(o.typ||'')===t), hasU=o=>D.users.some(u=>u.org===o.id), h=os.filter(hasU).concat(os.filter(o=>!hasU(o))).map(box).join(''); if(!h) return '';
-    const nu=D.users.filter(u=>os.some(o=>o.id===u.org)&&admAct(u)).length;
-    return '<div class="adm-g"><h4>'+esc(t||'Weitere')+'<span>'+os.length+' · '+nu+' aktiv</span></h4><div class="adm-grid">'+h+'</div></div>'; }).join('');
-  const none=D.users.filter(u=>!u.org||!D.orgs.some(o=>o.id===u.org)), noneM=none.filter(admMatch), showNone=ADM.none||q;
-  const nAct=D.users.filter(admAct).length, nFull=D.orgs.filter(admFull).length, nEmpty=D.orgs.filter(o=>!D.users.some(u=>u.org===o.id)).length;
-  const seg=[['all','Alle'],['used','Mit Zugängen'],['empty','Leer']].map(([k,l])=>'<button data-f="'+k+'" class="'+(ADM.f===k?'on':'')+'">'+l+'</button>').join('');
-  const body='<div class="adm-bar"><input type="search" class="adm-q" placeholder="Name oder E-Mail suchen" value="'+esc(ADM.q)+'"><div class="adm-seg" role="group" aria-label="Filter">'+seg+'</div><button class="btn-pri" data-new="">+ Neuer Zugang</button></div>'
-    +'<div class="adm-stats"><span><b>'+D.orgs.length+'</b> Verbände</span><span><b>'+nAct+'</b> aktive Zugänge</span><span><b>'+nEmpty+'</b> ohne Zugang</span>'+(nFull?'<span class="r"><b>'+nFull+'</b> voll</span>':'')+(none.length?'<span><b>'+none.length+'</b> ohne Verband</span>':'')+'</div>'
-    +'<div class="adm-body">'+grp
-    +(none.length&&(!q||noneM.length)&&F!=='empty'?'<section class="adm-o adm-none has"><button class="adm-oh" data-a="none"><span><b>Ohne Verband</b><small>ältere Zugänge – einem Verband zuordnen oder löschen</small></span><em class="adm-cap">'+none.length+'</em><span class="adm-chev">'+(showNone?'▾':'▸')+'</span></button>'
-      +(showNone?'<div class="adm-ul">'+noneM.slice(0,q?200:80).map(admUserRow).join('')+'</div>'+(!q&&none.length>80?'<div class="adm-empty">… weitere über die Suche finden</div>':''):'')+'</section>':'')
-    +(grp||none.length?'':'<div class="adm-empty">Nichts gefunden.</div>')+'</div>';
-  admShell(body,'Zugänge pro Verband · '+nAct+' aktiv · angemeldet als '+(D.me||''));
-  const nb=m.querySelector('.adm-body'); nb.scrollTop=top;
+  const nav='<nav class="adm-nav" aria-label="Verbände">'
+    +nv('all','Alle Zugänge',nAct+' aktiv','<em class="adm-n">'+D.users.length+'</em>')
+    +(none.length?nv('none','Ohne Verband','zuordnen','<em class="adm-n warn">'+none.length+'</em>','none'):'')
+    +typs.map(t=>'<div class="adm-nh">'+esc(t||'Weitere')+'</div>'+D.orgs.filter(o=>(o.typ||'')===t).map(o=>nv(o.id,esc(o.name),'','<em class="adm-cap'+(admFull(o)?' full':admCnt(o)?' some':'')+'">'+admCapTxt(o)+'</em>')).join('')).join('')+'</nav>';
+  const nsel='<select class="adm-nsel" aria-label="Ansicht"><option value="all"'+(V==='all'?' selected':'')+'>Alle Zugänge ('+D.users.length+')</option>'+(none.length?'<option value="none"'+(V==='none'?' selected':'')+'>Ohne Verband ('+none.length+')</option>':'')
+    +typs.map(t=>'<optgroup label="'+esc(t||'Weitere')+'">'+D.orgs.filter(o=>(o.typ||'')===t).map(o=>'<option value="'+esc(o.id)+'"'+(V===o.id?' selected':'')+'>'+esc(o.name)+' · '+admCapTxt(o)+'</option>').join('')+'</optgroup>').join('')+'</select>';
+  /* Kopf der Liste */
+  let ph;
+  if(org) ph='<div class="adm-ph"><div class="adm-pt"><h4>'+esc(org.name)+'</h4><span>'+esc(org.typ||'')+' · '+(org.max==null?'unbegrenzt viele Zugänge':'höchstens '+org.max+' aktive Zugänge')+'</span></div>'
+    +'<div class="adm-pcap"><em class="adm-cap'+(admFull(org)?' full':'')+'">'+admCapTxt(org)+'</em></div>'
+    +'<button class="btn-pri adm-add" data-new="'+esc(org.id)+'"'+(admFull(org)?' disabled title="Verband voll – zuerst einen Zugang deaktivieren"':'')+'>+ Zugang</button></div>';
+  else ph='<div class="adm-ph"><div class="adm-pt"><h4>'+(V==='q'?'Suche «'+esc(q)+'»':V==='none'?'Ohne Verband':'Alle Zugänge')+'</h4><span>'
+    +(V==='q'?U.length+' Treffer':V==='none'?'Ältere Zugänge – auswählen und einem Verband zuordnen':nAct+' aktiv · '+(D.users.length-nAct)+' inaktiv')+'</span></div></div>';
+  /* Mehrfach-Auswahl */
+  const nSel=ADM.sel.size, selAct=D.users.filter(u=>ADM.sel.has(u.e)&&admAct(u)).length;
+  const bulk=nSel?'<div class="adm-bulk"><b class="adm-bn">'+nSel+' ausgewählt</b><select class="adm-bo" aria-label="Verband"><option value="">Verband wählen …</option>'
+    +D.orgs.map(o=>{ const f=admFree(o), ok=f>=selAct; return '<option value="'+esc(o.id)+'"'+(ok?'':' disabled')+'>'+esc(o.name)+(o.max==null?'':' · noch '+f+' frei')+'</option>'; }).join('')
+    +'</select><button class="btn-pri adm-bgo" disabled>Zuordnen</button><button class="adm-bx">Auswahl aufheben</button></div>':'';
+  /* Tabelle */
+  const showOrg=!org, cols=admCols(showOrg), LIM=150, allSel=U.length&&U.every(u=>ADM.sel.has(u.e));
+  const th='<div class="adm-th" style="--cols:'+cols+'"><span class="adm-ck"><input type="checkbox" class="adm-all" aria-label="Alle auswählen"'+(allSel?' checked':'')+'></span><span></span><span>Name</span><span>E-Mail</span>'+(showOrg?'<span>Verband</span>':'')+'<span>Rolle</span><span>Geräte</span><span class="r">Zuletzt</span><span></span></div>';
+  const list=U.length?th+'<div class="adm-ul" style="--cols:'+cols+'">'+U.slice(0,LIM).map(u=>admUserRow(u,showOrg)).join('')+'</div>'+(U.length>LIM?'<div class="adm-more">… '+(U.length-LIM)+' weitere – über die Suche finden</div>':'')
+    :org?'<div class="adm-zero"><span class="use-ic">'+ADMI.ppl+'</span><b>Noch kein Zugang für '+esc(org.name)+'</b><small>'+(org.max==null?'Beliebig viele Zugänge möglich.':'Bis zu '+org.max+' aktive Zugänge.')+(none.length?' Oder ältere Zugänge unter «Ohne Verband» auswählen und zuordnen.':'')+'</small><button class="btn-pri" data-new="'+esc(org.id)+'">+ Ersten Zugang anlegen</button></div>'
+    :'<div class="adm-zero"><b>'+(V==='q'?'Nichts gefunden.':'Noch keine Zugänge.')+'</b></div>';
+  const body='<div class="adm-bar"><input type="search" class="adm-q" placeholder="Name oder E-Mail suchen" value="'+esc(ADM.q)+'"><button class="btn-pri" data-new="">+ Neuer Zugang</button></div>'
+    +'<div class="adm-main">'+nav+'<section class="adm-pane">'+nsel+ph+bulk+'<div class="adm-body">'+list+'</div></section></div>';
+  admShell(body,D.orgs.length+' Verbände · '+nAct+' aktive Zugänge · angemeldet als '+(D.me||''));
+  const nb=m.querySelector('.adm-body'); nb.scrollTop=top; const nvs=m.querySelector('.adm-nav .on'); if(nvs&&ADM._nt!=null) m.querySelector('.adm-nav').scrollTop=ADM._nt;
+  m.querySelector('.adm-nav').onscroll=e=>{ ADM._nt=e.target.scrollTop; };
   const qi=$('.adm-q',m); qi.oninput=()=>{ ADM.q=qi.value; const p=qi.selectionStart; admRender(); const n=$('#admModal .adm-q'); n.focus(); try{ n.setSelectionRange(p,p); }catch(e){} };
-  m.querySelectorAll('[data-f]').forEach(b=>b.onclick=()=>{ ADM.f=b.dataset.f; admRender(); });
+  const go=v=>{ ADM.v=v; ADM.q=''; ADM.open=''; admRender(); };
+  m.querySelectorAll('.adm-nv').forEach(b=>b.onclick=()=>go(b.dataset.v)); $('.adm-nsel',m).onchange=e=>go(e.target.value);
   m.querySelectorAll('[data-new]').forEach(b=>b.onclick=()=>admNew(b.dataset.new));
-  m.querySelectorAll('.adm-u').forEach(el=>{ const u=D.users.find(x=>x.e===el.dataset.e); el.querySelectorAll('[data-a]').forEach(b=>{ const a=b.dataset.a; if(a==='org') b.onchange=()=>admDo(u,'org',b.value); else b.onclick=()=>admUserAct(u,a,b); }); });
-  const nn=$('[data-a="none"]',m); if(nn) nn.onclick=()=>{ ADM.none=!ADM.none; admRender(); }; }
+  const all=$('.adm-all',m); if(all) all.onchange=()=>{ U.forEach(u=>all.checked?ADM.sel.add(u.e):ADM.sel.delete(u.e)); admRender(); };
+  if(nSel){ const bo=$('.adm-bo',m), bg=$('.adm-bgo',m); bo.onchange=()=>{ bg.disabled=!bo.value; }; bg.onclick=()=>admBulk(bo.value); $('.adm-bx',m).onclick=()=>{ ADM.sel.clear(); admRender(); }; }
+  m.querySelectorAll('.adm-u').forEach(el=>{ const u=D.users.find(x=>x.e===el.dataset.e), ck=$('.adm-ck input',el);
+    ck.onclick=e=>e.stopPropagation(); $('.adm-ck',el).onclick=e=>e.stopPropagation(); ck.onchange=()=>{ ck.checked?ADM.sel.add(u.e):ADM.sel.delete(u.e); admRender(); };
+    const ur=$('.adm-ur',el); ur.onkeydown=e=>{ if(e.target===ur&&(e.key==='Enter'||e.key===' ')){ e.preventDefault(); ur.click(); } };
+    el.querySelectorAll('[data-a]').forEach(b=>{ const a=b.dataset.a; if(a==='org') b.onchange=()=>admDo(u,'org',b.value); else b.onclick=()=>admUserAct(u,a,b); }); }); }
+async function admBulk(org){ const D=ADM.d, es=[...ADM.sel], o=D.orgs.find(x=>x.id===org); if(!es.length||!o||ADM.busy) return;
+  ADM.busy=true; let ok=0, bad=0; const bn=$('#admModal .adm-bn'); $$('#admModal .adm-bulk button,#admModal .adm-bulk select').forEach(x=>x.disabled=true);
+  for(const e of es){ if(bn) bn.textContent='Zuordnen … '+(ok+bad+1)+' / '+es.length; const j=await admCall('vlab_adm_set',{p_e:e,p_what:'org',p_val:org});
+    if(j.ok) ok++; else { bad++; if(j.err==='denied'||j.err==='auth'){ ADM.busy=false; ADM.pw=null; admPwForm(ADMERR[j.err]); return; } } }
+  ADM.busy=false; ADM.sel.clear(); toast(ok+(ok===1?' Zugang':' Zugänge')+' «'+o.name+'» zugeordnet'+(bad?' · '+bad+' nicht möglich (Verband voll?)':'')+'.',3800); ADM.v=org; await admLoad(); }
 async function admDo(u,what,val,ok){ if(ADM.busy) return false; ADM.busy=true; const j=await admCall('vlab_adm_set',{p_e:u.e,p_what:what,p_val:val==null?null:String(val)}); ADM.busy=false;
   if(!j.ok){ toast(ADMERR[j.err]||'Fehler.',4000); if(j.err==='denied'){ ADM.pw=null; admPwForm(ADMERR.denied); } else admLoad(); return false; }
   if(ok) toast(ok); await admLoad(); return true; }
@@ -9589,7 +9686,7 @@ if(false&&!LS.get('hint1',0)){ setTimeout(()=>{ toast(matchMedia('(pointer:coars
 
 /* Update-Hinweis: prüft version.json auf GitHub Pages; «Aktualisieren» lädt die Seite ohne Cache neu */
 (()=>{
-  const BUILD='20261118205131'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
+  const BUILD='20261118214100'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
   // nach einem Update die ?v=… aus der Adresse entfernen
   try{ const u=new URL(location.href); if(u.searchParams.has('v')){ u.searchParams.delete('v'); history.replaceState(null,'',u.pathname+(u.search||'')+u.hash); } }catch(e){}
   const el=$('#upd'); let latest=null, snoozed=null, busy=false;
