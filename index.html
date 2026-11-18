@@ -2490,6 +2490,8 @@ canvas.gap-row[hidden]{display:none}
 .ski-load .sl-t{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:2px 10px;margin-top:6px;color:#fff;font:600 11.5px var(--font)}
 .ski-load .sl-t b{font-weight:750;font-size:12.5px;white-space:nowrap}
 .ski-load .sl-t span{color:#aab4c0;font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ski-load .sl-tip{display:block;margin-top:5px;color:#c9d2dc;font:500 11px/1.35 var(--font)}
+.ski-load .sl-tip[hidden]{display:none}
 /* Side-by-Side: welches Video gesteuert wird */
 #cStages>.stage{transition:box-shadow .2s,opacity .2s}
 #cStages>.stage.cf-on{box-shadow:inset 0 0 0 3px var(--k-cf),0 0 0 1px var(--k-cf)}
@@ -5300,7 +5302,7 @@ class FrameSrc{
   async _slow(){ if(this.v) return this; this.fast=false; try{ this.dec&&this.dec.state!=='closed'&&this.dec.close(); }catch(e){} this.hold=null; this._drop(); this.v=await loadV(this.url); this.w=this.v.videoWidth; this.h=this.v.videoHeight; this.dur=this.v.duration; return this; }
   _mk(){ const me=this; this.dec=new VideoDecoder({output:fr=>me._out(fr),error:e=>{ me.err=e; me._wake(); me._wakeDq(); }}); this.dec.addEventListener('dequeue',()=>me._wakeDq()); this.dec.configure(this.cfg); this.needKey=true; }
   _out(fr){ const c=this.cache; { const ix=this.T.byTs.get(fr.timestamp); if(ix!=null) this.pend.delete(ix); } if(this.dead||c.has(fr.timestamp)||(this.want!=null&&fr.timestamp<this.want)){ fr.close(); this._wake(); return; } /* Bilder vor dem Ziel sofort freigeben – iOS hat nur wenige Bildpuffer, sonst bleibt der Decoder stehen */
-    c.set(fr.timestamp,fr); while(c.size>3){ const k=c.keys().next().value, o=c.get(k); c.delete(k); if(o!==this.hold) o.close(); } this._wake(); }
+    c.set(fr.timestamp,fr); while(c.size>3){ let k=null; for(const q of c.keys()) if(q!==this.need){ k=q; break; } if(k==null) break; const o=c.get(k); c.delete(k); if(o!==this.hold) o.close(); } this._wake(); } /* das gerade gesuchte Bild (need) nie verdrängen: gibt der Decoder unter Last mehrere Bilder auf einmal aus, ging es sonst verloren und es kam ein Bild ~1 s später */
   _wake(){ const r=this.wk; if(r){ this.wk=null; r(); } }
   _wait(ms){ return new Promise(r=>{ this.wk=r; setTimeout(r,ms||1200); }); } /* wartet auf ein ausgegebenes Bild */
   _wakeDq(){ const r=this.wkd; if(r){ this.wkd=null; r(); } }
@@ -5320,19 +5322,48 @@ class FrameSrc{
     if(r==='zeit'||r.e){ console.warn('FrameSrc: Decoder → <video>',r==='zeit'?'Zeitlimit':r.e); this.dead=true; if(r==='zeit') FrameSrc.offN=(FrameSrc.offN||0)+1; FrameSrc.off=FrameSrc.off||FrameSrc.offN>=2; /* erst nach zwei Hängern ganz abschalten (am Mac reicht ein kurzer Stau sonst für die ganze Sitzung) */ await this._slow(); await seekV(this.v,t); return this.v; }
     return r.x; }
   async _at(t){ if(!this.fast){ await seekV(this.v,t); return this.v; }
-    try{ const S=this.T.S, i=this._idx(t), ts=S[i].ts; this.want=ts; let fr=this.cache.get(ts); if(fr) return this._hold(fr);
+    try{ const S=this.T.S, i=this._idx(t), ts=S[i].ts; this.want=ts; let fr=this.cache.get(ts); if(fr){ this.need=null; return this._hold(fr); } this.need=ts;
       const kf=S[i].kf; if(this.needKey||(i<this.pos&&!this.pend.has(i))||kf>this.pos){ if(!this.needKey){ try{ this.dec.reset(); }catch(e){} this.dec.configure(this.cfg); } this.pend.clear(); this.pos=kf; this.needKey=false; } /* Zielbild ist weder im Cache noch im Decoder → ab Schlüsselbild neu */
       const LOOK=6, MAXL=28, feed=async()=>{ if(this.dec.decodeQueueSize>16) await this._waitDq(400); const s=S[this.pos]; this.pend.add(this.pos); this.pos++; const data=await this._bytes(s.off,s.sz); this.dec.decode(new EncodedVideoChunk({type:s.key?'key':'delta',timestamp:s.ts,duration:s.dus,data})); };
-      for(let guard=0;guard<6000;guard++){ if(this.dead) throw new Error('abgebrochen'); fr=this.cache.get(ts); if(fr) return this._hold(fr); if(this.err) throw this.err;
+      for(let guard=0;guard<6000;guard++){ if(this.dead) throw new Error('abgebrochen'); fr=this.cache.get(ts); if(fr){ this.need=null; return this._hold(fr); } if(this.err) throw this.err;
         const ahead=this.pos-i; /* wie weit über das Zielbild hinaus schon gefüttert */
         if(this.pos<S.length&&ahead<LOOK){ await feed(); continue; }
         if(this.dec.decodeQueueSize>0){ await this._wait(800); continue; } /* Decoder arbeitet noch – Bilder kommen */
         if(this.pos<S.length&&ahead<MAXL){ await feed(); await this._wait(300); continue; } /* Decoder hält Bilder zurück (Umsortierung) → eines mehr geben */
-        await this.dec.flush(); this.needKey=true; this.pend.clear(); fr=this.cache.get(ts)||this._near(ts); if(fr) return this._hold(fr); throw new Error('Bild fehlt'); }
+        await this.dec.flush(); this.needKey=true; this.pend.clear(); fr=this.cache.get(ts)||this._near(ts); this.need=null; if(fr) return this._hold(fr); throw new Error('Bild fehlt'); }
       throw new Error('Decoder hängt'); }
     catch(e){ throw e; } }
-  close(){ this.hold=null; this._drop(); try{ this.dec&&this.dec.state!=='closed'&&this.dec.close(); }catch(e){} if(this.v){ try{ this.v.removeAttribute('src'); this.v.load(); this.v.remove(); }catch(e){} this.v=null; } }
+  close(){ const h=this.hold; this.hold=null; this._drop(); if(h&&h.close) try{ h.close(); }catch(e){} /* zuletzt gelieferte Bild auch freigeben (sonst «VideoFrame was garbage collected»-Warnung, kann den Decoder bremsen) */ try{ this.dec&&this.dec.state!=='closed'&&this.dec.close(); }catch(e){} if(this.v){ try{ this.v.removeAttribute('src'); this.v.load(); this.v.remove(); }catch(e){} this.v=null; } }
 }
+/* Fahrer:innen-Suche und Feinausrichtung eines Bildes: reine Rechnung (ohne DOM) – läuft in einem Web Worker parallel zum nächsten Bild,
+   ohne Worker direkt. Gleiche Funktionen wie bisher, daher gleiches Ergebnis. */
+function ghRiderCalc(d){ const {iaD,ibD,M,p,W0,hA,hB,cA,cB,sens}=d; let pa=null,pb=null,ma=null,mb=null,M6=null;
+  const dB=new Uint8ClampedArray(W0*hA*4), okB=new Uint8Array(W0*hA), gB=ibD;
+  for(let y=0;y<hA;y++) for(let x=0;x<W0;x++){ const X=M[0]*x+M[1]*y+M[2], Y=M[3]*x+M[4]*y+M[5]; if(X<0||Y<0||X>=W0-1||Y>=hB-1) continue;
+    const k=(y*W0+x), j=((Y|0)*W0+(X|0))*4; okB[k]=1; dB[k*4]=gB[j]; dB[k*4+1]=gB[j+1]; dB[k*4+2]=gB[j+2]; }
+  const mB=morph(morph(ghostMask(iaD,dB,okB,W0*hA,p[4],sens+6,'B'),W0,hA,false),W0,hA,true);
+  const mA=morph(morph(ghostMask(iaD,dB,okB,W0*hA,p[4],sens+6,'A'),W0,hA,false),W0,hA,true);
+  // Wer filmt, hält die Fahrer:in fast immer in der Bildmitte → Bildmitte als starke Vorgabe
+  const ba=pickBlob(blobs(mA,W0,hA,4),cA,W0*0.06), bb=pickBlob(blobs(mB,W0,hA,4),cB,W0*0.06);
+  pa=ba&&Math.hypot(ba.x-cA[0],ba.y-cA[1])<W0*0.22?[ba.x,ba.y]:null;
+  pb=bb&&Math.hypot(bb.x-cB[0],bb.y-cB[1])<W0*0.22?[bb.x,bb.y]:null;
+  // A im eigenen Bild, B ebenfalls im eigenen Bild (eigene Kamerakette) – danach B-Lagen in A-Pixel umrechnen
+  if(d.hA0){ ma=motBlobs(iaD,null,d.hA0,null,d.QiA,W0,hA);
+    const Mi=affInv(M); mb=motBlobs(ibD,null,d.hB0,null,d.QiB,W0,hB).map(([x,y,a])=>{ const u=affApply(Mi,x,y); return [Math.round(u[0]*10)/10,Math.round(u[1]*10)/10,a]; }).filter(b=>b[0]>=0&&b[1]>=0&&b[0]<W0&&b[1]<hA); }
+  if(d.ok&&d.PA){ const ar=affRefine(d.PA,d.PB,p); if(ar) M6=cenToAbs(ar.m,W0,hA,W0,hB); }
+  return {pa,pb,ma,mb,M:M6}; }
+const GHW={w:null,off:false,n:0,cb:new Map()};
+function ghWorker(){ if(GHW.w||GHW.off||typeof Worker==='undefined') return GHW.w;
+  try{ const fn=['ghRiderCalc','ghostMask','morph','blobs','pickBlob','motBlobs','affRefine','gnAff','gnRefine','pick','allPix','bil','solveN','solve5','cenToAbs','affInv','affMul','simToAff','affToSim'];
+    const src='const RBUF=new Float32Array(20000);const affApply='+affApply.toString()+';\n'+fn.map(k=>window[k].toString()).join('\n')+
+      '\nonmessage=e=>{ let r; try{ r={id:e.data.id,r:ghRiderCalc(e.data.d)}; }catch(err){ r={id:e.data.id,err:String(err&&err.message||err)}; } postMessage(r); };';
+    const u=URL.createObjectURL(new Blob([src],{type:'text/javascript'})); const w=new Worker(u); URL.revokeObjectURL(u);
+    w.onmessage=e=>{ const c=GHW.cb.get(e.data.id); if(!c) return; GHW.cb.delete(e.data.id); if(e.data.err){ console.warn('Worker Fahrer:innen',e.data.err); GHW.off=true; c.res(ghRiderCalc(c.d)); } else c.res(e.data.r); };
+    w.onerror=ev=>{ ev.preventDefault&&ev.preventDefault(); GHW.off=true; for(const c of GHW.cb.values()) c.res(ghRiderCalc(c.d)); GHW.cb.clear(); try{ w.terminate(); }catch(e){} GHW.w=null; };
+    GHW.w=w; }catch(e){ GHW.off=true; } return GHW.w; }
+function ghRider(d){ const w=ghWorker(); if(!w) return Promise.resolve(ghRiderCalc(d));
+  return new Promise(res=>{ const id=++GHW.n; GHW.cb.set(id,{res,d}); try{ w.postMessage({id,d}); }catch(err){ GHW.cb.delete(id); GHW.off=true; res(ghRiderCalc(d)); } }); }
+function ghRiderEnd(){ /* Worker bleibt für die nächste Berechnung bereit */ }
 async function ghostCompute(opt){ // opt.resume: ab Bild opt.j mit fester Lage opt.p neu rechnen, davor bleibt · opt.coarse: Schnellvorschau (jedes 4. Bild) · opt.bg: fein im Hintergrund
   const coarse=!!(opt&&opt.coarse), bg=!!(opt&&opt.bg);
   if(bg){ if(GH.state!=='ready'||GH.bg) return; } else { if(GH.state==='busy') return; GH.bgAbort=true; }
@@ -5377,7 +5408,7 @@ async function ghostCompute(opt){ // opt.resume: ab Bild opt.j mit fester Lage o
     const Wl=lv.width, Hl=lv.height, k=Wl/W0, x=lv.getContext('2d'); x.setTransform(1,0,0,1,0,0); x.globalAlpha=1; x.drawImage(lbA,0,0,Wl,Hl);
     let Mi=affInv(M); if(OV.fix) Mi=affMul(ovDMat(OV.fix,W0),Mi);
     x.globalAlpha=+$('#opRange').value||0.5; x.setTransform(k*Mi[0],k*Mi[3],k*Mi[1],k*Mi[4],k*Mi[2],k*Mi[5]); x.drawImage(lbB,0,0,W0,hB); x.setTransform(1,0,0,1,0,0); x.globalAlpha=1; };
-  const cuts={a:0,b:0}; if(!bg) GH.cuts=cuts; let cutWarn=false; let i=0, mvHist=[]; const old=GH.S, resume=!!(opt&&opt.resume&&old&&old.length);
+  const cuts={a:0,b:0}; if(!bg) GH.cuts=cuts; let cutWarn=false; let i=0, mvHist=[]; const jobs=[]; const old=GH.S, resume=!!(opt&&opt.resume&&old&&old.length);
   if(resume){ const j=clamp(opt.j,0,Math.min(old.length,n)-1); for(let k=0;k<j;k++) S.push(old[k]);
     await seekPair(j*step);
     xa.drawImage(IA,0,0,W0,hA); xb.drawImage(IB,0,0,W0,hB);
@@ -5424,27 +5455,15 @@ async function ghostCompute(opt){ // opt.resume: ab Bild opt.j mit fester Lage o
     dbg.ok=ok?1:0; dbg.p=p.map(v=>+v.toFixed(3)); DBG.push(dbg);
     // Positionen beider Fahrer:innen (in A(i)-Pixeln)
     let M=simToAff(p,W0,hA,W0,hB); const Minv=affInv(M), cA=[W0/2,hA/2], cB=affApply(Minv,W0/2,hB/2); let pa=null, pb=null, ma=null, mb=null;
+    let job=null;
     if(!coarse){ // Schnellvorschau: Fahrer:innen-Suche (Namen) erst in der Feinberechnung
-    const dB=new Uint8ClampedArray(W0*hA*4), okB=new Uint8Array(W0*hA);
-    const gB=ib.data;
-    for(let y=0;y<hA;y++) for(let x=0;x<W0;x++){ const X=M[0]*x+M[1]*y+M[2], Y=M[3]*x+M[4]*y+M[5]; if(X<0||Y<0||X>=W0-1||Y>=hB-1) continue;
-      const k=(y*W0+x), j=((Y|0)*W0+(X|0))*4; okB[k]=1; dB[k*4]=gB[j]; dB[k*4+1]=gB[j+1]; dB[k*4+2]=gB[j+2]; }
-    const mB=morph(morph(ghostMask(ia.data,dB,okB,W0*hA,p[4],GH.sens+6,'B'),W0,hA,false),W0,hA,true);
-    const mA=morph(morph(ghostMask(ia.data,dB,okB,W0*hA,p[4],GH.sens+6,'A'),W0,hA,false),W0,hA,true);
-    // Wer filmt, hält die Fahrer:in fast immer in der Bildmitte → Bildmitte als starke Vorgabe
-    const ba=pickBlob(blobs(mA,W0,hA,4),cA,W0*0.06), bb=pickBlob(blobs(mB,W0,hA,4),cB,W0*0.06);
-    pa=ba&&Math.hypot(ba.x-cA[0],ba.y-cA[1])<W0*0.22?[ba.x,ba.y]:null;
-    pb=bb&&Math.hypot(bb.x-cB[0],bb.y-cB[1])<W0*0.22?[bb.x,bb.y]:null;
-    // Bewegung seit dem letzten Bild (Kamera herausgerechnet): wo ist es jetzt dunkler/farbiger als vorher → dort ist die Fahrer:in jetzt
-    // Vergleich mit dem Bild von ~0,25 s vorher (Kamerabewegung über die Kette herausgerechnet)
-    // A im eigenen Bild, B ebenfalls im eigenen Bild (eigene Kamerakette) – danach B-Lagen in A-Pixel umrechnen
-    mvHist.forEach(h=>{ h.Q=affMul(q,h.Q); h.QB=affMul(qb,h.QB); }); const lag=clamp(Math.round(0.25/step),1,5);
-    if(mvHist.length>=lag){ const h=mvHist[mvHist.length-lag]; ma=motBlobs(ia.data,null,h.a,null,affInv(h.Q),W0,hA);
-      const Mi=affInv(M); mb=motBlobs(ib.data,null,h.b,null,affInv(h.QB),W0,hB).map(([x,y,a])=>{ const u=affApply(Mi,x,y); return [Math.round(u[0]*10)/10,Math.round(u[1]*10)/10,a]; }).filter(b=>b[0]>=0&&b[1]>=0&&b[0]<W0&&b[1]<hA); }
+    // Bewegung seit dem letzten Bild (Kamera herausgerechnet), Vergleich mit dem Bild von ~0,25 s vorher – Kameraketten hier, die Suche selbst im Worker
+    mvHist.forEach(h=>{ h.Q=affMul(q,h.Q); h.QB=affMul(qb,h.QB); }); const lag=clamp(Math.round(0.25/step),1,5); const hh=mvHist.length>=lag?mvHist[mvHist.length-lag]:null;
+    job={iaD:ia.data,ibD:ib.data,M,p,ok,W0,hA,hB,cA,cB,sens:GH.sens,hA0:hh?hh.a:null,hB0:hh?hh.b:null,QiA:hh?affInv(hh.Q):null,QiB:hh?affInv(hh.QB):null,PA:ok?PA:null,PB:ok?PB:null};
     mvHist.push({a:ia.data,b:ib.data,Q:[1,0,0,0,1,0],QB:[1,0,0,0,1,0]}); if(mvHist.length>6) mvHist.shift();
     }
-    let M6=null; if(ok&&!coarse){ const ar=affRefine(PA,PB,p); if(ar) M6=cenToAbs(ar.m,W0,hA,W0,hB); }
-    S.push({e,p,ok,q,pa,pb,ca:cA,cb:cB,ma,mb,cut:(dbg.cutA||dbg.cutB)?1:0,M:M6,gt:(PA[0].g._gates||[]).map(g=>g[3]?[Math.round(g[0]*10)/10,Math.round(g[1]*10)/10,1]:[Math.round(g[0]*10)/10,Math.round(g[1]*10)/10])}); /* gt: rote Tore in A (für Rückstand je Tor) */
+    const sE={e,p,ok,q,pa,pb,ca:cA,cb:cB,ma,mb,cut:(dbg.cutA||dbg.cutB)?1:0,M:null,gt:(PA[0].g._gates||[]).map(g=>g[3]?[Math.round(g[0]*10)/10,Math.round(g[1]*10)/10,1]:[Math.round(g[0]*10)/10,Math.round(g[1]*10)/10])}; /* gt: rote Tore in A (für Rückstand je Tor) */ S.push(sE);
+    if(job) jobs.push(ghRider(job).then(r=>Object.assign(sE,r))); /* Fahrer:innen + Feinausrichtung laufen auf einem zweiten Kern, während das nächste Bild gerechnet wird */
     prev={p,M}; prevPA=PA; prevPB=PB;
     if(!bg){ GH.curLen=S.length; drawLive(M); }
     if(!bg&&!cutWarn&&cuts.a+cuts.b>=2){ cutWarn=true; toast('Achtung: '+(cuts.a&&cuts.b?'A und B haben':cuts.a?'Video A hat':'Video B hat')+' Kameraschnitte (TV-Bild) – Overlay braucht eine durchgehende Kamera vom gleichen Standort.',6000); }
@@ -5460,7 +5479,7 @@ async function ghostCompute(opt){ // opt.resume: ab Bild opt.j mit fester Lage o
     if(!bg){ GH.peek=null; GH.peekI=null; }
     i++;
   }
-  if(pend){ try{ await pend; }catch(e){} pend=null; }
+  if(pend){ try{ await pend; }catch(e){} pend=null; } await Promise.all(jobs); ghRiderEnd();
   /* Unsichere Stellen nachbessern: jede unsichere Strecke noch einmal von ihrem sicheren Ende her rückwärts rechnen (Ketten + breite Suche + Tore).
      Übernommen wird nur, was dort deutlich besser passt – sonst bleibt die Stelle gelb und man korrigiert von Hand. */
   if(!bg&&!coarse&&!stop()&&S.length>3){ const runs=[]; for(let k=1;k<S.length;k++){ if(S[k].ok) continue; let j=k; while(j+1<S.length&&!S[j+1].ok) j++; if(j+1<S.length&&S[j+1].ok) runs.push([k,j]); k=j; }
@@ -7049,10 +7068,10 @@ function skiLoad(f,txt){ if(mode!=='cmp'||!$('#viewCmp').classList.contains('ove
   let el=SKIL.el; if(!el||!el.isConnected){ el=document.createElement('div'); el.className='ski-load';
     const P='M8 40 C 38 40 40 12 70 12 S 102 40 132 40 S 164 12 194 12 S 226 40 256 40 S 288 14 312 14';
     const gates=[[70,12,'#DA291C'],[132,40,'#2f8fd8'],[194,12,'#DA291C'],[256,40,'#2f8fd8']].map(([x,y,c])=>{ const up=y<26, gy=up?y-14:y+2; return `<g><line x1="${x}" y1="${gy}" x2="${x}" y2="${gy+12}" stroke="${c}" stroke-width="1.6"/><rect x="${x}" y="${gy}" width="7" height="5" rx="1" fill="${c}"/></g>`; }).join('');
-    el.innerHTML=`<svg viewBox="0 0 320 54" aria-hidden="true"><path d="${P}" fill="none" stroke="rgba(255,255,255,.25)" stroke-width="2" stroke-dasharray="3 5" stroke-linecap="round"/>${gates}<path class="sl-done" d="${P}" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round"/><circle class="sl-sk" r="5.5" fill="#fff" stroke="#DA291C" stroke-width="2.4"/></svg><div class="sl-t"><b>Overlay wird erstellt</b><span></span></div>`;
+    el.innerHTML=`<svg viewBox="0 0 320 54" aria-hidden="true"><path d="${P}" fill="none" stroke="rgba(255,255,255,.25)" stroke-width="2" stroke-dasharray="3 5" stroke-linecap="round"/>${gates}<path class="sl-done" d="${P}" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round"/><circle class="sl-sk" r="5.5" fill="#fff" stroke="#DA291C" stroke-width="2.4"/></svg><div class="sl-t"><b>Overlay wird erstellt</b><span></span></div><small class="sl-tip" hidden>Tipp: Start und Ende enger setzen rechnet schneller · Laptop am Strom, Fenster im Vordergrund</small>`;
     ['pointerdown','click','dblclick','wheel'].forEach(k=>el.addEventListener(k,e=>e.stopPropagation())); A.stage.appendChild(el); SKIL.el=el; const pd=$('.sl-done',el); SKIL.len=pd.getTotalLength?pd.getTotalLength():300; pd.style.strokeDasharray=SKIL.len; }
   const L=SKIL.len, q=clamp(f||0,0,1), pd=$('.sl-done',el), sk=$('.sl-sk',el); pd.style.strokeDashoffset=String(L*(1-q)); try{ const pt=pd.getPointAtLength(L*q); sk.setAttribute('cx',pt.x); sk.setAttribute('cy',pt.y); }catch(e){}
-  const t=$('.sl-t span',el), s2=(txt||'').replace(/ · bei [^·]*·/,' ·'); if(t.textContent!==s2) t.textContent=s2; el.hidden=false; }
+  const t=$('.sl-t span',el), s2=(txt||'').replace(/ · bei [^·]*·/,' ·'); if(t.textContent!==s2) t.textContent=s2; { const tp=$('.sl-tip',el); if(tp) tp.hidden=!(GH.etaS>25); } /* lange Rechnung: Hinweis, wie es schneller geht */ el.hidden=false; }
 function skiLoadHide(){ if(SKIL.el) SKIL.el.hidden=true; }
 function ghostUI(){ // Ghost-Ansicht gibt es nicht mehr – die Leiste dient nur noch als Fortschritts-Quelle fürs Overlay
   $('#ghostBar').hidden=true; $('#syncInfo').hidden=false;
@@ -8308,7 +8327,7 @@ addEventListener('unhandledrejection',e=>{ FB.errs.push('Promise: '+String(e.rea
 function fbOn(){ return !!(typeof TRN_API!=='undefined'&&TRN_API); }
 const fbIco='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v12H8l-4 4z"/><path d="M12 7.5v4M12 14h.01"/></svg>';
 function fbInfo(){ const D=mode==='cmp'?A:mode==='gps'?GD:S, c=D&&D.clip, n=x=>x?(x.alias||x.name||'').slice(0,90):'';
-  return {build:'20261118114130'.startsWith('%%')?'dev':'20261118114130',env:window.VLAB_ENV||'live',url:location.pathname,lang:(window.vlabLang&&vlabLang.get())||'de',ua:navigator.userAgent.slice(0,240),
+  return {build:'20261118134432'.startsWith('%%')?'dev':'20261118134432',env:window.VLAB_ENV||'live',url:location.pathname,lang:(window.vlabLang&&vlabLang.get())||'de',ua:navigator.userAgent.slice(0,240),
     scr:screen.width+'×'+screen.height+' @'+(devicePixelRatio||1)+' · Fenster '+innerWidth+'×'+innerHeight,mem:navigator.deviceMemory||null,cpu:navigator.hardwareConcurrency||null,net:navigator.onLine?'online':'offline',
     view:mode+(mode==='cmp'&&$('#viewCmp').classList.contains('overlay')?' · overlay':''),clip:n(c),clipB:mode==='cmp'?n(B.clip):'',
     t:D&&D.ready?+(D.frame/D.fps).toFixed(2):null,fps:c&&c.fps||null,size:c?[c.w,c.h].join('×'):'',n:clips.length,errs:FB.errs.slice()}; }
@@ -9499,7 +9518,7 @@ if(false&&!LS.get('hint1',0)){ setTimeout(()=>{ toast(matchMedia('(pointer:coars
 
 /* Update-Hinweis: prüft version.json auf GitHub Pages; «Aktualisieren» lädt die Seite ohne Cache neu */
 (()=>{
-  const BUILD='20261118114130'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
+  const BUILD='20261118134432'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
   // nach einem Update die ?v=… aus der Adresse entfernen
   try{ const u=new URL(location.href); if(u.searchParams.has('v')){ u.searchParams.delete('v'); history.replaceState(null,'',u.pathname+(u.search||'')+u.hash); } }catch(e){}
   const el=$('#upd'); let latest=null, snoozed=null, busy=false;
