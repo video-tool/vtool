@@ -3338,6 +3338,74 @@ body.pfs .trn-pill{display:none}
 body #viewSingle .pbar #sTitle{font-size:13px!important;line-height:17px!important}
 body #viewSingle .pbar #sTitle::after{font-size:12px}
 @media (max-width:600px){ body #viewSingle .pbar #sTitle{font-size:12.5px!important} body #viewSingle .pbar #sTitle::after{font-size:11.5px} }
+/* Benutzerverwaltung (46_admin.js) – Computer: Fenster, Handy: ganzer Bildschirm */
+#admModal .adm{width:min(760px,100%);max-height:min(88vh,900px);background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:20px;box-shadow:0 24px 60px -20px rgba(10,14,20,.45);padding:20px 22px 16px;display:flex;flex-direction:column;gap:14px;font-family:var(--font);overflow:hidden}
+#admModal .adm-hd{display:flex;align-items:center;gap:12px}
+#admModal .use-ic{width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,#DA291C,#9f1a12);color:#fff;display:grid;place-items:center;flex:none}
+#admModal .use-ic svg{width:20px;height:20px}
+#admModal .adm-tt{flex:1;min-width:0}
+#admModal .adm-tt h3{margin:0;font:700 19px/1.2 var(--font)}
+#admModal .adm-sub{display:block;font-size:12.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#admModal .use-x{width:36px;height:36px;flex:none;border:1px solid var(--line);border-radius:11px;background:var(--card);color:var(--ink2);cursor:pointer;display:grid;place-items:center}
+#admModal .use-pw{display:flex;flex-direction:column;gap:10px;width:min(360px,100%);margin:8px auto 14px;text-align:center}
+#admModal .use-pw p{margin:0;color:var(--ink2);font-size:13px}
+#admModal input,#admModal select{height:42px;border:1px solid var(--line2);border-radius:10px;background:var(--field);color:var(--ink);padding:0 12px;font:500 15px var(--font);width:100%;min-width:0}
+#admModal .err{color:var(--red);font-size:12.5px;min-height:16px;font-weight:600}
+#admModal .adm-bar{display:flex;gap:8px}
+#admModal .adm-bar .btn-pri{flex:none;white-space:nowrap;padding:0 14px;height:42px}
+#admModal .adm-body{overflow:auto;-webkit-overflow-scrolling:touch;display:flex;flex-direction:column;gap:10px;margin:0 -6px;padding:0 6px 4px;overscroll-behavior:contain}
+#admModal .adm-o{border:1px solid var(--line);border-radius:14px;overflow:hidden;flex:none}
+#admModal .adm-o.full .adm-cap{background:color-mix(in srgb,var(--red) 12%,transparent);color:var(--red)}
+#admModal .adm-oh{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--field);width:100%;border:0;color:inherit;font:inherit;text-align:left}
+#admModal button.adm-oh{cursor:pointer}
+#admModal .adm-oh>span:first-child{flex:1;min-width:0;display:flex;flex-direction:column}
+#admModal .adm-oh b{font-size:14px}
+#admModal .adm-oh small{font-size:11.5px;color:var(--muted)}
+#admModal .adm-cap{font:650 12px var(--font);font-style:normal;padding:3px 9px;border-radius:999px;background:var(--card);color:var(--ink2);white-space:nowrap}
+#admModal .adm-plus{width:34px;height:34px;flex:none;border-radius:10px;border:1px solid var(--line2);background:var(--card);color:var(--ink);font:600 20px/1 var(--font);cursor:pointer}
+#admModal .adm-plus:disabled{opacity:.35;cursor:default}
+#admModal .adm-empty{padding:10px 12px;font-size:12.5px;color:var(--muted)}
+#admModal .adm-u{border-top:1px solid var(--line)}
+#admModal .adm-u.off .adm-un{opacity:.55}
+#admModal .adm-ur{display:flex;align-items:center;gap:10px;width:100%;min-height:52px;padding:8px 12px;border:0;background:none;color:inherit;font:inherit;text-align:left;cursor:pointer}
+#admModal .adm-ur:hover,#admModal .adm-u.op .adm-ur{background:var(--hover)}
+#admModal .adm-un{flex:1;min-width:0;display:flex;flex-direction:column}
+#admModal .adm-un b{font-size:13.5px;font-weight:650;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#admModal .adm-un small{font-size:11.5px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#admModal .adm-um{display:flex;align-items:center;gap:10px;flex:none;font-size:11.5px;color:var(--muted)}
+#admModal .adm-dv{display:inline-flex;align-items:center;gap:3px;font-variant-numeric:tabular-nums;color:var(--ink2)}
+#admModal .adm-dv svg{width:14px;height:14px;margin-left:4px}
+#admModal .adm-tag{font-style:normal;font-weight:650;padding:2px 7px;border-radius:999px;background:var(--field);color:var(--muted)}
+#admModal .adm-ux{padding:4px 12px 12px;display:flex;flex-direction:column;gap:10px;background:var(--hover)}
+#admModal label{display:flex;flex-direction:column;gap:5px;font-size:12px;font-weight:600;color:var(--ink2)}
+#admModal .adm-devs{display:flex;flex-direction:column;gap:6px}
+#admModal .adm-devs>small{font-size:12px;color:var(--muted)}
+#admModal .adm-d{display:flex;align-items:center;gap:10px;font-size:13px}
+#admModal .adm-d svg{width:16px;height:16px;flex:none;color:var(--ink2)}
+#admModal .adm-d span{flex:1;min-width:0;display:flex;flex-direction:column}
+#admModal .adm-d small{font-size:11px;color:var(--muted)}
+#admModal .adm-btns{display:flex;flex-wrap:wrap;gap:8px}
+#admModal .adm-btns button,#admModal .adm-d button{height:38px;padding:0 14px;border-radius:10px;border:1px solid var(--line2);background:var(--card);color:var(--ink);font:600 13px var(--font);cursor:pointer}
+#admModal .adm-btns .btn-pri{border:0}
+#admModal .adm-btns .danger{color:var(--red);border-color:color-mix(in srgb,var(--red) 40%,transparent)}
+#admModal .adm-chev{font-size:13px;color:var(--muted)}
+#admModal .adm-new{display:flex;flex-direction:column;gap:12px;overflow:auto}
+#admModal .adm-done{display:flex;flex-direction:column;gap:12px}
+#admModal .adm-done h4{margin:0;font-size:16px}
+#admModal .adm-done dl{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;margin:0;padding:14px;border-radius:12px;background:var(--field);font-size:14px}
+#admModal .adm-done dt{color:var(--muted)}
+#admModal .adm-done dd{margin:0;font-weight:650;word-break:break-all}
+#admModal .adm-done dd.p{font-family:ui-monospace,Menlo,monospace;font-size:16px}
+#admModal .adm-done p{margin:0;font-size:12.5px;color:var(--muted)}
+.vl-pop .vp-adm svg{width:16px;height:16px}
+@media (max-width:600px){
+  #admModal{padding:0}
+  #admModal .adm{width:100%;height:100%;max-height:none;border-radius:0;border:0;padding:max(14px,env(safe-area-inset-top)) 14px max(12px,env(safe-area-inset-bottom))}
+  #admModal .adm-bar{flex-direction:column}
+  #admModal .adm-bar .btn-pri{width:100%}
+  #admModal .adm-um small{display:none}
+  #admModal .adm-btns button{flex:1 1 calc(50% - 4px)}
+}
 </style>
 </head>
 <body class="m-single">
@@ -3411,10 +3479,11 @@ body #viewSingle .pbar #sTitle::after{font-size:12px}
 var K='vlab:auth', SB='https://sswtnkwqkmokozrcqrxf.supabase.co', PK='sb_publishable_g1FMMtPfyO0QNWAFtMXdsw_TUOOgQtB', DAYS=30;
 var de=document.documentElement, $=function(s){return document.getElementById(s)};
 function sess(){ try{ var s=JSON.parse(localStorage.getItem(K)||'null'); if(s&&s.e&&s.exp>Date.now()) return s; }catch(e){} return null; }
-window.vlabAuth={ get:sess, logout:function(){ var s=sess(); if(s&&devOn()) try{ fetch(SB+'/rest/v1/rpc/vlab_device_out',{method:'POST',headers:{'apikey':PK,'Content-Type':'application/json'},body:JSON.stringify({p_e:s.e,p_dev:devId()}),keepalive:true}).catch(function(){}); }catch(e){} try{ localStorage.removeItem(K); }catch(e){} setTimeout(function(){ location.reload(); },devOn()?250:0); },
+window.vlabAuth={ get:sess, logout:function(){ var s=sess(); if(s&&devOn()) try{ fetch(SB+'/rest/v1/rpc/vlab_device_out2',{method:'POST',headers:{'apikey':PK,'Content-Type':'application/json'},body:JSON.stringify({p_t:s.k||'',p_dev:devId()}),keepalive:true}).catch(function(){}); }catch(e){} try{ localStorage.removeItem(K); }catch(e){} setTimeout(function(){ location.reload(); },devOn()?250:0); },
   hash:function(e,p){ return hash(e,p); }, /* für Funktionen, die das Passwort nochmals prüfen (Nutzungsanalyse) – Hash bleibt nur im Speicher */
+  tok:function(){ var s=sess(); return s&&s.k||''; }, /* Sitzungs-Schlüssel vom Server (vlab_login) – damit prüfen alle Funktionen, wer angemeldet ist */
   rpc:function(fn,body){ return fetch(SB+'/rest/v1/rpc/'+fn,{method:'POST',headers:{'apikey':PK,'Content-Type':'application/json'},body:JSON.stringify(body)}); },
-  admin:function(){ var s=sess(); return !!(s&&/siebenthal|franzen|bruhin/i.test(s.e)); } }; /* nur Anzeige des Knopfs – die Zahlen gibt der Server nur Admins (vlab_admins) */
+  admin:function(){ var s=sess(); return !!(s&&(s.adm||/siebenthal|franzen|bruhin|pleus/i.test(s.e))); } }; /* nur Anzeige der Knöpfe – Daten gibt der Server nur Admins (vlab_admins, Admin-Passwort) */
 /* Nutzung zählen: nur wer (E-Mail), was (Start, Overlay, Export), wann, wo (Lab/Field, prod/staging) – keine Videos, keine Namen.
    Warteschlange im Browser, gesendet sobald online (auch offline erstellte Overlays zählen). Lokal (Tests, eigener Rechner) wird nichts gesendet. */
 var QK='vlab:q', APP=location.pathname.indexOf('/field/')>=0?'field':'lab', ENV=window.VLAB_ENV||(location.protocol==='file:'||/^(localhost|127\.|0\.0\.0\.0|192\.168\.|10\.)/.test(location.hostname)?'local':'prod');
@@ -3425,23 +3494,23 @@ function devKind(){ var u=navigator.userAgent||''; return /iPhone|iPad|iPod|Andr
 function devLabel(){ var u=navigator.userAgent||'', os=/iPhone/.test(u)?'iPhone':/iPad/.test(u)||(/Macintosh/.test(u)&&navigator.maxTouchPoints>1)?'iPad':/Android/.test(u)?'Android':/Mac/.test(u)?'Mac':/Windows/.test(u)?'Windows':/Linux/.test(u)?'Linux':'Gerät';
   var br=/Edg\//.test(u)?'Edge':/CriOS|Chrome\//.test(u)?'Chrome':/FxiOS|Firefox\//.test(u)?'Firefox':/Safari\//.test(u)?'Safari':''; return os+(br?' · '+br:''); }
 function devOn(){ try{ return ENV!=='local'||!!localStorage.getItem('vlab:devtest'); }catch(e){ return false; } }
-function devClaim(e){ if(!devOn()) return Promise.resolve({ok:true});
-  return fetch(SB+'/rest/v1/rpc/vlab_device',{method:'POST',headers:{'apikey':PK,'Content-Type':'application/json'},body:JSON.stringify({p_e:e,p_dev:devId(),p_kind:devKind(),p_label:devLabel()})})
-    .then(function(r){ if(r.status===404) return {ok:true}; return r.json().catch(function(){ return null; }).then(function(j){ return j&&j.err==='devices'?j:{ok:true}; }); }) /* Server-Fehler sperren niemanden aus */
+function devClaim(t){ if(!devOn()) return Promise.resolve({ok:true});
+  return fetch(SB+'/rest/v1/rpc/vlab_device2',{method:'POST',headers:{'apikey':PK,'Content-Type':'application/json'},body:JSON.stringify({p_t:t||'',p_dev:devId(),p_kind:devKind(),p_label:devLabel()})})
+    .then(function(r){ if(r.status===404) return {ok:true}; return r.json().catch(function(){ return null; }).then(function(j){ return j&&(j.err==='devices'||j.err==='auth')?j:{ok:true}; }); }) /* Server-Fehler sperren niemanden aus */
     .catch(function(){ return {ok:true}; }); }
-function devMsg(j){ var k=j.kind==='mobile'?'zwei Handys oder Tablets':'zwei Laptops oder Computer', L=(j.list||[]).map(function(d){ var t=d.seen?new Date(d.seen):null; return (d.label||'Gerät')+(t?', zuletzt '+(t.toDateString()===new Date().toDateString()?'heute':t.getDate()+'.'+(t.getMonth()+1)+'.'):''); });
+function devMsg(j){ if(j.err==='auth') return 'Bitte neu anmelden (Sicherheits-Update oder Zugang geändert).'; var k=j.kind==='mobile'?'zwei Handys oder Tablets':'zwei Laptops oder Computer', L=(j.list||[]).map(function(d){ var t=d.seen?new Date(d.seen):null; return (d.label||'Gerät')+(t?', zuletzt '+(t.toDateString()===new Date().toDateString()?'heute':t.getDate()+'.'+(t.getMonth()+1)+'.'):''); });
   return 'Mit diesem Zugang sind schon '+k+' angemeldet'+(L.length?' ('+L.join('; ')+')':'')+'. Bitte zuerst auf einem davon abmelden (Profil › Abmelden).'; }
 function qGet(){ try{ var q=JSON.parse(localStorage.getItem(QK)||'[]'); return Array.isArray(q)?q:[]; }catch(e){ return []; } }
 function qSet(q){ try{ localStorage.setItem(QK,JSON.stringify(q.slice(-300))); }catch(e){} }
 var qBusy=false, qT=0;
 function qFlush(){ if(qBusy||ENV==='local') return; var s=sess(), q=qGet(); if(!s||!q.length||navigator.onLine===false) return; var part=q.slice(0,50); qBusy=true;
-  fetch(SB+'/rest/v1/rpc/vlab_track',{method:'POST',headers:{'apikey':PK,'Content-Type':'application/json'},body:JSON.stringify({p_e:s.e,p_ev:part}),keepalive:true})
+  fetch(SB+'/rest/v1/rpc/vlab_track2',{method:'POST',headers:{'apikey':PK,'Content-Type':'application/json'},body:JSON.stringify({p_t:s.k||'',p_ev:part}),keepalive:true})
     .then(function(r){ if(r.ok){ var q2=qGet(); qSet(q2.slice(part.length)); if(q2.length>part.length) setTimeout(qFlush,800); } })
     .catch(function(){}).then(function(){ qBusy=false; }); }
 window.vlabTrack=function(k,x){ if(!sess()) return; var q=qGet(); q.push({k:String(k).slice(0,20),a:APP,v:ENV,d:devId(),t:new Date().toISOString(),x:x==null?null:String(x).slice(0,40)}); qSet(q); clearTimeout(qT); qT=setTimeout(qFlush,2500); };
 window.addEventListener('online',qFlush);
 window.addEventListener('keydown',function(e){ if(de.classList.contains('vgate')) e.stopImmediatePropagation(); },true);
-if(sess()){ de.classList.remove('vgate'); window.vlabTrack('open'); setTimeout(function(){ var s0=sess(); if(s0) devClaim(s0.e).then(function(j){ if(j.err==='devices'){ try{ localStorage.removeItem(K); sessionStorage.setItem('vlab:devmsg',devMsg(j)); }catch(e){} location.reload(); } }); },1500); return; } /* bestehende Anmeldung: Gerät melden (zählt mit) */
+if(sess()){ de.classList.remove('vgate'); window.vlabTrack('open'); setTimeout(function(){ var s0=sess(); if(s0) devClaim(s0.k).then(function(j){ if(j.err==='devices'||j.err==='auth'){ try{ localStorage.removeItem(K); sessionStorage.setItem('vlab:devmsg',devMsg(j)); }catch(e){} location.reload(); } }); },1500); return; } /* bestehende Anmeldung: Gerät melden (zählt mit) */
 de.classList.add('vgate');
 $('gTheme').addEventListener('click',function(){ var d=de.dataset.theme==='dark'?'light':'dark'; if(d==='dark') de.dataset.theme='dark'; else delete de.dataset.theme; try{ localStorage.setItem('vlab:theme',JSON.stringify(d)); }catch(e){} });
 $('gEye').addEventListener('click',function(){ var p=$('gPw'); p.type=p.type==='password'?'text':'password'; p.focus(); });
@@ -3464,8 +3533,8 @@ $('gLf').addEventListener('submit',async function(ev){
     var r=await fetch(SB+'/rest/v1/rpc/vlab_login',{method:'POST',headers:{'apikey':PK,'Content-Type':'application/json'},body:JSON.stringify({p_e:e,p_h:h})});
     var j=null; try{ j=await r.json(); }catch(x){}
     if(r.ok&&j&&j.ok&&j.me){
-      var dv=await devClaim(j.me.e||e); if(dv.err==='devices'){ err(devMsg(dv)); busy=false; go.disabled=false; go.classList.remove('busy'); return; }
-      var m=j.me, s={e:m.e||e,n:m.n||'',r:m.r||'',g:m.g||[],src:m.src||'',t:Date.now(),exp:Date.now()+DAYS*864e5};
+      var dv=await devClaim(j.t); if(dv.err){ err(devMsg(dv)); busy=false; go.disabled=false; go.classList.remove('busy'); return; }
+      var m=j.me, s={e:m.e||e,n:m.n||'',r:m.r||'',g:m.g||[],src:m.src||'',org:m.org||'',adm:!!m.adm,k:j.t||'',t:Date.now(),exp:Date.now()+DAYS*864e5};
       try{ localStorage.setItem(K,JSON.stringify(s)); localStorage.setItem('vlab:lastEmail',JSON.stringify(e)); }catch(x){}
       $('gPw').value=''; go.classList.remove('busy'); go.classList.add('ok'); window.vlabTrack('login');
       de.classList.add('vgate-out');
@@ -7597,7 +7666,7 @@ async function trnApi(path,opt={}){ const h=Object.assign({},opt.headers||{}); i
 
 function trnNames(){ return LS.get('trn:names',[]); }
 function trnRemember(p){ const s=trnNames(); if(!s.some(x=>x.n.toLowerCase()===p.n.toLowerCase()&&x.k===p.k)) s.unshift(p); LS.set('trn:names',s.slice(0,150)); }
-async function trnLoadPeople(e){ try{ const r=await vlabAuth.rpc('vlab_people_get',{p_e:e}); const j=await r.json().catch(()=>null);
+async function trnLoadPeople(e){ try{ const r=await vlabAuth.rpc('vlab_people_get2',{p_t:vlabAuth.tok()}); const j=await r.json().catch(()=>null);
   if(r.ok&&j&&j.ok){ TRN.people={acc:(j.accounts||[]).filter(x=>x&&x.n),own:(j.own||[]).filter(x=>x&&x.n)}; return; } }catch(x){} if(!TRN.people) TRN.people={acc:[],own:[]}; }
 function trnPool(kind){ const P=TRN.people||{acc:[],own:[]}, out=[], seen=new Set(), add=(n,src)=>{ const k=n.toLowerCase(); if(seen.has(k)) return; seen.add(k); out.push({n,src}); };
   if(kind==='c') P.acc.forEach(a=>add(a.n,'acc')); /* Konten nur bei den Coaches – Athletinnen und Athleten haben kein Login, sie werden mit «Neu» erstellt */
@@ -7612,7 +7681,7 @@ function trnPicker(box,list,kind){ const pool=$('.trn-pool',box), inp=$('input',
     if(q&&!vis.some(a=>a.n.toLowerCase().includes(q))) pool.insertAdjacentHTML('beforeend','<span class="trn-none">«'+esc(inp.value.trim())+'» nicht in der Liste – mit «Neu» erstellen.</span>'); else if(!vis.length) pool.innerHTML='<span class="trn-none">'+(q?'Nicht in der Liste – mit «Neu» erstellen.':(kind==='a'?'Noch keine Athletinnen oder Athleten – mit «Neu» erstellen.':'Keine Coaches gefunden – mit «Neu» erstellen.'))+'</span>';
     const exact=all.some(a=>a.n.toLowerCase()===q); nb.disabled=!q||exact; $('.trn-cnt',box).textContent=list.length?list.length+' gewählt':''; };
   const create=async()=>{ const n=inp.value.trim().replace(/\s+/g,' ').slice(0,60); if(!n) return; const p={n,k:kind}; trnRemember(p); if(!has(n)) list.push({n}); inp.value=''; draw();
-    const s=window.vlabAuth&&vlabAuth.get(); if(s) try{ const r=await vlabAuth.rpc('vlab_people_add',{p_e:s.e,p_n:n,p_k:kind}); if(r.ok&&TRN.people) TRN.people.own.push(p); }catch(e){} };
+    const s=window.vlabAuth&&vlabAuth.get(); if(s) try{ const r=await vlabAuth.rpc('vlab_people_add2',{p_t:vlabAuth.tok(),p_n:n,p_k:kind}); if(r.ok&&TRN.people) TRN.people.own.push(p); }catch(e){} };
   inp.addEventListener('input',draw); inp.addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); const q=inp.value.trim().toLowerCase(), m=trnPool(kind).find(a=>a.n.toLowerCase()===q); if(m){ if(!has(m.n)) list.push({n:m.n}); inp.value=''; draw(); } else create(); } });
   nb.onclick=create; draw(); return {refresh:draw}; }
 
@@ -7683,12 +7752,12 @@ async function trnSetPerson(sid,k,p,vid){ let ok=false;
 /* Laufende Aktivitäten, in denen ich eingetragen bin: eigene (anderes Gerät) still übernehmen,
    als Coach eingetragen → Einladung zum Beitreten, als Athlet:in eingetragen → Einladung zum Ansehen */
 async function trnMine(){ const a=window.vlabAuth&&vlabAuth.get(); if(!trnOn()||!a||!a.e) return;
-  try{ const r=await fetch(TRN_API+'/api/mine?e='+encodeURIComponent(a.e),{cache:'no-store'}), j=await r.json();
+  try{ const r=await fetch(TRN_API+'/api/mine?e='+encodeURIComponent(a.e),{cache:'no-store',headers:{'X-Tok':vlabAuth.tok()}}), j=await r.json();
     if(r.ok&&Array.isArray(j.list)){ const have=new Set(trnL().map(s=>s.id)), L=j.list.filter(o=>!have.has(o.id)&&o.exp>Date.now());
       TRN.offers=L.filter(o=>!o.own&&!o.ath); TRN.views=L.filter(o=>!o.own&&o.ath);
       for(const o of L.filter(o=>o.own&&!TRN.autoj[o.id])){ TRN.autoj[o.id]=1; await trnJoin(o,true); }
       trnUI(); if(TRN.view==='home') trnViewHome(trnDlg()); } }catch(e){} }
-async function trnJoin(o,quiet){ const a=vlabAuth.get(); const r=await trnApi('/'+o.id+'/join',{method:'POST',json:{e:a.e}}).catch(()=>({ok:false,j:{}}));
+async function trnJoin(o,quiet){ const a=vlabAuth.get(); const r=await trnApi('/'+o.id+'/join',{method:'POST',json:{e:a.e,t:vlabAuth.tok()}}).catch(()=>({ok:false,j:{}}));
   if(!r.ok){ if(quiet) return false; toast(r.j&&r.j.err==='not_coach'?'Du bist in dieser Aktivität nicht als Coach eingetragen.':'Beitreten nicht möglich – kein Netz?'); return false; }
   const L=tqList(); L.push({id:o.id,edit:r.j.token,exp:r.j.exp,own:!!o.own,joined:1,meta:r.j.meta,up:{},n:0,auto:true,t0:Date.now()}); tqSetList(L); if(!quiet||!trnCur()) LS.set('trn:cur2',o.id);
   TRN.offers=TRN.offers.filter(x=>x.id!==o.id); if(quiet){ trnUI(); return true; } if(window.vlabTrack) vlabTrack('trn_join'); toast('Beigetreten – deine neuen Videos gehen in «'+(r.j.meta.title||'Training')+'».',3200); trnUI(); return true; }
@@ -7754,7 +7823,7 @@ function trnViewNew(m){ const s=window.vlabAuth&&vlabAuth.get()||{}, b=$('.trn-b
     if(!s.e) return fail('Bitte zuerst anmelden.');
     go.disabled=true; go.textContent='Wird gestartet …';
     try{
-      const place=$('[name=place]',f).value.trim(), body={e:s.e,place,date:$('[name=date]',f).value,disc:$('[name=disc]',f).value,title:$('[name=title]',f).value.trim()||('Training'+(place?' '+place:'')),athletes:A,coaches:C};
+      const place=$('[name=place]',f).value.trim(), body={e:s.e,t:vlabAuth.tok(),place,date:$('[name=date]',f).value,disc:$('[name=disc]',f).value,title:$('[name=title]',f).value.trim()||('Training'+(place?' '+place:'')),athletes:A,coaches:C};
       const r=await trnApi('',{method:'POST',json:body});
       if(!r.ok){ return fail(r.j.err==='login'?'Dieses Konto ist für die Cloud nicht freigeschaltet.':'Cloud nicht erreichbar ('+r.status+').'); }
       const L=tqList(); L.push({id:r.j.id,edit:r.j.edit,exp:r.j.exp,own:true,meta:r.j.meta,up:{},n:0,auto:true,t0:Date.now()}); tqSetList(L); LS.set('trn:cur2',r.j.id); if(window.vlabTrack) vlabTrack('trn_new');
@@ -8217,7 +8286,7 @@ addEventListener('unhandledrejection',e=>{ FB.errs.push('Promise: '+String(e.rea
 function fbOn(){ return !!(typeof TRN_API!=='undefined'&&TRN_API); }
 const fbIco='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v12H8l-4 4z"/><path d="M12 7.5v4M12 14h.01"/></svg>';
 function fbInfo(){ const D=mode==='cmp'?A:mode==='gps'?GD:S, c=D&&D.clip, n=x=>x?(x.alias||x.name||'').slice(0,90):'';
-  return {build:'20261116154905'.startsWith('%%')?'dev':'20261116154905',env:window.VLAB_ENV||'live',url:location.pathname,lang:(window.vlabLang&&vlabLang.get())||'de',ua:navigator.userAgent.slice(0,240),
+  return {build:'20261118101251'.startsWith('%%')?'dev':'20261118101251',env:window.VLAB_ENV||'live',url:location.pathname,lang:(window.vlabLang&&vlabLang.get())||'de',ua:navigator.userAgent.slice(0,240),
     scr:screen.width+'×'+screen.height+' @'+(devicePixelRatio||1)+' · Fenster '+innerWidth+'×'+innerHeight,mem:navigator.deviceMemory||null,cpu:navigator.hardwareConcurrency||null,net:navigator.onLine?'online':'offline',
     view:mode+(mode==='cmp'&&$('#viewCmp').classList.contains('overlay')?' · overlay':''),clip:n(c),clipB:mode==='cmp'?n(B.clip):'',
     t:D&&D.ready?+(D.frame/D.fps).toFixed(2):null,fps:c&&c.fps||null,size:c?[c.w,c.h].join('×'):'',n:clips.length,errs:FB.errs.slice()}; }
@@ -8239,7 +8308,7 @@ function fbOpen(){ if(!fbOn()){ toast('Melden geht erst, wenn die Cloud eingeric
   go.onclick=async()=>{ const t=ta.value.trim(); er.hidden=true; if(t.length<3){ er.textContent='Bitte kurz beschreiben, was passiert ist.'; er.hidden=false; ta.focus(); return; }
     if(!s||!s.e){ er.textContent='Bitte zuerst anmelden.'; er.hidden=false; return; }
     go.disabled=true; go.textContent='Wird gesendet …'; const withImg=img&&$('.fb-img input',m).checked;
-    try{ const r=await fetch(TRN_API+'/api/fb',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({e:s.e,text:t,info:fbInfo(),img:withImg?img:''})}); const j=await r.json().catch(()=>({}));
+    try{ const r=await fetch(TRN_API+'/api/fb',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({e:s.e,t:vlabAuth.tok(),text:t,info:fbInfo(),img:withImg?img:''})}); const j=await r.json().catch(()=>({}));
       if(!r.ok) throw new Error(j.err==='login'?'Dieses Konto ist für die Cloud nicht freigeschaltet.':j.err==='size'?'Zu gross – bitte ohne Bild senden.':'Senden nicht möglich ('+r.status+').');
       LS.set('fbDraft',''); m.classList.remove('on'); toast('Danke! Deine Meldung ist angekommen.',3000); if(window.vlabTrack) vlabTrack('fb'); }
     catch(e){ er.textContent=e.message&&e.message!=='Failed to fetch'?e.message:'Keine Verbindung – der Text bleibt gespeichert, bitte später nochmals senden.'; er.hidden=false; go.disabled=false; go.textContent='Senden'; } };
@@ -8266,6 +8335,88 @@ async function fbAdmin(el){ if(!el||!fbOn()||!USE.h) return; const s=vlabAuth.ge
         }catch(e){ d.textContent='Nicht erreichbar.'; } };
       box.appendChild(r); }); };
   load(); }
+/* Benutzerverwaltung (nur Admins, Profil-Menü › Benutzer verwalten). Der Server prüft Sitzung, Admin-Liste und Admin-Passwort
+   (vlab_adm_list / vlab_adm_add / vlab_adm_set). Das Admin-Passwort bleibt nur im Speicher dieser Seite. Pro Verband höchstens
+   so viele aktive Zugänge wie vlab_orgs.max (Swiss-Ski unbegrenzt) – der Server blockiert, die Anzeige warnt vorher. */
+const ADM={pw:null,d:null,open:'',q:'',none:false,busy:false};
+const ADMI={x:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>',
+  ppl:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7M18 14a6 6 0 0 1 3.5 6"/></svg>',
+  desk:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/></svg>',
+  mob:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="2.5" width="10" height="19" rx="2.5"/><path d="M11 18.5h2"/></svg>'};
+const ADMERR={denied:'Admin-Passwort falsch oder keine Admin-Rechte.',full:'Dieser Verband hat schon 2 aktive Zugänge. Zuerst einen deaktivieren oder löschen.',
+  exists:'Diese E-Mail hat schon einen Zugang.',gtg:'Diese E-Mail ist ein Gate-to-Gate-Konto und kann sich schon anmelden.',bad:'Bitte Angaben prüfen (E-Mail).',
+  org:'Verband unbekannt.',self:'Den eigenen Zugang kann man nicht löschen.',gone:'Zugang nicht mehr vorhanden.',auth:'Bitte neu anmelden.',sql:'Server noch nicht eingerichtet (SQL fehlt).',net:'Keine Verbindung.'};
+function admPwGen(){ const C='bdfgklmnprstvz', V='aeiou', r=new Uint32Array(8); crypto.getRandomValues(r); let s='';
+  for(let i=0;i<6;i++) s+=(i%2?V:C)[r[i]%(i%2?V.length:C.length)]; return s[0].toUpperCase()+s.slice(1,3)+'-'+s.slice(3)+'-'+String(10+r[6]%90); }
+async function admCall(fn,body){ try{ const r=await vlabAuth.rpc(fn,Object.assign({p_t:vlabAuth.tok(),p_pw:ADM.pw},body||{})); if(r.status===404) return {ok:false,err:'sql'};
+    const j=await r.json().catch(()=>null); return j||{ok:false,err:'net'}; }catch(e){ return {ok:false,err:'net'}; } }
+function admOpen(){ let m=$('#admModal'); if(!m){ m=document.createElement('div'); m.className='modal'; m.id='admModal'; document.body.appendChild(m);
+    m.addEventListener('pointerdown',e=>{ if(e.target===m) m.classList.remove('on'); }); document.addEventListener('keydown',e=>{ if(e.key==='Escape'&&m.classList.contains('on')) m.classList.remove('on'); }); }
+  m.classList.add('on'); if(ADM.pw) admLoad(); else admPwForm(); }
+function admShell(body,sub){ const m=$('#admModal');
+  m.innerHTML='<div class="adm" role="dialog" aria-label="Benutzer verwalten"><div class="adm-hd"><span class="use-ic">'+ADMI.ppl+'</span><div class="adm-tt"><h3>Benutzer verwalten</h3><span class="adm-sub"></span></div><button class="use-x" aria-label="Schliessen">'+ADMI.x+'</button></div>'+body+'</div>';
+  $('.adm-sub',m).textContent=sub||'Zugänge pro Verband · nur Admins'; $('.use-x',m).onclick=()=>m.classList.remove('on'); return m; }
+function admPwForm(msg){ const m=admShell('<form class="use-pw adm-pw"><p>Bitte das Admin-Passwort eingeben.</p><input type="password" autocomplete="off" placeholder="Admin-Passwort"><span class="err"></span><button class="btn-pri" type="submit">Öffnen</button></form>');
+  const f=$('form',m), inp=$('input',f), go=$('button',f); $('.err',f).textContent=msg||''; setTimeout(()=>inp.focus(),60);
+  f.onsubmit=async ev=>{ ev.preventDefault(); if(!inp.value) return; go.disabled=true; go.textContent='Prüfen …'; ADM.pw=inp.value; inp.value=''; await admLoad(); }; }
+async function admLoad(){ const j=await admCall('vlab_adm_list'); if(!j.ok){ if(j.err==='denied'||j.err==='auth') ADM.pw=null; if(!ADM.pw||!ADM.d){ ADM.pw=null; admPwForm(ADMERR[j.err]||'Fehler.'); } else toast(ADMERR[j.err]||'Fehler.'); return false; }
+  ADM.d=j; admRender(); return true; }
+const admAct=u=>u.aktiv!==false;
+function admCnt(o){ return ADM.d.users.filter(u=>u.org===o.id&&admAct(u)).length; }
+function admFull(o){ return o.max!=null&&admCnt(o)>=o.max; }
+function admAgo(t){ if(!t) return 'nie'; const d=new Date(t), n=Math.floor((Date.now()-d)/864e5); return n<=0?'heute':n===1?'gestern':n<31?'vor '+n+' Tagen':d.toLocaleDateString('de-CH',{day:'numeric',month:'short',year:'2-digit'}); }
+function admUserRow(u){ const dv=u.dev||[], nd=dv.filter(x=>x.kind!=='mobile').length, nm=dv.length-nd, op=ADM.open===u.e;
+  const orgs=ADM.d.orgs.map(o=>'<option value="'+esc(o.id)+'"'+(o.id===u.org?' selected':'')+(o.id!==u.org&&admFull(o)&&admAct(u)?' disabled':'')+'>'+esc(o.name)+(o.id!==u.org&&admFull(o)&&admAct(u)?' (voll)':'')+'</option>').join('');
+  return '<div class="adm-u'+(admAct(u)?'':' off')+(op?' op':'')+'" data-e="'+esc(u.e)+'"><button class="adm-ur" data-a="tog"><span class="adm-un"><b>'+esc(u.n||u.e)+'</b><small>'+esc(u.n?u.e:'')+'</small></span>'
+    +'<span class="adm-um">'+(admAct(u)?'':'<em class="adm-tag">inaktiv</em>')+'<span class="adm-dv" title="Computer / Handys">'+ADMI.desk+nd+ADMI.mob+nm+'</span><small>'+esc(admAgo(u.last))+'</small></span></button>'
+    +(op?'<div class="adm-ux"><label>Verband<select data-a="org"><option value="">– ohne Verband –</option>'+orgs+'</select></label>'
+      +'<div class="adm-devs">'+(dv.length?dv.map(x=>'<div class="adm-d">'+(x.kind==='mobile'?ADMI.mob:ADMI.desk)+'<span>'+esc(x.label||'Gerät')+'<small>zuletzt '+esc(admAgo(x.seen))+'</small></span><button data-a="dev" data-v="'+esc(x.dev)+'">Freigeben</button></div>').join(''):'<small>Keine Geräte angemeldet.</small>')+'</div>'
+      +'<div class="adm-btns"><button data-a="pw">Neues Passwort</button><button data-a="akt">'+(admAct(u)?'Deaktivieren':'Aktivieren')+'</button><button class="danger" data-a="del">Löschen</button></div></div>':'')+'</div>'; }
+function admMatch(u){ const q=ADM.q.trim().toLowerCase(); return !q||(u.n||'').toLowerCase().includes(q)||u.e.includes(q); }
+function admRender(){ const D=ADM.d, m=$('#admModal'), sc=m.querySelector('.adm-body'), top=sc?sc.scrollTop:0, q=ADM.q.trim();
+  const box=o=>{ const U=D.users.filter(u=>u.org===o.id&&admMatch(u)), c=admCnt(o); if(q&&!U.length) return '';
+    return '<section class="adm-o'+(admFull(o)?' full':'')+'"><div class="adm-oh"><span><b>'+esc(o.name)+'</b><small>'+esc(o.typ)+'</small></span><em class="adm-cap">'+(o.max==null?c+' · unbegrenzt':c+' / '+o.max)+'</em>'
+      +'<button class="adm-plus" data-new="'+esc(o.id)+'"'+(admFull(o)?' disabled title="Verband voll"':'')+' aria-label="Zugang anlegen">+</button></div>'+(U.length?U.map(admUserRow).join(''):'<div class="adm-empty">Noch kein Zugang.</div>')+'</section>'; };
+  const none=D.users.filter(u=>!u.org||!D.orgs.some(o=>o.id===u.org)), noneM=none.filter(admMatch), showNone=ADM.none||q;
+  const body='<div class="adm-bar"><input type="search" class="adm-q" placeholder="Name oder E-Mail suchen" value="'+esc(ADM.q)+'"><button class="btn-pri" data-new="">+ Neuer Zugang</button></div>'
+    +'<div class="adm-body">'+D.orgs.map(box).join('')
+    +(none.length&&(!q||noneM.length)?'<section class="adm-o adm-none"><button class="adm-oh" data-a="none"><span><b>Ohne Verband</b><small>ältere Zugänge – einem Verband zuordnen oder löschen</small></span><em class="adm-cap">'+none.length+'</em><span class="adm-chev">'+(showNone?'▾':'▸')+'</span></button>'
+      +(showNone?noneM.slice(0,q?200:80).map(admUserRow).join('')+(!q&&none.length>80?'<div class="adm-empty">… weitere über die Suche finden</div>':''):'')+'</section>':'')+'</div>';
+  admShell(body,'Zugänge pro Verband · '+D.users.filter(admAct).length+' aktiv · angemeldet als '+(D.me||''));
+  const nb=m.querySelector('.adm-body'); nb.scrollTop=top;
+  const qi=$('.adm-q',m); qi.oninput=()=>{ ADM.q=qi.value; const p=qi.selectionStart; admRender(); const n=$('#admModal .adm-q'); n.focus(); try{ n.setSelectionRange(p,p); }catch(e){} };
+  m.querySelectorAll('[data-new]').forEach(b=>b.onclick=()=>admNew(b.dataset.new));
+  m.querySelectorAll('.adm-u').forEach(el=>{ const u=D.users.find(x=>x.e===el.dataset.e); el.querySelectorAll('[data-a]').forEach(b=>{ const a=b.dataset.a; if(a==='org') b.onchange=()=>admDo(u,'org',b.value); else b.onclick=()=>admUserAct(u,a,b); }); });
+  const nn=$('[data-a="none"]',m); if(nn) nn.onclick=()=>{ ADM.none=!ADM.none; admRender(); }; }
+async function admDo(u,what,val,ok){ if(ADM.busy) return false; ADM.busy=true; const j=await admCall('vlab_adm_set',{p_e:u.e,p_what:what,p_val:val==null?null:String(val)}); ADM.busy=false;
+  if(!j.ok){ toast(ADMERR[j.err]||'Fehler.',4000); if(j.err==='denied'){ ADM.pw=null; admPwForm(ADMERR.denied); } else admLoad(); return false; }
+  if(ok) toast(ok); await admLoad(); return true; }
+async function admUserAct(u,a,b){ if(a==='tog'){ ADM.open=ADM.open===u.e?'':u.e; admRender(); return; }
+  if(a==='dev'){ if(confirm('Gerät freigeben? Es wird dort abgemeldet.')) admDo(u,'dev',b.dataset.v,'Gerät freigegeben.'); return; }
+  if(a==='akt'){ const on=!admAct(u); if(on||confirm((u.n||u.e)+' deaktivieren? Alle Geräte werden abgemeldet.')) admDo(u,'aktiv',on,on?'Aktiviert.':'Deaktiviert.'); return; }
+  if(a==='del'){ if(confirm((u.n||u.e)+' endgültig löschen?')){ ADM.open=''; admDo(u,'del',null,'Gelöscht.'); } return; }
+  if(a==='pw'){ const pw=admPwGen(); if(!confirm('Neues Passwort für '+(u.n||u.e)+' setzen? Alle Geräte werden abgemeldet.')) return;
+    const h=await vlabAuth.hash(u.e,pw); if(await admDo(u,'pw',h)) admShow('Neues Passwort',u,pw); } }
+function admShow(title,u,pw){ const m=admShell('<div class="adm-done"><h4></h4><dl><dt>E-Mail</dt><dd class="e"></dd><dt>Passwort</dt><dd class="p"></dd></dl><p>Das Passwort ist nur jetzt sichtbar. Bitte direkt weitergeben.</p><div class="adm-btns"><button class="btn-pri" data-c>Kopieren</button><button data-b>Zurück zur Übersicht</button></div></div>');
+  $('h4',m).textContent=title+(u.n?' · '+u.n:''); $('.e',m).textContent=u.e; $('.p',m).textContent=pw;
+  $('[data-c]',m).onclick=async()=>{ const t='Video-Lab: https://video-tool.github.io/vtool/\nE-Mail: '+u.e+'\nPasswort: '+pw; try{ await navigator.clipboard.writeText(t); toast('Kopiert.'); }catch(e){ toast('Kopieren nicht möglich – bitte abschreiben.'); } };
+  $('[data-b]',m).onclick=()=>admRender(); }
+function admNew(org){ const D=ADM.d, pw=admPwGen();
+  const opts=D.orgs.map(o=>'<option value="'+esc(o.id)+'"'+(o.id===org?' selected':'')+(admFull(o)?' disabled':'')+'>'+esc(o.name)+(admFull(o)?' (voll, '+admCnt(o)+'/'+o.max+')':o.max!=null?' ('+admCnt(o)+'/'+o.max+')':'')+'</option>').join('');
+  const m=admShell('<form class="adm-new"><label>Verband<select name="org" required><option value="">– wählen –</option>'+opts+'</select></label><label>Name<input name="n" autocomplete="off" placeholder="z. B. BOSV Coach oder Vorname Nachname"></label>'
+    +'<label>E-Mail<input name="e" type="email" inputmode="email" autocomplete="off" autocapitalize="off" required></label><label>Rolle<select name="r"><option value="coach">Coach</option><option value="athlete">Athlet:in</option></select></label>'
+    +'<label>Startpasswort<input name="pw" autocomplete="off" autocapitalize="off" spellcheck="false" required></label><span class="err"></span><div class="adm-btns"><button class="btn-pri" type="submit">Zugang anlegen</button><button type="button" data-b>Abbrechen</button></div></form>','Neuer Zugang');
+  const f=$('form',m), er=$('.err',f), go=$('[type=submit]',f); f.pw.value=pw; $('[data-b]',f).onclick=()=>admRender(); setTimeout(()=>(org?f.n:f.org).focus(),60);
+  const chk=()=>{ const o=D.orgs.find(x=>x.id===f.org.value); er.textContent=o&&admFull(o)?ADMERR.full:''; go.disabled=!!(o&&admFull(o)); }; f.org.onchange=chk; chk();
+  f.onsubmit=async ev=>{ ev.preventDefault(); if(ADM.busy) return; const e=f.e.value.trim().toLowerCase(), p=f.pw.value.trim(); if(p.length<8){ er.textContent='Startpasswort: mindestens 8 Zeichen.'; return; }
+    if(D.users.some(u=>u.e===e)){ er.textContent=ADMERR.exists; return; }
+    ADM.busy=true; go.disabled=true; go.textContent='Wird angelegt …'; const h=await vlabAuth.hash(e,p);
+    const j=await admCall('vlab_adm_add',{p_e:e,p_n:f.n.value.trim(),p_org:f.org.value,p_r:f.r.value,p_h:h}); ADM.busy=false;
+    if(!j.ok){ er.textContent=ADMERR[j.err]||'Fehler.'; go.disabled=false; go.textContent='Zugang anlegen'; if(j.err==='denied'){ ADM.pw=null; admPwForm(ADMERR.denied); } return; }
+    const u={e,n:f.n.value.trim()}; await admLoad(); admShow('Zugang angelegt',u,p); }; }
+window.admMenuItem=(pop,close)=>{ if(!(window.vlabAuth&&vlabAuth.admin&&vlabAuth.admin())) return; const b=document.createElement('button'); b.className='vp-use vp-adm'; b.setAttribute('role','menuitem');
+  b.innerHTML=ADMI.ppl+'Benutzer verwalten'; b.onclick=()=>{ close(); admOpen(); }; const o=$('.vp-out',pop); o?o.before(b):pop.appendChild(b); };
+window.admOpen=admOpen;
 /* =========================================================
    RUNDE 3
    · Bildanpassung (Helligkeit/Kontrast/Sättigung, Preset «Schnee») + Spiegeln – pro Video gespeichert
@@ -9162,7 +9313,7 @@ document.addEventListener('visibilitychange',async()=>{ if(SER.on&&!document.hid
     pop=document.createElement('div'); pop.className='vl-pop'; pop.setAttribute('role','menu');
     pop.innerHTML='<div class="vp-h"><span class="vl-av"></span><div class="vp-t"><span class="vp-n"></span><span class="vp-e"></span>'+(ROLE[s.r]?'<span class="vp-r"></span>':'')+'</div></div><div class="vp-sep"></div>'+(window.vlabAuth&&vlabAuth.admin&&vlabAuth.admin()?'<button class="vp-use" role="menuitem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>Nutzungsanalyse</button><button class="vp-use vp-stg" role="menuitem"'+(stgOff()?' disabled title="Noch nicht aktiv"':'')+'><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6M10 3v6L4.5 18.5A1.7 1.7 0 0 0 6 21h12a1.7 1.7 0 0 0 1.5-2.5L14 9V3"/><path d="M7 15h10"/></svg>'+(window.VLAB_ENV==='staging'?'Zur Live-Seite':'Zur Staging-Seite')+'</button><div class="vp-sep"></div>':'')+'<button class="vp-lang" role="menuitem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1"/></svg>Einstellungen</button><button class="vp-out" role="menuitem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3"/><path d="M10 17l5-5-5-5"/><path d="M15 12H3"/></svg>Abmelden</button>';
     $('.vl-av',pop).textContent=ini(s); $('.vp-n',pop).textContent=s.n||s.e||''; $('.vp-e',pop).textContent=s.n?s.e:''; if(ROLE[s.r]) $('.vp-r',pop).textContent=ROLE[s.r];
-    $('.vp-lang',pop).addEventListener('click',()=>{ close(); settingsOpen(); }); if(window.trnMenuItem) trnMenuItem(pop,close); if(window.fbMenuItem) fbMenuItem(pop,close);
+    $('.vp-lang',pop).addEventListener('click',()=>{ close(); settingsOpen(); }); if(window.trnMenuItem) trnMenuItem(pop,close); if(window.fbMenuItem) fbMenuItem(pop,close); if(window.admMenuItem) admMenuItem(pop,close);
     $('.vp-out',pop).addEventListener('click',()=>{ close(); if(window.vlabAuth) vlabAuth.logout(); });
     { const u=$('.vp-use:not(.vp-stg)',pop); if(u) u.addEventListener('click',()=>{ close(); useOpen(); }); const g=$('.vp-stg',pop); if(g) g.addEventListener('click',()=>{ close(); stgGo(); }); }
     document.body.appendChild(pop); b.classList.add('on'); const r=b.getBoundingClientRect(), h=pop.offsetHeight, w=pop.offsetWidth;
@@ -9257,6 +9408,7 @@ setTimeout(fieldSync,600);
     window.fbOn&&fbOn()?['Problem melden',I('<path d="M4 4h16v12H8l-4 4z"/><path d="M12 7.5v4M12 14h.01"/>'),()=>fbOpen()]:null,
     ['Einstellungen',I('<circle cx="12" cy="12" r="3"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1"/>'),()=>settingsOpen()],
     window.vlabAuth&&vlabAuth.admin&&vlabAuth.admin()?['Nutzungsanalyse',I('<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>'),()=>useOpen()]:null,
+    window.vlabAuth&&vlabAuth.admin&&vlabAuth.admin()&&window.admOpen?['Benutzer verwalten',I('<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7M18 14a6 6 0 0 1 3.5 6"/>'),()=>admOpen()]:null,
     window.vlabAuth&&vlabAuth.admin&&vlabAuth.admin()?[window.VLAB_ENV==='staging'?'Zur Live-Seite':'Zur Staging-Seite',I('<path d="M9 3h6M10 3v6L4.5 18.5A1.7 1.7 0 0 0 6 21h12a1.7 1.7 0 0 0 1.5-2.5L14 9V3"/><path d="M7 15h10"/>'),()=>stgGo(),stgOff()]:null,
     ['Abmelden',I('<path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3"/><path d="M10 17l5-5-5-5"/><path d="M15 12H3"/>'),()=>window.vlabAuth&&vlabAuth.logout()]]); });
   // Videoliste als Blatt
@@ -9325,7 +9477,7 @@ if(false&&!LS.get('hint1',0)){ setTimeout(()=>{ toast(matchMedia('(pointer:coars
 
 /* Update-Hinweis: prüft version.json auf GitHub Pages; «Aktualisieren» lädt die Seite ohne Cache neu */
 (()=>{
-  const BUILD='20261116154905'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
+  const BUILD='20261118101251'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
   // nach einem Update die ?v=… aus der Adresse entfernen
   try{ const u=new URL(location.href); if(u.searchParams.has('v')){ u.searchParams.delete('v'); history.replaceState(null,'',u.pathname+(u.search||'')+u.hash); } }catch(e){}
   const el=$('#upd'); let latest=null, snoozed=null, busy=false;

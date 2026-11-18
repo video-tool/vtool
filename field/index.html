@@ -640,10 +640,11 @@ svg{display:block}
 var K='vlab:auth', SB='https://sswtnkwqkmokozrcqrxf.supabase.co', PK='sb_publishable_g1FMMtPfyO0QNWAFtMXdsw_TUOOgQtB', DAYS=30;
 var de=document.documentElement, $=function(s){return document.getElementById(s)};
 function sess(){ try{ var s=JSON.parse(localStorage.getItem(K)||'null'); if(s&&s.e&&s.exp>Date.now()) return s; }catch(e){} return null; }
-window.vlabAuth={ get:sess, logout:function(){ var s=sess(); if(s&&devOn()) try{ fetch(SB+'/rest/v1/rpc/vlab_device_out',{method:'POST',headers:{'apikey':PK,'Content-Type':'application/json'},body:JSON.stringify({p_e:s.e,p_dev:devId()}),keepalive:true}).catch(function(){}); }catch(e){} try{ localStorage.removeItem(K); }catch(e){} setTimeout(function(){ location.reload(); },devOn()?250:0); },
+window.vlabAuth={ get:sess, logout:function(){ var s=sess(); if(s&&devOn()) try{ fetch(SB+'/rest/v1/rpc/vlab_device_out2',{method:'POST',headers:{'apikey':PK,'Content-Type':'application/json'},body:JSON.stringify({p_t:s.k||'',p_dev:devId()}),keepalive:true}).catch(function(){}); }catch(e){} try{ localStorage.removeItem(K); }catch(e){} setTimeout(function(){ location.reload(); },devOn()?250:0); },
   hash:function(e,p){ return hash(e,p); }, /* für Funktionen, die das Passwort nochmals prüfen (Nutzungsanalyse) – Hash bleibt nur im Speicher */
+  tok:function(){ var s=sess(); return s&&s.k||''; }, /* Sitzungs-Schlüssel vom Server (vlab_login) – damit prüfen alle Funktionen, wer angemeldet ist */
   rpc:function(fn,body){ return fetch(SB+'/rest/v1/rpc/'+fn,{method:'POST',headers:{'apikey':PK,'Content-Type':'application/json'},body:JSON.stringify(body)}); },
-  admin:function(){ var s=sess(); return !!(s&&/siebenthal|franzen|bruhin/i.test(s.e)); } }; /* nur Anzeige des Knopfs – die Zahlen gibt der Server nur Admins (vlab_admins) */
+  admin:function(){ var s=sess(); return !!(s&&(s.adm||/siebenthal|franzen|bruhin|pleus/i.test(s.e))); } }; /* nur Anzeige der Knöpfe – Daten gibt der Server nur Admins (vlab_admins, Admin-Passwort) */
 /* Nutzung zählen: nur wer (E-Mail), was (Start, Overlay, Export), wann, wo (Lab/Field, prod/staging) – keine Videos, keine Namen.
    Warteschlange im Browser, gesendet sobald online (auch offline erstellte Overlays zählen). Lokal (Tests, eigener Rechner) wird nichts gesendet. */
 var QK='vlab:q', APP=location.pathname.indexOf('/field/')>=0?'field':'lab', ENV=window.VLAB_ENV||(location.protocol==='file:'||/^(localhost|127\.|0\.0\.0\.0|192\.168\.|10\.)/.test(location.hostname)?'local':'prod');
@@ -654,23 +655,23 @@ function devKind(){ var u=navigator.userAgent||''; return /iPhone|iPad|iPod|Andr
 function devLabel(){ var u=navigator.userAgent||'', os=/iPhone/.test(u)?'iPhone':/iPad/.test(u)||(/Macintosh/.test(u)&&navigator.maxTouchPoints>1)?'iPad':/Android/.test(u)?'Android':/Mac/.test(u)?'Mac':/Windows/.test(u)?'Windows':/Linux/.test(u)?'Linux':'Gerät';
   var br=/Edg\//.test(u)?'Edge':/CriOS|Chrome\//.test(u)?'Chrome':/FxiOS|Firefox\//.test(u)?'Firefox':/Safari\//.test(u)?'Safari':''; return os+(br?' · '+br:''); }
 function devOn(){ try{ return ENV!=='local'||!!localStorage.getItem('vlab:devtest'); }catch(e){ return false; } }
-function devClaim(e){ if(!devOn()) return Promise.resolve({ok:true});
-  return fetch(SB+'/rest/v1/rpc/vlab_device',{method:'POST',headers:{'apikey':PK,'Content-Type':'application/json'},body:JSON.stringify({p_e:e,p_dev:devId(),p_kind:devKind(),p_label:devLabel()})})
-    .then(function(r){ if(r.status===404) return {ok:true}; return r.json().catch(function(){ return null; }).then(function(j){ return j&&j.err==='devices'?j:{ok:true}; }); }) /* Server-Fehler sperren niemanden aus */
+function devClaim(t){ if(!devOn()) return Promise.resolve({ok:true});
+  return fetch(SB+'/rest/v1/rpc/vlab_device2',{method:'POST',headers:{'apikey':PK,'Content-Type':'application/json'},body:JSON.stringify({p_t:t||'',p_dev:devId(),p_kind:devKind(),p_label:devLabel()})})
+    .then(function(r){ if(r.status===404) return {ok:true}; return r.json().catch(function(){ return null; }).then(function(j){ return j&&(j.err==='devices'||j.err==='auth')?j:{ok:true}; }); }) /* Server-Fehler sperren niemanden aus */
     .catch(function(){ return {ok:true}; }); }
-function devMsg(j){ var k=j.kind==='mobile'?'zwei Handys oder Tablets':'zwei Laptops oder Computer', L=(j.list||[]).map(function(d){ var t=d.seen?new Date(d.seen):null; return (d.label||'Gerät')+(t?', zuletzt '+(t.toDateString()===new Date().toDateString()?'heute':t.getDate()+'.'+(t.getMonth()+1)+'.'):''); });
+function devMsg(j){ if(j.err==='auth') return 'Bitte neu anmelden (Sicherheits-Update oder Zugang geändert).'; var k=j.kind==='mobile'?'zwei Handys oder Tablets':'zwei Laptops oder Computer', L=(j.list||[]).map(function(d){ var t=d.seen?new Date(d.seen):null; return (d.label||'Gerät')+(t?', zuletzt '+(t.toDateString()===new Date().toDateString()?'heute':t.getDate()+'.'+(t.getMonth()+1)+'.'):''); });
   return 'Mit diesem Zugang sind schon '+k+' angemeldet'+(L.length?' ('+L.join('; ')+')':'')+'. Bitte zuerst auf einem davon abmelden (Profil › Abmelden).'; }
 function qGet(){ try{ var q=JSON.parse(localStorage.getItem(QK)||'[]'); return Array.isArray(q)?q:[]; }catch(e){ return []; } }
 function qSet(q){ try{ localStorage.setItem(QK,JSON.stringify(q.slice(-300))); }catch(e){} }
 var qBusy=false, qT=0;
 function qFlush(){ if(qBusy||ENV==='local') return; var s=sess(), q=qGet(); if(!s||!q.length||navigator.onLine===false) return; var part=q.slice(0,50); qBusy=true;
-  fetch(SB+'/rest/v1/rpc/vlab_track',{method:'POST',headers:{'apikey':PK,'Content-Type':'application/json'},body:JSON.stringify({p_e:s.e,p_ev:part}),keepalive:true})
+  fetch(SB+'/rest/v1/rpc/vlab_track2',{method:'POST',headers:{'apikey':PK,'Content-Type':'application/json'},body:JSON.stringify({p_t:s.k||'',p_ev:part}),keepalive:true})
     .then(function(r){ if(r.ok){ var q2=qGet(); qSet(q2.slice(part.length)); if(q2.length>part.length) setTimeout(qFlush,800); } })
     .catch(function(){}).then(function(){ qBusy=false; }); }
 window.vlabTrack=function(k,x){ if(!sess()) return; var q=qGet(); q.push({k:String(k).slice(0,20),a:APP,v:ENV,d:devId(),t:new Date().toISOString(),x:x==null?null:String(x).slice(0,40)}); qSet(q); clearTimeout(qT); qT=setTimeout(qFlush,2500); };
 window.addEventListener('online',qFlush);
 window.addEventListener('keydown',function(e){ if(de.classList.contains('vgate')) e.stopImmediatePropagation(); },true);
-if(sess()){ de.classList.remove('vgate'); window.vlabTrack('open'); setTimeout(function(){ var s0=sess(); if(s0) devClaim(s0.e).then(function(j){ if(j.err==='devices'){ try{ localStorage.removeItem(K); sessionStorage.setItem('vlab:devmsg',devMsg(j)); }catch(e){} location.reload(); } }); },1500); return; } /* bestehende Anmeldung: Gerät melden (zählt mit) */
+if(sess()){ de.classList.remove('vgate'); window.vlabTrack('open'); setTimeout(function(){ var s0=sess(); if(s0) devClaim(s0.k).then(function(j){ if(j.err==='devices'||j.err==='auth'){ try{ localStorage.removeItem(K); sessionStorage.setItem('vlab:devmsg',devMsg(j)); }catch(e){} location.reload(); } }); },1500); return; } /* bestehende Anmeldung: Gerät melden (zählt mit) */
 de.classList.add('vgate');
 $('gTheme').addEventListener('click',function(){ var d=de.dataset.theme==='dark'?'light':'dark'; if(d==='dark') de.dataset.theme='dark'; else delete de.dataset.theme; try{ localStorage.setItem('vlab:theme',JSON.stringify(d)); }catch(e){} });
 $('gEye').addEventListener('click',function(){ var p=$('gPw'); p.type=p.type==='password'?'text':'password'; p.focus(); });
@@ -693,8 +694,8 @@ $('gLf').addEventListener('submit',async function(ev){
     var r=await fetch(SB+'/rest/v1/rpc/vlab_login',{method:'POST',headers:{'apikey':PK,'Content-Type':'application/json'},body:JSON.stringify({p_e:e,p_h:h})});
     var j=null; try{ j=await r.json(); }catch(x){}
     if(r.ok&&j&&j.ok&&j.me){
-      var dv=await devClaim(j.me.e||e); if(dv.err==='devices'){ err(devMsg(dv)); busy=false; go.disabled=false; go.classList.remove('busy'); return; }
-      var m=j.me, s={e:m.e||e,n:m.n||'',r:m.r||'',g:m.g||[],src:m.src||'',t:Date.now(),exp:Date.now()+DAYS*864e5};
+      var dv=await devClaim(j.t); if(dv.err){ err(devMsg(dv)); busy=false; go.disabled=false; go.classList.remove('busy'); return; }
+      var m=j.me, s={e:m.e||e,n:m.n||'',r:m.r||'',g:m.g||[],src:m.src||'',org:m.org||'',adm:!!m.adm,k:j.t||'',t:Date.now(),exp:Date.now()+DAYS*864e5};
       try{ localStorage.setItem(K,JSON.stringify(s)); localStorage.setItem('vlab:lastEmail',JSON.stringify(e)); }catch(x){}
       $('gPw').value=''; go.classList.remove('busy'); go.classList.add('ok'); window.vlabTrack('login');
       de.classList.add('vgate-out');
@@ -1342,9 +1343,9 @@ function ftrnBadge(){ var b=document.getElementById('ftrn'); if(!b) return; var 
   document.getElementById('ftrnT').textContent=(s.meta&&s.meta.title)||'Training';
   tqAll().then(function(Q){ var n=Q.filter(function(it){ return it.sid===s.id; }).length; document.getElementById('ftrnS').textContent=(n?(navigator.onLine?n+' am Hochladen':n+' warten auf Netz'):(s.n||0)+' Videos in der Cloud')+' · '+ftrnLeft(s); }); }
 async function ftrnMine(){ var a=null; try{ a=JSON.parse(localStorage.getItem('vlab:auth')||'null'); }catch(e){} if(!TQ.api||!a||!a.e) return;
-  try{ var r=await fetch(TQ.api+'/api/mine?e='+encodeURIComponent(a.e),{cache:'no-store'}), j=await r.json(); var have=ftrnLive().map(function(s){ return s.id; }); if(r.ok&&j.list) FTRN.offers=j.list.filter(function(o){ return have.indexOf(o.id)<0&&o.exp>Date.now(); }); }catch(e){} ftrnBadge(); }
+  try{ var r=await fetch(TQ.api+'/api/mine?e='+encodeURIComponent(a.e),{cache:'no-store',headers:{'X-Tok':a.k||''}}), j=await r.json(); var have=ftrnLive().map(function(s){ return s.id; }); if(r.ok&&j.list) FTRN.offers=j.list.filter(function(o){ return have.indexOf(o.id)<0&&o.exp>Date.now(); }); }catch(e){} ftrnBadge(); }
 async function ftrnJoin(o){ var a=null; try{ a=JSON.parse(localStorage.getItem('vlab:auth')||'null'); }catch(e){}
-  try{ var r=await fetch(TQ.api+'/api/s/'+o.id+'/join',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({e:a&&a.e})}), j=await r.json(); if(!r.ok) throw 0;
+  try{ var r=await fetch(TQ.api+'/api/s/'+o.id+'/join',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({e:a&&a.e,t:a&&a.k||''})}), j=await r.json(); if(!r.ok) throw 0;
     var L=tqList(); L.push({id:o.id,edit:j.token,exp:j.exp,own:!!o.own,joined:1,meta:j.meta,up:{},n:(j.meta.videos||[]).length,auto:true,t0:Date.now()}); tqSetList(L); localStorage.setItem('vlab:trn:cur2',JSON.stringify(o.id));
     FTRN.offers=FTRN.offers.filter(function(x){ return x.id!==o.id; }); toast('Beigetreten – neue Aufnahmen gehen in «'+(j.meta.title||'Training')+'».',3000); }catch(e){ toast('Beitreten nicht möglich – kein Netz?'); } ftrnBadge(); }
 function ftrnPick(){ var L=ftrnLive(), cur=ftrnCur(), esc=function(t){ return String(t==null?'':t).replace(/[&<>"]/g,function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); };
