@@ -2546,8 +2546,10 @@ canvas.gap-row[hidden]{display:none}
 .exp-prog .gprog-bar{height:8px;background:color-mix(in srgb,var(--ink) 10%,transparent)!important}
 .exp-prog .gprog-bar i{background:linear-gradient(90deg,#DA291C,#ff6b5c)!important}
 @media (max-width:760px){ .exp-top{grid-template-columns:1fr} .exp-pv canvas{aspect-ratio:16/9} .exp-checks{grid-template-columns:1fr!important} .es-row{grid-template-columns:18px 84px 1fr} .help.exp{padding:18px 16px 16px} }
-/* Marker-Funktion entfernt */
+/* Marker-Funktion und Tormessung («Tore») vorerst ausgeblendet */
 [data-act="marker"],#btnSplits,#splits,.notepill,#expNotesRow,.mk-count,#sMarks{display:none!important}
+html:not(.tm-beta) :is(#btnTm,#tmPanel,#tmBanner){display:none!important}
+#ftView,#libView{display:none!important} /* Listenansicht ohne Vorschaubild entfernt */
 #viewSingle .dz-r>.ctl-sep{display:none!important}
 
 /* Nutzungsanalyse (nur Admins) */
@@ -2750,6 +2752,17 @@ canvas.gap-row[hidden]{display:none}
 .btn-cam{display:none;align-items:center;gap:6px;height:36px;padding:0 12px 0 10px;border-radius:11px;background:var(--red);color:#fff;font-weight:700;font-size:13px;text-decoration:none;flex:none}
 .btn-cam svg{width:17px;height:17px}
 @media (pointer:coarse){ .btn-cam{display:inline-flex} }
+
+/* Einstieg Training-Aktivität in der Videoliste */
+.ft-empty.trn-start{width:100%;border:0;margin:6px 0 2px;font:inherit;color:var(--ink)}
+.ft-empty.trn-start[hidden]{display:none!important}
+.ft-empty.trn-start .ft-empty-ic{background:linear-gradient(135deg,#DA291C,#ff7a59)!important;box-shadow:0 8px 16px -10px rgba(218,41,28,.9)!important}
+.trn-start .trn-tx{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px;font-style:normal}
+.trn-start .trn-tx b{font-size:13px;font-weight:650;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.trn-start .trn-tx em{font-style:normal;font-size:11.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* V1: kein Filmen in der App, nur Videos einfügen und analysieren */
+html body .btn-cam,html body header .btn-cam{display:none!important}
 /* ---- Handy: feste Leisten oben und unten, nichts scrollt dahinter · Bedienung in zwei Zeilen ---- */
 @media (max-width:600px){
   header{position:sticky!important;top:0!important;z-index:130;margin:0 -0px 8px!important;padding:env(safe-area-inset-top,0px) 0 0!important;background:var(--bg)!important;border-bottom:1px solid var(--line)!important}
@@ -3597,6 +3610,7 @@ setTimeout(function(){ if(de.classList.contains('vgate')&&matchMedia('(min-width
         <span>Wähle z. B. deinen Ordner mit Trainings- und Rennvideos. Du siehst dann die Ordnerstruktur, kannst Videos öffnen, beschriften und verschieben.</span>
         <button class="btn-pri" id="ftAdd2">Ordner wählen</button>
       </div>
+      <button type="button" class="ft-empty compact trn-start" id="trnStart" hidden><i class="ft-empty-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 18a4.5 4.5 0 0 1-.6-8.96A6 6 0 0 1 18 9.5a4 4 0 0 1-.5 8.5H7z"/><path d="M12 15v-5M9.5 12.5 12 10l2.5 2.5"/></svg></i><i class="trn-tx"><b>Training-Aktivität starten</b><em>Videos 3 Tage per Link teilen</em></i></button>
       <div class="ft-demo" id="ftDemo" hidden></div>
       <div class="ft-note ft-ro" id="ftRo" hidden></div>
       <div class="ft-note" id="ftNote" hidden>Ordnerzugriff gibt es am Computer in <b>Chrome</b>, <b>Edge</b> und <b>Brave</b>. Auf iPhone und iPad öffnet <b>«+»</b> Videos aus <b>Fotos</b> oder <b>Dateien</b> – sie erscheinen oben unter «Geöffnet». Fertige Clips lassen sich danach direkt teilen oder in Fotos sichern.</div>
@@ -3875,7 +3889,6 @@ setTimeout(function(){ if(de.classList.contains('vgate')&&matchMedia('(min-width
       <dt><kbd>?</kbd></dt><dd>Diese Hilfe</dd>
     </dl></div></section>
     <section class="hp" data-hp="mobile" hidden><dl>
-      <dt>Am Hang</dt><dd>Für den Einsatz draussen gibt es die schlanke Handy-App <a href="field/" target="_blank" rel="noopener" style="color:var(--red);font-weight:700">Video-Lab Field</a>: filmen, sofort in Zeitlupe ansehen, Side-by-Side, aufs Handy sichern</dd>
       <dt>Videos</dt><dd>«+» öffnet Videos aus Fotos oder Dateien – sie erscheinen oben unter «Geöffnet»</dd>
       <dt>Bedienen</dt><dd>Tippen = Abspielen · Zeitleiste wischen = Bild für Bild</dd>
       <dt>Sichern</dt><dd>Nach Export oder Standbild: «Teilen · In Fotos sichern»</dd>
@@ -4003,13 +4016,13 @@ function addFiles(files){
 })();
 document.addEventListener('click',e=>{ const b=e.target.closest('#libView [data-lv]'); if(!b) return; LS.set('libview',b.dataset.lv); renderLib(); });
 $('#ftEmpty').addEventListener('click',e=>{ const c=$('#ftEmpty'); if(c.classList.contains('compact')&&!e.target.closest('#ftAdd2')) $('#ftAdd2').click(); });
-function ftViewUI(){ const n=LS.get('ftview','thumbs')==='names'; $('#sideTree').classList.toggle('names',n); $$('#ftView button').forEach(b=>b.classList.toggle('on',b.dataset.fv===(n?'names':'thumbs'))); }
+function ftViewUI(){ const n=false; /* nur noch Ansicht mit Vorschaubild */ $('#sideTree').classList.toggle('names',n); $$('#ftView button').forEach(b=>b.classList.toggle('on',b.dataset.fv===(n?'names':'thumbs'))); }
 document.addEventListener('click',e=>{ const b=e.target.closest('#ftView [data-fv]'); if(!b) return; LS.set('ftview',b.dataset.fv); ftViewUI(); });
 ftViewUI();
 function renderLibSoon(){ if(renderLibSoon.q) return; renderLibSoon.q=true; queueMicrotask(()=>{ renderLibSoon.q=false; renderLib(); }); } /* viele Videos auf einmal hinzufügen → nur einmal zeichnen */
 function renderLib(){
   const el=$('#lib'); el.innerHTML=''; $('#libCount').textContent=clips.length; if(typeof sideOpenUI==='function') sideOpenUI(); if(typeof renderDemoList==='function') setTimeout(renderDemoList,0);
-  el.classList.add('list'); const NAMES=LS.get('libview','thumbs')==='names'; el.classList.toggle('names',NAMES); $$('#libView button').forEach(b=>b.classList.toggle('on',b.dataset.lv===(NAMES?'names':'thumbs')));
+  el.classList.add('list'); const NAMES=false; /* nur noch Ansicht mit Vorschaubild */ el.classList.toggle('names',NAMES); $$('#libView button').forEach(b=>b.classList.toggle('on',b.dataset.lv===(NAMES?'names':'thumbs')));
   // nach Rennen/Training gruppieren (Ort · Disziplin · Datum), Reihenfolge wie geöffnet
   const gk=c=>{ const m=c.meta; return m&&m.ok&&(m.place||m.date)?[m.place||'',m.disc||'',m.date||''].join('|'):'~'; };
   /* neueste zuoberst: Aufnahmezeit (Zeitcode/Dateiname), sonst Datum der Datei, sonst wann geöffnet */
@@ -7811,7 +7824,10 @@ async function trnRefresh(id){ const s=trnL().find(x=>x.id===id); if(!s) return;
 /* Weggeklickte Einladungen (pro Aktivität) – bleiben ausgeblendet, bis die Aktivität abläuft */
 function trnHid(){ try{ return JSON.parse(localStorage.getItem('vlab:trnHide')||'[]'); }catch(e){ return []; } }
 function trnHide(id){ const h=trnHid().filter(x=>TRN.offers.concat(TRN.views,trnL()).some(o=>o.id===x)); h.push(id); try{ localStorage.setItem('vlab:trnHide',JSON.stringify(h)); }catch(e){} }
-function trnUI(){ let p=$('#trnPill'); const hid=trnHid(), off=trnOn()?TRN.offers.concat(TRN.views).find(o=>!hid.includes(o.id)):null; let s=trnOn()?trnCur():null;
+function trnStartUI(){ const c=$('#trnStart'); if(!c) return; c.hidden=!trnOn(); const s=c.hidden?null:trnCur();
+  $('.trn-tx b',c).textContent=s?'Training «'+((s.meta&&s.meta.title)||'Training')+'»':'Training-Aktivität starten'; $('.trn-tx em',c).textContent=s?(s.n||0)+' Videos · '+trnLeft(s):'Videos 3 Tage per Link teilen'; c.classList.toggle('cur',!!s);
+  c.onclick=()=>{ if(s) return trnOpen(s.id); const m=trnDlg(); clearInterval(TRN.poll); trnViewNew(m); m.classList.add('on'); }; } /* gut sichtbarer Einstieg in der Videoliste (Desktop und App) */
+function trnUI(){ let p=$('#trnPill'); trnStartUI(); const hid=trnHid(), off=trnOn()?TRN.offers.concat(TRN.views).find(o=>!hid.includes(o.id)):null; let s=trnOn()?trnCur():null;
   const pend=s?Object.entries(TRN.st).filter(([k,v])=>k.startsWith(s.id+'|')&&v.s!=='err'):[], offl=pend.some(([,v])=>v.s==='off'||v.s==='retry');
   if(s&&!pend.length&&hid.includes(s.id)) s=null; /* weggeklickt: erscheint wieder, sobald etwas hochlädt (Aktivität bleibt im Menü) */
   if(!s&&!off&&!TRN.ask){ if(p) p.remove(); trnDlgList(); return; }
@@ -7851,7 +7867,7 @@ function trnViewHome(m){ TRN.view='home'; trnHead(m,'Training-Aktivitäten','Lau
   $('.trn-newbtn',b).onclick=()=>trnViewNew(m); }
 function trnViewNew(m){ const s=window.vlabAuth&&vlabAuth.get()||{}, b=$('.trn-body',m), today=new Date(), iso=today.getFullYear()+'-'+String(today.getMonth()+1).padStart(2,'0')+'-'+String(today.getDate()).padStart(2,'0');
   TRN.view='new'; trnHead(m,'Neue Training-Aktivität','Videos 3 Tage lang per Link teilen');
-  b.innerHTML='<p class="trn-intro">Alle Videos, die du während der Aktivität filmst oder hinzufügst, werden verkleinert (720p) in die Cloud geladen. Wer den Link hat, kann sie 3 Tage lang ansehen und herunterladen – danach werden sie gelöscht.</p>'+
+  b.innerHTML='<p class="trn-intro">Alle Videos, die du während der Aktivität hinzufügst, werden verkleinert (720p) in die Cloud geladen. Wer den Link hat, kann sie 3 Tage lang ansehen und herunterladen – danach werden sie gelöscht.</p>'+
    '<form class="trn-f" autocomplete="off"><div class="trn-2"><label class="inv-l">Ort<input name="place" placeholder="z. B. Saas-Fee"></label><label class="inv-l">Datum<input name="date" type="date" value="'+iso+'"></label></div>'+
    '<div class="trn-2"><label class="inv-l">Disziplin<select name="disc" class="inv-q"><option value="">–</option><option>Slalom</option><option>Riesenslalom</option><option>Super-G</option><option>Abfahrt</option><option>Freies Fahren</option><option>Andere</option></select></label><label class="inv-l">Titel<input name="title" placeholder="Training"></label></div>'+[
    ['a','Athletinnen und Athleten'],['c','Coaches']].map(([k,l])=>'<div class="inv-l trn-pp" data-k="'+k+'"><span class="trn-lab">'+l+' <i class="trn-cnt"></i></span><div class="trn-find"><input placeholder="Suchen oder neu eintippen" autocomplete="off"><button type="button" class="trn-new">Neu</button></div><div class="trn-pool"></div></div>').join('')+
@@ -8328,7 +8344,7 @@ addEventListener('unhandledrejection',e=>{ FB.errs.push('Promise: '+String(e.rea
 function fbOn(){ return !!(typeof TRN_API!=='undefined'&&TRN_API); }
 const fbIco='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v12H8l-4 4z"/><path d="M12 7.5v4M12 14h.01"/></svg>';
 function fbInfo(){ const D=mode==='cmp'?A:mode==='gps'?GD:S, c=D&&D.clip, n=x=>x?(x.alias||x.name||'').slice(0,90):'';
-  return {build:'20261118173307'.startsWith('%%')?'dev':'20261118173307',env:window.VLAB_ENV||'live',url:location.pathname,lang:(window.vlabLang&&vlabLang.get())||'de',ua:navigator.userAgent.slice(0,240),
+  return {build:'20261118192736'.startsWith('%%')?'dev':'20261118192736',env:window.VLAB_ENV||'live',url:location.pathname,lang:(window.vlabLang&&vlabLang.get())||'de',ua:navigator.userAgent.slice(0,240),
     scr:screen.width+'×'+screen.height+' @'+(devicePixelRatio||1)+' · Fenster '+innerWidth+'×'+innerHeight,mem:navigator.deviceMemory||null,cpu:navigator.hardwareConcurrency||null,net:navigator.onLine?'online':'offline',
     view:mode+(mode==='cmp'&&$('#viewCmp').classList.contains('overlay')?' · overlay':''),clip:n(c),clipB:mode==='cmp'?n(B.clip):'',
     t:D&&D.ready?+(D.frame/D.fps).toFixed(2):null,fps:c&&c.fps||null,size:c?[c.w,c.h].join('×'):'',n:clips.length,errs:FB.errs.slice()}; }
@@ -9519,7 +9535,7 @@ if(false&&!LS.get('hint1',0)){ setTimeout(()=>{ toast(matchMedia('(pointer:coars
 
 /* Update-Hinweis: prüft version.json auf GitHub Pages; «Aktualisieren» lädt die Seite ohne Cache neu */
 (()=>{
-  const BUILD='20261118173307'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
+  const BUILD='20261118192736'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
   // nach einem Update die ?v=… aus der Adresse entfernen
   try{ const u=new URL(location.href); if(u.searchParams.has('v')){ u.searchParams.delete('v'); history.replaceState(null,'',u.pathname+(u.search||'')+u.hash); } }catch(e){}
   const el=$('#upd'); let latest=null, snoozed=null, busy=false;
