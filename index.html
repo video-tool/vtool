@@ -5281,10 +5281,28 @@ function edgeNCC(LA,LB,p){ /* Übereinstimmung der Kantenstärke (A gegen versch
   for(let y=3;y<h-3;y++) for(let x=3;x<w-3;x++){ const u=x-cx, v=y-cy, X=(1+p[0])*u-p[1]*v+p[2]+cX, Y=p[1]*u+(1+p[0])*v+p[3]+cY; if(X<2||Y<2||X>=W-3||Y>=H-3) continue;
     const a=ma[y*w+x], b=Math.hypot(bil(LB.gx,W,H,X,Y),bil(LB.gy,W,H,X,Y)); n++; sa+=a; sb+=b; saa+=a*a; sbb+=b*b; sab+=a*b; }
   if(n<w*h*0.25) return -1; const va=saa-sa*sa/n, vb=sbb-sb*sb/n; return (sab-sa*sb/n)/Math.sqrt(va*vb+1e-9)*Math.min(1,n/(w*h*0.6)); }
+/* Rastersuche über ganzzahlige Verschiebungen bei fester Drehung/Zoom: Lage und Gewichte der Bildpunkte einmal rechnen, pro Verschiebung nur noch Index + Gewichte (gleiches Ergebnis wie costAt, viel schneller) */
+const GB={};
+function gridPrep(T,L,a,b){ const {w}=L, cx=w/2, cy=L.h/2, N=T.length/3;
+  if(!GB.n||GB.n<N){ GB.n=N; GB.X=new Float64Array(N); GB.Y=new Float64Array(N); GB.I=new Int32Array(N); GB.fx=new Float64Array(N); GB.fy=new Float64Array(N); GB.v=new Float32Array(N); GB.r=new Float64Array(N); }
+  const {X,Y,I,fx,fy,v}=GB;
+  for(let k=0,q=0;k<N;k++,q+=3){ const x=T[q],y=T[q+1], xx=(1+a)*x-b*y+cx, yy=b*x+(1+a)*y+cy; X[k]=xx; Y[k]=yy; const x0=Math.floor(xx), y0=Math.floor(yy); fx[k]=xx-x0; fy[k]=yy-y0; I[k]=y0*w+x0; v[k]=T[q+2]; }
+  return N; }
+function gridCost(L,N,dx,dy,ks){ /* ks: jeden ks-ten Bildpunkt (Grobsuche) */ const {g,w,h}=L, {X,Y,I,fx,fy,v,r:RB}=GB, off=dy*w+dx; let n=0, s=0, n0=0;
+  for(let k=0;k<N;k+=ks){ n0++; const xs=X[k]+dx, ys=Y[k]+dy; if(xs<1||ys<1||xs>=w-2||ys>=h-2) continue; const i=I[k]+off, ax=fx[k], ay=fy[k];
+    const r=(g[i]*(1-ax)+g[i+1]*ax)*(1-ay)+(g[i+w]*(1-ax)+g[i+w+1]*ax)*ay-v[k]; RB[n++]=r; s+=r; }
+  if(n<n0*0.5) return 1e9; const m=s/n; let t=0; for(let i=0;i<n;i++) t+=Math.abs(RB[i]-m); return t/n+(1-n/n0)*10; }
+/* Rastersuche bei fester Drehung/Zoom: grob (Schritt 4, jeder 2. Bildpunkt), dann die 8 besten Stellen exakt im Schritt 2 nachprüfen. Kosten wie costAt. */
+function gridBest(T,L,a,b,R){ const N=gridPrep(T,L,a,b), top=[];
+  for(let dy=-R;dy<=R;dy+=4) for(let dx=-R;dx<=R;dx+=4){ const c=gridCost(L,N,dx,dy,2); if(top.length<8||c<top[7].c){ top.push({c,dx,dy}); top.sort((p,q)=>p.c-q.c); if(top.length>8) top.pop(); } }
+  let bc=1e18, bx=0, by=0; const done=new Set();
+  for(const t of top) for(let ey=-2;ey<=2;ey+=2) for(let ex=-2;ex<=2;ex+=2){ const dx=t.dx+ex, dy=t.dy+ey; if(Math.abs(dx)>R+1||Math.abs(dy)>R+1) continue; const key=dx*4096+dy; if(done.has(key)) continue; done.add(key);
+    const c=gridCost(L,N,dx,dy,1); if(c<bc){ bc=c; bx=dx; by=dy; } }
+  return bc<1e18?{c:bc,dx:bx,dy:by}:null; }
 function alignWide(PA,PB){ const top=PA.length-1, Tc=allPix(PA[top]), L=PB[top], R=Math.round(L.w*0.35), C=[];
   for(let th=-8;th<=8.01;th+=2){ const a=th*Math.PI/180, ca=Math.cos(a), sa=Math.sin(a);
     for(let sc=0.6;sc<=1.751;sc*=1.04){ let bc=1e18, bp=null;
-      for(let dy=-R;dy<=R;dy+=2) for(let dx=-R;dx<=R;dx+=2){ const p=[sc*ca-1,sc*sa,dx,dy,0], c=costAt(Tc,L,p); if(c<bc){ bc=c; bp=p; } }
+      const r=gridBest(Tc,L,sc*ca-1,sc*sa,R); if(r){ bc=r.c; bp=[sc*ca-1,sc*sa,r.dx,r.dy,0]; }
       if(bp) C.push({c:bc,p:bp}); } }
   C.sort((a,b)=>a.c-b.c); const T1=pick(PA[1],1500); let best=null, seen=[];
   { const gs=gateSim(PA[0].g._gates,PB[0].g._gates,PA[0].w); if(gs&&gs.n>=3){ const p0=affToSim(gs.M,PA[0].w,PA[0].h,PB[0].w,PB[0].h), r=align(PA,PB,p0,false), q=r&&r.ok?r.p:p0, c=-edgeNCC(PA[2],PB[2],[q[0],q[1],q[2]/4,q[3]/4])-0.04*Math.min(gs.n,6); best={ok:true,inl:Math.max(r&&r.inl||0,0.5),p:q,c,gates:gs.n}; } } /* Tore als Fixpunkte: bei wenig Struktur (Gegenlicht, überbelichtet) oft die einzige sichere Lage */
@@ -8456,7 +8474,7 @@ addEventListener('unhandledrejection',e=>{ FB.errs.push('Promise: '+String(e.rea
 function fbOn(){ return !!(typeof TRN_API!=='undefined'&&TRN_API); }
 const fbIco='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v12H8l-4 4z"/><path d="M12 7.5v4M12 14h.01"/></svg>';
 function fbInfo(){ const D=mode==='cmp'?A:mode==='gps'?GD:S, c=D&&D.clip, n=x=>x?(x.alias||x.name||'').slice(0,90):'';
-  return {build:'20261119070709'.startsWith('%%')?'dev':'20261119070709',env:window.VLAB_ENV||'live',url:location.pathname,lang:(window.vlabLang&&vlabLang.get())||'de',ua:navigator.userAgent.slice(0,240),
+  return {build:'20261119074626'.startsWith('%%')?'dev':'20261119074626',env:window.VLAB_ENV||'live',url:location.pathname,lang:(window.vlabLang&&vlabLang.get())||'de',ua:navigator.userAgent.slice(0,240),
     scr:screen.width+'×'+screen.height+' @'+(devicePixelRatio||1)+' · Fenster '+innerWidth+'×'+innerHeight,mem:navigator.deviceMemory||null,cpu:navigator.hardwareConcurrency||null,net:navigator.onLine?'online':'offline',
     view:mode+(mode==='cmp'&&$('#viewCmp').classList.contains('overlay')?' · overlay':''),clip:n(c),clipB:mode==='cmp'?n(B.clip):'',
     t:D&&D.ready?+(D.frame/D.fps).toFixed(2):null,fps:c&&c.fps||null,size:c?[c.w,c.h].join('×'):'',n:clips.length,errs:FB.errs.slice()}; }
@@ -8864,6 +8882,8 @@ function strKeyPut(cx,bg,PW,PH,cv,T,ox,oy){ const w0=cv.width, h0=cv.height, cs=
   for(let yy=0;yy<bh;yy++) for(let xx=0;xx<bw;xx++){ const q=yy*bw+xx, k=q*4, sa=S2[k+3]; if(!sa) continue; let sm=0,c=0; for(let y2=Math.max(0,yy-1);y2<=Math.min(bh-1,yy+1);y2++) for(let x2=Math.max(0,xx-1);x2<=Math.min(bw-1,xx+1);x2++){ sm+=A1[y2*bw+x2]; c++; }
     const a=(sm/c)*Math.min(1,sa/150); if(a<=0.01) continue; od[k]+=(S2[k]-od[k])*a; od[k+1]+=(S2[k+1]-od[k+1])*a; od[k+2]+=(S2[k+2]-od[k+2])*a; }
   cx.putImageData(O,bx,by); }
+function med4(A,n){ /* Median von 2–4 Werten ohne neue Listen (wie sortieren und Mitte nehmen) */ if(n===2) return (A[0]+A[1])/2; if(n===3){ const a=A[0],b=A[1],c=A[2]; return Math.max(Math.min(a,b),Math.min(Math.max(a,b),c)); }
+  const a=A[0],b=A[1],c=A[2],d=A[3], lo=Math.min(Math.max(a,b),Math.max(c,d)), hi=Math.max(Math.min(a,b),Math.min(c,d)); return (lo+hi)/2; }
 async function strobeRunLong(a,b,N,two){
   const c=SD.clip, fps=SD.fps, prog=(f,t)=>{ $('#strProg i').style.width=(f*100)+'%'; $('#strProg span').textContent=t; }, tick=()=>new Promise(r=>setTimeout(r,0));
   let v; try{ v=await FrameSrc.open(c); }catch(e){ throw new Error('Video konnte nicht geladen werden.'); }
@@ -8874,10 +8894,12 @@ async function strobeRunLong(a,b,N,two){
     const AF=[...set].sort((p,q)=>p-q), nA=AF.length, onGrid=k=>(AF[k]-a)%N===0;
     /* 1) Bilder lesen: kleine Pyramide für die Kamerakette, Kleinbild für die Suche */
     const cs=document.createElement('canvas'); cs.width=W0; cs.height=h0; const xs=cs.getContext('2d',{willReadFrequently:true});
-    const TB=[], M0=[[1,0,0,0,1,0]]; let prevP=null, weak=0;
+    const TB=[], M0=[[1,0,0,0,1,0]]; let prevP=null, lastP=null, weak=0;
     for(let k=0;k<nA;k++){ const im=await v.at((AF[k]+0.5)/fps); xs.drawImage(im,0,0,W0,h0); const P=pyramid(grayOf(xs.getImageData(0,0,W0,h0)),W0,h0);
       const t=document.createElement('canvas'); t.width=TW; t.height=TH; const tx=t.getContext('2d'); if(fxCss(c)) tx.filter=fxCss(c); tx.drawImage(im,0,0,TW,TH); TB.push(t);
-      if(prevP){ const r=align(prevP,P,[0,0,0,0,0],{R:0.25,scales:[0.95,0.975,1,1.025,1.05]}); if(!r.ok||r.inl<0.35) weak++; M0.push(affMul(simToAff(r.p,W0,h0,W0,h0),M0[k-1])); }
+      if(prevP){ /* Kamera bewegt sich gleichmässig: Bewegung vom letzten Bild als Start, kleine Suche; nur wenn das nicht passt, die grosse Suche */
+        let r=lastP?align(prevP,P,lastP,false,0,true):null; if(!r||!r.ok||r.inl<0.45){ const g=align(prevP,P,[0,0,0,0,0],{R:0.25,scales:[0.95,0.975,1,1.025,1.05]}); if(!r||!r.ok||g.ok&&g.inl>r.inl) r=g; }
+        if(!r.ok||r.inl<0.35) weak++; lastP=r.ok?r.p.slice():null; M0.push(affMul(simToAff(r.p,W0,h0,W0,h0),M0[k-1])); }
       prevP=P; if(k%4===3){ prog((k+1)/nA*0.4,'Bilder lesen und Kamera ausgleichen … '+Math.round((AF[k]-a)/fps)+' / '+Math.round((b-a)/fps)+' s'); await tick(); } }
     let km=0; for(let k=1;k<nA;k++) if(Math.abs(AF[k]-midF)<Math.abs(AF[km]-midF)) km=k;
     const iRef=affInv(M0[km]), MA=M0.map(m=>affMul(m,iRef)); /* Bezug → Bild k (W0) */
@@ -8887,9 +8909,9 @@ async function strobeRunLong(a,b,N,two){
     const inK=(j,k)=>{ const H=affMul(MA[k],affInv(MA[j])); return [H[0],H[1],H[2]*ts,H[3],H[4],H[5]*ts]; }; /* Bild j → Bild k (Kleinbild-Pixel) */
     const maskK=k=>{ wx.setTransform(1,0,0,1,0,0); wx.clearRect(0,0,TW,TH); wx.drawImage(TB[k],0,0); const cur=wx.getImageData(0,0,TW,TH).data; const NB=[];
       for(const o of [-2,-1,1,2]){ const j=k+o*dK; if(j<0||j>=nA) continue; const H=inK(j,k); wx.setTransform(1,0,0,1,0,0); wx.clearRect(0,0,TW,TH); wx.setTransform(H[0],H[3],H[1],H[4],H[2],H[5]); wx.drawImage(TB[j],0,0); NB.push(wx.getImageData(0,0,TW,TH).data); }
-      wx.setTransform(1,0,0,1,0,0); let mk=new Uint8Array(NT); if(NB.length<2) return {lab:new Int32Array(NT),info:[0]}; const L=new Float32Array(4), S2=new Float32Array(4);
-      for(let p=0,j=0;p<NT;p++,j+=4){ let n=0; for(const d of NB){ if(d[j+3]<200) continue; L[n]=0.299*d[j]+0.587*d[j+1]+0.114*d[j+2]; S2[n]=Math.max(d[j],d[j+1],d[j+2])-Math.min(d[j],d[j+1],d[j+2]); n++; } if(n<2) continue;
-        const ls=Array.from(L.subarray(0,n)).sort((x,y)=>x-y), ss=Array.from(S2.subarray(0,n)).sort((x,y)=>x-y), lb=n&1?ls[n>>1]:(ls[n/2-1]+ls[n/2])/2, sb=n&1?ss[n>>1]:(ss[n/2-1]+ss[n/2])/2;
+      wx.setTransform(1,0,0,1,0,0); let mk=new Uint8Array(NT); if(NB.length<2) return {lab:new Int32Array(NT),info:[0]}; const L=new Float32Array(4), S2=new Float32Array(4), nb=NB.length;
+      for(let p=0,j=0;p<NT;p++,j+=4){ let n=0; for(let q=0;q<nb;q++){ const d=NB[q]; if(d[j+3]<200) continue; const r0=d[j],g0=d[j+1],b0=d[j+2]; L[n]=0.299*r0+0.587*g0+0.114*b0; S2[n]=(r0>g0?(r0>b0?r0:b0):(g0>b0?g0:b0))-(r0<g0?(r0<b0?r0:b0):(g0<b0?g0:b0)); n++; } if(n<2) continue;
+        const lb=med4(L,n), sb=med4(S2,n);
         const lf=0.299*cur[j]+0.587*cur[j+1]+0.114*cur[j+2], sf=Math.max(cur[j],cur[j+1],cur[j+2])-Math.min(cur[j],cur[j+1],cur[j+2]); if(lb-lf>30||sf-sb>40) mk[p]=1; }
       mk=morph(morph(mk,TW,TH,true),TW,TH,false); return labelMap(mk,TW,TH); };
     const minA=NT*0.00012, toRef=(k,x,y)=>{ const q=affApply(affInv(MA[k]),x/ts,y/ts); return q; }, toK=(k,X,Y)=>{ const q=affApply(MA[k],X,Y); return [q[0]*ts,q[1]*ts]; };
@@ -9728,7 +9750,7 @@ if(false&&!LS.get('hint1',0)){ setTimeout(()=>{ toast(matchMedia('(pointer:coars
 
 /* Update-Hinweis: prüft version.json auf GitHub Pages; «Aktualisieren» lädt die Seite ohne Cache neu */
 (()=>{
-  const BUILD='20261119070709'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
+  const BUILD='20261119074626'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
   // nach einem Update die ?v=… aus der Adresse entfernen
   try{ const u=new URL(location.href); if(u.searchParams.has('v')){ u.searchParams.delete('v'); history.replaceState(null,'',u.pathname+(u.search||'')+u.hash); } }catch(e){}
   const el=$('#upd'); let latest=null, snoozed=null, busy=false;
