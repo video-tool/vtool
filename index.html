@@ -2740,9 +2740,9 @@ html:not(.tm-beta) :is(#btnTm,#tmPanel,#tmBanner){display:none!important}
 .tim-acts .ctl span{font:650 12px var(--font)}
 #viewCmp.cmp-linked:not(.overlay) .strips>.tl:nth-child(2){display:none}
 /* Zeitleisten-Zoom im Side-by-Side/Overlay: in der Zeitleiste (nicht halb unter dem Video versteckt) */
-@media (min-width:601px){ #viewCmp .tl-zoom{top:4px!important;bottom:auto!important;right:6px!important;gap:3px!important;padding:2px;border-radius:10px;background:rgba(12,15,20,.55);backdrop-filter:blur(6px)}
-  #viewCmp .tl-zoom button{width:26px!important;height:22px!important;font-size:14px!important;border-radius:7px!important}
-  #viewCmp .tl-zoom .tl-film svg{width:13px!important;height:13px!important} }
+@media (min-width:601px){ :is(#viewCmp,#viewSingle) .tl-zoom{top:4px!important;bottom:auto!important;right:6px!important;gap:3px!important;padding:2px;border-radius:10px;background:rgba(12,15,20,.55);backdrop-filter:blur(6px)}
+  :is(#viewCmp,#viewSingle) .tl-zoom button{width:26px!important;height:22px!important;font-size:14px!important;border-radius:7px!important}
+  :is(#viewCmp,#viewSingle) .tl-zoom .tl-film svg{width:13px!important;height:13px!important} }
 #viewCmp.overlay.ov-split.ov-one .strips{grid-template-columns:1fr!important}
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
@@ -4780,7 +4780,7 @@ function refreshSingleHead(){
   $('#sTitle').textContent=c?metaTitle(c):'Kein Video geöffnet'; $('#sTitle').title=c?dispName(c):''; $('#sTitle').dataset.x=c&&c.meta&&c.meta.ok?[c.meta.disc,c.meta.run].filter(Boolean).map(t=>' · '+t).join(''):''; // Handy: alles in einer Zeile
   const ch=$('#sChips');
   const mt=c&&c.meta&&c.meta.ok?[c.meta.date,c.meta.disc?c.meta.disc+(c.meta.sex?' '+c.meta.sex:''):null,c.meta.run].filter(Boolean).map(t=>`<span class="chip meta">${esc(t)}</span>`).join(''):'';
-  ch.innerHTML=mt+(c?'<span class="tech">'+[c.w?c.w+'×'+c.h:'',c.dur?fmtDur(c.dur):'',c.size?fmtMB(c.size):''].filter(Boolean).join('<i>·</i>')+'</span>':'');
+  { const tech=n=>c?'<span class="tech">'+[c.w?c.w+'×'+c.h:'',c.dur?fmtDur(c.dur):'',c.size?fmtMB(c.size):''].filter(Boolean).slice(0,n).join('<i>·</i>')+'</span>':''; let n=3; ch.innerHTML=mt+tech(n); while(n>0&&ch.scrollWidth>ch.clientWidth+1){ n--; ch.innerHTML=mt+tech(n); } } /* passt die Zeile nicht: lieber eine Angabe weglassen als mitten im Wort abschneiden */
   const fi=$('#sFps'); if(document.activeElement!==fi) fi.value=c&&c.fps?fmtFps(c.fps):'';
   renderMarks(); loopUI();
 }
@@ -5443,7 +5443,9 @@ class FrameSrc{
   async _slow(){ if(this.v) return this; this.fast=false; try{ this.dec&&this.dec.state!=='closed'&&this.dec.close(); }catch(e){} this.hold=null; this._drop(); this.v=await loadV(this.url); this.w=this.v.videoWidth; this.h=this.v.videoHeight; this.dur=this.v.duration; return this; }
   _mk(){ const me=this; this.dec=new VideoDecoder({output:fr=>me._out(fr),error:e=>{ me.err=e; me._wake(); me._wakeDq(); }}); this.dec.addEventListener('dequeue',()=>me._wakeDq()); this.dec.configure(this.cfg); this.needKey=true; }
   _out(fr){ const c=this.cache; { const ix=this.T.byTs.get(fr.timestamp); if(ix!=null) this.pend.delete(ix); } if(this.dead||c.has(fr.timestamp)||(this.want!=null&&fr.timestamp<this.want)){ fr.close(); this._wake(); return; } /* Bilder vor dem Ziel sofort freigeben – iOS hat nur wenige Bildpuffer, sonst bleibt der Decoder stehen */
-    c.set(fr.timestamp,fr); while(c.size>3){ let k=null; for(const q of c.keys()) if(q!==this.need){ k=q; break; } if(k==null) break; const o=c.get(k); c.delete(k); if(o!==this.hold) o.close(); } this._wake(); } /* das gerade gesuchte Bild (need) nie verdrängen: gibt der Decoder unter Last mehrere Bilder auf einmal aus, ging es sonst verloren und es kam ein Bild ~1 s später */
+    c.set(fr.timestamp,fr); const cap=FrameSrc.capN();
+    while(c.size>cap){ const w=this.want!=null?this.want:-1; let k=null, old=null; for(const q of c.keys()){ if(q===this.need) continue; if(q<w){ if(old==null||q<old) old=q; } else if(k==null||q>k) k=q; } if(old!=null) k=old; if(k==null) break; const o=c.get(k); c.delete(k); if(o!==this.hold) o.close(); } this._wake(); } /* zuerst Bilder vor dem gesuchten freigeben, sonst das am weitesten vorausliegende – nie das nächste: sonst muss der Decoder ab Schlüsselbild neu anfangen (bei Videos mit Schlüsselbild nur alle ~8 s sehr teuer) */
+  static capN(){ return FrameSrc.cap||(FrameSrc.cap=matchMedia('(pointer:coarse)').matches?3:6); } /* Handy (iOS): wenige Bildpuffer; Computer: ein paar Bilder voraus /* das gerade gesuchte Bild (need) nie verdrängen: gibt der Decoder unter Last mehrere Bilder auf einmal aus, ging es sonst verloren und es kam ein Bild ~1 s später */
   _wake(){ const r=this.wk; if(r){ this.wk=null; r(); } }
   _wait(ms){ return new Promise(r=>{ this.wk=r; setTimeout(r,ms||1200); }); } /* wartet auf ein ausgegebenes Bild */
   _wakeDq(){ const r=this.wkd; if(r){ this.wkd=null; r(); } }
@@ -5465,7 +5467,7 @@ class FrameSrc{
   async _at(t){ if(!this.fast){ await seekV(this.v,t); return this.v; }
     try{ const S=this.T.S, i=this._idx(t), ts=S[i].ts; this.want=ts; let fr=this.cache.get(ts); if(fr){ this.need=null; return this._hold(fr); } this.need=ts;
       const kf=S[i].kf; if(this.needKey||(i<this.pos&&!this.pend.has(i))||kf>this.pos){ if(!this.needKey){ try{ this.dec.reset(); }catch(e){} this.dec.configure(this.cfg); } this.pend.clear(); this.pos=kf; this.needKey=false; } /* Zielbild ist weder im Cache noch im Decoder → ab Schlüsselbild neu */
-      const LOOK=6, MAXL=28, feed=async()=>{ if(this.dec.decodeQueueSize>16) await this._waitDq(400); const s=S[this.pos]; this.pend.add(this.pos); this.pos++; const data=await this._bytes(s.off,s.sz); this.dec.decode(new EncodedVideoChunk({type:s.key?'key':'delta',timestamp:s.ts,duration:s.dus,data})); };
+      const LOOK=Math.min(6,FrameSrc.capN()), MAXL=28, feed=async()=>{ if(this.dec.decodeQueueSize>16) await this._waitDq(400); const s=S[this.pos]; this.pend.add(this.pos); this.pos++; const data=await this._bytes(s.off,s.sz); this.dec.decode(new EncodedVideoChunk({type:s.key?'key':'delta',timestamp:s.ts,duration:s.dus,data})); };
       for(let guard=0;guard<6000;guard++){ if(this.dead) throw new Error('abgebrochen'); fr=this.cache.get(ts); if(fr){ this.need=null; return this._hold(fr); } if(this.err) throw this.err;
         const ahead=this.pos-i; /* wie weit über das Zielbild hinaus schon gefüttert */
         if(this.pos<S.length&&ahead<LOOK){ await feed(); continue; }
@@ -5530,10 +5532,16 @@ async function ghostCompute(opt){ // opt.resume: ab Bild opt.j mit fester Lage o
   if(refP&&!bg&&!(opt&&opt.resume)&&OV.Tt!=null&&Math.abs(OV.Tt-GH.t0)>0.6/(A.fps||30)){ try{
     const gp=async(src,t,x,h)=>{ const im=await src.at(t); x.drawImage(im,0,0,W0,h); return pyramid(grayN(x.getImageData(0,0,W0,h)),W0,h); };
     const d=GH.t0-OV.Tt, ns=Math.max(1,Math.ceil(Math.abs(d)/0.1)); let M=simToAff(refP,W0,hA,W0,hB), qa0=[0,0,0,0,0], qb0=[0,0,0,0,0];
-    let pA=await gp(va,OV.Tt+0.5/A.fps,xa,hA), pB=await gp(vb,OV.Tt+GH.off+0.5/B.fps,xb,hB);
-    for(let k=1;k<=ns;k++){ const t=OV.Tt+d*k/ns, nA=await gp(va,t+0.5/A.fps,xa,hA), nB=await gp(vb,t+GH.off+0.5/B.fps,xb,hB);
+    /* Kette immer vorwärts durchs Video lesen (rückwärts muss der Decoder für jedes Bild ab Schlüsselbild neu anfangen – bei Schlüsselbildern nur alle ~8 s sehr langsam):
+       liegt das Startbild vor der Handlage, Kamerabewegung Start → Handlage messen und umkehren */
+    const fwd=d<0, ts0=fwd?GH.t0:OV.Tt, dd=fwd?-d:d; let CA=[1,0,0,0,1,0], CB=[1,0,0,0,1,0];
+    let pA=await gp(va,ts0+0.5/A.fps,xa,hA), pB=await gp(vb,ts0+GH.off+0.5/B.fps,xb,hB);
+    for(let k=1;k<=ns;k++){ const t=ts0+dd*k/ns, nA=await gp(va,t+0.5/A.fps,xa,hA), nB=await gp(vb,t+GH.off+0.5/B.fps,xb,hB);
       const ra=align(pA,nA,qa0,false,1,true), rb=align(pB,nB,qb0,false,1,true); if(!ra.ok||!rb.ok||ra.inl<0.3||rb.inl<0.3) throw new Error('Kette');
-      M=affMul(affMul(simToAff(rb.p,W0,hB,W0,hB),M),affInv(simToAff(ra.p,W0,hA,W0,hA))); qa0=ra.p.slice(); qa0[4]=0; qb0=rb.p.slice(); qb0[4]=0; pA=nA; pB=nB; }
+      if(fwd){ CA=affMul(simToAff(ra.p,W0,hA,W0,hA),CA); CB=affMul(simToAff(rb.p,W0,hB,W0,hB),CB); }
+      else M=affMul(affMul(simToAff(rb.p,W0,hB,W0,hB),M),affInv(simToAff(ra.p,W0,hA,W0,hA)));
+      qa0=ra.p.slice(); qa0[4]=0; qb0=rb.p.slice(); qb0[4]=0; pA=nA; pB=nB; }
+    if(fwd) M=affMul(affInv(CB),affMul(M,CA));
     const r=affToSim(M,W0,hA,W0,hB); r[4]=refP[4]; refP=r; }catch(e){ console.warn('Handlage nicht übertragbar',e); } }
   const DBG=[]; if(!bg) GH.dbg=DBG; const hist=[]; let fail=0; const S=[]; let prev=null, prevPA=null, prevPB=null, pInit=[0,0,0,0,0], lastQa=[0,0,0,0,0], lastQb=[0,0,0,0,0]; const trk={a:null,b:null};
   const n=Math.max(2,Math.floor(eEnd/step)+1), t0=performance.now();
@@ -5627,7 +5635,7 @@ async function ghostCompute(opt){ // opt.resume: ab Bild opt.j mit fester Lage o
     const sane2=r=>r.ok&&r.inl>0.35&&Math.abs(r.p[0])<0.06&&Math.abs(r.p[1])<0.04&&Math.hypot(r.p[2],r.p[3])<W0*0.35, nBad=runs.reduce((a,[x,y])=>a+y-x+1,0); let done=0, fixed=0;
     const gp=async e=>{ await seekPair(e); xa.drawImage(IA,0,0,W0,hA); xb.drawImage(IB,0,0,W0,hB); const ia=xa.getImageData(0,0,W0,hA), ib=xb.getImageData(0,0,W0,hB); const PA=pyramid(grayN(ia),W0,hA), PB=pyramid(grayN(ib),W0,hB); withPoles(PA[0],IA,W0,hA,'a'); withPoles(PB[0],IB,W0,hB,'b'); return {PA,PB,KA:pyramid(grayOf(ia),W0,hA),KB:pyramid(grayOf(ib),W0,hB)}; };
     for(const [i0,i1] of runs){ if(stop()) break; let nx=await gp(S[i1+1].e), pp=S[i1+1].p, pM=simToAff(pp,W0,hA,W0,hB), miss=0;
-      for(let k=i1;k>=i0&&!stop();k--){ const cu=await gp(S[k].e); done++; if(!bg) ghostProgress(1,'Schritt 3 von 3 · Unsichere Stellen nachbessern · '+done+' / '+nBad);
+      for(let k=i1;k>=i0&&!stop();k--){ const cu=await gp(S[k].e); done++; if(!bg) ghostProgress(1,'Schritt 3 von 3 · Unsichere Stellen nachbessern · '+done+' / '+nBad+' · '+etaTxt('fix',done/Math.max(1,nBad)));
         const ra=align(nx.KA,cu.KA,[0,0,0,0,0],false,1,true), rb=align(nx.KB,cu.KB,[0,0,0,0,0],false,1,true); if(!sane2(ra)||!sane2(rb)) break; /* Kamera springt (Schnitt) – hier nicht weiter */
         const Mp=affMul(affMul(simToAff(rb.p,W0,hB,W0,hB),pM),affInv(simToAff(ra.p,W0,hA,W0,hA))), p0=affToSim(Mp,W0,hA,W0,hB); p0[4]=pp[4];
         const cands=[{p:p0,src:'pred'}], r1=align(cu.PA,cu.PB,p0,false); if(r1.ok) cands.push({p:r1.p,src:'ref'}); const r2=align(cu.PA,cu.PB,p0,{around:true,rad:12,scales:[0.95,0.975,1,1.025,1.05]}); if(r2&&r2.ok) cands.push({p:r2.p,src:'wide'});
@@ -5969,7 +5977,7 @@ function ovUI(){ vchipPlace();
     acts=ovBtn('edit','Zurück',OVI.back,'ghost','Gleichen Moment neu wählen')+cutBtns+ovMore([['pick','Referenzpunkte neu',OVI.pin],['hand','Von Hand nachschieben',OVI.fix]])+ovBtn('make','Overlay erstellen',OVI.go,'pri'); }
   else { const kc=OV.K.length?`<span class="ov-chip">${OVI.fix}${OV.K.length} Korrektur${OV.K.length>1?'en':''}<button data-ov="fixall" title="Alle Korrekturen entfernen">${OVI.x}</button></span>`:'';
     
-    ttl=GH.coarse?'Vorschau':'Fertig'; dot=true; const QU=!GH.coarse&&PRE.state!=='run'&&REF.key===GH.key&&REF.Q?ovQual():null, QN=QU?QU.runs.length:0; say=PRE.state==='run'?'Flüssige Wiedergabe wird vorbereitet · '+Math.round(PRE.p*100)+' %':QN?QN+(QN===1?' Stelle':' Stellen')+' prüfen (gelb oder rot in der Zeitleiste)':GH.bg?'Wird verfeinert · '+Math.round((GH.bg.p||0)*100)+' %':GH.coarse?'Grob gerechnet – «…» › «Neu berechnen» rechnet fein.':''; chips=cut+kc;
+    ttl=GH.coarse?'Vorschau':'Fertig'; dot=true; const QU=!GH.coarse&&PRE.state!=='run'&&REF.key===GH.key&&REF.Q?ovQual():null, QN=QU?QU.runs.length:0; say=PRE.state==='run'?'Flüssige Wiedergabe wird vorbereitet · '+Math.round(PRE.p*100)+' % · '+etaTxt('pre',PRE.p):QN?QN+(QN===1?' Stelle':' Stellen')+' prüfen (gelb oder rot in der Zeitleiste)':GH.bg?'Wird verfeinert · '+Math.round((GH.bg.p||0)*100)+' % · '+etaTxt('bg',GH.bg.p||0):GH.coarse?'Grob gerechnet – «…» › «Neu berechnen» rechnet fein.':''; chips=cut+kc;
     tip='Liegt B neben A: an der Stelle anhalten, dann «Neu legen» (B von Hand schieben) oder «Zwei Punkte». Der Punkt links und das Band in der Zeitleiste zeigen den Zustand: grün ausgerichtet, gelb unsicher, rot Kameraschnitt. Das Auge bei den Läufen oben links blendet einen Lauf ein oder aus.';
     acts=cutBtns+(QN?ovBtn('qnext','Nächste Stelle',OVI.go,'ghost','Zur nächsten unsicheren Stelle springen'):'')+(ovBtn('bpts','Zwei Punkte',OVI.pin,'ghost','Zwei gleiche Punkte in A und B antippen, z. B. Torflaggen')+ovBtn('fix','Neu legen',OVI.fix,'ghost','B an dieser Stelle neu über A legen (von Hand schieben)'))
       +ovMore([OVT_READY?['ovtrailnew',OVT.keys.a.length&&OVT.key===GH.key?'Spur bearbeiten (antippen)':'Spur hinter Fahrer:innen setzen …',OVI.pin]:null,OVT_READY&&OVT.trk&&OVT.key===GH.key?['ovtrail',OVT.on?'Spur ausblenden':'Spur einblenden',OVI.go]:null,ovGpsPair()?['ovgps',OVG.on?'GPS-Tacho ausblenden':'GPS-Tacho einblenden',OVI.go]:null,['ovgap',OVGAP.on?'Rückstand ausblenden':'Rückstand einblenden',OVI.go],['nameset','Namen setzen (Fahrer:innen antippen)',OVI.tag],LAY.length<3?['addrun','Weiteren Lauf dazunehmen',OVI.plus]:null,['series','Serie gegen A rechnen …',OVI.go],['make','Neu berechnen',OVI.go],['edit','Neu beginnen',OVI.back]])+ovSaveBtn(); }
@@ -7014,7 +7022,7 @@ async function autoSyncFind(ca,cb,prog,ex){ ex=ex||[]; // gleicher Kamerastandor
   /* Kantenbild 64×36: robust gegen Licht und Schatten der zwei Läufe, kleine Kameraabweichung wird beim Vergleich erlaubt */ const cv2=document.createElement('canvas'); cv2.width=W*2; cv2.height=H*2; const x2=cv2.getContext('2d',{willReadFrequently:true});
   const edge=v=>{ const w=W*2,h=H*2; x2.drawImage(v,0,0,w,h); const d=x2.getImageData(0,0,w,h).data, l=new Float32Array(w*h), e=new Float32Array(W*H); for(let i=0,j=0;i<l.length;i++,j+=4) l[i]=0.299*d[j]+0.587*d[j+1]+0.114*d[j+2]; for(let y=1;y<h-1;y++) for(let q=1;q<w-1;q++){ const i=y*w+q; e[(y>>1)*W+(q>>1)]+=Math.abs(l[i+1]-l[i-1])+Math.abs(l[i+w]-l[i-w]); } let m=0; for(let i=0;i<e.length;i++) m+=e[i]; m/=e.length; let sd=0; for(let i=0;i<e.length;i++){ e[i]-=m; sd+=e[i]*e[i]; } sd=Math.sqrt(sd/e.length)||1; for(let i=0;i<e.length;i++) e[i]/=sd; return e; };
   const grab=v=>{ x.drawImage(v,0,0,W,H); const d=x.getImageData(0,0,W,H).data, g=new Float32Array(W*H); let m=0; for(let i=0,j=0;i<g.length;i++,j+=4){ g[i]=0.299*d[j]+0.587*d[j+1]+0.114*d[j+2]; m+=g[i]; } m/=g.length; let sd=0; for(let i=0;i<g.length;i++){ g[i]-=m; sd+=g[i]*g[i]; } sd=Math.sqrt(sd/g.length)||1; for(let i=0;i<g.length;i++) g[i]*=40/sd; g.e=edge(v); return g; }; // Helligkeit + Kontrast ausgleichen
-  const ck=ca.id+'|'+cb.id, hit=AS.scan&&AS.scan.k===ck; const va=hit?null:await loadV(ca.url), vb=hit?null:await loadV(cb.url); const st=0.25;
+  const ck=ca.id+'|'+cb.id, hit=AS.scan&&AS.scan.k===ck; let va=null, vb=null; const st=0.25;
   try{
     // Schnell: Video stumm im Zeitraffer abspielen und Bilder mitnehmen (viel schneller als hunderte Sprünge); Lücken danach per Sprung füllen
     const scan=async(v,from)=>{ const T=Math.min(v.duration-0.3,90), N=Math.floor(T/st)+1, out=new Array(N).fill(null);
@@ -7024,7 +7032,12 @@ async function autoSyncFind(ca,cb,prog,ex){ ex=ex||[]; // gleicher Kamerastandor
           v.requestVideoFrameCallback(cb); v.playbackRate=6; v.play().catch(fin); }); }
       for(let k=0;k<N;k++){ if(AS.abort) return null; if(!out[k]){ await seekV(v,k*st); out[k]=grab(v); } }
       return out; };
-    let SA,SB; if(hit){ SA=AS.scan.SA; SB=AS.scan.SB; } else { SA=await scan(va,0); if(!SA) return null; SB=await scan(vb,0.5); if(!SB) return null; AS.scan={k:ck,SA,SB}; }
+    /* Genau: Rasterbilder (alle 0.25 s) direkt aus dem Decoder – immer dieselben Bilder, gleiches Ergebnis bei jedem Versuch. Ohne Decoder: Zeitraffer wie bisher */
+    const scanFS=async(c,from)=>{ let s=null; try{ s=await FrameSrc.open(c); if(!s.fast) return null; const T=Math.min(s.dur-0.3,90), N=Math.floor(T/st)+1, out=new Array(N);
+        for(let k=0;k<N;k++){ if(AS.abort) return null; const im=await s.at(k*st+0.001); out[k]=grab(im); if(k%8===0){ if(prog) prog(from+k/N*0.5); await new Promise(r=>setTimeout(r,0)); } } return out; }
+      catch(e){ console.warn('Zeitabgleich: Decoder',e); return null; } finally{ try{ s&&s.close(); }catch(e){} } };
+    const one=async(c,from,side)=>{ let o=await scanFS(c,from); if(o||AS.abort) return o; const v=await loadV(c.url); if(side==='a') va=v; else vb=v; return scan(v,from); };
+    let SA,SB; if(hit){ SA=AS.scan.SA; SB=AS.scan.SB; } else { SA=await one(ca,0,'a'); if(!SA) return null; SB=await one(cb,0.5,'b'); if(!SB) return null; AS.scan={k:ck,SA,SB}; }
     const diff=(p,q)=>{ let s=0; for(let i=0;i<p.length;i+=2){ const d=p[i]-q[i]; s+=d*d; } return s/(p.length/2); };
     // Bewegung je Bild (Kamera schwenkt = Fahrer:in unterwegs) – ruhige Startbilder zählen kaum
     const mv=S=>S.map((g,i)=>i?Math.min(1,diff(g,S[i-1])/60):0); const mA=mv(SA), mB=mv(SB);
@@ -7205,6 +7218,11 @@ $('#cmpReset').addEventListener('click',cmpReset);
 /* Restzeit: aus dem Tempo der letzten Bilder (nicht dem Schnitt seit Start), geglättet und bewusst grob – erst nach einigen Bildern */
 function ovEta(i,n){ const now=performance.now(); if(i<2||!GH.etaQ) { GH.etaQ=[]; GH.etaS=null; } const q=GH.etaQ; q.push(now); if(q.length>24) q.shift(); if(i<8||q.length<6) return 'Restzeit wird geschätzt …';
   const rest=(now-q[0])/(q.length-1)/1000*(n-i-1)*1.1; GH.etaS=GH.etaS==null?rest:GH.etaS*0.9+rest*0.1; const r=GH.etaS; if(r<8) return 'gleich fertig'; if(r<60) return 'noch ca. '+Math.ceil(r/10)*10+' s'; return 'noch ca. '+Math.ceil(r/30)/2+' Min.'; }
+/* Restzeit aus dem Anteil f (0–1) seit Beginn von «k»: erst nach 2 s und 6 % schätzen, geglättet, grob gerundet */
+const ETA={};
+function etaTxt(k,f){ const now=performance.now(); let e=ETA[k]; if(!e||f<e.f-0.02){ e=ETA[k]={t:now,f:f||0,s:null}; } e.f=f; const el=(now-e.t)/1000, df=f-(e.f0!=null?e.f0:(e.f0=f));
+  if(el<2||df<0.06) return 'Restzeit wird geschätzt …'; const rest=el/df*(1-f)*1.05; e.s=e.s==null?rest:e.s*0.85+rest*0.15; const r=e.s;
+  if(r<8) return 'gleich fertig'; if(r<60) return 'noch ca. '+Math.ceil(r/5)*5+' s'; return 'noch ca. '+Math.ceil(r/30)/2+' Min.'; }
 function ghostProgress(f,txt){ const b=$('#ghostBar'); $('.gprog i',b).style.width=(f*100)+'%'; $('.gprog span',b).textContent=txt; skiLoad(f,txt); }
 /* Ladeanzeige als Skispur: Fahrer:in fährt durch die Tore, gefahrene Spur hell, Rest gestrichelt */
 const SKIL={el:null,len:0};
@@ -8474,7 +8492,7 @@ addEventListener('unhandledrejection',e=>{ FB.errs.push('Promise: '+String(e.rea
 function fbOn(){ return !!(typeof TRN_API!=='undefined'&&TRN_API); }
 const fbIco='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v12H8l-4 4z"/><path d="M12 7.5v4M12 14h.01"/></svg>';
 function fbInfo(){ const D=mode==='cmp'?A:mode==='gps'?GD:S, c=D&&D.clip, n=x=>x?(x.alias||x.name||'').slice(0,90):'';
-  return {build:'20261119074626'.startsWith('%%')?'dev':'20261119074626',env:window.VLAB_ENV||'live',url:location.pathname,lang:(window.vlabLang&&vlabLang.get())||'de',ua:navigator.userAgent.slice(0,240),
+  return {build:'20261119102733'.startsWith('%%')?'dev':'20261119102733',env:window.VLAB_ENV||'live',url:location.pathname,lang:(window.vlabLang&&vlabLang.get())||'de',ua:navigator.userAgent.slice(0,240),
     scr:screen.width+'×'+screen.height+' @'+(devicePixelRatio||1)+' · Fenster '+innerWidth+'×'+innerHeight,mem:navigator.deviceMemory||null,cpu:navigator.hardwareConcurrency||null,net:navigator.onLine?'online':'offline',
     view:mode+(mode==='cmp'&&$('#viewCmp').classList.contains('overlay')?' · overlay':''),clip:n(c),clipB:mode==='cmp'?n(B.clip):'',
     t:D&&D.ready?+(D.frame/D.fps).toFixed(2):null,fps:c&&c.fps||null,size:c?[c.w,c.h].join('×'):'',n:clips.length,errs:FB.errs.slice()}; }
@@ -9750,7 +9768,7 @@ if(false&&!LS.get('hint1',0)){ setTimeout(()=>{ toast(matchMedia('(pointer:coars
 
 /* Update-Hinweis: prüft version.json auf GitHub Pages; «Aktualisieren» lädt die Seite ohne Cache neu */
 (()=>{
-  const BUILD='20261119074626'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
+  const BUILD='20261119102733'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
   // nach einem Update die ?v=… aus der Adresse entfernen
   try{ const u=new URL(location.href); if(u.searchParams.has('v')){ u.searchParams.delete('v'); history.replaceState(null,'',u.pathname+(u.search||'')+u.hash); } }catch(e){}
   const el=$('#upd'); let latest=null, snoozed=null, busy=false;
