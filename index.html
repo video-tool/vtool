@@ -3489,6 +3489,21 @@ body #viewSingle .pbar #sTitle::after{font-size:12px}
 #admModal .adm-zero .use-ic{width:52px;height:52px;border-radius:16px;margin-bottom:4px}
 #admModal .adm-zero .use-ic svg{width:24px;height:24px}
 #admModal .adm-zero .btn-pri{margin-top:6px;height:40px;padding:0 16px}
+#admModal .adm-csv{height:34px;padding:0 12px;border:1px solid var(--line2);border-radius:10px;background:var(--card);color:var(--ink2);font:650 12.5px var(--font);cursor:pointer;flex:none}
+#admModal .adm-csv:hover{color:var(--ink);border-color:var(--ink2)}
+#admModal .adm-fl{display:flex;gap:6px;padding:10px 18px;border-bottom:1px solid var(--line);overflow-x:auto;scrollbar-width:none}
+#admModal .adm-fl button{flex:none;height:30px;padding:0 11px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--ink2);font:600 12.5px var(--font);cursor:pointer;white-space:nowrap}
+#admModal .adm-fl button i{font-style:normal;color:var(--muted);font-variant-numeric:tabular-nums;margin-left:2px}
+#admModal .adm-fl button.on{background:var(--ink);border-color:var(--ink);color:var(--card)}
+#admModal .adm-fl button.on i{color:inherit;opacity:.7}
+#admModal .adm-fl button:disabled{opacity:.4;cursor:default}
+#admModal .adm-so{display:flex;align-items:center;gap:4px;height:100%;padding:0;border:0;background:none;color:inherit;font:inherit;letter-spacing:inherit;text-transform:inherit;cursor:pointer;text-align:left;min-width:0}
+#admModal .adm-so.r{justify-content:flex-end}
+#admModal .adm-so:hover,#admModal .adm-so.on{color:var(--ink)}
+#admModal .adm-so i{font-style:normal;font-size:8px}
+#admModal .adm-bsep{width:1px;height:22px;background:var(--line2);margin:0 2px}
+#admModal .adm-bb{border:1px solid var(--line2);border-radius:10px;background:var(--card);color:var(--ink);font:600 13px var(--font);cursor:pointer}
+#admModal .adm-bb.danger{color:var(--red);border-color:color-mix(in srgb,var(--red) 40%,transparent)}
 @media (max-width:1100px){ #admModal .adm-main{grid-template-columns:230px minmax(0,1fr)} }
 @media (max-width:760px){
   #admModal .adm-main{grid-template-columns:1fr;border:0;border-radius:0;background:none}
@@ -3504,6 +3519,8 @@ body #viewSingle .pbar #sTitle::after{font-size:12px}
   #admModal .adm-bulk select{flex:1 1 100%;min-width:0}
   #admModal .adm-bulk .adm-bn{flex:1 1 100%}
   #admModal .adm-bulk button{flex:1}
+  #admModal .adm-bsep{display:none}
+  #admModal .adm-fl{padding:8px 2px}
 }
 @media (max-width:600px){
   #admModal{padding:0}
@@ -8439,7 +8456,7 @@ addEventListener('unhandledrejection',e=>{ FB.errs.push('Promise: '+String(e.rea
 function fbOn(){ return !!(typeof TRN_API!=='undefined'&&TRN_API); }
 const fbIco='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v12H8l-4 4z"/><path d="M12 7.5v4M12 14h.01"/></svg>';
 function fbInfo(){ const D=mode==='cmp'?A:mode==='gps'?GD:S, c=D&&D.clip, n=x=>x?(x.alias||x.name||'').slice(0,90):'';
-  return {build:'20261118214100'.startsWith('%%')?'dev':'20261118214100',env:window.VLAB_ENV||'live',url:location.pathname,lang:(window.vlabLang&&vlabLang.get())||'de',ua:navigator.userAgent.slice(0,240),
+  return {build:'20261119070709'.startsWith('%%')?'dev':'20261119070709',env:window.VLAB_ENV||'live',url:location.pathname,lang:(window.vlabLang&&vlabLang.get())||'de',ua:navigator.userAgent.slice(0,240),
     scr:screen.width+'×'+screen.height+' @'+(devicePixelRatio||1)+' · Fenster '+innerWidth+'×'+innerHeight,mem:navigator.deviceMemory||null,cpu:navigator.hardwareConcurrency||null,net:navigator.onLine?'online':'offline',
     view:mode+(mode==='cmp'&&$('#viewCmp').classList.contains('overlay')?' · overlay':''),clip:n(c),clipB:mode==='cmp'?n(B.clip):'',
     t:D&&D.ready?+(D.frame/D.fps).toFixed(2):null,fps:c&&c.fps||null,size:c?[c.w,c.h].join('×'):'',n:clips.length,errs:FB.errs.slice()}; }
@@ -8491,7 +8508,7 @@ async function fbAdmin(el){ if(!el||!fbOn()||!USE.h) return; const s=vlabAuth.ge
 /* Benutzerverwaltung (nur Admins, Profil-Menü › Benutzer verwalten). Der Server prüft Sitzung, Admin-Liste und Admin-Passwort
    (vlab_adm_list / vlab_adm_add / vlab_adm_set). Das Admin-Passwort bleibt nur im Speicher dieser Seite. Pro Verband höchstens
    so viele aktive Zugänge wie vlab_orgs.max (Swiss-Ski unbegrenzt) – der Server blockiert, die Anzeige warnt vorher. */
-const ADM={pw:null,d:null,open:'',q:'',busy:false,v:'all',sel:new Set()};
+const ADM={pw:null,d:null,open:'',q:'',busy:false,v:'all',sel:new Set(),st:'all',sort:null};
 const ADMI={x:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>',
   ppl:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7M18 14a6 6 0 0 1 3.5 6"/></svg>',
   desk:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/></svg>',
@@ -8548,7 +8565,11 @@ function admRender(){ const D=ADM.d, m=$('#admModal'), q=ADM.q.trim(); if(!ADM.s
   const none=D.users.filter(u=>!u.org||!admIsOrg(u.org)), V=q?'q':ADM.v, org=admIsOrg(V)?D.orgs.find(o=>o.id===V):null;
   ADM._lv=V; [...ADM.sel].forEach(e=>{ if(!D.users.some(u=>u.e===e)) ADM.sel.delete(e); });
   let U=V==='q'?D.users.filter(admMatch):V==='all'?D.users:V==='none'?none:D.users.filter(u=>u.org===V);
-  U=U.slice().sort((a,b)=>(admAct(b)-admAct(a))||String(b.last||'').localeCompare(String(a.last||''))||String(a.n||a.e).localeCompare(String(b.n||b.e),'de',{numeric:true}));
+  const U0=U, OLD=Date.now()-90*864e5, ST={all:u=>true,act:admAct,off:u=>!admAct(u),never:u=>!u.last,old:u=>!u.last||new Date(u.last)<OLD};
+  if(!ST[ADM.st]) ADM.st='all'; U=U.filter(ST[ADM.st]);
+  const nmOf=u=>String(u.n||u.e), ogOf=u=>{ const o=D.orgs.find(x=>x.id===u.org); return o?o.name:'~'; }, cmp=(x,y)=>String(x).localeCompare(String(y),'de',{numeric:true,sensitivity:'base'});
+  const SK={n:(a,b)=>cmp(nmOf(a),nmOf(b)),e:(a,b)=>a.e<b.e?-1:a.e>b.e?1:0,org:(a,b)=>cmp(ogOf(a),ogOf(b)),r:(a,b)=>cmp(a.r||'coach',b.r||'coach'),last:(a,b)=>String(a.last||'').localeCompare(String(b.last||''))};
+  U=U.slice().sort(ADM.sort&&SK[ADM.sort.k]?(a,b)=>SK[ADM.sort.k](a,b)*ADM.sort.d||cmp(nmOf(a),nmOf(b)):(a,b)=>(admAct(b)-admAct(a))||String(b.last||'').localeCompare(String(a.last||''))||cmp(nmOf(a),nmOf(b)));
   const nAct=D.users.filter(admAct).length;
   /* Navigation */
   const nv=(v,label,sub,right,cls)=>'<button class="adm-nv'+(V===v?' on':'')+(cls?' '+cls:'')+'" data-v="'+esc(v)+'"><span class="adm-nl"><b>'+label+'</b>'+(sub?'<small>'+sub+'</small>':'')+'</span>'+right+'</button>';
@@ -8563,22 +8584,24 @@ function admRender(){ const D=ADM.d, m=$('#admModal'), q=ADM.q.trim(); if(!ADM.s
   let ph;
   if(org) ph='<div class="adm-ph"><div class="adm-pt"><h4>'+esc(org.name)+'</h4><span>'+esc(org.typ||'')+' · '+(org.max==null?'unbegrenzt viele Zugänge':'höchstens '+org.max+' aktive Zugänge')+'</span></div>'
     +'<div class="adm-pcap"><em class="adm-cap'+(admFull(org)?' full':'')+'">'+admCapTxt(org)+'</em></div>'
-    +'<button class="btn-pri adm-add" data-new="'+esc(org.id)+'"'+(admFull(org)?' disabled title="Verband voll – zuerst einen Zugang deaktivieren"':'')+'>+ Zugang</button></div>';
+    +(U0.length?'<button class="adm-csv" title="Diese Liste als CSV-Datei (Excel) herunterladen">CSV</button>':'')+'<button class="btn-pri adm-add" data-new="'+esc(org.id)+'"'+(admFull(org)?' disabled title="Verband voll – zuerst einen Zugang deaktivieren"':'')+'>+ Zugang</button></div>';
   else ph='<div class="adm-ph"><div class="adm-pt"><h4>'+(V==='q'?'Suche «'+esc(q)+'»':V==='none'?'Ohne Verband':'Alle Zugänge')+'</h4><span>'
-    +(V==='q'?U.length+' Treffer':V==='none'?'Ältere Zugänge – auswählen und einem Verband zuordnen':nAct+' aktiv · '+(D.users.length-nAct)+' inaktiv')+'</span></div></div>';
+    +(V==='q'?U0.length+' Treffer':V==='none'?'Ältere Zugänge – auswählen und einem Verband zuordnen':nAct+' aktiv · '+(D.users.length-nAct)+' inaktiv')+'</span></div>'+(U0.length?'<button class="adm-csv" title="Diese Liste als CSV-Datei (Excel) herunterladen">CSV</button>':'')+'</div>';
+  const fl=U0.length?'<div class="adm-fl" role="group" aria-label="Filter">'+[['all','Alle'],['act','Aktiv'],['off','Inaktiv'],['never','Nie angemeldet'],['old','Über 90 Tage nicht da']].map(([k,l])=>{ const n=U0.filter(ST[k]).length; return '<button data-st="'+k+'" class="'+(ADM.st===k?'on':'')+'"'+(n||k==='all'||ADM.st===k?'':' disabled')+'>'+l+' <i>'+n+'</i></button>'; }).join('')+'</div>':'';
   /* Mehrfach-Auswahl */
   const nSel=ADM.sel.size, selAct=D.users.filter(u=>ADM.sel.has(u.e)&&admAct(u)).length;
   const bulk=nSel?'<div class="adm-bulk"><b class="adm-bn">'+nSel+' ausgewählt</b><select class="adm-bo" aria-label="Verband"><option value="">Verband wählen …</option>'
     +D.orgs.map(o=>{ const f=admFree(o), ok=f>=selAct; return '<option value="'+esc(o.id)+'"'+(ok?'':' disabled')+'>'+esc(o.name)+(o.max==null?'':' · noch '+f+' frei')+'</option>'; }).join('')
-    +'</select><button class="btn-pri adm-bgo" disabled>Zuordnen</button><button class="adm-bx">Auswahl aufheben</button></div>':'';
+    +'</select><button class="btn-pri adm-bgo" disabled>Zuordnen</button><span class="adm-bsep"></span><button class="adm-bb" data-b="off">Deaktivieren</button><button class="adm-bb danger" data-b="del">Löschen</button><button class="adm-bx">Aufheben</button></div>':'';
   /* Tabelle */
   const showOrg=!org, cols=admCols(showOrg), LIM=150, allSel=U.length&&U.every(u=>ADM.sel.has(u.e));
-  const th='<div class="adm-th" style="--cols:'+cols+'"><span class="adm-ck"><input type="checkbox" class="adm-all" aria-label="Alle auswählen"'+(allSel?' checked':'')+'></span><span></span><span>Name</span><span>E-Mail</span>'+(showOrg?'<span>Verband</span>':'')+'<span>Rolle</span><span>Geräte</span><span class="r">Zuletzt</span><span></span></div>';
+  const sh=(k,l,r)=>{ const on=ADM.sort&&ADM.sort.k===k; return '<button class="adm-so'+(on?' on':'')+(r?' r':'')+'" data-sort="'+k+'" title="Sortieren">'+l+'<i>'+(on?(ADM.sort.d>0?'▲':'▼'):'')+'</i></button>'; };
+  const th='<div class="adm-th" style="--cols:'+cols+'"><span class="adm-ck"><input type="checkbox" class="adm-all" aria-label="Alle auswählen"'+(allSel?' checked':'')+'></span><span></span>'+sh('n','Name')+sh('e','E-Mail')+(showOrg?sh('org','Verband'):'')+sh('r','Rolle')+'<span>Geräte</span>'+sh('last','Zuletzt',1)+'<span></span></div>';
   const list=U.length?th+'<div class="adm-ul" style="--cols:'+cols+'">'+U.slice(0,LIM).map(u=>admUserRow(u,showOrg)).join('')+'</div>'+(U.length>LIM?'<div class="adm-more">… '+(U.length-LIM)+' weitere – über die Suche finden</div>':'')
     :org?'<div class="adm-zero"><span class="use-ic">'+ADMI.ppl+'</span><b>Noch kein Zugang für '+esc(org.name)+'</b><small>'+(org.max==null?'Beliebig viele Zugänge möglich.':'Bis zu '+org.max+' aktive Zugänge.')+(none.length?' Oder ältere Zugänge unter «Ohne Verband» auswählen und zuordnen.':'')+'</small><button class="btn-pri" data-new="'+esc(org.id)+'">+ Ersten Zugang anlegen</button></div>'
-    :'<div class="adm-zero"><b>'+(V==='q'?'Nichts gefunden.':'Noch keine Zugänge.')+'</b></div>';
+    :'<div class="adm-zero"><b>'+(U0.length?'Keine Zugänge mit diesem Filter.':V==='q'?'Nichts gefunden.':'Noch keine Zugänge.')+'</b></div>';
   const body='<div class="adm-bar"><input type="search" class="adm-q" placeholder="Name oder E-Mail suchen" value="'+esc(ADM.q)+'"><button class="btn-pri" data-new="">+ Neuer Zugang</button></div>'
-    +'<div class="adm-main">'+nav+'<section class="adm-pane">'+nsel+ph+bulk+'<div class="adm-body">'+list+'</div></section></div>';
+    +'<div class="adm-main">'+nav+'<section class="adm-pane">'+nsel+ph+fl+bulk+'<div class="adm-body">'+list+'</div></section></div>';
   admShell(body,D.orgs.length+' Verbände · '+nAct+' aktive Zugänge · angemeldet als '+(D.me||''));
   const nb=m.querySelector('.adm-body'); nb.scrollTop=top; const nvs=m.querySelector('.adm-nav .on'); if(nvs&&ADM._nt!=null) m.querySelector('.adm-nav').scrollTop=ADM._nt;
   m.querySelector('.adm-nav').onscroll=e=>{ ADM._nt=e.target.scrollTop; };
@@ -8587,7 +8610,11 @@ function admRender(){ const D=ADM.d, m=$('#admModal'), q=ADM.q.trim(); if(!ADM.s
   m.querySelectorAll('.adm-nv').forEach(b=>b.onclick=()=>go(b.dataset.v)); $('.adm-nsel',m).onchange=e=>go(e.target.value);
   m.querySelectorAll('[data-new]').forEach(b=>b.onclick=()=>admNew(b.dataset.new));
   const all=$('.adm-all',m); if(all) all.onchange=()=>{ U.forEach(u=>all.checked?ADM.sel.add(u.e):ADM.sel.delete(u.e)); admRender(); };
-  if(nSel){ const bo=$('.adm-bo',m), bg=$('.adm-bgo',m); bo.onchange=()=>{ bg.disabled=!bo.value; }; bg.onclick=()=>admBulk(bo.value); $('.adm-bx',m).onclick=()=>{ ADM.sel.clear(); admRender(); }; }
+  if(nSel){ const bo=$('.adm-bo',m), bg=$('.adm-bgo',m); bo.onchange=()=>{ bg.disabled=!bo.value; }; bg.onclick=()=>admBulk(bo.value); $('.adm-bx',m).onclick=()=>{ ADM.sel.clear(); admRender(); };
+    m.querySelectorAll('.adm-bb').forEach(b=>b.onclick=()=>admBulkSet(b.dataset.b)); }
+  m.querySelectorAll('[data-st]').forEach(b=>b.onclick=()=>{ ADM.st=b.dataset.st; ADM.open=''; admRender(); });
+  m.querySelectorAll('[data-sort]').forEach(b=>b.onclick=()=>{ const k=b.dataset.sort, c=ADM.sort; ADM.sort=c&&c.k===k?(c.d>0?{k,d:-1}:null):{k,d:k==='last'?-1:1}; admRender(); });
+  const cv=$('.adm-csv',m); if(cv) cv.onclick=()=>admCsv(U,org?org.name:V==='none'?'ohne-verband':V==='q'?'suche':'alle');
   m.querySelectorAll('.adm-u').forEach(el=>{ const u=D.users.find(x=>x.e===el.dataset.e), ck=$('.adm-ck input',el);
     ck.onclick=e=>e.stopPropagation(); $('.adm-ck',el).onclick=e=>e.stopPropagation(); ck.onchange=()=>{ ck.checked?ADM.sel.add(u.e):ADM.sel.delete(u.e); admRender(); };
     const ur=$('.adm-ur',el); ur.onkeydown=e=>{ if(e.target===ur&&(e.key==='Enter'||e.key===' ')){ e.preventDefault(); ur.click(); } };
@@ -8597,6 +8624,19 @@ async function admBulk(org){ const D=ADM.d, es=[...ADM.sel], o=D.orgs.find(x=>x.
   for(const e of es){ if(bn) bn.textContent='Zuordnen … '+(ok+bad+1)+' / '+es.length; const j=await admCall('vlab_adm_set',{p_e:e,p_what:'org',p_val:org});
     if(j.ok) ok++; else { bad++; if(j.err==='denied'||j.err==='auth'){ ADM.busy=false; ADM.pw=null; admPwForm(ADMERR[j.err]); return; } } }
   ADM.busy=false; ADM.sel.clear(); toast(ok+(ok===1?' Zugang':' Zugänge')+' «'+o.name+'» zugeordnet'+(bad?' · '+bad+' nicht möglich (Verband voll?)':'')+'.',3800); ADM.v=org; await admLoad(); }
+async function admBulkSet(kind){ const D=ADM.d, us=D.users.filter(u=>ADM.sel.has(u.e)&&(kind==='del'||admAct(u))); if(ADM.busy) return;
+  if(!us.length){ toast('Die ausgewählten Zugänge sind schon inaktiv.'); return; }
+  if(!confirm(kind==='del'?us.length+(us.length===1?' Zugang':' Zugänge')+' endgültig löschen? Das lässt sich nicht rückgängig machen.':us.length+(us.length===1?' Zugang':' Zugänge')+' deaktivieren? Alle Geräte werden abgemeldet.')) return;
+  ADM.busy=true; let ok=0, bad=0; const bn=$('#admModal .adm-bn'); $$('#admModal .adm-bulk button,#admModal .adm-bulk select').forEach(x=>x.disabled=true);
+  for(const u of us){ if(bn) bn.textContent=(kind==='del'?'Löschen':'Deaktivieren')+' … '+(ok+bad+1)+' / '+us.length; const j=await admCall('vlab_adm_set',{p_e:u.e,p_what:kind==='del'?'del':'aktiv',p_val:kind==='del'?null:'false'});
+    if(j.ok) ok++; else { bad++; if(j.err==='denied'||j.err==='auth'){ ADM.busy=false; ADM.pw=null; admPwForm(ADMERR[j.err]); return; } } }
+  ADM.busy=false; ADM.sel.clear(); ADM.open=''; toast(ok+(ok===1?' Zugang ':' Zugänge ')+(kind==='del'?'gelöscht':'deaktiviert')+(bad?' · '+bad+' nicht möglich':'')+'.',3800); await admLoad(); }
+function admCsv(U,name){ const D=ADM.d, q=v=>{ v=v==null?'':String(v); return /[";\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v; };
+  const rows=[['Name','E-Mail','Verband','Rolle','Status','Computer','Handys','Zuletzt angemeldet']].concat(U.map(u=>{ const o=D.orgs.find(x=>x.id===u.org), dv=u.dev||[], nd=dv.filter(x=>x.kind!=='mobile').length;
+    return [u.n||'',u.e,o?o.name:'',u.r==='athlete'?'Athlet:in':'Coach',admAct(u)?'aktiv':'inaktiv',nd,dv.length-nd,u.last?new Date(u.last).toLocaleDateString('de-CH'):'nie']; }));
+  const blob=new Blob(['﻿'+rows.map(r=>r.map(q).join(';')).join('\r\n')],{type:'text/csv;charset=utf-8'}), a=document.createElement('a'), d=new Date();
+  a.href=URL.createObjectURL(blob); a.download='video-lab-zugaenge_'+String(name).toLowerCase().replace(/[^a-z0-9äöü]+/g,'-')+'_'+d.getFullYear()+String(d.getMonth()+1).padStart(2,'0')+String(d.getDate()).padStart(2,'0')+'.csv';
+  document.body.appendChild(a); a.click(); setTimeout(()=>{ URL.revokeObjectURL(a.href); a.parentNode&&a.parentNode.removeChild(a); },1000); toast(U.length+' Zugänge als CSV gespeichert.'); }
 async function admDo(u,what,val,ok){ if(ADM.busy) return false; ADM.busy=true; const j=await admCall('vlab_adm_set',{p_e:u.e,p_what:what,p_val:val==null?null:String(val)}); ADM.busy=false;
   if(!j.ok){ toast(ADMERR[j.err]||'Fehler.',4000); if(j.err==='denied'){ ADM.pw=null; admPwForm(ADMERR.denied); } else admLoad(); return false; }
   if(ok) toast(ok); await admLoad(); return true; }
@@ -8606,9 +8646,11 @@ async function admUserAct(u,a,b){ if(a==='tog'){ ADM.open=ADM.open===u.e?'':u.e;
   if(a==='del'){ if(confirm((u.n||u.e)+' endgültig löschen?')){ ADM.open=''; admDo(u,'del',null,'Gelöscht.'); } return; }
   if(a==='pw'){ const pw=admPwGen(); if(!confirm('Neues Passwort für '+(u.n||u.e)+' setzen? Alle Geräte werden abgemeldet.')) return;
     const h=await vlabAuth.hash(u.e,pw); if(await admDo(u,'pw',h)) admShow('Neues Passwort',u,pw); } }
-function admShow(title,u,pw){ const m=admShell('<div class="adm-done"><h4></h4><dl><dt>E-Mail</dt><dd class="e"></dd><dt>Passwort</dt><dd class="p"></dd></dl><p>Das Passwort ist nur jetzt sichtbar. Bitte direkt weitergeben.</p><div class="adm-btns"><button class="btn-pri" data-c>Kopieren</button><button data-b>Zurück zur Übersicht</button></div></div>');
+function admShow(title,u,pw){ const m=admShell('<div class="adm-done"><h4></h4><dl><dt>E-Mail</dt><dd class="e"></dd><dt>Passwort</dt><dd class="p"></dd></dl><p>Das Passwort ist nur jetzt sichtbar. Bitte direkt weitergeben.</p><div class="adm-btns"><button class="btn-pri" data-c>Kopieren</button><button data-m>Per E-Mail senden</button><button data-b>Zurück zur Übersicht</button></div></div>');
   $('h4',m).textContent=title+(u.n?' · '+u.n:''); $('.e',m).textContent=u.e; $('.p',m).textContent=pw;
   $('[data-c]',m).onclick=async()=>{ const t='Video-Lab: https://video-tool.github.io/vtool/\nE-Mail: '+u.e+'\nPasswort: '+pw; try{ await navigator.clipboard.writeText(t); toast('Kopiert.'); }catch(e){ toast('Kopieren nicht möglich – bitte abschreiben.'); } };
+  $('[data-m]',m).onclick=()=>{ const b='Hallo\n\nhier dein Zugang zum Video-Lab von Swiss-Ski:\n\nAdresse: https://video-tool.github.io/vtool/\nE-Mail: '+u.e+'\nPasswort: '+pw+'\n\nBitte das Passwort nicht weitergeben.\n\nGruss';
+    location.href='mailto:'+encodeURIComponent(u.e)+'?subject='+encodeURIComponent('Dein Zugang zum Video-Lab')+'&body='+encodeURIComponent(b); };
   $('[data-b]',m).onclick=()=>admRender(); }
 function admNew(org){ const D=ADM.d, pw=admPwGen();
   const opts=D.orgs.map(o=>'<option value="'+esc(o.id)+'"'+(o.id===org?' selected':'')+(admFull(o)?' disabled':'')+'>'+esc(o.name)+(admFull(o)?' (voll, '+admCnt(o)+'/'+o.max+')':o.max!=null?' ('+admCnt(o)+'/'+o.max+')':'')+'</option>').join('');
@@ -9686,7 +9728,7 @@ if(false&&!LS.get('hint1',0)){ setTimeout(()=>{ toast(matchMedia('(pointer:coars
 
 /* Update-Hinweis: prüft version.json auf GitHub Pages; «Aktualisieren» lädt die Seite ohne Cache neu */
 (()=>{
-  const BUILD='20261118214100'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
+  const BUILD='20261119070709'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
   // nach einem Update die ?v=… aus der Adresse entfernen
   try{ const u=new URL(location.href); if(u.searchParams.has('v')){ u.searchParams.delete('v'); history.replaceState(null,'',u.pathname+(u.search||'')+u.hash); } }catch(e){}
   const el=$('#upd'); let latest=null, snoozed=null, busy=false;
