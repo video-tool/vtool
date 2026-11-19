@@ -3078,13 +3078,14 @@ body.pfs .gps-sel,body.pfs .gps-foot,body.pfs #gpsChart,body.pfs #viewGps .ctl-l
 
 /* Handy quer im Vollbild: alles ohne Scrollen sichtbar */
 @media (max-height:500px) and (orientation:landscape){
-  body.pfs #sHost .stage,body.pfs #gHost .stage{max-height:calc(100dvh - 112px)!important}
-  body.pfs #cStages .stage,body.pfs #viewCmp .stages .stage{max-height:calc(100dvh - 118px)!important}
+  body.pfs #sHost .stage,body.pfs #gHost .stage{max-height:calc(100dvh - 130px)!important}
+  body.pfs #cStages .stage,body.pfs #viewCmp .stages .stage{max-height:calc(100dvh - 126px)!important}
   body.pfs canvas.strip{height:34px!important}
   body.pfs .player .tl,body.pfs #viewGps .tl{margin-top:3px!important}
   body.pfs .player .dock,body.pfs #viewGps .dock{margin-top:3px!important;padding:2px 6px!important;flex-wrap:nowrap!important}
-  body.pfs .player .dock .ctl:not(.play),body.pfs #viewGps .dock .ctl:not(.play){height:32px!important;min-height:0!important}
-  body.pfs .player .dock .ctl.play,body.pfs #viewGps .ctl.play{width:38px!important;height:38px!important;min-width:38px!important}
+  body.pfs .player .dock .ctl:not(.play),body.pfs #viewGps .dock .ctl:not(.play){height:40px!important;min-height:0!important;min-width:46px!important} /* quer: Knöpfe gut treffbar, Icons grösser */
+  body.pfs .player .dock .ctl:not(.play) svg,body.pfs #viewGps .dock .ctl:not(.play) svg{width:21px!important;height:21px!important}
+  body.pfs .player .dock .ctl.play,body.pfs #viewGps .ctl.play{width:48px!important;height:48px!important;min-width:48px!important}
   body.pfs .player>.pbar,body.pfs .player>.c-head,body.pfs #ovTxt,body.pfs #ovSteps{display:none!important}  body.pfs #viewGps .dock.dock3{display:flex!important;flex-wrap:nowrap!important;justify-content:center!important;gap:6px!important}
   body.pfs #viewGps .dock.dock3>.dz{flex:none!important;margin:0!important}
 }
@@ -4101,6 +4102,7 @@ function addClip(o){
 }
 function removeClip(c,quiet){
   const i=clips.indexOf(c); if(i<0) return;
+  if(c.field&&!quiet){ const H=LS.get('fieldhide',[]); if(!H.includes(c.field)){ H.push(c.field); LS.set('fieldhide',H.slice(-800)); } } /* Lauf aus «Filmen»: weggeklickt bleibt weg (die Aufnahme selbst wird nicht gelöscht) – sonst käme er bei jedem Öffnen wieder */
   clips.splice(i,1); c.gen.destroy(); if(c.handle) idbDel(clipKey(c)); if(c.cloud&&window.cloudDel) cloudDel(c.cloud);
   decks.forEach(d=>{ if(d.clip===c) d.setClip(null); });
   try{ URL.revokeObjectURL(c.url); }catch(e){}
@@ -5444,8 +5446,9 @@ class FrameSrc{
   _mk(){ const me=this; this.dec=new VideoDecoder({output:fr=>me._out(fr),error:e=>{ me.err=e; me._wake(); me._wakeDq(); }}); this.dec.addEventListener('dequeue',()=>me._wakeDq()); this.dec.configure(this.cfg); this.needKey=true; }
   _out(fr){ const c=this.cache; { const ix=this.T.byTs.get(fr.timestamp); if(ix!=null) this.pend.delete(ix); } if(this.dead||c.has(fr.timestamp)||(this.want!=null&&fr.timestamp<this.want)){ fr.close(); this._wake(); return; } /* Bilder vor dem Ziel sofort freigeben – iOS hat nur wenige Bildpuffer, sonst bleibt der Decoder stehen */
     c.set(fr.timestamp,fr); const cap=FrameSrc.capN();
-    while(c.size>cap){ const w=this.want!=null?this.want:-1; let k=null, old=null; for(const q of c.keys()){ if(q===this.need) continue; if(q<w){ if(old==null||q<old) old=q; } else if(k==null||q>k) k=q; } if(old!=null) k=old; if(k==null) break; const o=c.get(k); c.delete(k); if(o!==this.hold) o.close(); } this._wake(); } /* zuerst Bilder vor dem gesuchten freigeben, sonst das am weitesten vorausliegende – nie das nächste: sonst muss der Decoder ab Schlüsselbild neu anfangen (bei Videos mit Schlüsselbild nur alle ~8 s sehr teuer) */
-  static capN(){ return FrameSrc.cap||(FrameSrc.cap=matchMedia('(pointer:coarse)').matches?3:6); } /* Handy (iOS): wenige Bildpuffer; Computer: ein paar Bilder voraus /* das gerade gesuchte Bild (need) nie verdrängen: gibt der Decoder unter Last mehrere Bilder auf einmal aus, ging es sonst verloren und es kam ein Bild ~1 s später */
+    while(c.size>cap){ const w=this.want!=null?this.want:-1; let k=null, old=null; if(FrameSrc.phone()){ for(const q of c.keys()) if(q!==this.need){ k=q; break; } } /* Handy: Verhalten wie bisher (auf dem iPhone bewährt) */ else { for(const q of c.keys()){ if(q===this.need) continue; if(q<w){ if(old==null||q<old) old=q; } else if(k==null||q>k) k=q; } if(old!=null) k=old; } if(k==null) break; const o=c.get(k); c.delete(k); if(o!==this.hold) o.close(); } this._wake(); } /* zuerst Bilder vor dem gesuchten freigeben, sonst das am weitesten vorausliegende – nie das nächste: sonst muss der Decoder ab Schlüsselbild neu anfangen (bei Videos mit Schlüsselbild nur alle ~8 s sehr teuer) */
+  static phone(){ if(FrameSrc.ph==null) FrameSrc.ph=matchMedia('(pointer:coarse)').matches; return FrameSrc.ph; }
+  static capN(){ return FrameSrc.phone()?3:6; } /* Handy (iOS): wenige Bildpuffer; Computer: ein paar Bilder voraus /* das gerade gesuchte Bild (need) nie verdrängen: gibt der Decoder unter Last mehrere Bilder auf einmal aus, ging es sonst verloren und es kam ein Bild ~1 s später */
   _wake(){ const r=this.wk; if(r){ this.wk=null; r(); } }
   _wait(ms){ return new Promise(r=>{ this.wk=r; setTimeout(r,ms||1200); }); } /* wartet auf ein ausgegebenes Bild */
   _wakeDq(){ const r=this.wkd; if(r){ this.wkd=null; r(); } }
@@ -5467,7 +5470,7 @@ class FrameSrc{
   async _at(t){ if(!this.fast){ await seekV(this.v,t); return this.v; }
     try{ const S=this.T.S, i=this._idx(t), ts=S[i].ts; this.want=ts; let fr=this.cache.get(ts); if(fr){ this.need=null; return this._hold(fr); } this.need=ts;
       const kf=S[i].kf; if(this.needKey||(i<this.pos&&!this.pend.has(i))||kf>this.pos){ if(!this.needKey){ try{ this.dec.reset(); }catch(e){} this.dec.configure(this.cfg); } this.pend.clear(); this.pos=kf; this.needKey=false; } /* Zielbild ist weder im Cache noch im Decoder → ab Schlüsselbild neu */
-      const LOOK=Math.min(6,FrameSrc.capN()), MAXL=28, feed=async()=>{ if(this.dec.decodeQueueSize>16) await this._waitDq(400); const s=S[this.pos]; this.pend.add(this.pos); this.pos++; const data=await this._bytes(s.off,s.sz); this.dec.decode(new EncodedVideoChunk({type:s.key?'key':'delta',timestamp:s.ts,duration:s.dus,data})); };
+      const LOOK=6, MAXL=28, feed=async()=>{ if(this.dec.decodeQueueSize>16) await this._waitDq(400); const s=S[this.pos]; this.pend.add(this.pos); this.pos++; const data=await this._bytes(s.off,s.sz); this.dec.decode(new EncodedVideoChunk({type:s.key?'key':'delta',timestamp:s.ts,duration:s.dus,data})); };
       for(let guard=0;guard<6000;guard++){ if(this.dead) throw new Error('abgebrochen'); fr=this.cache.get(ts); if(fr){ this.need=null; return this._hold(fr); } if(this.err) throw this.err;
         const ahead=this.pos-i; /* wie weit über das Zielbild hinaus schon gefüttert */
         if(this.pos<S.length&&ahead<LOOK){ await feed(); continue; }
@@ -7981,10 +7984,12 @@ function trnPicker(box,list,kind){ const pool=$('.trn-pool',box), inp=$('input',
 /* Video verkleinern: kürzere Seite 720 px, Bild für Bild aus der Datei (WebCodecs), ohne Ton. Sonst Original. */
 const TRN_MAX=95*1024*1024;
 async function trnShrink(c,prog){
-  await catDur(c); const fps0=c.fps||(await Promise.race([c.whenFps,new Promise(r=>setTimeout(()=>r(null),1500))]))||30, fps=Math.min(60,Math.max(15,fps0));
+  await Promise.race([catDur(c),new Promise(r=>setTimeout(r,8000))]); const fps0=c.fps||(await Promise.race([c.whenFps,new Promise(r=>setTimeout(()=>r(null),1500))]))||30, fps=Math.min(60,Math.max(15,fps0));
   const orig=async()=>{ if(c.size>TRN_MAX) throw new Error('size'); const r=await fetch(c.url); return {blob:await r.blob(),w:c.w,h:c.h,small:false}; };
   if(typeof VideoEncoder==='undefined'||typeof Mp4Muxer==='undefined'||!(c.dur>0)) return orig();
-  let v; try{ v=await FrameSrc.open(c); }catch(e){ return orig(); }
+  /* Zeitgrenze: bleibt das Lesen eines Bildes hängen (auf dem iPhone bei manchen Videos), nicht ewig bei «Verkleinern 0 %» stehen, sondern das Original hochladen */
+  const lim=(pr,ms)=>{ let to; return Promise.race([pr,new Promise((_,rej)=>{ to=setTimeout(()=>rej(new Error('Zeitgrenze')),ms); })]).finally(()=>clearTimeout(to)); };
+  let v; try{ v=await lim(FrameSrc.open(c),20000); }catch(e){ return orig(); }
   try{
     const w0=v.w||c.w, h0=v.h||c.h, sh=Math.min(w0,h0); if(!w0||!h0) return orig();
     if(sh<=720&&c.size<=40*1024*1024) return orig();
@@ -7995,7 +8000,8 @@ async function trnShrink(c,prog){
     const mux=new Mp4Muxer.Muxer({target:new Mp4Muxer.ArrayBufferTarget(),video:{codec:'avc',width:W,height:H,frameRate:Math.round(fps)},fastStart:'in-memory',firstTimestampBehavior:'offset'});
     let err=null; const enc=new VideoEncoder({output:(ch,m)=>{ try{ mux.addVideoChunk(ch,m); }catch(e){ err=e; } },error:e=>{ err=e; }}); enc.configure(cfg);
     const n=Math.max(1,Math.floor(c.dur*fps)), kf=Math.round(fps*2);
-    for(let f=0;f<n;f++){ const im=await v.at((f+0.5)/fps); x.drawImage(im,0,0,W,H); const vf=new VideoFrame(cv,{timestamp:Math.round(f/fps*1e6),duration:Math.round(1e6/fps)}); enc.encode(vf,{keyFrame:f%kf===0}); vf.close();
+    const tS=performance.now();
+    for(let f=0;f<n;f++){ const im=await lim(v.at((f+0.5)/fps),f?12000:20000); if(f===90&&performance.now()-tS>90000&&c.size<=TRN_MAX) throw new Error('zu langsam'); /* über 1 s pro Bild: das Original ist schneller oben */ x.drawImage(im,0,0,W,H); const vf=new VideoFrame(cv,{timestamp:Math.round(f/fps*1e6),duration:Math.round(1e6/fps)}); enc.encode(vf,{keyFrame:f%kf===0}); vf.close();
       while(enc.encodeQueueSize>12) await new Promise(r=>setTimeout(r,6)); if(err) throw err; if(f%6===0){ prog&&prog(f/n); await new Promise(r=>setTimeout(r,0)); } }
     await enc.flush(); enc.close(); mux.finalize(); if(err) throw err;
     const blob=new Blob([mux.target.buffer],{type:'video/mp4'}); if(blob.size>=c.size&&c.size<=TRN_MAX) return orig(); return {blob,w:W,h:H,small:true};
@@ -8582,7 +8588,7 @@ addEventListener('unhandledrejection',e=>{ FB.errs.push('Promise: '+String(e.rea
 function fbOn(){ return !!(typeof TRN_API!=='undefined'&&TRN_API); }
 const fbIco='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v12H8l-4 4z"/><path d="M12 7.5v4M12 14h.01"/></svg>';
 function fbInfo(){ const D=mode==='cmp'?A:mode==='gps'?GD:S, c=D&&D.clip, n=x=>x?(x.alias||x.name||'').slice(0,90):'';
-  return {build:'20261119134612'.startsWith('%%')?'dev':'20261119134612',env:window.VLAB_ENV||'live',url:location.pathname,lang:(window.vlabLang&&vlabLang.get())||'de',ua:navigator.userAgent.slice(0,240),
+  return {build:'20261119223114'.startsWith('%%')?'dev':'20261119223114',env:window.VLAB_ENV||'live',url:location.pathname,lang:(window.vlabLang&&vlabLang.get())||'de',ua:navigator.userAgent.slice(0,240),
     scr:screen.width+'×'+screen.height+' @'+(devicePixelRatio||1)+' · Fenster '+innerWidth+'×'+innerHeight,mem:navigator.deviceMemory||null,cpu:navigator.hardwareConcurrency||null,net:navigator.onLine?'online':'offline',
     view:mode+(mode==='cmp'&&$('#viewCmp').classList.contains('overlay')?' · overlay':''),clip:n(c),clipB:mode==='cmp'?n(B.clip):'',
     t:D&&D.ready?+(D.frame/D.fps).toFixed(2):null,fps:c&&c.fps||null,size:c?[c.w,c.h].join('×'):'',n:clips.length,errs:FB.errs.slice()}; }
@@ -9315,7 +9321,7 @@ function ftMatch(n){ if(!FT.q) return true; if(n.kind==='directory') return ftHa
 function ftHasMatch(n){ if(!n.children) return false; return n.children.some(k=>k.kind==='directory'?ftHasMatch(k):ftMatch(k)); }
 function ftRender(){
   const el=$('#ftree'); if(!el) return; el.innerHTML='';
-  $('#ftEmpty').hidden=!!FT.roots.length||!(DIR_OK||DIR_RO); $('#ftNote').hidden=DIR_OK||DIR_RO; $('#ftRo').hidden=!FT.roots.some(r=>r.ro); $('#ftTools').hidden=false; $('#ftTools').classList.toggle('noroot',!FT.roots.length); $('#sideTree').classList.toggle('has-roots',!!FT.roots.length);
+  $('#ftEmpty').hidden=!!FT.roots.length||!(DIR_OK||DIR_RO); $('#ftNote').hidden=DIR_OK||DIR_RO||matchMedia('(pointer:coarse)').matches; /* Handy: der Hinweis zum Ordnerzugriff am Computer hilft dort nicht */ $('#ftRo').hidden=!FT.roots.some(r=>r.ro); $('#ftTools').hidden=false; $('#ftTools').classList.toggle('noroot',!FT.roots.length); $('#sideTree').classList.toggle('has-roots',!!FT.roots.length);
   const openIds=new Set([S,A,B,GD].map(d=>d.clip&&d.clip._node&&d.clip._node.id).filter(Boolean));
   const row=(n,depth)=>{
     const r=document.createElement('div'); r.className='ft-row '+(n.kind==='directory'?'dir':'file')+(n.root?' root':'')+(openIds.has(n.id)?' on':''); r.dataset.id=n.id; r.style.setProperty('--d',depth);
@@ -9753,8 +9759,8 @@ async function fieldSync(){ if(!window.indexedDB) return; let db;
   try{ db=await new Promise((res,rej)=>{ const r=indexedDB.open('vlab-field'); r.onupgradeneeded=()=>{ try{ r.transaction.abort(); }catch(e){} }; r.onsuccess=()=>res(r.result); r.onerror=()=>rej(r.error); r.onblocked=()=>rej(); }); }catch(e){ return; } // gibt es die Datenbank noch nicht: nichts anlegen
   if(!db.objectStoreNames.contains('clips')){ db.close(); return; }
   const L=await new Promise(res=>{ try{ const q=db.transaction('clips').objectStore('clips').getAll(); q.onsuccess=()=>res(q.result||[]); q.onerror=()=>res([]); }catch(e){ res([]); } }); db.close();
-  const seen=new Set(); let n=0, ch=false;
-  for(const f of L.sort((a,b)=>a.created-b.created)){ if(!f.blob) continue; seen.add(f.id);
+  const seen=new Set(), hid=new Set(LS.get('fieldhide',[])); let n=0, ch=false;
+  for(const f of L.sort((a,b)=>a.created-b.created)){ if(!f.blob||hid.has(f.id)) continue; seen.add(f.id);
     const nm=f.fname||(String(f.name||'Lauf').replace(/[^\wäöüÄÖÜéèà\- ]+/g,'').trim().replace(/\s+/g,'_')+'.'+(/webm/.test(f.mime||f.blob.type)?'webm':'mp4'));
     let c=clips.find(x=>x.field===f.id);
     if(c){ if(c.name!==nm){ c.name=nm; c.meta=parseName(nm); ch=true; } continue; } // in der Field-App umbenannt
@@ -9858,7 +9864,7 @@ if(false&&!LS.get('hint1',0)){ setTimeout(()=>{ toast(matchMedia('(pointer:coars
 
 /* Update-Hinweis: prüft version.json auf GitHub Pages; «Aktualisieren» lädt die Seite ohne Cache neu */
 (()=>{
-  const BUILD='20261119134612'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
+  const BUILD='20261119223114'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
   // nach einem Update die ?v=… aus der Adresse entfernen
   try{ const u=new URL(location.href); if(u.searchParams.has('v')){ u.searchParams.delete('v'); history.replaceState(null,'',u.pathname+(u.search||'')+u.hash); } }catch(e){}
   const el=$('#upd'); let latest=null, snoozed=null, busy=false;
