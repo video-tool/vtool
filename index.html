@@ -6353,7 +6353,7 @@ function ovGapRender(){ layGapRender(); let el=$('.gap-pill:not(.lay)',A.stage);
     ['pointerdown','dblclick'].forEach(k=>el.addEventListener(k,ev=>ev.stopPropagation())); el.addEventListener('click',ev=>{ ev.stopPropagation(); if(el.classList.contains('has-sec')) secOpen(); }); }
   el.classList.toggle('on',g!=null); if(g==null) return; const nm=lastName(B.clip)||'B', t='≈ '+(g>=0?'+':'−')+Math.abs(g).toFixed(2)+' s', st=Math.abs(g)<0.005?'eq':g>0?'behind':'ahead';
   if($('span',el).textContent!==nm) $('span',el).textContent=nm; if($('b',el).textContent!==t) $('b',el).textContent=t; { const sr=OVGAP.src||''; if($('em',el).textContent!==sr) $('em',el).textContent=sr; } if(el.dataset.st!==st) el.dataset.st=st; { const hs=ovSectors().length>=2; el.classList.toggle('has-sec',hs); } el.title=g>0?nm+' liegt hier '+Math.abs(g).toFixed(2)+' s hinter '+(lastName(A.clip)||'A'):nm+' liegt hier '+Math.abs(g).toFixed(2)+' s vor '+(lastName(A.clip)||'A'); }
-const OVT={on:false,len:1.6,trk:null,al:null,key:'',edit:null,keys:{a:[],b:[]},seg:{a:new Map(),b:new Map()},busy:0,q:[]};
+const OVT={on:false,len:6,trk:null,al:null,key:'',edit:null,keys:{a:[],b:[]},seg:{a:new Map(),b:new Map()},busy:0,q:[]};
 function ovB2A(e){ return affMul(ovDMat(ovDAt(e),GH.W0),affInv(ovMat(clamp(e,0,GH.eEnd)))); }
 function ovTapA(ev){ const st=A.stage, r=st.getBoundingClientRect(), R=A.rect(), z=A.z||{x:0,y:0,s:1}; const u=((ev.clientX-r.left-z.x)/z.s-R.x)/R.w, v=((ev.clientY-r.top-z.y)/z.s-R.y)/R.h; return [u*GH.W0,v*GH.W0*R.h/R.w]; }
 function ovTrailReset(){ OVT.keys={a:[],b:[]}; OVT.seg={a:new Map(),b:new Map()}; OVT.trk=null; OVT.al=null; OVT.key=GH.key; OVT.q.length=0; for(const k in TRS){ try{ TRS[k].close(); }catch(e){} delete TRS[k]; } }
@@ -6417,23 +6417,110 @@ function ovTrailBuild(){ const N=GH.S.length, st=GH.step; OVT.trk={a:new Array(N
     let j=0; for(let i=0;i<N;i++){ const e=i*st; while(j+1<pts.length&&pts[j+1][0]<e) j++; const a=pts[j], b=pts[j+1]; if(!b||e<a[0]-1e-3||e>b[0]+1e-3||b[0]-a[0]>0.2) continue; const f=b[0]>a[0]?(e-a[0])/(b[0]-a[0]):0; let q=[a[1]+(b[1]-a[1])*f,a[2]+(b[2]-a[2])*f];
       if(k==='b') q=affApply(ovB2A(e),q[0],q[1]); OVT.trk[k][i]=q; OVT.al[k][i]=(a[3]==null?1:a[3])*(1-f)+(b[3]==null?1:b[3])*f; } }
   TGD.f=-1; if(GH.S&&GH.S.length) ghostGap(); }
-function ovTrailPts(k,e,L){ const T=L?L.trail:OVT.trk&&OVT.trk[k], AL=L?L.trailAl:OVT.al&&OVT.al[k], S=L?L.S:GH.S, st=L?L.step:GH.step; if(!T||!AL||!S||!(st>0)) return null;
-  const j=Math.min(S.length-1,Math.floor(e/st)); if(j<1||!T[j]||AL[j]<0.15) return null; const head=trackAt(T,st,e)||T[j];
+/* ---------- Fahrer:in für die Linie verfolgen: Figur gegen den Hintergrund aus Nachbarbildern (wie beim Stroboskop) ----------
+   Je Video im eigenen Bild: Nachbarbilder (±0.4 / ±0.8 s) über die Kamerabewegung ins aktuelle Bild holen, Median = leerer Hintergrund;
+   dunkler oder farbiger als der Hintergrund = Figur. Start bei der klarsten Figur nahe der Bildmitte (wer filmt, hält die Fahrer:in mittig),
+   von dort vor- und rückwärts mit der Bewegung auf der Piste. Ergebnis je Overlay-Schritt in A-Pixeln: Mitte, Fusspunkt (Unterkante), Höhe, Sicherheit. */
+const OVR={busy:false,p:0};
+function rtBlobs(m,w,h,minA){ const lab=new Uint8Array(m.length), out=[], st=[];
+  for(let s=0;s<m.length;s++){ if(!m[s]||lab[s]) continue; let a=0,sx=0,sy=0,x0=w,x1=0,y0=h,y1=0; st.push(s); lab[s]=1;
+    while(st.length){ const k=st.pop(), x=k%w, y=(k/w)|0; a++; sx+=x; sy+=y; if(x<x0) x0=x; if(x>x1) x1=x; if(y<y0) y0=y; if(y>y1) y1=y;
+      if(x>0&&m[k-1]&&!lab[k-1]){ lab[k-1]=1; st.push(k-1); } if(x<w-1&&m[k+1]&&!lab[k+1]){ lab[k+1]=1; st.push(k+1); } if(y>0&&m[k-w]&&!lab[k-w]){ lab[k-w]=1; st.push(k-w); } if(y<h-1&&m[k+w]&&!lab[k+w]){ lab[k+w]=1; st.push(k+w); } }
+    if(a>=minA) out.push({a,x:sx/a,y:sy/a,x0,x1,y0,y1}); }
+  return out; }
+async function ovRiderTrack(){ const key=GH.key; if(GH.rt&&GH.rt.key===key) return GH.rt; if(OVR.busy||!ovFollowOK()) return null; OVR.busy=true; OVR.p=0;
+  const S=GH.S, N=S.length, st=GH.step, W0=GH.W0, I=[1,0,0,0,1,0], out={key}, VV={}; let srcs=[];
+  try{
+    /* Kamerakette von A: Bild i → Bild 0 */ const CA=[I]; for(let i=1;i<N;i++) CA.push(affMul(CA[i-1],affInv(S[i].q||I)));
+    for(const k of ['a','b']){ const isB=k==='b', d=isB?B:A, hK=isB?GH.hB:GH.hA, TW=320, ts=TW/W0, TH=Math.round(hK*ts)&~1, NT=TW*TH;
+      const MB=isB?S.map(s=>simToAff(s.p,W0,GH.hA,W0,GH.hB)):null, C=isB?[I]:CA; /* B: eigene Kamerakette aus den eigenen Bildern (über die Ausrichtung zu A wäre sie zu unruhig) */
+      const src=await FrameSrc.open(d.clip); srcs.push(src); const TB=[]; const pc=isB?document.createElement('canvas'):null, px=pc?(pc.width=W0,pc.height=hK,pc.getContext('2d',{willReadFrequently:true})):null; let pP=null, lastP=null;
+      for(let i=0;i<N;i++){ if(GH.key!==key) return null; const im=await src.at(GH.t0+(isB?GH.off:0)+i*st+0.5/(d.fps||30)); const c=document.createElement('canvas'); c.width=TW; c.height=TH; c.getContext('2d').drawImage(im,0,0,TW,TH); TB.push(c);
+        if(isB){ px.drawImage(im,0,0,W0,hK); const P=pyramid(grayN(px.getImageData(0,0,W0,hK)),W0,hK); if(pP){ let r=lastP?align(pP,P,lastP,false,1,true):null; if(!r||!r.ok||r.inl<0.45){ const g=align(pP,P,[0,0,0,0,0],{R:0.25,scales:[0.95,0.975,1,1.025,1.05]},1); if(!r||!r.ok||(g.ok&&g.inl>r.inl)) r=g; } lastP=r.ok?r.p.slice():null; C.push(affMul(C[i-1],affInv(simToAff(r.ok?r.p:[0,0,0,0,0],W0,hK,W0,hK)))); } pP=P; }
+        if(i%10===9){ OVR.p=(isB?0.5:0)+0.3*(i+1)/N; await new Promise(r=>setTimeout(r,0)); } }
+      const wc=document.createElement('canvas'); wc.width=TW; wc.height=TH; const wx=wc.getContext('2d',{willReadFrequently:true});
+      const dK=Math.max(1,Math.round(0.4/st)), jToI=(j,i)=>{ const H=affMul(affInv(C[i]),C[j]); return [H[0],H[1],H[2]*ts,H[3],H[4],H[5]*ts]; };
+      const L=new Float32Array(4), S2=new Float32Array(4), minA=Math.max(6,NT*0.00012);
+      const cand=i=>{ wx.setTransform(1,0,0,1,0,0); wx.clearRect(0,0,TW,TH); wx.drawImage(TB[i],0,0); const cur=wx.getImageData(0,0,TW,TH).data, NB=[];
+        for(const o of [-2,-1,1,2]){ const j=i+o*dK; if(j<0||j>=N) continue; const H=jToI(j,i); wx.setTransform(1,0,0,1,0,0); wx.clearRect(0,0,TW,TH); wx.setTransform(H[0],H[3],H[1],H[4],H[2],H[5]); wx.drawImage(TB[j],0,0); NB.push(wx.getImageData(0,0,TW,TH).data); }
+        wx.setTransform(1,0,0,1,0,0); if(NB.length<2) return []; let mk=new Uint8Array(NT); const nb=NB.length;
+        for(let p=0,j=0;p<NT;p++,j+=4){ let n=0; for(let q=0;q<nb;q++){ const dd=NB[q]; if(dd[j+3]<200) continue; const r0=dd[j],g0=dd[j+1],b0=dd[j+2]; L[n]=0.299*r0+0.587*g0+0.114*b0; S2[n]=Math.max(r0,g0,b0)-Math.min(r0,g0,b0); n++; } if(n<2) continue;
+          const lb=med4(L,n), sb=med4(S2,n), r=cur[j], g=cur[j+1], b=cur[j+2], lf=0.299*r+0.587*g+0.114*b, sf=Math.max(r,g,b)-Math.min(r,g,b); if(lb-lf>30||sf-sb>40) mk[p]=1; }
+        mk=morph(morph(mk,TW,TH,true),TW,TH,false); return rtBlobs(mk,TW,TH,minA*0.5); };
+      const CD=[]; for(let i=0;i<N;i++){ if(GH.key!==key) return null; CD.push(cand(i)); if(i%8===7){ OVR.p=(isB?0.5:0)+0.3+0.2*(i+1)/N; await new Promise(r=>setTimeout(r,0)); } }
+      /* Welt (Bild 0, Kleinbild-Pixel) ↔ Bild i */ const toW=(i,x,y)=>affApply(C[i],x/ts,y/ts), toK=(i,X,Y)=>{ const q=affApply(affInv(C[i]),X,Y); return [q[0]*ts,q[1]*ts]; };
+      /* Alle Figuren zu Bahnen verketten (nächste Figur an der erwarteten Stelle, Bewegung auf der Piste). Die Fahrer:in ist die Bahn, die auf der Piste am weitesten kommt
+         und nahe der Bildmitte bleibt – Zuschauer, Torflaggen und Reste der Ausrichtung stehen still, Gondeln fahren am Rand. */
+      const TL=[], act=[];
+      for(let i=0;i<N;i++){ const used=new Set(), bl=CD[i];
+        for(const t of act){ const n=t.miss+1, pr=[t.c[0]+t.v[0]*n,t.c[1]+t.v[1]*n], pk=toK(i,pr[0],pr[1]), lim=Math.max(TW*0.05,Math.sqrt(t.a)*3)*(1+t.miss*0.5); let bb=-1, bs=-1;
+          for(let q=0;q<bl.length;q++){ if(used.has(q)) continue; const o=bl[q], dd=Math.hypot(o.x-pk[0],o.y-pk[1]); if(dd>lim) continue; const sc=Math.min(1,o.a/t.a,t.a/o.a)/Math.pow(1+dd/(lim*0.5),2); if(sc>bs){ bs=sc; bb=q; } }
+          if(bb<0){ t.miss++; continue; } used.add(bb); const o=bl[bb], cW=toW(i,o.x,o.y); t.v=[(cW[0]-t.c[0])/n*0.7+t.v[0]*0.3,(cW[1]-t.c[1])/n*0.7+t.v[1]*0.3]; t.c=cW; t.a=t.a*0.7+o.a*0.3; t.miss=0; t.pts.push({i,o,c:cW}); }
+        for(let q=act.length-1;q>=0;q--) if(act[q].miss>8) act.splice(q,1);
+        for(let q=0;q<bl.length;q++){ if(used.has(q)||bl[q].a<minA) continue; const o=bl[q], t={c:toW(i,o.x,o.y),v:[0,0],a:o.a,miss:0,pts:[]}; t.pts.push({i,o,c:t.c}); act.push(t); TL.push(t); } }
+      /* gemeinsame Koordinaten (Piste im Bild 0 von A), um A und B zu vergleichen */ const toA=isB?(i,c0)=>{ const p=affApply(affInv(C[i]),c0[0],c0[1]), q=affApply(affInv(MB[i]),p[0],p[1]); return affApply(CA[i],q[0],q[1]); }:(i,c0)=>c0;
+      for(const t of TL){ const P=t.pts; t.sc=0; if(P.length<4) continue; let len=0, dc=0; const h=Math.max(1,Math.round(0.3/st)); for(let q=h;q<P.length;q+=h) len+=Math.hypot(P[q].c[0]-P[q-h].c[0],P[q].c[1]-P[q-h].c[1]); for(const u of P) dc+=Math.hypot(u.o.x-TW/2,u.o.y-TH/2)/(TW*0.24); dc/=P.length;
+        const net=Math.hypot(P[P.length-1].c[0]-P[0].c[0],P[P.length-1].c[1]-P[0].c[1]); t.sc=Math.min(len,net*1.5+W0*0.02)*Math.exp(-dc*dc); /* Zittern auf der Stelle zählt nicht als Strecke */ for(const u of P) u.w=toA(u.i,u.c); }
+      VV[k]={TL,C,ts,isB,src}; }
+    /* Wahl: die klarere der zwei Bahnen ist der Bezug; die andere muss etwa dieselbe Strecke fahren (gleiche Piste) */
+    const bestOf=(v,ref)=>{ let best=null, bs=0; for(const t of v.TL){ if(t.sc<=0) continue; let sc=t.sc; if(ref){ let dm=0; for(const u of t.pts){ let dn=1e9; for(const r of ref) { const d=Math.hypot(u.w[0]-r[0],u.w[1]-r[1]); if(d<dn) dn=d; } dm+=dn; } dm/=t.pts.length; t.dm=dm; sc*=Math.exp(-Math.pow(dm/(W0*0.07),2)); } t.sc2=sc; if(sc>bs){ bs=sc; best=t; } } return best&&bs>W0*0.04?best:null; };
+    const build=(v,ref)=>{ const TR=new Array(N).fill(null), first=bestOf(v,ref); if(!first) return TR; const put=t=>{ for(const u of t.pts) if(!TR[u.i]) TR[u.i]={c:u.c,o:u.o,w:u.w}; t.used=true; }; put(first);
+      /* Stücke davor und danach anhängen, die zur Bewegung passen (Fahrer:in kurz verdeckt oder Figur zerfallen) */
+      for(let guard=0;guard<12;guard++){ let i0=0; while(i0<N&&!TR[i0]) i0++; let i1=N-1; while(i1>=0&&!TR[i1]) i1--; if(i0>i1) break; let add=null, as=0;
+        const vel=(a,b)=>{ const d=Math.max(1,Math.abs(b-a)); return [(TR[b].c[0]-TR[a].c[0])/d,(TR[b].c[1]-TR[a].c[1])/d]; }, hh=Math.max(1,Math.round(0.4/st)), gmax=Math.round(1.5/st);
+        for(const t of v.TL){ if(t.used||t.pts.length<3||!(t.sc>0)||(ref&&t.dm>W0*0.12)) continue; const f=t.pts[0], l=t.pts[t.pts.length-1];
+          if(f.i>i1&&f.i-i1<=gmax){ let a=i1-hh; while(a<i1&&(a<0||!TR[a])) a++; const vv=vel(a,i1), g=f.i-i1, ex=[TR[i1].c[0]+vv[0]*g,TR[i1].c[1]+vv[1]*g], dd=Math.hypot(f.c[0]-ex[0],f.c[1]-ex[1]); if(dd<W0*(0.05+0.2*g*st)&&t.sc>as){ as=t.sc; add=t; } }
+          else if(l.i<i0&&i0-l.i<=gmax){ let b=i0+hh; while(b>i0&&(b>=N||!TR[b])) b--; const vv=vel(i0,b), g=i0-l.i, ex=[TR[i0].c[0]-vv[0]*g,TR[i0].c[1]-vv[1]*g], dd=Math.hypot(l.c[0]-ex[0],l.c[1]-ex[1]); if(dd<W0*(0.05+0.2*g*st)&&t.sc>as){ as=t.sc; add=t; } } }
+        if(!add) break; put(add); }
+      return TR; };
+    const pathOf=TR=>TR.filter(Boolean).map(r=>r.w);
+    { const fa=bestOf(VV.a,null), fb=bestOf(VV.b,null), refK=(fa?fa.sc:0)>=(fb?fb.sc:0)?'a':'b', oth=refK==='a'?'b':'a'; VV[refK].TR=build(VV[refK],null); const ref=pathOf(VV[refK].TR); VV[oth].TL.forEach(t=>{ t.used=false; }); VV[oth].TR=build(VV[oth],ref.length>=5?ref:null); }
+    for(const k of ['a','b']){ const {TR,C,ts,isB}=VV[k];
+      /* je Schritt: Mitte, Fusspunkt, Höhe (eigenes Bild, W0-Pixel); kurze Lücken (≤ 0.8 s) auf der Piste überbrücken */
+      const T=new Array(N).fill(null), F=new Array(N).fill(null), SZ=new Float32Array(N), AL=new Float32Array(N), real=new Uint8Array(N);
+      for(let i=0;i<N;i++){ const r=TR[i]; if(!r) continue; T[i]=[r.o.x/ts,r.o.y/ts]; F[i]=[r.o.x/ts,r.o.y1/ts]; SZ[i]=(r.o.y1-r.o.y0+1)/ts; real[i]=1; }
+      const gapN=Math.round(0.8/st); for(let i=1;i<N-1;i++){ if(T[i]) continue; let j=i; while(j<N&&!T[j]) j++; if(T[i-1]&&j<N&&j-i<=gapN){ const a=i-1, wa=affApply(C[a],T[a][0],T[a][1]), wb=affApply(C[j],T[j][0],T[j][1]), fa=affApply(C[a],F[a][0],F[a][1]), fb=affApply(C[j],F[j][0],F[j][1]);
+          for(let q=i;q<j;q++){ const f=(q-a)/(j-a), iv=affInv(C[q]); T[q]=affApply(iv,wa[0]+(wb[0]-wa[0])*f,wa[1]+(wb[1]-wa[1])*f); F[q]=affApply(iv,fa[0]+(fb[0]-fa[0])*f,fa[1]+(fb[1]-fa[1])*f); SZ[q]=SZ[a]+(SZ[j]-SZ[a])*f; } } i=j; }
+      /* Höhe beruhigen (Median ±0.6 s), Fusspunkt = Mitte + halbe ruhige Höhe (die Unterkante allein zittert mit Stöcken und Schnee) */
+      { const hw=Math.max(2,Math.round(0.6/st)), raw=Float32Array.from(SZ), buf=[]; for(let i=0;i<N;i++){ if(!T[i]) continue; buf.length=0; for(let j=Math.max(0,i-hw);j<=Math.min(N-1,i+hw);j++) if(raw[j]>0) buf.push(raw[j]); buf.sort((x,y)=>x-y); SZ[i]=buf[buf.length>>1]||raw[i]; F[i]=[T[i][0],(F[i][1]+T[i][1]+SZ[i]*0.5)/2]; } }
+      for(let i=0;i<N;i++){ if(!T[i]) continue; let d=4; for(let q=1;q<4;q++){ if(i-q<0||i+q>=N||!T[i-q]||!T[i+q]){ d=q; break; } } AL[i]=Math.min(1,d/3); }
+      /* B: ins Bild von A (wie B gezeichnet wird) */ if(isB) for(let i=0;i<N;i++){ if(!T[i]) continue; const M=ovB2A(i*st), sc=Math.sqrt(Math.abs(M[0]*M[4]-M[1]*M[3]))||1; T[i]=affApply(M,T[i][0],T[i][1]); F[i]=affApply(M,F[i][0],F[i][1]); SZ[i]*=sc; }
+      out[k]={T,F,SZ,AL,n:real.reduce((a,b)=>a+b,0)}; }
+    if(GH.key!==key) return null; GH.rt=out; TGD.f=-1; return out; }
+  catch(e){ console.warn('Linie: Verfolgung',e); return null; }
+  finally{ OVR.busy=false; OVR.p=0; srcs.forEach(s=>{ try{ s.close(); }catch(e){} }); } }
+/* Quelle der Linie: angetippt (genau) – sonst die automatische Verfolgung der bewegten Figur. Dazu je Schritt die Figurhöhe (aus der Fläche der Figur, über ±1 s beruhigt):
+   daraus der Fusspunkt (Linie liegt bei den Ski auf dem Schnee) und die Banddicke. */
+function ovTrailSrc(k){ const hasK=OVT.trk&&OVT.key===GH.key&&OVT.keys[k]&&OVT.keys[k].length, tap=hasK&&OVT.keys[k].some(x=>!x.auto), R0=GH.rt&&GH.rt.key===GH.key&&GH.rt[k]; /* von Hand angetippt geht vor; der automatische Startpunkt nur, wenn die neue Verfolgung nichts findet */ if(tap||(hasK&&!(R0&&R0.n>=5))) return {T:OVT.trk[k],AL:OVT.al[k],SZ:null,tap:true};
+  { const R=GH.rt&&GH.rt.key===GH.key&&GH.rt[k]; if(R&&R.n>=5) return {T:R.T,AL:R.AL,SZ:R.SZ,F:R.F,tap:false}; }
+  const T=GH.trk&&GH.trk[k], AL=GH.trkAl&&GH.trkAl[k]; if(!T||!AL) return null; const C=GH._tsz||(GH._tsz={}); if(!C[k]||C[k].T!==T){ const S=GH.S, N=T.length, key=k==='b'?'mb':'ma', raw=new Float32Array(N), W=GH.W0;
+    for(let i=0;i<N;i++){ const p=T[i], B=S[i]&&S[i][key]; if(!p||!B) continue; let bd=W*0.05, ba=0; for(const b of B){ const d=Math.hypot(b[0]-p[0],b[1]-p[1]); if(d<bd){ bd=d; ba=b[2]||0; } } if(ba>0) raw[i]=Math.sqrt(ba)*1.9; } /* Figur ≈ 1.9 × Wurzel der Fläche hoch */
+    const st=GH.step||0.1, hw=Math.max(2,Math.round(1/st)), SZ=new Float32Array(N), buf=[]; for(let i=0;i<N;i++){ buf.length=0; for(let j=Math.max(0,i-hw);j<=Math.min(N-1,i+hw);j++) if(raw[j]>0) buf.push(raw[j]); buf.sort((a,b)=>a-b); SZ[i]=buf.length?buf[buf.length>>1]:0; }
+    for(let pass=0;pass<2;pass++) for(let i=1;i<N-1;i++) if(SZ[i-1]&&SZ[i]&&SZ[i+1]) SZ[i]=(SZ[i-1]+2*SZ[i]+SZ[i+1])/4; C[k]={T,SZ}; }
+  return {T,AL,SZ:C[k].SZ,tap:false}; }
+function ovTrailPts(k,e,L){ const src=L?null:ovTrailSrc(k), T=L?L.trail:src&&src.T, AL=L?L.trailAl:src&&src.AL, SZ=src&&src.SZ, FT=src&&src.F, S=L?L.S:GH.S, st=L?L.step:GH.step; if(!T||!AL||!S||!(st>0)) return null;
+  const j=Math.min(S.length-1,Math.floor(e/st)); if(j<1||!T[j]||AL[j]<0.15) return null; const foot=i=>SZ&&SZ[i]?SZ[i]*0.42:0, h0=(FT&&trackAt(FT,st,e))||trackAt(T,st,e)||T[j], head=FT?[h0[0],h0[1]]:[h0[0],h0[1]+foot(j)];
   const n=Math.round(OVT.len/st), pts=[head]; let M=[1,0,0,0,1,0]; const jump=GH.W0*0.06;
-  for(let i=j;i>=Math.max(0,j-n);i--){ const p=T[i]; if(!p||AL[i]<0.15) break; const q=affApply(M,p[0],p[1]), l=pts[pts.length-1]; if(Math.hypot(q[0]-l[0],q[1]-l[1])>jump*(pts.length===1?2:1)) break; pts.push(q); if(S[i].cut) break; M=affMul(M,S[i].q||[1,0,0,0,1,0]); }
+  for(let i=j;i>=Math.max(0,j-n);i--){ const p0=T[i]; if(!p0||AL[i]<0.15) break; const p=FT&&FT[i]?FT[i]:[p0[0],p0[1]+foot(i)]; const q=affApply(M,p[0],p[1]), l=pts[pts.length-1]; if(Math.hypot(q[0]-l[0],q[1]-l[1])>jump*(pts.length===1?2:1)) break; pts.push(q); if(S[i].cut) break; M=affMul(M,S[i].q||[1,0,0,0,1,0]); }
   if(pts.length<3) return null;
-  return pts.map((p,i)=>{ if(i===0) return p; let sx=0,sy=0,w=0; for(let d=-2;d<=2;d++){ const q=pts[i+d]; if(!q) continue; const ww=3-Math.abs(d); sx+=q[0]*ww; sy+=q[1]*ww; w+=ww; } return [sx/w,sy/w]; }); }
-function ovTrailDraw(x,ox,oy,w,h){ if(!OVT.on) return; const mine=!!OVT.trk&&OVT.key===GH.key&&ovFollowOK(), lays=LAY.filter(L=>!L.hide&&L.trail&&L.aClip===A.clip); if(!mine&&!lays.length) return; const e=ovE(), lw=Math.max(2,w/320);
-  const runs=[]; if(mine){ runs.push(['a','#FFD866']); if(!OV.hideB) runs.push(['b','#B79CFF']); } lays.forEach(L=>runs.push(['l',L.col,L]));
+  const sm=P=>P.map((p,i)=>{ if(i===0) return p; let sx=0,sy=0,w=0; for(let d=-3;d<=3;d++){ const q=P[i+d]; if(!q) continue; const ww=4-Math.abs(d); sx+=q[0]*ww; sy+=q[1]*ww; w+=ww; } return [sx/w,sy/w]; });
+  const out=sm(sm(pts)); out.sz=SZ&&SZ[j]?SZ[j]:0; return out; } /* zweimal glätten: ruhiges Band statt zittriger Linie */
+function ovTrailDraw(x,ox,oy,w,h){ if(!OVT.on) return; const mine=ovFollowOK()&&!!(ovTrailSrc('a')||ovTrailSrc('b')), lays=LAY.filter(L=>!L.hide&&L.trail&&L.aClip===A.clip); if(!mine&&!lays.length) return; const e=ovE(), lwMax=Math.max(4,w/105);
+  /* Farben wie die Athlet:innen (A gelb, B violett), dezent: leicht durchscheinend, damit die Linie das Bild nicht dominiert */
+  const cA='#FFC21A', cB='#8B5CF6';
+  const runs=[]; if(mine){ if(!OV.hideB) runs.push(['b',cB]); runs.push(['a',cA]); } lays.forEach(L=>runs.push(['l',L.col,L]));
+  const shade=(c,f)=>{ const n=parseInt(c.slice(1),16), r=(n>>16)&255, g=(n>>8)&255, b=n&255, m=v=>Math.round(f<0?v*(1+f):v+(255-v)*f); return 'rgb('+m(r)+','+m(g)+','+m(b)+')'; };
   x.save(); x.lineCap='round'; x.lineJoin='round';
-  for(const [k,col,L] of runs){ const P=L?ovTrailPts(k,ovTA()-L.t0,L):ovTrailPts(k,e); if(!P) continue; const W0_=L?L.W0:GH.W0, H0_=L?L.hA:GH.hA, sx=w/W0_, sy=h/H0_, Q=P.map(p=>[ox+p[0]*sx,oy+p[1]*sy]), N=Q.length;
-    const curve=(A0,B0)=>{ const P2=Q.slice(A0,B0+1); if(P2.length<2) return; x.beginPath(); x.moveTo(P2[0][0],P2[0][1]); for(let i=1;i<P2.length-1;i++) x.quadraticCurveTo(P2[i][0],P2[i][1],(P2[i][0]+P2[i+1][0])/2,(P2[i][1]+P2[i+1][1])/2); const l=P2[P2.length-1]; x.lineTo(l[0],l[1]); x.stroke(); };
-    /* blass in den Farben A/B, ohne Leuchten – soll das Bild nicht dominieren */
-    x.globalAlpha=0.12; x.strokeStyle='#000'; x.lineWidth=lw*1.8; curve(0,N-1);
-    const parts=4; for(let q=0;q<parts;q++){ const a0=Math.floor(q*(N-1)/parts), b0=Math.floor((q+1)*(N-1)/parts); x.globalAlpha=0.5*(1-q/parts*0.75); x.strokeStyle=col; x.lineWidth=lw; curve(a0,b0); } }
+  for(const [k,col,L] of runs){ const P=L?ovTrailPts(k,ovTA()-L.t0,L):ovTrailPts(k,e); if(!P) continue; const W0_=L?L.W0:GH.W0, H0_=L?L.hA:GH.hA, sx=w/W0_, sy=h/H0_, Q=P.map(p=>[ox+p[0]*sx,oy+p[1]*sy]), N=Q.length, lw=P.sz?clamp(P.sz*sx*0.1,Math.max(2.5,w/420),lwMax):lwMax*0.6; /* Band passend zur Figur: bei Totalen schmal, nah gefilmt breit */
+    const path=()=>{ x.beginPath(); x.moveTo(Q[0][0],Q[0][1]); for(let i=1;i<N-1;i++) x.quadraticCurveTo(Q[i][0],Q[i][1],(Q[i][0]+Q[i+1][0])/2,(Q[i][1]+Q[i+1][1])/2); x.lineTo(Q[N-1][0],Q[N-1][1]); };
+    /* Band wie auf den Schnee gelegt: dunkler Rand, kräftige Farbe, heller Kern; das alte Ende läuft weich aus */
+    let grad=col, gE=shade(col,-0.4), gC=shade(col,0.45); { const a=Q[0], b=Q[N-1]; if(Math.hypot(a[0]-b[0],a[1]-b[1])>4){ const mk=c=>{ const g=x.createLinearGradient(a[0],a[1],b[0],b[1]); const t=c.replace('rgb(','rgba(').replace(')',''); const rgba=al=>c[0]==='#'?c+Math.round(al*255).toString(16).padStart(2,'0'):t+','+al+')'; g.addColorStop(0,rgba(1)); g.addColorStop(0.75,rgba(1)); g.addColorStop(1,rgba(0)); return g; }; grad=mk(col); gE=mk(gE); gC=mk(gC); } }
+    x.globalAlpha=0.2; x.strokeStyle=gE; x.lineWidth=lw*1.25; path(); x.stroke();
+    x.globalAlpha=0.5; x.strokeStyle=grad; x.lineWidth=lw; path(); x.stroke();
+    x.globalAlpha=0.16; x.strokeStyle=gC; x.lineWidth=lw*0.3; path(); x.stroke(); }
   x.restore(); }
 function ovTrailCanvas(){ let c=$('canvas.ovtrail',A.stage); if(!c){ c=document.createElement('canvas'); c.className='ovtrail'; $('canvas.ovb',A.stage).after(c); } return c; }
-function ovTrailRender(){ const c=ovTrailCanvas(), on=OVT.on&&ovActive()&&!OV.fix&&((!!OVT.trk&&OVT.key===GH.key&&ovFollowOK())||LAY.some(L=>L.trail&&!L.hide)); c.hidden=!on&&!OVT.edit; if(!on&&!OVT.edit) return;
+function ovTrailRender(){ const c=ovTrailCanvas(), on=OVT.on&&ovActive()&&!OV.fix&&((ovFollowOK()&&!!(ovTrailSrc('a')||ovTrailSrc('b')))||LAY.some(L=>L.trail&&!L.hide)); c.hidden=!on&&!OVT.edit; if(!on&&!OVT.edit) return;
   const R=A.rect(), d=Math.min(window.devicePixelRatio||1,3), W=Math.round(R.w*d), H=Math.round(R.h*d);
   Object.assign(c.style,{left:R.x+'px',top:R.y+'px',width:R.w+'px',height:R.h+'px'}); if(c.width!==W||c.height!==H){ c.width=W; c.height=H; }
   const x=c.getContext('2d'); x.setTransform(1,0,0,1,0,0); x.clearRect(0,0,W,H); if(on) ovTrailDraw(x,0,0,W,H);
@@ -6770,7 +6857,7 @@ function renderOv(){
     else if(a==='make'){ OV.follow=true; OV.fix=null; if(!ovFollowOK()){ OV.K=[]; ovUI(); ghostCompute({}); return; } if(GH.coarse&&!GH.bg){ ghostCompute({bg:true}); } ovUI(); return; }
     else if(a==='fix'){ A.pause(); B.pause(); G.playing=false; cmpPlayIcon(); const D=ovDAt(ovE()); OV.fix={...D}; OV.fix0={...D}; }
     else if(a==='hand') return ovAlign();
-    else if(a==='ovtrail'){ OVT.on=!OVT.on; }
+    else if(a==='ovtrail'){ OVT.on=!OVT.on; if(OVT.on&&ovFollowOK()&&!(GH.rt&&GH.rt.key===GH.key)&&!OVR.busy){ toast('Linie wird berechnet …',2500); ovRiderTrack().then(r=>{ if(r){ A.dirty=true; ovTrailRender(); if(!(r.a.n>=5)&&!(r.b.n>=5)) toast('Fahrer:in nicht sicher gefunden – «…» › «Spur setzen» und antippen.',4500); } }); } }
     else if(a==='ovtrailnew'){ ovTrailStart(); }
     else if(a==='qnext'){ const q=$('.ovq',A.stage); if(q) q.click(); return; }
     else if(a==='bpts'){ A.pause(); B.pause(); G.playing=false; cmpPlayIcon(); OV.pa=[]; OV.pb=[]; OV.pickFix=true; OV.pick='a'; }
@@ -8492,7 +8579,7 @@ addEventListener('unhandledrejection',e=>{ FB.errs.push('Promise: '+String(e.rea
 function fbOn(){ return !!(typeof TRN_API!=='undefined'&&TRN_API); }
 const fbIco='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v12H8l-4 4z"/><path d="M12 7.5v4M12 14h.01"/></svg>';
 function fbInfo(){ const D=mode==='cmp'?A:mode==='gps'?GD:S, c=D&&D.clip, n=x=>x?(x.alias||x.name||'').slice(0,90):'';
-  return {build:'20261119102733'.startsWith('%%')?'dev':'20261119102733',env:window.VLAB_ENV||'live',url:location.pathname,lang:(window.vlabLang&&vlabLang.get())||'de',ua:navigator.userAgent.slice(0,240),
+  return {build:'20261119123410'.startsWith('%%')?'dev':'20261119123410',env:window.VLAB_ENV||'live',url:location.pathname,lang:(window.vlabLang&&vlabLang.get())||'de',ua:navigator.userAgent.slice(0,240),
     scr:screen.width+'×'+screen.height+' @'+(devicePixelRatio||1)+' · Fenster '+innerWidth+'×'+innerHeight,mem:navigator.deviceMemory||null,cpu:navigator.hardwareConcurrency||null,net:navigator.onLine?'online':'offline',
     view:mode+(mode==='cmp'&&$('#viewCmp').classList.contains('overlay')?' · overlay':''),clip:n(c),clipB:mode==='cmp'?n(B.clip):'',
     t:D&&D.ready?+(D.frame/D.fps).toFixed(2):null,fps:c&&c.fps||null,size:c?[c.w,c.h].join('×'):'',n:clips.length,errs:FB.errs.slice()}; }
@@ -9768,7 +9855,7 @@ if(false&&!LS.get('hint1',0)){ setTimeout(()=>{ toast(matchMedia('(pointer:coars
 
 /* Update-Hinweis: prüft version.json auf GitHub Pages; «Aktualisieren» lädt die Seite ohne Cache neu */
 (()=>{
-  const BUILD='20261119102733'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
+  const BUILD='20261119123410'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
   // nach einem Update die ?v=… aus der Adresse entfernen
   try{ const u=new URL(location.href); if(u.searchParams.has('v')){ u.searchParams.delete('v'); history.replaceState(null,'',u.pathname+(u.search||'')+u.hash); } }catch(e){}
   const el=$('#upd'); let latest=null, snoozed=null, busy=false;
