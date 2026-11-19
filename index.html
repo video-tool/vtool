@@ -2763,6 +2763,11 @@ html:not(.tm-beta) :is(#btnTm,#tmPanel,#tmBanner){display:none!important}
 
 /* V1: kein Filmen in der App, nur Videos einfügen und analysieren */
 html body .btn-cam,html body header .btn-cam{display:none!important}
+
+/* Videoliste: «Wer fährt?» bei Videos der laufenden Training-Aktivität */
+.clip.row .lib-who{display:block;margin-top:3px;max-width:100%;height:24px;padding:0 22px 0 9px;border-radius:999px;border:1px dashed var(--line2);background:var(--field);color:var(--muted);font:600 11.5px var(--font);cursor:pointer;appearance:none;-webkit-appearance:none;background-image:linear-gradient(45deg,transparent 50%,currentColor 50%),linear-gradient(135deg,currentColor 50%,transparent 50%);background-position:calc(100% - 12px) 10px,calc(100% - 8px) 10px;background-size:4px 4px;background-repeat:no-repeat;text-overflow:ellipsis}
+.clip.row .lib-who.set{border-style:solid;border-color:color-mix(in srgb,#DA291C 35%,transparent);background-color:color-mix(in srgb,#DA291C 9%,var(--card));color:var(--ink)}
+.clip.row .lib-who:disabled{opacity:.5}
 /* ---- Handy: feste Leisten oben und unten, nichts scrollt dahinter · Bedienung in zwei Zeilen ---- */
 @media (max-width:600px){
   header{position:sticky!important;top:0!important;z-index:130;margin:0 -0px 8px!important;padding:env(safe-area-inset-top,0px) 0 0!important;background:var(--bg)!important;border-bottom:1px solid var(--line)!important}
@@ -4162,6 +4167,7 @@ function renderLib(){
     const mm=c.meta, grouped=!NAMES&&order.length>1&&g!=='~'&&mm&&mm.ok;
     $('.nm',card).textContent=NAMES?dispName(c):grouped?mm.athlete:metaTitle(c); card.title=dispName(c)+(c.alias?' (Datei: '+c.name+')':'');
     $('.mt',card).textContent=grouped?[mm.run,mm.date].filter(Boolean).join(' · '):(c.demo?'Beispiel · ':'')+(metaLine(c)||[c.dur?fmtDur(c.dur):null,c.size?fmtMB(c.size):null].filter(Boolean).join(' · ')||'—');
+    if(typeof trnLibWho==='function') trnLibWho(card,c); /* läuft eine Training-Aktivität: Athlet:in direkt in der Liste zuordnen */
     if(false&&c.markers.length){ const mk=document.createElement('span'); mk.className='mk-count'; mk.innerHTML='<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 9-7 9-7-9z"/></svg>'+c.markers.length; $('.thumb',card).appendChild(mk); }
     const open=()=>{ if(mode==='single'){ S.setClip(c); refreshSingleHead(); } else if(mode==='gps'){ GD.setClip(c); if(typeof gpsSelects==='function') gpsSelects(); } else if(A.clip!==c&&B.clip!==c){ B.setClip(c); unlink(); syncSelects(); } renderLib(); };
     card.addEventListener('click',e=>{ if(e.target.closest('.x,.ab')) return; open(); });
@@ -8020,7 +8026,19 @@ function trnGuess(s,c){ const A=((s.meta||{}).athletes||[]).map(a=>a.n).filter(B
   const hay=((c.meta&&c.meta.athlete)||'')+' '+(c.name||'').replace(/[_-]+/g,' '); const low=hay.toLowerCase();
   return A.find(n=>low.includes(n.toLowerCase()))||A.find(n=>n.split(/\s+/).some(w=>w.length>2&&low.includes(w.toLowerCase())))||''; }
 
-function trnSet(k,s,p){ TRN.st[k]={s,p:p||0}; trnUI(); }
+function trnSet(k,s,p){ const nw=!TRN.st[k]; TRN.st[k]={s,p:p||0}; trnUI(); if(nw&&typeof renderLibSoon==='function') renderLibSoon(); }
+/* Videoliste: bei Videos der laufenden Aktivität ein kleines Feld «Wer fährt?» – gleiche Zuordnung wie im Aktivitäts-Fenster, ohne es öffnen zu müssen */
+function trnLibWho(card,c){ const s=trnOn()&&trnCur(); if(!s||c.demo) return; const A=((s.meta||{}).athletes||[]).map(a=>a.n); if(!A.length) return;
+  const k=trnQK(s,c), vid=(s.up||{})[k]; if(!TRN.st[k]&&!vid) return; const info=card.querySelector('.info'); if(!info) return;
+  const x=document.createElement('select'); x.className='lib-who'; x.title='Wer fährt? – Zuordnung in «'+((s.meta&&s.meta.title)||'Training')+'»'; x.setAttribute('aria-label','Wer fährt?');
+  x.appendChild(new Option('Wer fährt?','')); A.forEach(n=>x.appendChild(new Option(n,n)));
+  const show=v=>{ if(v&&!A.includes(v)) x.appendChild(new Option(v,v)); x.value=v||''; x.classList.toggle('set',!!x.value); };
+  const mv=vid&&((s.meta||{}).videos||[]).find(v=>v.id===vid); if(mv) show(mv.p); else { show(''); tqGet(k).then(it=>{ if(it&&it.p) show(it.p); }).catch(()=>{}); }
+  ['click','pointerdown','mousedown','touchstart','keydown','dblclick'].forEach(ev=>x.addEventListener(ev,e=>e.stopPropagation()));
+  x.onchange=async()=>{ const p=x.value; x.disabled=true; const ok=await trnSetPerson(s.id,k,p); x.disabled=false; if(!ok){ show(mv?mv.p:''); return; }
+    x.classList.toggle('set',!!p); const v2=(s.up||{})[k]||(trnCur()&&(trnCur().up||{})[k]); if(v2) trnUpd(s.id,q=>{ const w=((q.meta||{}).videos||[]).find(y=>y.id===v2); if(w) w.p=p; });
+    toast(p?p+' zugeordnet.':'Ohne Person.',1400); if(TRN.view===s.id) trnDlgList(); };
+  info.appendChild(x); }
 function trnNew(list){ const s=trnCur(); if(!s||s.auto===false) return; list.filter(c=>c&&!c.demo&&!c.err).forEach(c=>trnQueue(c,s)); }
 async function trnQueue(c,s){ s=s||trnCur(); if(!s) return; const k=trnQK(s,c); if((s.up||{})[k]||TRN.prep.some(x=>x.k===k)||(TRN.st[k]&&TRN.st[k].s!=='err')) return;
   TRN.prep.push({k,c,sid:s.id}); trnSet(k,'wait'); trnPrep(); }
@@ -8588,7 +8606,7 @@ addEventListener('unhandledrejection',e=>{ FB.errs.push('Promise: '+String(e.rea
 function fbOn(){ return !!(typeof TRN_API!=='undefined'&&TRN_API); }
 const fbIco='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v12H8l-4 4z"/><path d="M12 7.5v4M12 14h.01"/></svg>';
 function fbInfo(){ const D=mode==='cmp'?A:mode==='gps'?GD:S, c=D&&D.clip, n=x=>x?(x.alias||x.name||'').slice(0,90):'';
-  return {build:'20261119223114'.startsWith('%%')?'dev':'20261119223114',env:window.VLAB_ENV||'live',url:location.pathname,lang:(window.vlabLang&&vlabLang.get())||'de',ua:navigator.userAgent.slice(0,240),
+  return {build:'20261119225659'.startsWith('%%')?'dev':'20261119225659',env:window.VLAB_ENV||'live',url:location.pathname,lang:(window.vlabLang&&vlabLang.get())||'de',ua:navigator.userAgent.slice(0,240),
     scr:screen.width+'×'+screen.height+' @'+(devicePixelRatio||1)+' · Fenster '+innerWidth+'×'+innerHeight,mem:navigator.deviceMemory||null,cpu:navigator.hardwareConcurrency||null,net:navigator.onLine?'online':'offline',
     view:mode+(mode==='cmp'&&$('#viewCmp').classList.contains('overlay')?' · overlay':''),clip:n(c),clipB:mode==='cmp'?n(B.clip):'',
     t:D&&D.ready?+(D.frame/D.fps).toFixed(2):null,fps:c&&c.fps||null,size:c?[c.w,c.h].join('×'):'',n:clips.length,errs:FB.errs.slice()}; }
@@ -9792,6 +9810,7 @@ setTimeout(fieldSync,600);
     ['Videos',I('<rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M3 10h18"/>'),()=>libOpen(true)],
     GPS_ON?[invAuth()?'Von innove abmelden':'Bei innove anmelden',I('<path d="M12 21s7-6.2 7-11.5A7 7 0 0 0 5 9.5C5 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.4"/>'),()=>{ if(invAuth()){ LS.set('innove',null); invBtnUI(); toast('Von innove abgemeldet.'); } else invLoginUI().then(ok=>{ if(ok) toast('Bei innove angemeldet.',2500); }); }]:null,
     window.trnOn&&trnOn()?['Training-Aktivität',I('<path d="M7 18a4.5 4.5 0 0 1-.6-8.96A6 6 0 0 1 18 9.5a4 4 0 0 1-.5 8.5H7z"/><path d="M12 15v-5M9.5 12.5 12 10l2.5 2.5"/>'),()=>trnOpen()]:null,
+    mode==='single'?['Anleitung',I('<circle cx="12" cy="12" r="9"/><path d="M10 8.5l5.5 3.5-5.5 3.5z"/>'),()=>startTour('single')]:null,
     window.fbOn&&fbOn()?['Problem melden',I('<path d="M4 4h16v12H8l-4 4z"/><path d="M12 7.5v4M12 14h.01"/>'),()=>fbOpen()]:null,
     ['Einstellungen',I('<circle cx="12" cy="12" r="3"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1"/>'),()=>settingsOpen()],
     window.vlabAuth&&vlabAuth.admin&&vlabAuth.admin()?['Nutzungsanalyse',I('<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>'),()=>useOpen()]:null,
@@ -9864,7 +9883,7 @@ if(false&&!LS.get('hint1',0)){ setTimeout(()=>{ toast(matchMedia('(pointer:coars
 
 /* Update-Hinweis: prüft version.json auf GitHub Pages; «Aktualisieren» lädt die Seite ohne Cache neu */
 (()=>{
-  const BUILD='20261119223114'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
+  const BUILD='20261119225659'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
   // nach einem Update die ?v=… aus der Adresse entfernen
   try{ const u=new URL(location.href); if(u.searchParams.has('v')){ u.searchParams.delete('v'); history.replaceState(null,'',u.pathname+(u.search||'')+u.hash); } }catch(e){}
   const el=$('#upd'); let latest=null, snoozed=null, busy=false;
@@ -9896,7 +9915,7 @@ async function preOvLoad(){ if(PRE_OV) return PRE_OV; try{ const r=await fetch('
   const spot=$('.tour-spot',el), card=$('.tour-card',el), cur=$('.tour-cur',el);
   const sleep=async ms=>{ let t=0; while(t<ms){ await new Promise(q=>setTimeout(q,40)); if(TR.abort||!TR.on) return; if(!TR.paused) t+=40; } };
   const stopped=()=>TR.abort||!TR.on;
-  const demo=n=>clips.find(c=>c.name===n);
+  const demo=n=>clips.find(c=>c.name===n), vis=sel=>{ for(const e of document.querySelectorAll(sel)){ const r=e.getBoundingClientRect(); if(r.width>2&&r.height>2&&getComputedStyle(e).visibility!=='hidden') return e; } return null; }, rv=(...sels)=>()=>{ for(const q of sels){ const e=vis(q); if(e) return e.getBoundingClientRect(); } return null; };
   const waitReady=async()=>{ for(let k=0;k<200&&!(A.ready&&B.ready);k++) await sleep(100); };
   // Spotlight
   function focus(target,pad=8,depth=0){
@@ -9935,23 +9954,37 @@ async function preOvLoad(){ if(PRE_OV) return PRE_OV; try{ const r=await fetch('
     side:[
       {t:'Zwei Läufe wählen',p:'Oben wählst du Lauf A und Lauf B – hier Meillard und Gratz in Sölden. Alternativ links in der Liste auf «A» / «B» tippen.',f:rectOf('.vchip[data-k="a"]','.vchip[data-k="b"]'),
        run:async()=>{ setLayout('side'); A.setClip(demo(M)); B.setClip(demo(Gz)); unlink(); syncSelects(); renderLib(); await waitReady(); A.seekTime(0); B.seekTime(0); await sleep(600); }},
-      {t:'Ins Video A klicken',p:'Ein Klick ins Video A: gelber Rahmen – jetzt bewegt sich nur A. Zeitleiste ziehen, bis Meillard am ersten gut sichtbaren Tor ist. Feinschliff: ← / → für ein Bild.',f:()=>A.stage,
+      {t:'Ins Video A klicken',p:'Ein Klick ins Video A: gelber Rahmen – jetzt bewegt sich nur A. Zeitleiste ziehen, bis Meillard am ersten gut sichtbaren Tor ist. Feinschliff: ← / → für ein Bild.',f:()=>A.stage.getBoundingClientRect(),
        run:async()=>{ cfSet('a',true); await scrub(A,4.0); }},
-      {t:'Ins Video B klicken',p:'Dasselbe mit B (violetter Rahmen): Gratz an genau dieselbe Stelle bringen.',f:()=>B.stage,
+      {t:'Ins Video B klicken',p:'Dasselbe mit B (violetter Rahmen): Gratz an genau dieselbe Stelle bringen.',f:()=>B.stage.getBoundingClientRect(),
        run:async()=>{ cfSet('b',true); await scrub(B,4.0); }},
       {t:'Nochmals klicken = beide',p:'Nochmals ins Video klicken: Rahmen um beide – A und B sind an diesem Moment verbunden und bewegen sich ab jetzt gemeinsam.',f:rectOf('#cStages'),
        run:async()=>{ cfSet(null); await sleep(400); }},
       {t:'Gemeinsam abspielen',p:'Abspielen – beide laufen gemeinsam. So siehst du direkt, wer wo Zeit gewinnt. Mit «1×» auf Zeitlupe schalten.',f:'#viewCmp .ctl.play',
        run:async()=>{ await clickEl('#viewCmp .ctl.play'); await sleep(3600); if(!A.v.paused) cmpToggle(); }},
     ],
+    single:[
+      {t:'Video wählen',p:'In der Liste ein Video antippen oder mit «+» eigene Videos öffnen – hier Meillard in Sölden. Die Videos bleiben auf deinem Gerät.',f:rv('.libcard','header .btn-add','#sHost .stage'),
+       run:async()=>{ const c=demo(M); if(S.clip!==c){ S.setClip(c); renderLib(); if(typeof refreshSingleHead==='function') refreshSingleHead(); } for(let k=0;k<200&&!S.ready;k++) await sleep(100); S.pause(); S.seekTime(0); await sleep(700); }},
+      {t:'Abspielen und Tempo',p:'Der rote Knopf spielt ab und hält an (Leertaste). Daneben stellst du das Tempo ein – Zeitlupe bis 0.1×.',f:rectOf('#viewSingle [data-act="play"]','#viewSingle [data-act="rate"]'),
+       run:async()=>{ await clickEl('#viewSingle [data-act="play"]'); await sleep(2600); if(!S.v.paused) S.pause(); }},
+      {t:'Zeitleiste und Bild für Bild',p:'In der Zeitleiste ziehst du zur gewünschten Stelle. Die Pfeile neben dem roten Knopf springen ein Bild oder eine Sekunde – am Computer auch mit ← und →.',f:rectOf(()=>S.cv,()=>$$('#viewSingle [data-act="step"]')[0],()=>$$('#viewSingle [data-act="step"]')[3]),
+       run:async()=>{ await scrub(S,6.0); const st=$$('#viewSingle [data-act="step"]'); if(st[2]){ await clickEl(st[2]); await clickEl(st[2]); } }},
+      {t:'Start und Ende',p:'«Start» und «Ende» begrenzen den Abschnitt: abgespielt und gespeichert wird nur dieser Teil. «Halt» setzt ein Standbild in den Clip.',f:rectOf('#viewSingle [data-act="in"]','#viewSingle [data-act="hold"]'),
+       run:async()=>{ await clickEl('#viewSingle [data-act="in"]'); await scrub(S,10.0,1200); await clickEl('#viewSingle [data-act="out"]'); }},
+      {t:'Zeichnen und Messen',p:'Der Stift öffnet die Werkzeuge: Linien, Pfeile, Winkel und Text direkt ins Bild zeichnen – sie bleiben am gewählten Bild stehen.',f:rv('#sHost .rail-tg','#viewSingle [data-act="draw"]'),
+       run:async()=>{ const e=vis('#sHost .rail-tg')||vis('#viewSingle [data-act="draw"]'); if(e){ const [x,y]=ctr(e); await moveTo(x,y); await tap(); } await sleep(400); }},
+      {t:'Speichern und teilen',p:'«Speichern» exportiert den Abschnitt als Video oder das aktuelle Bild. «Aufnahme» nimmt auf, was du zeigst, zeichnest und sagst. Für zwei Läufe: Reiter «Side-by-Side» oder «Overlay».',f:rv('#viewSingle .save-w','#viewSingle [data-act="export"]'),
+       run:async()=>{ const e=vis('#viewSingle .save-w')||vis('#viewSingle [data-act="export"]'); if(e){ const [x,y]=ctr(e); await moveTo(x,y); } await sleep(500); }},
+    ],
     overlay:[
       {t:'1 · Beide zum gleichen Moment',p:'Beispiel: Abfahrtstraining Courchevel vom Gegenhang, Boisset (A) gegen Kriechmayr (B). A und B einzeln in ihren Zeitleisten verschieben, bis beide am gleichen Punkt sind – z. B. beim ersten Tor, das in beiden zu sehen ist.',f:rectOf(tlA,tlB),
        run:async()=>{ setLayout('overlay'); A.setClip(demo(BO)); B.setClip(demo(KR)); unlink(); syncSelects(); renderLib(); await waitReady(); A.seekTime(0.5); B.seekTime(1.5); OV.cut={a:null,b:null}; OV.T=null; OV.follow=false; OV.edit=false; OV.pick=null; ovUI(); await sleep(500); await scrub(A,PRE_OV.cut.a,1400); await scrub(B,PRE_OV.cut.a+PRE_OV.off,1400); }},
-      {t:'Weiter',p:'«Weiter» verbindet A und B an diesem Moment. «Automatisch suchen» findet die Stelle auch selbst, wenn beide vom gleichen Standort gefilmt sind.',f:'[data-ov="sync"]',run:async()=>{ await clickEl('[data-ov="sync"]'); }},
+      {t:'Weiter',p:'«Weiter» verbindet A und B an diesem Moment. «Automatisch suchen» findet die Stelle in wenigen Sekunden selbst, wenn beide vom gleichen Standort gefilmt sind.',f:'[data-ov="sync"]',run:async()=>{ await clickEl('[data-ov="sync"]'); }},
       {t:'Start und Ende (optional)',p:'Mit «Start» und «Ende» wählst du den Teil der Strecke, der übereinandergelegt wird. Ohne Angabe gilt das ganze Video.',f:innerWidth>760?'.sbs-cut':'.ov-cutg',run:async()=>{ await clickEl(innerWidth>760?'[data-sbs="a"]':'[data-ov="cuta"]'); }},
-      {t:'2 · Übereinanderlegen',p:'Im echten Ablauf schiebst du jetzt B auf A, bis die Tore übereinanderliegen («B schieben»), oder lässt es die App machen. «Overlay erstellen» – die App legt B über A und führt es von Start bis Ende mit, auch wenn die Kamera schwenkt und zoomt. Das dauert etwa 2–3 Minuten (hier vorbereitet).',f:'[data-ov="make"]',
+      {t:'2 · Übereinanderlegen',p:'Im echten Ablauf schiebst du jetzt B auf A, bis die Tore übereinanderliegen («B schieben»), oder lässt es die App machen. «Overlay erstellen» – die App legt B über A und führt es von Start bis Ende mit, auch wenn die Kamera schwenkt und zoomt. Das dauert je nach Länge etwa 20–40 Sekunden, die Restzeit wird angezeigt (hier vorbereitet).',f:'[data-ov="make"]',
        run:async()=>{ OV.cut.b=PRE_OV.cut.b; ovUI(); preloadOv(); await clickEl('[data-ov="make"]'); }},
-      {t:'3 · Fertig',p:'Abspielen oder scrubben: Boisset und Kriechmayr fahren im selben Bild. Liegt B irgendwo daneben: anhalten und «Korrigieren». «Speichern» exportiert das Overlay als Video.',f:stage,
+      {t:'3 · Fertig',p:'Abspielen oder scrubben: Boisset und Kriechmayr fahren im selben Bild. Liegt B irgendwo daneben: anhalten und «Korrigieren». Unter «…» blendet «Spur» die Fahrlinie von A und B ein. «Speichern» exportiert das Overlay als Video.',f:stage,
        run:async()=>{ A.seekTime(26); A.onUserSeek(A); await sleep(700); cmpToggle(); await sleep(4200); if(!A.v.paused) cmpToggle(); }}
     ]
   };
@@ -9975,16 +10008,18 @@ async function preOvLoad(){ if(PRE_OV) return PRE_OV; try{ const r=await fetch('
   function setPause(v){ TR.paused=v; el.classList.toggle('paused',v); const b=$('[data-tr="pause"]',el);
     b.innerHTML=v?'<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>':'<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="6.5" y="5" width="4" height="14" rx="1"/><rect x="13.5" y="5" width="4" height="14" rx="1"/></svg>'; b.setAttribute('aria-label',v?'Weiter abspielen':'Pause');
     if(v){ clearTimeout(TR.timer); if(TR.t0) TR.left=Math.max(500,TR.left-(performance.now()-TR.t0)); TR.t0=0; const bar=$('.tour-bar i',el); const w=getComputedStyle(bar).width; bar.style.transition='none'; bar.style.width=w;
-      if(!A.v.paused||!B.v.paused){ TR.wasPlaying=true; A.pause(); B.pause(); G.playing=false; cmpPlayIcon(); } }
-    else { if(TR.wasPlaying){ TR.wasPlaying=false; cmpToggle(); } if(!TR.busy&&TR.i<TR.steps.length-1) autoNext(); } }
+      if(TR.kind==='single'){ if(!S.v.paused){ TR.wasPlaying=true; S.pause(); } } else if(!A.v.paused||!B.v.paused){ TR.wasPlaying=true; A.pause(); B.pause(); G.playing=false; cmpPlayIcon(); } }
+    else { if(TR.wasPlaying){ TR.wasPlaying=false; if(TR.kind==='single') S.play(); else cmpToggle(); } if(!TR.busy&&TR.i<TR.steps.length-1) autoNext(); } }
   function saveState(){ return {a:A.clip,b:B.clip,lay:$('#viewCmp').classList.contains('overlay')?'overlay':$('#viewCmp').classList.contains('ghost')?'ghost':'side',G:{...G},ta:A.time(),tb:B.time()}; }
   window.startTour=async kind=>{
+    if(kind==='single'){ if(!demo(M)){ toast('Die Anleitung braucht die Beispiel-Läufe (nur online verfügbar).'); return; } if(mode!=='single') setMode('single'); TR.kind=kind; TR.steps=STEPS.single; TR.saved=null; TR.on=true; el.hidden=false; document.body.classList.add('touring'); requestAnimationFrame(()=>el.classList.add('on')); cur.style.opacity='0'; show(0); return; }
     if(kind==='overlay'&&!(await preOvLoad())){ toast('Die Anleitung braucht die Beispiel-Videos – bitte online öffnen.',3600); return; }
     if(!demo(M)||!demo(BO)){ toast('Die Anleitung braucht die Beispiel-Läufe (nur online verfügbar).'); return; }
     TR.kind=kind; TR.steps=STEPS[kind]; TR.saved=saveState(); TR.on=true; if(kind!=='overlay'){ const dk=$('#viewCmp .dock3'); if(dk&&!dk.classList.contains('tools-open')) $('#btnTools').click(); } el.hidden=false; document.body.classList.add('touring');
     requestAnimationFrame(()=>el.classList.add('on')); cur.style.opacity='0'; show(0);
   };
   async function end(){ TR.on=false; TR.abort=true; clearTimeout(TR.timer); el.classList.remove('on'); document.body.classList.remove('touring'); setTimeout(()=>{ el.hidden=true; },300);
+    if(TR.kind==='single'){ if(!S.v.paused) S.pause(); const c=demo(M); if(c&&S.clip===c){ c.loop.a=null; c.loop.b=null; c.loop.on=false; if(typeof saveClip==='function') saveClip(c); S.dirty=true; if(typeof renderMarks==='function') renderMarks(); } return; } /* Start/Ende aus der Anleitung nicht stehen lassen */
     if(!A.v.paused||!B.v.paused){ A.pause(); B.pause(); G.playing=false; cmpPlayIcon(); } }
   $('.tour-x',el).addEventListener('click',end);
   $('[data-tr="pause"]',el).addEventListener('click',()=>setPause(!TR.paused));
@@ -9994,6 +10029,7 @@ async function preOvLoad(){ if(PRE_OV) return PRE_OV; try{ const r=await fetch('
   addEventListener('resize',()=>{ if(TR.on) focus(TR.steps[TR.i].f); });
   setInterval(()=>{ if(TR.on) focus(TR.steps[TR.i].f); },500);
   $('#tutBtn').addEventListener('click',()=>{ const v=$('#viewCmp').classList; startTour(v.contains('overlay')?'overlay':'side'); });
+  { const box=$('#viewSingle .s-tools'), t0=$('#tutBtn'); if(box&&t0){ const b=t0.cloneNode(true); b.id='tutBtnS'; b.title='Anleitung direkt im Tool – zeigt Schritt für Schritt, wie «Ein Video» geht'; box.prepend(b); b.addEventListener('click',()=>startTour('single')); } }
 })();
 
 
