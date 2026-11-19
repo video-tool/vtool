@@ -5977,7 +5977,7 @@ function ovUI(){ vchipPlace();
     acts=ovBtn('edit','Zurück',OVI.back,'ghost','Gleichen Moment neu wählen')+cutBtns+ovMore([['pick','Referenzpunkte neu',OVI.pin],['hand','Von Hand nachschieben',OVI.fix]])+ovBtn('make','Overlay erstellen',OVI.go,'pri'); }
   else { const kc=OV.K.length?`<span class="ov-chip">${OVI.fix}${OV.K.length} Korrektur${OV.K.length>1?'en':''}<button data-ov="fixall" title="Alle Korrekturen entfernen">${OVI.x}</button></span>`:'';
     
-    ttl=GH.coarse?'Vorschau':'Fertig'; dot=true; const QU=!GH.coarse&&PRE.state!=='run'&&REF.key===GH.key&&REF.Q?ovQual():null, QN=QU?QU.runs.length:0; say=PRE.state==='run'?'Flüssige Wiedergabe wird vorbereitet · '+Math.round(PRE.p*100)+' % · '+etaTxt('pre',PRE.p):QN?QN+(QN===1?' Stelle':' Stellen')+' prüfen (gelb oder rot in der Zeitleiste)':GH.bg?'Wird verfeinert · '+Math.round((GH.bg.p||0)*100)+' % · '+etaTxt('bg',GH.bg.p||0):GH.coarse?'Grob gerechnet – «…» › «Neu berechnen» rechnet fein.':''; chips=cut+kc;
+    ttl=GH.coarse?'Vorschau':'Fertig'; dot=true; const QU=!GH.coarse&&PRE.state!=='run'&&REF.key===GH.key&&REF.Q?ovQual():null, QN=QU?QU.runs.length:0; say=(typeof OVR!=='undefined'&&OVR.busy)?'Linie wird berechnet · '+Math.round(OVR.p*100)+' %':PRE.state==='run'?'Flüssige Wiedergabe wird vorbereitet · '+Math.round(PRE.p*100)+' % · '+etaTxt('pre',PRE.p):QN?QN+(QN===1?' Stelle':' Stellen')+' prüfen (gelb oder rot in der Zeitleiste)':GH.bg?'Wird verfeinert · '+Math.round((GH.bg.p||0)*100)+' % · '+etaTxt('bg',GH.bg.p||0):GH.coarse?'Grob gerechnet – «…» › «Neu berechnen» rechnet fein.':''; chips=cut+kc;
     tip='Liegt B neben A: an der Stelle anhalten, dann «Neu legen» (B von Hand schieben) oder «Zwei Punkte». Der Punkt links und das Band in der Zeitleiste zeigen den Zustand: grün ausgerichtet, gelb unsicher, rot Kameraschnitt. Das Auge bei den Läufen oben links blendet einen Lauf ein oder aus.';
     acts=cutBtns+(QN?ovBtn('qnext','Nächste Stelle',OVI.go,'ghost','Zur nächsten unsicheren Stelle springen'):'')+(ovBtn('bpts','Zwei Punkte',OVI.pin,'ghost','Zwei gleiche Punkte in A und B antippen, z. B. Torflaggen')+ovBtn('fix','Neu legen',OVI.fix,'ghost','B an dieser Stelle neu über A legen (von Hand schieben)'))
       +ovMore([OVT_READY?['ovtrailnew',OVT.keys.a.length&&OVT.key===GH.key?'Spur bearbeiten (antippen)':'Spur hinter Fahrer:innen setzen …',OVI.pin]:null,OVT_READY&&OVT.trk&&OVT.key===GH.key?['ovtrail',OVT.on?'Spur ausblenden':'Spur einblenden',OVI.go]:null,ovGpsPair()?['ovgps',OVG.on?'GPS-Tacho ausblenden':'GPS-Tacho einblenden',OVI.go]:null,['ovgap',OVGAP.on?'Rückstand ausblenden':'Rückstand einblenden',OVI.go],['nameset','Namen setzen (Fahrer:innen antippen)',OVI.tag],LAY.length<3?['addrun','Weiteren Lauf dazunehmen',OVI.plus]:null,['series','Serie gegen A rechnen …',OVI.go],['make','Neu berechnen',OVI.go],['edit','Neu beginnen',OVI.back]])+ovSaveBtn(); }
@@ -6437,7 +6437,7 @@ async function ovRiderTrack(){ const key=GH.key; if(GH.rt&&GH.rt.key===key) retu
       const src=await FrameSrc.open(d.clip); srcs.push(src); const TB=[]; const pc=isB?document.createElement('canvas'):null, px=pc?(pc.width=W0,pc.height=hK,pc.getContext('2d',{willReadFrequently:true})):null; let pP=null, lastP=null;
       for(let i=0;i<N;i++){ if(GH.key!==key) return null; const im=await src.at(GH.t0+(isB?GH.off:0)+i*st+0.5/(d.fps||30)); const c=document.createElement('canvas'); c.width=TW; c.height=TH; c.getContext('2d').drawImage(im,0,0,TW,TH); TB.push(c);
         if(isB){ px.drawImage(im,0,0,W0,hK); const P=pyramid(grayN(px.getImageData(0,0,W0,hK)),W0,hK); if(pP){ let r=lastP?align(pP,P,lastP,false,1,true):null; if(!r||!r.ok||r.inl<0.45){ const g=align(pP,P,[0,0,0,0,0],{R:0.25,scales:[0.95,0.975,1,1.025,1.05]},1); if(!r||!r.ok||(g.ok&&g.inl>r.inl)) r=g; } lastP=r.ok?r.p.slice():null; C.push(affMul(C[i-1],affInv(simToAff(r.ok?r.p:[0,0,0,0,0],W0,hK,W0,hK)))); } pP=P; }
-        if(i%10===9){ OVR.p=(isB?0.5:0)+0.3*(i+1)/N; await new Promise(r=>setTimeout(r,0)); } }
+        if(i%10===9){ OVR.p=(isB?0.5:0)+0.3*(i+1)/N; if(i%30===29&&typeof ovUI==='function') ovUI(); await new Promise(r=>setTimeout(r,0)); } }
       const wc=document.createElement('canvas'); wc.width=TW; wc.height=TH; const wx=wc.getContext('2d',{willReadFrequently:true});
       const dK=Math.max(1,Math.round(0.4/st)), jToI=(j,i)=>{ const H=affMul(affInv(C[i]),C[j]); return [H[0],H[1],H[2]*ts,H[3],H[4],H[5]*ts]; };
       const L=new Float32Array(4), S2=new Float32Array(4), minA=Math.max(6,NT*0.00012);
@@ -6476,6 +6476,9 @@ async function ovRiderTrack(){ const key=GH.key; if(GH.rt&&GH.rt.key===key) retu
     const pathOf=TR=>TR.filter(Boolean).map(r=>r.w);
     { const fa=bestOf(VV.a,null), fb=bestOf(VV.b,null), refK=(fa?fa.sc:0)>=(fb?fb.sc:0)?'a':'b', oth=refK==='a'?'b':'a'; VV[refK].TR=build(VV[refK],null); const ref=pathOf(VV[refK].TR); VV[oth].TL.forEach(t=>{ t.used=false; }); VV[oth].TR=build(VV[oth],ref.length>=5?ref:null); }
     for(const k of ['a','b']){ const {TR,C,ts,isB}=VV[k];
+      /* Ausreisser: einzelne Lagen, die weit neben ihren Nachbarn (±0.3 s, Median auf der Piste) liegen, verwerfen – die Lücke wird danach überbrückt */
+      { const hw=Math.max(2,Math.round(0.3/st)), drop=[]; for(let i=0;i<N;i++){ if(!TR[i]) continue; const xs=[], ys=[]; for(let j=Math.max(0,i-hw);j<=Math.min(N-1,i+hw);j++){ if(j===i||!TR[j]) continue; xs.push(TR[j].c[0]); ys.push(TR[j].c[1]); } if(xs.length<3) continue; xs.sort((a,b)=>a-b); ys.sort((a,b)=>a-b);
+          const mx=xs[xs.length>>1], my=ys[ys.length>>1], thr=Math.max(W0*0.03,Math.sqrt(TR[i].o.a)/ts*2.5); if(Math.hypot(TR[i].c[0]-mx,TR[i].c[1]-my)>thr) drop.push(i); } for(const i of drop) TR[i]=null; }
       /* je Schritt: Mitte, Fusspunkt, Höhe (eigenes Bild, W0-Pixel); kurze Lücken (≤ 0.8 s) auf der Piste überbrücken */
       const T=new Array(N).fill(null), F=new Array(N).fill(null), SZ=new Float32Array(N), AL=new Float32Array(N), real=new Uint8Array(N);
       for(let i=0;i<N;i++){ const r=TR[i]; if(!r) continue; T[i]=[r.o.x/ts,r.o.y/ts]; F[i]=[r.o.x/ts,r.o.y1/ts]; SZ[i]=(r.o.y1-r.o.y0+1)/ts; real[i]=1; }
@@ -6488,7 +6491,7 @@ async function ovRiderTrack(){ const key=GH.key; if(GH.rt&&GH.rt.key===key) retu
       out[k]={T,F,SZ,AL,n:real.reduce((a,b)=>a+b,0)}; }
     if(GH.key!==key) return null; GH.rt=out; TGD.f=-1; return out; }
   catch(e){ console.warn('Linie: Verfolgung',e); return null; }
-  finally{ OVR.busy=false; OVR.p=0; srcs.forEach(s=>{ try{ s.close(); }catch(e){} }); } }
+  finally{ OVR.busy=false; OVR.p=0; srcs.forEach(s=>{ try{ s.close(); }catch(e){} }); if(typeof ovUI==='function') ovUI(); } }
 /* Quelle der Linie: angetippt (genau) – sonst die automatische Verfolgung der bewegten Figur. Dazu je Schritt die Figurhöhe (aus der Fläche der Figur, über ±1 s beruhigt):
    daraus der Fusspunkt (Linie liegt bei den Ski auf dem Schnee) und die Banddicke. */
 function ovTrailSrc(k){ const hasK=OVT.trk&&OVT.key===GH.key&&OVT.keys[k]&&OVT.keys[k].length, tap=hasK&&OVT.keys[k].some(x=>!x.auto), R0=GH.rt&&GH.rt.key===GH.key&&GH.rt[k]; /* von Hand angetippt geht vor; der automatische Startpunkt nur, wenn die neue Verfolgung nichts findet */ if(tap||(hasK&&!(R0&&R0.n>=5))) return {T:OVT.trk[k],AL:OVT.al[k],SZ:null,tap:true};
@@ -8579,7 +8582,7 @@ addEventListener('unhandledrejection',e=>{ FB.errs.push('Promise: '+String(e.rea
 function fbOn(){ return !!(typeof TRN_API!=='undefined'&&TRN_API); }
 const fbIco='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v12H8l-4 4z"/><path d="M12 7.5v4M12 14h.01"/></svg>';
 function fbInfo(){ const D=mode==='cmp'?A:mode==='gps'?GD:S, c=D&&D.clip, n=x=>x?(x.alias||x.name||'').slice(0,90):'';
-  return {build:'20261119123410'.startsWith('%%')?'dev':'20261119123410',env:window.VLAB_ENV||'live',url:location.pathname,lang:(window.vlabLang&&vlabLang.get())||'de',ua:navigator.userAgent.slice(0,240),
+  return {build:'20261119134612'.startsWith('%%')?'dev':'20261119134612',env:window.VLAB_ENV||'live',url:location.pathname,lang:(window.vlabLang&&vlabLang.get())||'de',ua:navigator.userAgent.slice(0,240),
     scr:screen.width+'×'+screen.height+' @'+(devicePixelRatio||1)+' · Fenster '+innerWidth+'×'+innerHeight,mem:navigator.deviceMemory||null,cpu:navigator.hardwareConcurrency||null,net:navigator.onLine?'online':'offline',
     view:mode+(mode==='cmp'&&$('#viewCmp').classList.contains('overlay')?' · overlay':''),clip:n(c),clipB:mode==='cmp'?n(B.clip):'',
     t:D&&D.ready?+(D.frame/D.fps).toFixed(2):null,fps:c&&c.fps||null,size:c?[c.w,c.h].join('×'):'',n:clips.length,errs:FB.errs.slice()}; }
@@ -9855,7 +9858,7 @@ if(false&&!LS.get('hint1',0)){ setTimeout(()=>{ toast(matchMedia('(pointer:coars
 
 /* Update-Hinweis: prüft version.json auf GitHub Pages; «Aktualisieren» lädt die Seite ohne Cache neu */
 (()=>{
-  const BUILD='20261119123410'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
+  const BUILD='20261119134612'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
   // nach einem Update die ?v=… aus der Adresse entfernen
   try{ const u=new URL(location.href); if(u.searchParams.has('v')){ u.searchParams.delete('v'); history.replaceState(null,'',u.pathname+(u.search||'')+u.hash); } }catch(e){}
   const el=$('#upd'); let latest=null, snoozed=null, busy=false;
