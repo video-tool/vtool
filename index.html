@@ -2219,6 +2219,9 @@ body.no-hdr .cmp-tools>.save-w .ctl{height:34px!important}
 .coach button:hover{background:rgba(20,24,31,.22)}
 .coach-ar{position:absolute;top:-6px;width:12px;height:12px;background:#ffd24a;transform:translateX(-50%) rotate(45deg);border-radius:2px}
 .coach.up .coach-ar{top:auto;bottom:-6px}
+
+/* Anleitung im Querformat auf dem Handy: Karte kompakter, damit mehr vom Bild frei bleibt */
+@media (max-height:520px) and (min-width:700px){ .tour-card{padding:10px 12px} .tour-t{font-size:14px;margin-bottom:2px} .tour-p{font-size:12px;line-height:1.4;margin-bottom:7px} .tour-bar{margin-bottom:7px} .tour-b{height:30px} .tour-top{margin-bottom:0} }
 /* ---- Overlay-Leiste: drei Zonen (links Schritt, Mitte kurzer Hinweis, rechts Knöpfe) ---- */
 #viewCmp .ov-panel{position:relative}
 .ov-zl{display:flex;align-items:center;gap:10px;flex:none;min-width:0}
@@ -8606,7 +8609,7 @@ addEventListener('unhandledrejection',e=>{ FB.errs.push('Promise: '+String(e.rea
 function fbOn(){ return !!(typeof TRN_API!=='undefined'&&TRN_API); }
 const fbIco='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v12H8l-4 4z"/><path d="M12 7.5v4M12 14h.01"/></svg>';
 function fbInfo(){ const D=mode==='cmp'?A:mode==='gps'?GD:S, c=D&&D.clip, n=x=>x?(x.alias||x.name||'').slice(0,90):'';
-  return {build:'20261119225659'.startsWith('%%')?'dev':'20261119225659',env:window.VLAB_ENV||'live',url:location.pathname,lang:(window.vlabLang&&vlabLang.get())||'de',ua:navigator.userAgent.slice(0,240),
+  return {build:'20261120074116'.startsWith('%%')?'dev':'20261120074116',env:window.VLAB_ENV||'live',url:location.pathname,lang:(window.vlabLang&&vlabLang.get())||'de',ua:navigator.userAgent.slice(0,240),
     scr:screen.width+'×'+screen.height+' @'+(devicePixelRatio||1)+' · Fenster '+innerWidth+'×'+innerHeight,mem:navigator.deviceMemory||null,cpu:navigator.hardwareConcurrency||null,net:navigator.onLine?'online':'offline',
     view:mode+(mode==='cmp'&&$('#viewCmp').classList.contains('overlay')?' · overlay':''),clip:n(c),clipB:mode==='cmp'?n(B.clip):'',
     t:D&&D.ready?+(D.frame/D.fps).toFixed(2):null,fps:c&&c.fps||null,size:c?[c.w,c.h].join('×'):'',n:clips.length,errs:FB.errs.slice()}; }
@@ -9883,7 +9886,7 @@ if(false&&!LS.get('hint1',0)){ setTimeout(()=>{ toast(matchMedia('(pointer:coars
 
 /* Update-Hinweis: prüft version.json auf GitHub Pages; «Aktualisieren» lädt die Seite ohne Cache neu */
 (()=>{
-  const BUILD='20261119225659'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
+  const BUILD='20261120074116'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
   // nach einem Update die ?v=… aus der Adresse entfernen
   try{ const u=new URL(location.href); if(u.searchParams.has('v')){ u.searchParams.delete('v'); history.replaceState(null,'',u.pathname+(u.search||'')+u.hash); } }catch(e){}
   const el=$('#upd'); let latest=null, snoozed=null, busy=false;
@@ -9922,16 +9925,31 @@ async function preOvLoad(){ if(PRE_OV) return PRE_OV; try{ const r=await fetch('
     let r=null; try{ if(typeof target==='function') r=target(); else if(target){ const e=typeof target==='string'?$(target):target; r=e?e.getBoundingClientRect():null; } }catch(err){ r=null; }
     if(!r||!r.width){ spot.style.opacity='0'; if(!target||!card.style.top) placeCard(null); return; } /* Ziel ist nach dem Klick weg (z. B. «Weiter»): Karte bleibt stehen statt quer übers Bild zu springen */
     // Handy: Ziel in den sichtbaren Bereich über der Karte scrollen
-    if(innerWidth<700&&depth<2){ const room=innerHeight-(card.offsetHeight||190)-110; if(r.top<60||r.bottom>room){ window.scrollBy(0,r.top-Math.max(60,(room-r.height)/2)); return requestAnimationFrame(()=>focus(target,pad,depth+1)); } }
+    if(innerWidth<700&&depth<2){ const room=innerHeight-(card.offsetHeight||190)-110; if(r.top<60||r.bottom>room){ window.scrollBy({top:r.top-Math.max(60,(room-r.height)/2),behavior:'smooth'}); spot.style.opacity='0'; return setTimeout(()=>{ if(TR.on) focus(target,pad,depth+1); },420); } /* weich scrollen, Lichtkegel erst am Ziel zeigen */ }
     spot.style.opacity='1'; Object.assign(spot.style,{left:(r.left-pad)+'px',top:(r.top-pad)+'px',width:(r.width+2*pad)+'px',height:(r.height+2*pad)+'px'});
     placeCard(r);
   }
+  /* Karte ruhig halten: sie bleibt stehen, solange sie weder das Ziel noch den Bereich verdeckt, in dem der Zeiger gerade etwas zeigt.
+     Muss sie weichen, nimmt sie den freien Platz, der am nächsten liegt – kein Springen quer übers Bild. */
   function placeCard(r){
-    const W=innerWidth,H=innerHeight, cw=Math.min(360,W-24); card.style.width=cw+'px'; const ch=card.offsetHeight||170;
-    let x,y; if(W<700){ x=(W-cw)/2; y=H-ch-96; card.style.left=x+'px'; card.style.top=Math.max(12,y)+'px'; return; } // Handy: unten über der Navigation
-    if(!r){ x=(W-cw)/2; y=H-ch-24; }
-    else { x=clamp(r.left+r.width/2-cw/2,12,W-cw-12); y=r.bottom+18; if(y+ch>H-12) y=r.top-ch-18; if(y<12){ y=clamp(r.top+16,12,H-ch-12); x=r.right+18+cw<W?r.right+18:clamp(r.left-cw-18,12,W-cw-12); } }
-    card.style.left=x+'px'; card.style.top=clamp(y,12,Math.max(12,H-ch-12))+'px';
+    const W=innerWidth,H=innerHeight; let lc=null; if(W>=1000){ const e=vis('.libcard'); if(e){ const q=e.getBoundingClientRect(); if(q.width>=260&&q.left<40&&q.bottom>H-60) lc=q; } } /* Computer: fester Platz unten in der Videoliste */
+    const cw=lc?Math.min(360,Math.round(lc.width-4)):Math.min(360,W-24); card.style.width=cw+'px'; const ch=card.offsetHeight||170;
+    if(W<700){ card.style.left=(W-cw)/2+'px'; card.style.top=Math.max(12,H-ch-96)+'px'; return; } // Handy: unten über der Navigation
+    const mx=Math.max(12,W-cw-12), my=Math.max(12,H-ch-12), fit=(x,y)=>[clamp(x,12,mx),clamp(y,12,my)];
+    const cx=parseFloat(card.style.left), cy=parseFloat(card.style.top), has=isFinite(cx)&&isFinite(cy);
+    const s=TR.steps&&TR.steps[TR.i]; let av=[]; try{ av=s&&s.av?[].concat(s.av()).filter(Boolean):[]; }catch(e){}
+    const boxes=(r?[r]:[]).concat(av).map(b=>({l:b.left-16,t:b.top-16,r:b.right+16,b:b.bottom+16}));
+    const ov=(x,y)=>boxes.reduce((a,b)=>a+Math.max(0,Math.min(x+cw,b.r)-Math.max(x,b.l))*Math.max(0,Math.min(y+ch,b.b)-Math.max(y,b.t)),0);
+    const set=(x,y)=>{ const near=!has||TR.fresh||Math.hypot(x-cx,y-cy)<40; card.style.transitionProperty=near?'opacity,transform':''; card.style.left=Math.round(x)+'px'; card.style.top=Math.round(y)+'px'; }; /* erste Platzierung und kleine Korrekturen ohne Gleiten */
+    if(!boxes.length){ if(has) set(...fit(cx,cy)); else set((W-cw)/2,H-ch-24); return; }
+    if(has){ const [x,y]=fit(cx,cy); if(ov(x,y)<1){ set(x,y); return; } }
+    if(lc){ const [x,y]=fit(lc.left+2,lc.bottom-ch-8); if(ov(x,y)<1){ set(x,y); return; } }
+    const mid=r?r.left+r.width/2-cw/2:(W-cw)/2, C=[];
+    if(r){ C.push([mid,r.bottom+20],[mid,r.top-ch-20],[r.right+20,r.top],[r.left-cw-20,r.top],[r.right+20,r.bottom-ch],[r.left-cw-20,r.bottom-ch]); }
+    for(const x of [12,(W-cw)/2,mx]) for(const y of [12,(H-ch)/2,my]) C.push([x,y]);
+    const ref=has?[cx,cy]:C[0]; let best=null;
+    C.forEach(([x0,y0],k)=>{ const [x,y]=fit(x0,y0), o=ov(x,y), d=Math.hypot(x-ref[0],y-ref[1])+(has?0:k*.01); const sc=Math.round(o/(cw*ch)*40)*1e5+d; if(!best||sc<best[0]) best=[sc,x,y]; });
+    set(best[1],best[2]);
   }
   // Mauszeiger
   const cpos={x:innerWidth/2,y:innerHeight*0.7};
@@ -9945,7 +9963,7 @@ async function preOvLoad(){ if(PRE_OV) return PRE_OV; try{ const r=await fetch('
     for(let k=1;k<=n&&!stopped();k++){ const f=k/n, e=f<.5?2*f*f:1-Math.pow(-2*f+2,2)/2; d.seekTime(t0+(t-t0)*e); if(d.onUserSeek&&G.linked) d.onUserSeek(d); cur.style.transition='none'; cur.style.left=(x0-r.width*0.22*e)+'px'; await sleep(ms/n); }
     d.seekTime(t); if(d.onUserSeek&&G.linked) d.onUserSeek(d); cur.classList.remove('drag'); await sleep(400); }
     const stage='#cStages', tlA=()=>A.cv, tlB=()=>B.cv;
-  const rectOf=(...els)=>()=>{ const rs=els.map(f=>(typeof f==='function'?f():$(f))).filter(Boolean).map(e=>e.getBoundingClientRect()); if(!rs.length) return null;
+  const rectOf=(...els)=>()=>{ const rs=els.map(f=>(typeof f==='function'?f():$(f))).filter(Boolean).map(e=>e.getBoundingClientRect()).filter(q=>q.width>2&&q.height>2); if(!rs.length) return null; /* unsichtbare Teile nicht mitrechnen */
     const l=Math.min(...rs.map(r=>r.left)),t=Math.min(...rs.map(r=>r.top)),R=Math.max(...rs.map(r=>r.right)),b=Math.max(...rs.map(r=>r.bottom)); return {left:l,top:t,right:R,bottom:b,width:R-l,height:b-t}; };
 
   const M='Meillard_Soelden_251026_GS_M_L1.mp4', Gz='Gratz_Soelden_251026_GS_M_L1.mp4';
@@ -9964,7 +9982,7 @@ async function preOvLoad(){ if(PRE_OV) return PRE_OV; try{ const r=await fetch('
        run:async()=>{ await clickEl('#viewCmp .ctl.play'); await sleep(3600); if(!A.v.paused) cmpToggle(); }},
     ],
     single:[
-      {t:'Video wählen',p:'In der Liste ein Video antippen oder mit «+» eigene Videos öffnen – hier Meillard in Sölden. Die Videos bleiben auf deinem Gerät.',f:rv('.libcard','header .btn-add','#sHost .stage'),
+      {t:'Video wählen',p:'In der Liste ein Video antippen oder mit «+» eigene Videos öffnen – hier Meillard in Sölden. Die Videos bleiben auf deinem Gerät.',f:rv('.libcard .ft-row.file.on','.libcard','header .btn-add','#sHost .stage'),
        run:async()=>{ const c=demo(M); if(S.clip!==c){ S.setClip(c); renderLib(); if(typeof refreshSingleHead==='function') refreshSingleHead(); } for(let k=0;k<200&&!S.ready;k++) await sleep(100); S.pause(); S.seekTime(0); await sleep(700); }},
       {t:'Abspielen und Tempo',p:'Der rote Knopf spielt ab und hält an (Leertaste). Daneben stellst du das Tempo ein – Zeitlupe bis 0.1×.',f:rectOf('#viewSingle [data-act="play"]','#viewSingle [data-act="rate"]'),
        run:async()=>{ await clickEl('#viewSingle [data-act="play"]'); await sleep(2600); if(!S.v.paused) S.pause(); }},
@@ -9982,7 +10000,7 @@ async function preOvLoad(){ if(PRE_OV) return PRE_OV; try{ const r=await fetch('
        run:async()=>{ setLayout('overlay'); A.setClip(demo(BO)); B.setClip(demo(KR)); unlink(); syncSelects(); renderLib(); await waitReady(); A.seekTime(0.5); B.seekTime(1.5); OV.cut={a:null,b:null}; OV.T=null; OV.follow=false; OV.edit=false; OV.pick=null; ovUI(); await sleep(500); await scrub(A,PRE_OV.cut.a,1400); await scrub(B,PRE_OV.cut.a+PRE_OV.off,1400); }},
       {t:'Weiter',p:'«Weiter» verbindet A und B an diesem Moment. «Automatisch suchen» findet die Stelle in wenigen Sekunden selbst, wenn beide vom gleichen Standort gefilmt sind.',f:'[data-ov="sync"]',run:async()=>{ await clickEl('[data-ov="sync"]'); }},
       {t:'Start und Ende (optional)',p:'Mit «Start» und «Ende» wählst du den Teil der Strecke, der übereinandergelegt wird. Ohne Angabe gilt das ganze Video.',f:innerWidth>760?'.sbs-cut':'.ov-cutg',run:async()=>{ await clickEl(innerWidth>760?'[data-sbs="a"]':'[data-ov="cuta"]'); }},
-      {t:'2 · Übereinanderlegen',p:'Im echten Ablauf schiebst du jetzt B auf A, bis die Tore übereinanderliegen («B schieben»), oder lässt es die App machen. «Overlay erstellen» – die App legt B über A und führt es von Start bis Ende mit, auch wenn die Kamera schwenkt und zoomt. Das dauert je nach Länge etwa 20–40 Sekunden, die Restzeit wird angezeigt (hier vorbereitet).',f:'[data-ov="make"]',
+      {t:'2 · Übereinanderlegen',p:'«Overlay erstellen» legt B über A und führt es von Start bis Ende mit, auch wenn die Kamera schwenkt und zoomt. Das dauert etwa 20–40 Sekunden, die Restzeit wird angezeigt (hier vorbereitet). Vorher kannst du B mit «B schieben» selbst auf A legen.',f:'[data-ov="make"]',
        run:async()=>{ OV.cut.b=PRE_OV.cut.b; ovUI(); preloadOv(); await clickEl('[data-ov="make"]'); }},
       {t:'3 · Fertig',p:'Abspielen oder scrubben: Boisset und Kriechmayr fahren im selben Bild. Liegt B irgendwo daneben: anhalten und «Korrigieren». Unter «…» blendet «Spur» die Fahrlinie von A und B ein. «Speichern» exportiert das Overlay als Video.',f:stage,
        run:async()=>{ A.seekTime(26); A.onUserSeek(A); await sleep(700); cmpToggle(); await sleep(4200); if(!A.v.paused) cmpToggle(); }}
@@ -10012,11 +10030,11 @@ async function preOvLoad(){ if(PRE_OV) return PRE_OV; try{ const r=await fetch('
     else { if(TR.wasPlaying){ TR.wasPlaying=false; if(TR.kind==='single') S.play(); else cmpToggle(); } if(!TR.busy&&TR.i<TR.steps.length-1) autoNext(); } }
   function saveState(){ return {a:A.clip,b:B.clip,lay:$('#viewCmp').classList.contains('overlay')?'overlay':$('#viewCmp').classList.contains('ghost')?'ghost':'side',G:{...G},ta:A.time(),tb:B.time()}; }
   window.startTour=async kind=>{
-    if(kind==='single'){ if(!demo(M)){ toast('Die Anleitung braucht die Beispiel-Läufe (nur online verfügbar).'); return; } if(mode!=='single') setMode('single'); TR.kind=kind; TR.steps=STEPS.single; TR.saved=null; TR.on=true; el.hidden=false; document.body.classList.add('touring'); requestAnimationFrame(()=>el.classList.add('on')); cur.style.opacity='0'; show(0); return; }
+    if(kind==='single'){ if(!demo(M)){ toast('Die Anleitung braucht die Beispiel-Läufe (nur online verfügbar).'); return; } if(mode!=='single') setMode('single'); TR.kind=kind; TR.steps=STEPS.single; TR.saved=null; TR.on=true; el.hidden=false; document.body.classList.add('touring'); card.style.left=card.style.top=''; TR.fresh=true; setTimeout(()=>{ TR.fresh=false; },700); requestAnimationFrame(()=>el.classList.add('on')); cur.style.opacity='0'; show(0); return; }
     if(kind==='overlay'&&!(await preOvLoad())){ toast('Die Anleitung braucht die Beispiel-Videos – bitte online öffnen.',3600); return; }
     if(!demo(M)||!demo(BO)){ toast('Die Anleitung braucht die Beispiel-Läufe (nur online verfügbar).'); return; }
     TR.kind=kind; TR.steps=STEPS[kind]; TR.saved=saveState(); TR.on=true; if(kind!=='overlay'){ const dk=$('#viewCmp .dock3'); if(dk&&!dk.classList.contains('tools-open')) $('#btnTools').click(); } el.hidden=false; document.body.classList.add('touring');
-    requestAnimationFrame(()=>el.classList.add('on')); cur.style.opacity='0'; show(0);
+    card.style.left=card.style.top=''; TR.fresh=true; setTimeout(()=>{ TR.fresh=false; },700); requestAnimationFrame(()=>el.classList.add('on')); cur.style.opacity='0'; show(0);
   };
   async function end(){ TR.on=false; TR.abort=true; clearTimeout(TR.timer); el.classList.remove('on'); document.body.classList.remove('touring'); setTimeout(()=>{ el.hidden=true; },300);
     if(TR.kind==='single'){ if(!S.v.paused) S.pause(); const c=demo(M); if(c&&S.clip===c){ c.loop.a=null; c.loop.b=null; c.loop.on=false; if(typeof saveClip==='function') saveClip(c); S.dirty=true; if(typeof renderMarks==='function') renderMarks(); } return; } /* Start/Ende aus der Anleitung nicht stehen lassen */
