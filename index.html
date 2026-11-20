@@ -2220,8 +2220,15 @@ body.no-hdr .cmp-tools>.save-w .ctl{height:34px!important}
 .coach-ar{position:absolute;top:-6px;width:12px;height:12px;background:#ffd24a;transform:translateX(-50%) rotate(45deg);border-radius:2px}
 .coach.up .coach-ar{top:auto;bottom:-6px}
 
-/* Anleitung im Querformat auf dem Handy: Karte kompakter, damit mehr vom Bild frei bleibt */
-@media (max-height:520px) and (min-width:700px){ .tour-card{padding:10px 12px} .tour-t{font-size:14px;margin-bottom:2px} .tour-p{font-size:12px;line-height:1.4;margin-bottom:7px} .tour-bar{margin-bottom:7px} .tour-b{height:30px} .tour-top{margin-bottom:0} }
+/* Anleitung im Querformat auf dem Handy: flache Leiste über die ganze Breite statt Karte */
+.tour-card.bar{display:grid;grid-template-columns:1fr auto;grid-template-areas:"t top" "p nav" "bar bar";column-gap:16px;align-items:center;padding:8px 12px 9px;border-radius:14px}
+.tour-card.bar .tour-top{grid-area:top;margin:0;justify-content:flex-end;gap:10px}
+.tour-card.bar .tour-x{width:24px;height:24px}
+.tour-card.bar .tour-t{grid-area:t;margin:0;font-size:14px}
+.tour-card.bar .tour-p{grid-area:p;margin:0;font-size:12px;line-height:1.35}
+.tour-card.bar .tour-bar{grid-area:bar;margin:7px 0 0}
+.tour-card.bar .tour-nav{grid-area:nav}
+.tour-card.bar .tour-b{height:30px}
 /* ---- Overlay-Leiste: drei Zonen (links Schritt, Mitte kurzer Hinweis, rechts Knöpfe) ---- */
 #viewCmp .ov-panel{position:relative}
 .ov-zl{display:flex;align-items:center;gap:10px;flex:none;min-width:0}
@@ -8609,7 +8616,7 @@ addEventListener('unhandledrejection',e=>{ FB.errs.push('Promise: '+String(e.rea
 function fbOn(){ return !!(typeof TRN_API!=='undefined'&&TRN_API); }
 const fbIco='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v12H8l-4 4z"/><path d="M12 7.5v4M12 14h.01"/></svg>';
 function fbInfo(){ const D=mode==='cmp'?A:mode==='gps'?GD:S, c=D&&D.clip, n=x=>x?(x.alias||x.name||'').slice(0,90):'';
-  return {build:'20261120074116'.startsWith('%%')?'dev':'20261120074116',env:window.VLAB_ENV||'live',url:location.pathname,lang:(window.vlabLang&&vlabLang.get())||'de',ua:navigator.userAgent.slice(0,240),
+  return {build:'20261120130036'.startsWith('%%')?'dev':'20261120130036',env:window.VLAB_ENV||'live',url:location.pathname,lang:(window.vlabLang&&vlabLang.get())||'de',ua:navigator.userAgent.slice(0,240),
     scr:screen.width+'×'+screen.height+' @'+(devicePixelRatio||1)+' · Fenster '+innerWidth+'×'+innerHeight,mem:navigator.deviceMemory||null,cpu:navigator.hardwareConcurrency||null,net:navigator.onLine?'online':'offline',
     view:mode+(mode==='cmp'&&$('#viewCmp').classList.contains('overlay')?' · overlay':''),clip:n(c),clipB:mode==='cmp'?n(B.clip):'',
     t:D&&D.ready?+(D.frame/D.fps).toFixed(2):null,fps:c&&c.fps||null,size:c?[c.w,c.h].join('×'):'',n:clips.length,errs:FB.errs.slice()}; }
@@ -9886,7 +9893,7 @@ if(false&&!LS.get('hint1',0)){ setTimeout(()=>{ toast(matchMedia('(pointer:coars
 
 /* Update-Hinweis: prüft version.json auf GitHub Pages; «Aktualisieren» lädt die Seite ohne Cache neu */
 (()=>{
-  const BUILD='20261120074116'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
+  const BUILD='20261120130036'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
   // nach einem Update die ?v=… aus der Adresse entfernen
   try{ const u=new URL(location.href); if(u.searchParams.has('v')){ u.searchParams.delete('v'); history.replaceState(null,'',u.pathname+(u.search||'')+u.hash); } }catch(e){}
   const el=$('#upd'); let latest=null, snoozed=null, busy=false;
@@ -9925,7 +9932,9 @@ async function preOvLoad(){ if(PRE_OV) return PRE_OV; try{ const r=await fetch('
     let r=null; try{ if(typeof target==='function') r=target(); else if(target){ const e=typeof target==='string'?$(target):target; r=e?e.getBoundingClientRect():null; } }catch(err){ r=null; }
     if(!r||!r.width){ spot.style.opacity='0'; if(!target||!card.style.top) placeCard(null); return; } /* Ziel ist nach dem Klick weg (z. B. «Weiter»): Karte bleibt stehen statt quer übers Bild zu springen */
     // Handy: Ziel in den sichtbaren Bereich über der Karte scrollen
-    if(innerWidth<700&&depth<2){ const room=innerHeight-(card.offsetHeight||190)-110; if(r.top<60||r.bottom>room){ window.scrollBy({top:r.top-Math.max(60,(room-r.height)/2),behavior:'smooth'}); spot.style.opacity='0'; return setTimeout(()=>{ if(TR.on) focus(target,pad,depth+1); },420); } /* weich scrollen, Lichtkegel erst am Ziel zeigen */ }
+    if((innerWidth<700||innerHeight<520)&&depth<2){ const low=innerWidth>=700, H=innerHeight, chh=card.offsetHeight||(low?85:190), top0=low?chh+22:60, room=low?H-10:H-chh-110; /* Handy: Ziel in den freien Bereich neben der Karte scrollen (quer: unter die Leiste) */
+      if(r.top<top0||r.bottom>room){ const dy=r.top-Math.max(top0,top0+(room-top0-r.height)/2), max=Math.max(0,document.documentElement.scrollHeight-H), ny=clamp(scrollY+dy,0,max);
+        if(Math.abs(ny-scrollY)>4){ window.scrollBy({top:ny-scrollY,behavior:'smooth'}); spot.style.opacity='0'; return setTimeout(()=>{ if(TR.on) focus(target,pad,depth+1); },420); } } }
     spot.style.opacity='1'; Object.assign(spot.style,{left:(r.left-pad)+'px',top:(r.top-pad)+'px',width:(r.width+2*pad)+'px',height:(r.height+2*pad)+'px'});
     placeCard(r);
   }
@@ -9933,6 +9942,11 @@ async function preOvLoad(){ if(PRE_OV) return PRE_OV; try{ const r=await fetch('
      Muss sie weichen, nimmt sie den freien Platz, der am nächsten liegt – kein Springen quer übers Bild. */
   function placeCard(r){
     const W=innerWidth,H=innerHeight; let lc=null; if(W>=1000){ const e=vis('.libcard'); if(e){ const q=e.getBoundingClientRect(); if(q.width>=260&&q.left<40&&q.bottom>H-60) lc=q; } } /* Computer: fester Platz unten in der Videoliste */
+    const low=H<520&&W>=700; card.classList.toggle('bar',low); /* Handy quer: flache Leiste oben, nur wenn sie das Ziel verdeckt unten */
+    if(low){ const bw=W-24; card.style.width=bw+'px'; const bh=card.offsetHeight||80, cy0=parseFloat(card.style.top), yT=8, yB=H-bh-8;
+      const cov=y=>{ if(!r||!r.height) return 0; const o=Math.max(0,Math.min(y+bh,r.bottom)-Math.max(y,r.top)); return o/r.height; };
+      let y=isFinite(cy0)?(cy0>H/3?yB:yT):yT; if(cov(y)>.3){ const o=y===yT?yB:yT; if(cov(o)<cov(y)) y=o; }
+      card.style.transitionProperty=isFinite(cy0)&&Math.abs(cy0-y)>40&&!TR.fresh?'':'opacity,transform'; card.style.left='12px'; card.style.top=Math.round(y)+'px'; return; }
     const cw=lc?Math.min(360,Math.round(lc.width-4)):Math.min(360,W-24); card.style.width=cw+'px'; const ch=card.offsetHeight||170;
     if(W<700){ card.style.left=(W-cw)/2+'px'; card.style.top=Math.max(12,H-ch-96)+'px'; return; } // Handy: unten über der Navigation
     const mx=Math.max(12,W-cw-12), my=Math.max(12,H-ch-12), fit=(x,y)=>[clamp(x,12,mx),clamp(y,12,my)];
