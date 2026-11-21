@@ -2775,9 +2775,29 @@ html:not(.tm-beta) :is(#btnTm,#tmPanel,#tmBanner){display:none!important}
 html body .btn-cam,html body header .btn-cam{display:none!important}
 
 /* Videoliste: «Wer fährt?» bei Videos der laufenden Training-Aktivität */
-.clip.row .lib-who{display:block;margin-top:3px;max-width:100%;height:24px;padding:0 22px 0 9px;border-radius:999px;border:1px dashed var(--line2);background:var(--field);color:var(--muted);font:600 11.5px var(--font);cursor:pointer;appearance:none;-webkit-appearance:none;background-image:linear-gradient(45deg,transparent 50%,currentColor 50%),linear-gradient(135deg,currentColor 50%,transparent 50%);background-position:calc(100% - 12px) 10px,calc(100% - 8px) 10px;background-size:4px 4px;background-repeat:no-repeat;text-overflow:ellipsis}
+.clip.row .lib-who{display:block;min-width:0;flex:0 1 auto;max-width:100%;height:24px;padding:0 22px 0 9px;border-radius:999px;border:1px dashed var(--line2);background:var(--field);color:var(--muted);font:600 11.5px var(--font);cursor:pointer;appearance:none;-webkit-appearance:none;background-image:linear-gradient(45deg,transparent 50%,currentColor 50%),linear-gradient(135deg,currentColor 50%,transparent 50%);background-position:calc(100% - 12px) 10px,calc(100% - 8px) 10px;background-size:4px 4px;background-repeat:no-repeat;text-overflow:ellipsis}
 .clip.row .lib-who.set{border-style:solid;border-color:color-mix(in srgb,#DA291C 35%,transparent);background-color:color-mix(in srgb,#DA291C 9%,var(--card));color:var(--ink)}
 .clip.row .lib-who:disabled{opacity:.5}
+
+/* Videoliste bei laufender Aktivität: Status-Marke pro Video (in Aktivität / lädt hoch / hinzufügen) */
+.clip.row .lib-trn{display:flex;align-items:center;gap:6px;margin-top:4px;min-width:0}
+.clip.row .lib-cl{flex:none;display:inline-flex;align-items:center;gap:4px;height:24px;padding:0 9px;border-radius:999px;font:650 11px var(--font);white-space:nowrap;border:1px solid transparent}
+.clip.row .lib-cl svg{width:14px;height:14px}
+.clip.row .lib-cl.ok{background:color-mix(in srgb,#1f9d55 16%,transparent);color:#1f9d55}
+:root[data-theme="dark"] .clip.row .lib-cl.ok{color:#4ade80}
+.clip.row .lib-cl.busy{background:color-mix(in srgb,#DA291C 12%,transparent);color:#DA291C}
+.clip.row .lib-cl.off{background:color-mix(in srgb,#b45309 16%,transparent);color:#d97706}
+.clip.row .lib-cl.add,.clip.row .lib-cl.err{background:none;border:1px dashed var(--line2);color:var(--muted);cursor:pointer}
+.clip.row .lib-cl.err{color:#DA291C;border-color:color-mix(in srgb,#DA291C 45%,transparent)}
+.clip.row .lib-cl.add:hover{color:var(--ink);border-color:var(--ink)}
+
+/* Videos der Aktivität, die nicht auf diesem Gerät sind: gleiche Zeile, per Tipp aus der Cloud laden */
+.lib.list .clip.row.cloud{grid-template-columns:76px minmax(0,1fr)}
+.clip.row.cloud .thumb img{width:100%;height:100%;object-fit:cover;display:block;border-radius:inherit}
+.clip.row.cloud .thumb{opacity:.82}
+.clip.row .lib-cl.get{background:color-mix(in srgb,#2563eb 13%,transparent);color:#2563eb;cursor:pointer}
+:root[data-theme="dark"] .clip.row .lib-cl.get{color:#7fb0ff}
+.clip.row .lib-pn{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font:600 11.5px var(--font);color:var(--muted)}
 /* ---- Handy: feste Leisten oben und unten, nichts scrollt dahinter · Bedienung in zwei Zeilen ---- */
 @media (max-width:600px){
   header{position:sticky!important;top:0!important;z-index:130;margin:0 -0px 8px!important;padding:env(safe-area-inset-top,0px) 0 0!important;background:var(--bg)!important;border-bottom:1px solid var(--line)!important}
@@ -4195,6 +4215,7 @@ function renderLib(){
     th.addEventListener('pointerleave',()=>th.classList.remove('scrub'));
     el.appendChild(card);
   });
+  if(typeof trnLibCloud==='function') trnLibCloud(el); /* Videos der laufenden Aktivität, die nicht auf diesem Gerät geöffnet sind */
   if(LIB.q&&!el.children.length){ const e0=document.createElement('div'); e0.className='lib-empty'; e0.textContent='Kein Video passt zu «'+LIB.q+'».'; el.appendChild(e0); }
   const add=document.createElement('label'); add.className='add-tile'; add.htmlFor='fileIn'; add.addEventListener('click',e=>{ if(FSA){ e.preventDefault(); pickVideos(); } });
   add.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>Videos hinzufügen<small>oder ins Fenster ziehen</small>';
@@ -7958,7 +7979,7 @@ document.addEventListener('visibilitychange',()=>{ if(!document.hidden) tqRun();
    Ansehen ohne Login unter s/#<id>; nach 72 h sperrt der Worker die Aktivität und löscht die Dateien. */
 const TRN_API=(()=>{ try{ if(/^(localhost|127\.0\.0\.1)$/.test(location.hostname)){ const o=localStorage.getItem('vlab:cloudApi'); if(o) return o; } }catch(e){} return 'https://vlab-cloud.swiss-ski-club.workers.dev'.indexOf('%%')===0?'':'https://vlab-cloud.swiss-ski-club.workers.dev'; })().replace(/\/+$/,'');
 TQ.api=TRN_API;
-const TRN={st:{},people:null,offers:[],views:[],autoj:{},prep:[],busy:false,ask:null,view:null,poll:0};
+const TRN={dl:{},who:{},st:{},people:null,offers:[],views:[],autoj:{},prep:[],busy:false,ask:null,view:null,poll:0};
 const trnOn=()=>!!TRN_API;
 const trnL=()=>tqList().filter(s=>s.exp>Date.now());
 const trnCur=()=>{ const id=LS.get('trn:cur2',null); return trnL().find(s=>s.id===id)||null; };
@@ -8036,43 +8057,77 @@ function trnGuess(s,c){ const A=((s.meta||{}).athletes||[]).map(a=>a.n).filter(B
   const hay=((c.meta&&c.meta.athlete)||'')+' '+(c.name||'').replace(/[_-]+/g,' '); const low=hay.toLowerCase();
   return A.find(n=>low.includes(n.toLowerCase()))||A.find(n=>n.split(/\s+/).some(w=>w.length>2&&low.includes(w.toLowerCase())))||''; }
 
-function trnSet(k,s,p){ const nw=!TRN.st[k]; TRN.st[k]={s,p:p||0}; trnUI(); if(nw&&typeof renderLibSoon==='function') renderLibSoon(); }
-/* Videoliste: bei Videos der laufenden Aktivität ein kleines Feld «Wer fährt?» – gleiche Zuordnung wie im Aktivitäts-Fenster, ohne es öffnen zu müssen */
-function trnLibWho(card,c){ const s=trnOn()&&trnCur(); if(!s||c.demo) return; const A=((s.meta||{}).athletes||[]).map(a=>a.n); if(!A.length) return;
-  const k=trnQK(s,c), vid=(s.up||{})[k]; if(!TRN.st[k]&&!vid) return; const info=card.querySelector('.info'); if(!info) return;
-  const x=document.createElement('select'); x.className='lib-who'; x.title='Wer fährt? – Zuordnung in «'+((s.meta&&s.meta.title)||'Training')+'»'; x.setAttribute('aria-label','Wer fährt?');
-  x.appendChild(new Option('Wer fährt?','')); A.forEach(n=>x.appendChild(new Option(n,n)));
-  const show=v=>{ if(v&&!A.includes(v)) x.appendChild(new Option(v,v)); x.value=v||''; x.classList.toggle('set',!!x.value); };
-  const mv=vid&&((s.meta||{}).videos||[]).find(v=>v.id===vid); if(mv) show(mv.p); else { show(''); tqGet(k).then(it=>{ if(it&&it.p) show(it.p); }).catch(()=>{}); }
-  ['click','pointerdown','mousedown','touchstart','keydown','dblclick'].forEach(ev=>x.addEventListener(ev,e=>e.stopPropagation()));
-  x.onchange=async()=>{ const p=x.value; x.disabled=true; const ok=await trnSetPerson(s.id,k,p); x.disabled=false; if(!ok){ show(mv?mv.p:''); return; }
-    x.classList.toggle('set',!!p); const v2=(s.up||{})[k]||(trnCur()&&(trnCur().up||{})[k]); if(v2) trnUpd(s.id,q=>{ const w=((q.meta||{}).videos||[]).find(y=>y.id===v2); if(w) w.p=p; });
-    toast(p?p+' zugeordnet.':'Ohne Person.',1400); if(TRN.view===s.id) trnDlgList(); };
-  info.appendChild(x); }
+function trnSet(k,s,p){ const o=trnLibCls(TRN.st[k]); TRN.st[k]={s,p:p||0}; trnUI(); if(o!==trnLibCls(TRN.st[k])&&typeof renderLibSoon==='function') renderLibSoon(); } /* Liste nur neu zeichnen, wenn sich die Anzeige der Zeile ändert */
+/* Videoliste bei laufender Aktivität: jede Zeile zeigt, ob das Video in der Aktivität ist (Wolke), gerade hochlädt oder noch fehlt («Zur Aktivität»),
+   und bei Videos der Aktivität das Feld «Wer fährt?» – gleiche Zuordnung wie im Aktivitäts-Fenster */
+function trnLibCls(v){ return !v?'':v.s==='err'?'err':v.s==='off'||v.s==='retry'?'off':'busy'; }
+function trnLibWho(card,c){ const s=trnOn()&&trnCur(); if(!s||c.demo||c.err) return; const info=card.querySelector('.info'); if(!info) return;
+  const A=((s.meta||{}).athletes||[]).map(a=>a.n), k=trnQK(s,c), vid=(s.up||{})[k], st=TRN.st[k], cls=vid?'ok':trnLibCls(st), ttl=(s.meta&&s.meta.title)||'Training';
+  const row=document.createElement('div'); row.className='lib-trn'; const quiet=e=>['click','pointerdown','mousedown','touchstart','keydown','dblclick'].forEach(ev=>e.addEventListener(ev,x=>x.stopPropagation()));
+  const add=!cls||cls==='err', chip=document.createElement(add?'button':'span'); chip.className='lib-cl '+(cls||'add'); if(add) chip.type='button';
+  chip.innerHTML=(cls==='ok'?'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M7 18a4.5 4.5 0 0 1-.6-8.96A6 6 0 0 1 18 9.5a4 4 0 0 1-.5 8.5H7z"/><path d="M9.3 13.2l2 2 3.6-3.8"/></svg>':add?'':trnIco)+'<span></span>';
+  chip.lastChild.textContent=cls==='ok'?'In Aktivität':cls==='busy'?'Lädt hoch …':cls==='off'?'Wartet auf Netz':cls==='err'?'Fehler · nochmals':'+ Zur Aktivität';
+  chip.title=cls==='ok'?'Dieses Video ist in «'+ttl+'»':add?'Dieses Video in «'+ttl+'» hochladen':'Wird in «'+ttl+'» hochgeladen';
+  if(add){ quiet(chip); chip.addEventListener('click',()=>{ if(TRN.st[k]) delete TRN.st[k]; trnQueue(c,s); renderLibSoon(); }); }
+  row.appendChild(chip); card.classList.toggle('in-trn',!add);
+  if(!add&&A.length){
+    const x=document.createElement('select'); x.className='lib-who'; x.title='Wer fährt? – Zuordnung in «'+ttl+'»'; x.setAttribute('aria-label','Wer fährt?');
+    x.appendChild(new Option('Wer fährt?','')); A.forEach(n=>x.appendChild(new Option(n,n)));
+    const show=v=>{ if(v&&!A.includes(v)) x.appendChild(new Option(v,v)); x.value=v||''; x.classList.toggle('set',!!x.value); };
+    const mv=vid&&((s.meta||{}).videos||[]).find(v=>v.id===vid); if(mv) show(mv.p); else { show(TRN.who[k]||''); tqGet(k).then(it=>{ if(it&&it.p) show(it.p); }).catch(()=>{}); }
+    quiet(x);
+    x.onchange=async()=>{ const p=x.value; x.disabled=true; const ok=await trnSetPerson(s.id,k,p); x.disabled=false; if(!ok){ show(mv?mv.p:''); return; }
+      x.classList.toggle('set',!!p); const v2=(s.up||{})[k]||(trnCur()&&(trnCur().up||{})[k]); if(v2) trnUpd(s.id,q=>{ const w=((q.meta||{}).videos||[]).find(y=>y.id===v2); if(w) w.p=p; });
+      toast(p?p+' zugeordnet.':'Ohne Person.',1400); if(TRN.view===s.id) trnDlgList(); };
+    row.appendChild(x); }
+  info.appendChild(row); }
+/* Videoliste: Videos der laufenden Aktivität, die nicht (mehr) auf diesem Gerät geöffnet sind – sie bleiben sichtbar und lassen sich per Tipp aus der Cloud laden */
+function trnLibCloud(el){ const s=trnOn()&&trnCur(); if(!s) return; const vs=((s.meta||{}).videos||[]); if(!vs.length) return;
+  const have=new Set(); clips.forEach(c=>{ if(c.demo) return; const v=(s.up||{})[trnQK(s,c)]; if(v) have.add(v); if(c.trnVid) have.add(c.trnVid); });
+  const q=(typeof LIB!=='undefined'&&LIB.q)||'', rest=vs.filter(v=>!have.has(v.id)&&(!q||[v.name,v.p,v.by].filter(Boolean).join(' ').toLowerCase().includes(q))); if(!rest.length) return;
+  const h=document.createElement('div'); h.className='lib-grp'; h.textContent='In der Aktivität · nicht auf diesem Gerät'; el.appendChild(h);
+  rest.slice().sort((a,b)=>(b.t||0)-(a.t||0)).forEach(v=>{ const card=document.createElement('div'); card.className='clip row cloud in-trn'; card.tabIndex=0; card.dataset.vid=v.id;
+    card.innerHTML='<div class="thumb">'+(v.poster?'<img alt="" loading="lazy">':'<div class="ph"></div>')+(v.dur?'<span class="dur">'+fmtDur(v.dur)+'</span>':'')+'</div><div class="info"><div class="nm"></div><div class="mt"></div><div class="lib-trn"><button type="button" class="lib-cl get">'+trnIco.replace('M12 15v-5M9.5 12.5 12 10l2.5 2.5','M12 10v5M9.5 12.5 12 15l2.5-2.5')+'<span>Laden</span></button><span class="lib-pn"></span></div></div>';
+    if(v.poster) $('img',card).src=TRN_API+'/api/s/'+s.id+'/v/'+v.id+'/p';
+    $('.nm',card).textContent=String(v.name||'Video').replace(/\.[a-z0-9]{2,4}$/i,''); $('.mt',card).textContent=[v.dur?fmtDur(v.dur):null,v.size?fmtMB(v.size):null,v.by?'von '+v.by:null].filter(Boolean).join(' · ')||'—';
+    const pn=$('.lib-pn',card); pn.textContent=v.p||''; pn.hidden=!v.p; card.title='In «'+((s.meta&&s.meta.title)||'Training')+'» – antippen, um das Video auf dieses Gerät zu laden';
+    const go=e=>{ if(e) e.stopPropagation(); trnLibGet(s.id,v); }; card.addEventListener('click',go); card.addEventListener('keydown',e=>{ if(e.key==='Enter') go(e); });
+    if(TRN.dl[v.id]!=null) trnLibDlUI(v.id,TRN.dl[v.id]); el.appendChild(card); if(TRN.dl[v.id]!=null) trnLibDlUI(v.id,TRN.dl[v.id]); }); }
+function trnLibDlUI(vid,f){ const b=document.querySelector('.clip.row.cloud[data-vid="'+vid+'"] .lib-cl.get span'); if(b) b.textContent=f==null?'Laden':'Lädt … '+Math.round(f*100)+' %'; }
+async function trnLibGet(sid,v){ if(TRN.dl[v.id]!=null) return; const s=trnL().find(x=>x.id===sid); if(!s) return; TRN.dl[v.id]=0; trnLibDlUI(v.id,0);
+  try{ const r=await fetch(TRN_API+'/api/s/'+sid+'/v/'+v.id); if(!r.ok) throw new Error(r.status); const tot=+r.headers.get('Content-Length')||v.size||0; let blob;
+    if(r.body&&r.body.getReader){ const rd=r.body.getReader(), parts=[]; let n=0; for(;;){ const {done,value}=await rd.read(); if(done) break; parts.push(value); n+=value.length; if(tot){ TRN.dl[v.id]=Math.min(.99,n/tot); trnLibDlUI(v.id,TRN.dl[v.id]); } } blob=new Blob(parts,{type:r.headers.get('Content-Type')||'video/mp4'}); }
+    else blob=await r.blob();
+    const c=addClip({name:v.name||'Video.mp4',size:blob.size,mod:v.t||Date.now(),url:URL.createObjectURL(blob)}); c.trnVid=v.id;
+    trnUpd(sid,q=>{ (q.up=q.up||{})[trnQK(q,c)]=v.id; }); delete TRN.dl[v.id];
+    if(mode==='single'){ S.setClip(c); if(typeof refreshSingleHead==='function') refreshSingleHead(); } renderLib(); syncSelects(); toast('Geladen: '+metaTitle(c),1800);
+  }catch(e){ delete TRN.dl[v.id]; trnLibDlUI(v.id,null); toast('Laden nicht möglich – kein Netz?',3200); } }
 function trnNew(list){ const s=trnCur(); if(!s||s.auto===false) return; list.filter(c=>c&&!c.demo&&!c.err).forEach(c=>trnQueue(c,s)); }
 async function trnQueue(c,s){ s=s||trnCur(); if(!s) return; const k=trnQK(s,c); if((s.up||{})[k]||TRN.prep.some(x=>x.k===k)||(TRN.st[k]&&TRN.st[k].s!=='err')) return;
   TRN.prep.push({k,c,sid:s.id}); trnSet(k,'wait'); trnPrep(); }
 async function trnPrep(){ if(TRN.busy) return; TRN.busy=true;
   try{ while(TRN.prep.length){ const {k,c,sid}=TRN.prep[0], s=trnL().find(x=>x.id===sid);
       if(s) try{ trnSet(k,'prep',0); const r=await trnShrink(c,p=>trnSet(k,'prep',p)); const poster=await trnPoster(c);
-        const p=trnGuess(s,c); await tqPut({k,sid,blob:r.blob,name:base(c.name)+'.mp4',w:r.w||0,h:r.h||0,dur:c.dur||0,p,poster,t:Date.now(),title:metaTitle(c),src:'lab'});
-        trnSet(k,'wait'); if(!p&&((s.meta||{}).athletes||[]).length>1) trnAsk(sid,k,metaTitle(c),poster); tqRun();
+        const p=k in TRN.who?TRN.who[k]:trnGuess(s,c); delete TRN.who[k]; await tqPut({k,sid,blob:r.blob,name:base(c.name)+'.mp4',w:r.w||0,h:r.h||0,dur:c.dur||0,p,poster,t:Date.now(),title:metaTitle(c),src:'lab'});
+        trnSet(k,'wait'); tqRun(); /* keine Nachfrage mehr als Fenster: «Wer fährt?» steht direkt beim Video in der Liste */
       }catch(e){ trnSet(k,'err'); toast('Hochladen nicht möglich ('+(e.message==='size'?'Video zu gross':'Fehler beim Verkleinern')+'): '+metaTitle(c),4200); }
       TRN.prep.shift(); } }
   finally{ TRN.busy=false; trnUI(); } }
-TQ.cb=(k,s,p,x)=>{
+TQ.cb=(k,s,p,x)=>{ const o0=trnLibCls(TRN.st[k]);
   if(s==='ok'){ delete TRN.st[k]; toast('In der Cloud: '+((x&&x.it&&x.it.title)||(x&&x.v&&x.v.name)||'Video'),2200); if(window.vlabTrack) vlabTrack('trn_up'); trnRefresh(k.split('|')[0]); }
   else if(s==='gone') delete TRN.st[k];
   else if(s==='err'){ TRN.st[k]={s:'err',p:0}; const c=x&&x.code; toast('Hochladen nicht möglich ('+(c==='size'||c===413?'zu gross oder Aktivität voll':c===410||c===404?'Aktivität abgelaufen':c==='edit'||c===403?'keine Berechtigung':'Fehler')+')',4200); }
-  else TRN.st[k]={s,p}; trnUI(); };
+  else TRN.st[k]={s,p}; trnUI(); if(o0!==trnLibCls(TRN.st[k])&&typeof renderLibSoon==='function') renderLibSoon(); };
 /* Beim Start: Einträge, die noch in der Warteschlange liegen, anzeigen und weiter hochladen */
 async function trnBoot(){ if(location.hash==='#training'){ try{ history.replaceState(null,'',location.pathname+location.search); }catch(e){} setTimeout(()=>trnOpen(),300); } /* aus der Feld-App: «Neue Aktivität starten» */
-  const L=await tqAll(); L.forEach(it=>{ if(!TRN.st[it.k]) TRN.st[it.k]={s:it.tries?'retry':'wait',p:0}; }); trnUI(); tqRun(); trnMine(); }
+  const L=await tqAll(); L.forEach(it=>{ if(!TRN.st[it.k]) TRN.st[it.k]={s:it.tries?'retry':'wait',p:0}; }); trnUI(); tqRun(); trnMine(); { const c=trnCur(); if(c) trnRefresh(c.id); } } /* Stand der Aktivität holen: auch Videos von anderen Geräten erscheinen in der Liste */
+document.addEventListener('visibilitychange',()=>{ if(!document.hidden&&trnOn()){ const c=trnCur(); if(c) trnRefresh(c.id); } });
 
 /* Nachfragen, wer im Video fährt (unten in der Leiste, ohne den Dialog zu öffnen) */
 function trnAsk(sid,k,title,poster){ TRN.ask={sid,k,title,img:poster?URL.createObjectURL(poster):''}; trnUI(); }
 async function trnSetPerson(sid,k,p,vid){ let ok=false;
   if(vid){ const s=trnL().find(x=>x.id===sid); if(s){ const r=await trnApi('/'+sid+'/v/'+vid,{method:'PATCH',s,json:{p}}).catch(()=>({ok:false})); ok=r.ok; } }
+  else if(TRN.prep.some(x=>x.k===k)){ TRN.who[k]=p; ok=true; } /* wird noch verkleinert: Wahl merken, kommt beim Einreihen mit */
   else ok=await tqPerson(sid,k,p);
   if(!ok) toast('Zuordnen nicht möglich – kein Netz?'); return ok; }
 
@@ -8090,7 +8145,7 @@ async function trnJoin(o,quiet){ const a=vlabAuth.get(); const r=await trnApi('/
   TRN.offers=TRN.offers.filter(x=>x.id!==o.id); if(quiet){ trnUI(); return true; } if(window.vlabTrack) vlabTrack('trn_join'); toast('Beigetreten – deine neuen Videos gehen in «'+(r.j.meta.title||'Training')+'».',3200); trnUI(); return true; }
 async function trnRefresh(id){ const s=trnL().find(x=>x.id===id); if(!s) return; const r=await trnApi('/'+id).catch(()=>null); if(!r) return;
   if(r.status===410||r.status===404){ trnUpd(id,x=>{ x.exp=0; }); trnUI(); if(TRN.view===id) trnOpen(); return; }
-  if(r.ok){ trnUpd(id,x=>{ x.meta=r.j; x.n=(r.j.videos||[]).length; }); if(TRN.view===id) trnDlgList(); trnUI(); } }
+  if(r.ok){ trnUpd(id,x=>{ x.meta=r.j; x.n=(r.j.videos||[]).length; }); if(TRN.view===id) trnDlgList(); trnUI(); if(typeof renderLibSoon==='function') renderLibSoon(); } }
 
 /* Leiste unten: Status der laufenden Aktivität, Nachfrage «Wer fährt?» oder Einladung zum Beitreten */
 /* Weggeklickte Einladungen (pro Aktivität) – bleiben ausgeblendet, bis die Aktivität abläuft */
@@ -8616,7 +8671,7 @@ addEventListener('unhandledrejection',e=>{ FB.errs.push('Promise: '+String(e.rea
 function fbOn(){ return !!(typeof TRN_API!=='undefined'&&TRN_API); }
 const fbIco='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v12H8l-4 4z"/><path d="M12 7.5v4M12 14h.01"/></svg>';
 function fbInfo(){ const D=mode==='cmp'?A:mode==='gps'?GD:S, c=D&&D.clip, n=x=>x?(x.alias||x.name||'').slice(0,90):'';
-  return {build:'20261120130036'.startsWith('%%')?'dev':'20261120130036',env:window.VLAB_ENV||'live',url:location.pathname,lang:(window.vlabLang&&vlabLang.get())||'de',ua:navigator.userAgent.slice(0,240),
+  return {build:'20261121111325'.startsWith('%%')?'dev':'20261121111325',env:window.VLAB_ENV||'live',url:location.pathname,lang:(window.vlabLang&&vlabLang.get())||'de',ua:navigator.userAgent.slice(0,240),
     scr:screen.width+'×'+screen.height+' @'+(devicePixelRatio||1)+' · Fenster '+innerWidth+'×'+innerHeight,mem:navigator.deviceMemory||null,cpu:navigator.hardwareConcurrency||null,net:navigator.onLine?'online':'offline',
     view:mode+(mode==='cmp'&&$('#viewCmp').classList.contains('overlay')?' · overlay':''),clip:n(c),clipB:mode==='cmp'?n(B.clip):'',
     t:D&&D.ready?+(D.frame/D.fps).toFixed(2):null,fps:c&&c.fps||null,size:c?[c.w,c.h].join('×'):'',n:clips.length,errs:FB.errs.slice()}; }
@@ -9893,7 +9948,7 @@ if(false&&!LS.get('hint1',0)){ setTimeout(()=>{ toast(matchMedia('(pointer:coars
 
 /* Update-Hinweis: prüft version.json auf GitHub Pages; «Aktualisieren» lädt die Seite ohne Cache neu */
 (()=>{
-  const BUILD='20261120130036'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
+  const BUILD='20261121111325'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
   // nach einem Update die ?v=… aus der Adresse entfernen
   try{ const u=new URL(location.href); if(u.searchParams.has('v')){ u.searchParams.delete('v'); history.replaceState(null,'',u.pathname+(u.search||'')+u.hash); } }catch(e){}
   const el=$('#upd'); let latest=null, snoozed=null, busy=false;
