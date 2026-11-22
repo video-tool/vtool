@@ -4217,7 +4217,7 @@ function renderLib(){
   });
   if(typeof trnLibCloud==='function') trnLibCloud(el); /* Videos der laufenden Aktivität, die nicht auf diesem Gerät geöffnet sind */
   if(LIB.q&&!el.children.length){ const e0=document.createElement('div'); e0.className='lib-empty'; e0.textContent='Kein Video passt zu «'+LIB.q+'».'; el.appendChild(e0); }
-  const add=document.createElement('label'); add.className='add-tile'; add.htmlFor='fileIn'; add.addEventListener('click',e=>{ if(FSA&&!FSA_BAD){ e.preventDefault(); pickVideos(); } });
+  const add=document.createElement('label'); add.className='add-tile'; add.htmlFor='fileIn'; add.addEventListener('click',e=>{ if(FSA&&!FSA_BAD){ e.preventDefault(); pickVideos(); } else pickWatch($('#fileIn')); });
   add.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>Videos hinzufügen<small>oder ins Fenster ziehen</small>';
   el.appendChild(add);
 }
@@ -8342,8 +8342,12 @@ async function idbOp(mode,fn){ try{ const db=await idb(); return await new Promi
 const idbPut=(k,v)=>idbOp('readwrite',st=>st.put(v,k)), idbDel=k=>idbOp('readwrite',st=>st.delete(k)), idbGet=k=>idbOp('readonly',st=>st.get(k));
 async function idbAll(){ try{ const db=await idb(); return await new Promise(r=>{ const tx=db.transaction('h'), st=tx.objectStore('h'), out=[]; const cur=st.openCursor(); cur.onsuccess=()=>{ const c=cur.result; if(c){ out.push([c.key,c.value]); c.continue(); } }; tx.oncomplete=()=>r(out); tx.onerror=()=>r(out); }); }catch(e){ return []; } }
 function rememberHandle(c,h){ if(!h||!c) return; c.handle=h; idbPut(clipKey(c),{h,name:c.name,size:c.size,at:Date.now()}); }
+// Installierte Safari-App am Mac: dort öffnet macOS das Dateifenster teils gar nicht (WebKit-Fehler 277884) – dann den Weg übers Ziehen zeigen
+const WK_APP=!FSA&&/Macintosh/.test(navigator.userAgent)&&!/Chrome|Firefox/.test(navigator.userAgent)&&(matchMedia('(display-mode: standalone)').matches||navigator.standalone===true);
+function pickWatch(inp){ if(!WK_APP||!inp) return; let ok=false; const on=()=>{ ok=true; }; window.addEventListener('blur',on,{once:true}); inp.addEventListener('change',on,{once:true}); inp.addEventListener('cancel',on,{once:true});
+  setTimeout(()=>{ window.removeEventListener('blur',on); if(!ok) toast('Kein Fenster aufgegangen? Das ist ein Fehler von macOS in der installierten App. Videos aus dem Finder ins Fenster ziehen – oder Video-Lab im Browser öffnen.',9000); },1500); }
 async function pickVideos(target){
-  if(!FSA||FSA_BAD){ pickTarget=target||null; $('#fileIn').click(); return; }
+  if(!FSA||FSA_BAD){ pickTarget=target||null; pickWatch($('#fileIn')); $('#fileIn').click(); return; }
   const t0=performance.now(); let hs; try{ hs=await window.showOpenFilePicker({multiple:!target,types:[{description:'Videos',accept:{'video/*':['.mp4','.mov','.m4v','.mkv','.webm','.mts','.avi']}}]}); }
   catch(e){ if(!fsaFail(e,t0)) return; pickTarget=target||null; $('#fileIn').click(); toast('Das Dateifenster des Browsers liess sich nicht öffnen – die einfache Auswahl wird verwendet. Geht nichts auf: bitte nochmals klicken.',5200); return; }
   const files=[]; for(const h of hs){ try{ const f=await h.getFile(); f._h=h; files.push(f); }catch(e){} }
@@ -8610,7 +8614,7 @@ function finishExport(){
   try{ r.stop(); }catch(e){}
 }
 
-$('.btn-add').addEventListener('click',e=>{ if(FSA&&!FSA_BAD){ e.preventDefault(); pickVideos(); } });
+$('.btn-add').addEventListener('click',e=>{ if(FSA&&!FSA_BAD){ e.preventDefault(); pickVideos(); } else pickWatch($('#fileIn')); });
 $('#libQ').addEventListener('input',e=>{ LIB.q=e.target.value.trim().toLowerCase(); renderLib(); });
 $('#btnRestore').addEventListener('click',restorePending);
 $('#expX').addEventListener('click',()=>{ if(EXP.live){ EXP.cancel=true; } $('#expModal').classList.remove('on'); });
@@ -8675,7 +8679,7 @@ addEventListener('unhandledrejection',e=>{ FB.errs.push('Promise: '+String(e.rea
 function fbOn(){ return !!(typeof TRN_API!=='undefined'&&TRN_API); }
 const fbIco='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v12H8l-4 4z"/><path d="M12 7.5v4M12 14h.01"/></svg>';
 function fbInfo(){ const D=mode==='cmp'?A:mode==='gps'?GD:S, c=D&&D.clip, n=x=>x?(x.alias||x.name||'').slice(0,90):'';
-  return {build:'20261122161317'.startsWith('%%')?'dev':'20261122161317',env:window.VLAB_ENV||'live',url:location.pathname,lang:(window.vlabLang&&vlabLang.get())||'de',ua:navigator.userAgent.slice(0,240),
+  return {build:'20261122195821'.startsWith('%%')?'dev':'20261122195821',env:window.VLAB_ENV||'live',url:location.pathname,lang:(window.vlabLang&&vlabLang.get())||'de',ua:navigator.userAgent.slice(0,240),
     scr:screen.width+'×'+screen.height+' @'+(devicePixelRatio||1)+' · Fenster '+innerWidth+'×'+innerHeight,mem:navigator.deviceMemory||null,cpu:navigator.hardwareConcurrency||null,net:navigator.onLine?'online':'offline',
     view:mode+(mode==='cmp'&&$('#viewCmp').classList.contains('overlay')?' · overlay':''),clip:n(c),clipB:mode==='cmp'?n(B.clip):'',
     t:D&&D.ready?+(D.frame/D.fps).toFixed(2):null,fps:c&&c.fps||null,size:c?[c.w,c.h].join('×'):'',n:clips.length,errs:FB.errs.slice()}; }
@@ -9271,7 +9275,7 @@ const IS_BRAVE=!!navigator.brave;
 const DIR_RO=!DIR_OK&&('webkitdirectory' in document.createElement('input'))&&!/iPhone|iPad|Android/i.test(navigator.userAgent);
 function vDir(name){ const kids=new Map(); return {kind:'directory',name,ro:true,_k:kids,async *entries(){ for(const e of kids) yield e; }}; }
 function vFile(f){ return {kind:'file',name:f.name,ro:true,getFile:async()=>f}; }
-function ftPickRO(){ const i=document.createElement('input'); i.type='file'; i.webkitdirectory=true; i.multiple=true; i.hidden=true; document.body.appendChild(i);
+function ftPickRO(){ const i=document.createElement('input'); i.type='file'; i.webkitdirectory=true; i.multiple=true; i.style.cssText='position:fixed;left:-99px;top:0;width:1px;height:1px;opacity:0;pointer-events:none'; i.tabIndex=-1; document.body.appendChild(i); if(typeof pickWatch==='function') pickWatch(i);
   i.addEventListener('change',async()=>{ const fs=[...i.files]; i.remove(); if(!fs.length){ toast('In diesem Ordner sind keine Dateien.'); return; }
     const root=vDir((fs[0].webkitRelativePath||fs[0].name).split('/')[0]);
     for(const f of fs){ const parts=(f.webkitRelativePath||f.name).split('/').slice(1); if(!parts.length) continue; let d=root;
@@ -9954,7 +9958,7 @@ if(false&&!LS.get('hint1',0)){ setTimeout(()=>{ toast(matchMedia('(pointer:coars
 
 /* Update-Hinweis: prüft version.json auf GitHub Pages; «Aktualisieren» lädt die Seite ohne Cache neu */
 (()=>{
-  const BUILD='20261122161317'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
+  const BUILD='20261122195821'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
   // nach einem Update die ?v=… aus der Adresse entfernen
   try{ const u=new URL(location.href); if(u.searchParams.has('v')){ u.searchParams.delete('v'); history.replaceState(null,'',u.pathname+(u.search||'')+u.hash); } }catch(e){}
   const el=$('#upd'); let latest=null, snoozed=null, busy=false;
