@@ -4217,7 +4217,7 @@ function renderLib(){
   });
   if(typeof trnLibCloud==='function') trnLibCloud(el); /* Videos der laufenden Aktivität, die nicht auf diesem Gerät geöffnet sind */
   if(LIB.q&&!el.children.length){ const e0=document.createElement('div'); e0.className='lib-empty'; e0.textContent='Kein Video passt zu «'+LIB.q+'».'; el.appendChild(e0); }
-  const add=document.createElement('label'); add.className='add-tile'; add.htmlFor='fileIn'; add.addEventListener('click',e=>{ if(FSA){ e.preventDefault(); pickVideos(); } });
+  const add=document.createElement('label'); add.className='add-tile'; add.htmlFor='fileIn'; add.addEventListener('click',e=>{ if(FSA&&!FSA_BAD){ e.preventDefault(); pickVideos(); } });
   add.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>Videos hinzufügen<small>oder ins Fenster ziehen</small>';
   el.appendChild(add);
 }
@@ -8334,14 +8334,18 @@ function metaTitle(c){ const m=c.meta; return m&&m.ok?m.athlete+(m.place?' · '+
 
 /* ---------- Videos merken (Datei-Zugriff des Browsers) ---------- */
 const FSA=typeof window.showOpenFilePicker==='function';
+/* Dateifenster des Browsers blockiert (Richtlinie, eingebettetes Fenster, Browser ohne volle Unterstützung): ab dann die einfache Dateiauswahl nehmen */
+let FSA_BAD=false; try{ FSA_BAD=sessionStorage.getItem('vlab:fsaBad')==='1'; }catch(e){}
+function fsaFail(e,t0){ if(e&&e.name==='AbortError'&&!(t0&&performance.now()-t0<350)) return false; /* Abbruch durch die Person – ausser er kommt sofort: dann ging das Fenster gar nie auf */ FSA_BAD=true; try{ sessionStorage.setItem('vlab:fsaBad','1'); }catch(x){} if(window.vlabTrack) try{ vlabTrack('fsa_fail'); }catch(x){} return true; }
 function idb(){ return new Promise((res,rej)=>{ try{ const r=indexedDB.open('vlab',1); r.onupgradeneeded=()=>r.result.createObjectStore('h'); r.onsuccess=()=>res(r.result); r.onerror=()=>rej(r.error); }catch(e){ rej(e); } }); }
 async function idbOp(mode,fn){ try{ const db=await idb(); return await new Promise(r=>{ const tx=db.transaction('h',mode), st=tx.objectStore('h'); const q=fn(st); tx.oncomplete=()=>r(q&&q.result); tx.onerror=()=>r(null); }); }catch(e){ return null; } }
 const idbPut=(k,v)=>idbOp('readwrite',st=>st.put(v,k)), idbDel=k=>idbOp('readwrite',st=>st.delete(k)), idbGet=k=>idbOp('readonly',st=>st.get(k));
 async function idbAll(){ try{ const db=await idb(); return await new Promise(r=>{ const tx=db.transaction('h'), st=tx.objectStore('h'), out=[]; const cur=st.openCursor(); cur.onsuccess=()=>{ const c=cur.result; if(c){ out.push([c.key,c.value]); c.continue(); } }; tx.oncomplete=()=>r(out); tx.onerror=()=>r(out); }); }catch(e){ return []; } }
 function rememberHandle(c,h){ if(!h||!c) return; c.handle=h; idbPut(clipKey(c),{h,name:c.name,size:c.size,at:Date.now()}); }
 async function pickVideos(target){
-  if(!FSA){ pickTarget=target||null; $('#fileIn').click(); return; }
-  let hs; try{ hs=await window.showOpenFilePicker({multiple:!target,types:[{description:'Videos',accept:{'video/*':['.mp4','.mov','.m4v','.mkv','.webm','.mts','.avi']}}]}); }catch(e){ return; }
+  if(!FSA||FSA_BAD){ pickTarget=target||null; $('#fileIn').click(); return; }
+  const t0=performance.now(); let hs; try{ hs=await window.showOpenFilePicker({multiple:!target,types:[{description:'Videos',accept:{'video/*':['.mp4','.mov','.m4v','.mkv','.webm','.mts','.avi']}}]}); }
+  catch(e){ if(!fsaFail(e,t0)) return; pickTarget=target||null; $('#fileIn').click(); toast('Das Dateifenster des Browsers liess sich nicht öffnen – die einfache Auswahl wird verwendet. Geht nichts auf: bitte nochmals klicken.',5200); return; }
   const files=[]; for(const h of hs){ try{ const f=await h.getFile(); f._h=h; files.push(f); }catch(e){} }
   if(target&&files[0]){ const c=addClip({name:files[0].name,size:files[0].size,mod:files[0].lastModified,url:URL.createObjectURL(files[0])}); rememberHandle(c,files[0]._h); target.setClip(c); if(target!==S&&target!==GD) unlink(); syncSelects(); renderLib(); refreshSingleHead(); gpsSelects(); return; }
   if(files.length) addFiles(files);
@@ -8606,7 +8610,7 @@ function finishExport(){
   try{ r.stop(); }catch(e){}
 }
 
-$('.btn-add').addEventListener('click',e=>{ if(FSA){ e.preventDefault(); pickVideos(); } });
+$('.btn-add').addEventListener('click',e=>{ if(FSA&&!FSA_BAD){ e.preventDefault(); pickVideos(); } });
 $('#libQ').addEventListener('input',e=>{ LIB.q=e.target.value.trim().toLowerCase(); renderLib(); });
 $('#btnRestore').addEventListener('click',restorePending);
 $('#expX').addEventListener('click',()=>{ if(EXP.live){ EXP.cancel=true; } $('#expModal').classList.remove('on'); });
@@ -8671,7 +8675,7 @@ addEventListener('unhandledrejection',e=>{ FB.errs.push('Promise: '+String(e.rea
 function fbOn(){ return !!(typeof TRN_API!=='undefined'&&TRN_API); }
 const fbIco='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v12H8l-4 4z"/><path d="M12 7.5v4M12 14h.01"/></svg>';
 function fbInfo(){ const D=mode==='cmp'?A:mode==='gps'?GD:S, c=D&&D.clip, n=x=>x?(x.alias||x.name||'').slice(0,90):'';
-  return {build:'20261121111325'.startsWith('%%')?'dev':'20261121111325',env:window.VLAB_ENV||'live',url:location.pathname,lang:(window.vlabLang&&vlabLang.get())||'de',ua:navigator.userAgent.slice(0,240),
+  return {build:'20261122161317'.startsWith('%%')?'dev':'20261122161317',env:window.VLAB_ENV||'live',url:location.pathname,lang:(window.vlabLang&&vlabLang.get())||'de',ua:navigator.userAgent.slice(0,240),
     scr:screen.width+'×'+screen.height+' @'+(devicePixelRatio||1)+' · Fenster '+innerWidth+'×'+innerHeight,mem:navigator.deviceMemory||null,cpu:navigator.hardwareConcurrency||null,net:navigator.onLine?'online':'offline',
     view:mode+(mode==='cmp'&&$('#viewCmp').classList.contains('overlay')?' · overlay':''),clip:n(c),clipB:mode==='cmp'?n(B.clip):'',
     t:D&&D.ready?+(D.frame/D.fps).toFixed(2):null,fps:c&&c.fps||null,size:c?[c.w,c.h].join('×'):'',n:clips.length,errs:FB.errs.slice()}; }
@@ -9337,7 +9341,9 @@ async function ftAddRoot(h,persist=true){
 }
 async function ftConnect(){
   if(!DIR_OK){ if(DIR_RO) return ftPickRO(); toast('Ordnerzugriff gibt es in Chrome, Edge und Brave am Computer.',3500); return; }
-  let h; try{ h=await window.showDirectoryPicker({mode:'readwrite',id:'vlab-root'}); }catch(e){ return; }
+  if(typeof FSA_BAD!=='undefined'&&FSA_BAD) return ftPickRO();
+  const t0=performance.now(); let h; try{ h=await window.showDirectoryPicker({mode:'readwrite',id:'vlab-root'}); }
+  catch(e){ if(typeof fsaFail!=='function'||!fsaFail(e,t0)) return; toast('Das Ordnerfenster des Browsers liess sich nicht öffnen – der Ordner wird nur zum Ansehen eingelesen. Geht nichts auf: bitte nochmals klicken.',5200); return ftPickRO(); } /* blockiert: Ordner ohne Schreibzugriff einlesen */
   await ftAddRoot(h); setSideTab('tree');
 }
 async function ftRestore(){
@@ -9948,7 +9954,7 @@ if(false&&!LS.get('hint1',0)){ setTimeout(()=>{ toast(matchMedia('(pointer:coars
 
 /* Update-Hinweis: prüft version.json auf GitHub Pages; «Aktualisieren» lädt die Seite ohne Cache neu */
 (()=>{
-  const BUILD='20261121111325'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
+  const BUILD='20261122161317'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
   // nach einem Update die ?v=… aus der Adresse entfernen
   try{ const u=new URL(location.href); if(u.searchParams.has('v')){ u.searchParams.delete('v'); history.replaceState(null,'',u.pathname+(u.search||'')+u.hash); } }catch(e){}
   const el=$('#upd'); let latest=null, snoozed=null, busy=false;
