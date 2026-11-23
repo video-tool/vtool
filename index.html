@@ -8370,7 +8370,7 @@ function rememberHandle(c,h){ if(!h||!c) return; c.handle=h; idbPut(clipKey(c),{
 // Installierte Safari-App am Mac: dort öffnet macOS das Dateifenster teils gar nicht (WebKit-Fehler 277884) – dann den Weg übers Ziehen zeigen
 const WK_APP=!FSA&&/Macintosh/.test(navigator.userAgent)&&!/Chrome|Firefox/.test(navigator.userAgent)&&(matchMedia('(display-mode: standalone)').matches||navigator.standalone===true);
 function pickWatch(inp){ if(!WK_APP||!inp) return; let ok=false; const on=()=>{ ok=true; }; window.addEventListener('blur',on,{once:true}); inp.addEventListener('change',on,{once:true}); inp.addEventListener('cancel',on,{once:true});
-  setTimeout(()=>{ window.removeEventListener('blur',on); if(!ok) toast('Kein Fenster aufgegangen? Das ist ein Fehler von macOS in der installierten App. Videos aus dem Finder ins Fenster ziehen – oder Video-Lab im Browser öffnen.',9000); },1500); }
+  setTimeout(()=>{ window.removeEventListener('blur',on); if(!ok) toast('Kein Fenster aufgegangen? Das ist ein Fehler von macOS in der installierten App. Videos aus dem Finder ins Fenster ziehen – oder Video-Lab am Mac über Chrome installieren, dort geht es.',9000); },1500); }
 async function pickVideos(target){
   if(!FSA||FSA_BAD){ pickTarget=target||null; pickWatch($('#fileIn')); $('#fileIn').click(); return; }
   const t0=performance.now(); let hs; try{ hs=await window.showOpenFilePicker({multiple:!target,types:[{description:'Videos',accept:{'video/*':['.mp4','.mov','.m4v','.mkv','.webm','.mts','.avi']}}]}); }
@@ -8704,7 +8704,7 @@ addEventListener('unhandledrejection',e=>{ FB.errs.push('Promise: '+String(e.rea
 function fbOn(){ return !!(typeof TRN_API!=='undefined'&&TRN_API); }
 const fbIco='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v12H8l-4 4z"/><path d="M12 7.5v4M12 14h.01"/></svg>';
 function fbInfo(){ const D=mode==='cmp'?A:mode==='gps'?GD:S, c=D&&D.clip, n=x=>x?(x.alias||x.name||'').slice(0,90):'';
-  return {build:'20261123141346'.startsWith('%%')?'dev':'20261123141346',env:window.VLAB_ENV||'live',url:location.pathname,lang:(window.vlabLang&&vlabLang.get())||'de',ua:navigator.userAgent.slice(0,240),
+  return {build:'20261123152539'.startsWith('%%')?'dev':'20261123152539',env:window.VLAB_ENV||'live',url:location.pathname,lang:(window.vlabLang&&vlabLang.get())||'de',ua:navigator.userAgent.slice(0,240),
     scr:screen.width+'×'+screen.height+' @'+(devicePixelRatio||1)+' · Fenster '+innerWidth+'×'+innerHeight,mem:navigator.deviceMemory||null,cpu:navigator.hardwareConcurrency||null,net:navigator.onLine?'online':'offline',
     view:mode+(mode==='cmp'&&$('#viewCmp').classList.contains('overlay')?' · overlay':''),clip:n(c),clipB:mode==='cmp'?n(B.clip):'',
     t:D&&D.ready?+(D.frame/D.fps).toFixed(2):null,fps:c&&c.fps||null,size:c?[c.w,c.h].join('×'):'',n:clips.length,errs:FB.errs.slice()}; }
@@ -9983,7 +9983,7 @@ if(false&&!LS.get('hint1',0)){ setTimeout(()=>{ toast(matchMedia('(pointer:coars
 
 /* Update-Hinweis: prüft version.json auf GitHub Pages; «Aktualisieren» lädt die Seite ohne Cache neu */
 (()=>{
-  const BUILD='20261123141346'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
+  const BUILD='20261123152539'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
   // nach einem Update die ?v=… aus der Adresse entfernen
   try{ const u=new URL(location.href); if(u.searchParams.has('v')){ u.searchParams.delete('v'); history.replaceState(null,'',u.pathname+(u.search||'')+u.hash); } }catch(e){}
   const el=$('#upd'); let latest=null, snoozed=null, busy=false;
