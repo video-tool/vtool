@@ -8704,7 +8704,7 @@ addEventListener('unhandledrejection',e=>{ FB.errs.push('Promise: '+String(e.rea
 function fbOn(){ return !!(typeof TRN_API!=='undefined'&&TRN_API); }
 const fbIco='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v12H8l-4 4z"/><path d="M12 7.5v4M12 14h.01"/></svg>';
 function fbInfo(){ const D=mode==='cmp'?A:mode==='gps'?GD:S, c=D&&D.clip, n=x=>x?(x.alias||x.name||'').slice(0,90):'';
-  return {build:'20261123184828'.startsWith('%%')?'dev':'20261123184828',env:window.VLAB_ENV||'live',url:location.pathname,lang:(window.vlabLang&&vlabLang.get())||'de',ua:navigator.userAgent.slice(0,240),
+  return {build:'20261123190935'.startsWith('%%')?'dev':'20261123190935',env:window.VLAB_ENV||'live',url:location.pathname,lang:(window.vlabLang&&vlabLang.get())||'de',ua:navigator.userAgent.slice(0,240),
     scr:screen.width+'×'+screen.height+' @'+(devicePixelRatio||1)+' · Fenster '+innerWidth+'×'+innerHeight,mem:navigator.deviceMemory||null,cpu:navigator.hardwareConcurrency||null,net:navigator.onLine?'online':'offline',
     view:mode+(mode==='cmp'&&$('#viewCmp').classList.contains('overlay')?' · overlay':''),clip:n(c),clipB:mode==='cmp'?n(B.clip):'',
     t:D&&D.ready?+(D.frame/D.fps).toFixed(2):null,fps:c&&c.fps||null,size:c?[c.w,c.h].join('×'):'',n:clips.length,errs:FB.errs.slice()}; }
@@ -8778,7 +8778,7 @@ function admPwForm(msg){ const m=admShell('<form class="use-pw adm-pw"><p>Bitte 
   const f=$('form',m), inp=$('input',f), go=$('button',f); $('.err',f).textContent=msg||''; setTimeout(()=>inp.focus(),60);
   f.onsubmit=async ev=>{ ev.preventDefault(); if(!inp.value) return; go.disabled=true; go.textContent='Prüfen …'; ADM.pw=inp.value; inp.value=''; await admLoad(); }; }
 async function admLoad(){ const j=await admCall('vlab_adm_list'); if(!j.ok){ if(j.err==='denied'||j.err==='auth') ADM.pw=null; if(!ADM.pw||!ADM.d){ ADM.pw=null; admPwForm(ADMERR[j.err]||'Fehler.'); } else toast(ADMERR[j.err]||'Fehler.'); return false; }
-  ADM.d=j; admRender(); return true; }
+  j.ext=(j.ext||[]).map(u=>Object.assign(u,{x:true})); ADM.d=j; admRender(); return true; } /* ext = Protern-/Gate-to-Gate-Zugänge mit angemeldeten Geräten: nur ansehen und Geräte freigeben */
 const admAct=u=>u.aktiv!==false;
 function admCnt(o){ return ADM.d.users.filter(u=>u.org===o.id&&admAct(u)).length; }
 function admFull(o){ return o.max!=null&&admCnt(o)>=o.max; }
@@ -8794,25 +8794,25 @@ function admCols(showOrg){ return '30px 34px minmax(130px,1.1fr) minmax(160px,1.
 function admUserRow(u,showOrg){ const dv=u.dev||[], nd=dv.filter(x=>x.kind!=='mobile').length, nm=dv.length-nd, op=ADM.open===u.e, on=admAct(u), og=ADM.d.orgs.find(o=>o.id===u.org);
   const orgs=ADM.d.orgs.map(o=>'<option value="'+esc(o.id)+'"'+(o.id===u.org?' selected':'')+(o.id!==u.org&&admFull(o)&&on?' disabled':'')+'>'+esc(o.name)+(o.id!==u.org&&admFull(o)&&on?' (voll)':'')+'</option>').join('');
   return '<div class="adm-u'+(on?'':' off')+(op?' op':'')+(ADM.sel.has(u.e)?' sel':'')+'" data-e="'+esc(u.e)+'"><div class="adm-ur" data-a="tog" role="button" tabindex="0" aria-expanded="'+op+'">'
-    +'<span class="adm-ck"><input type="checkbox" aria-label="Auswählen"'+(ADM.sel.has(u.e)?' checked':'')+'></span>'
+    +'<span class="adm-ck"><input type="checkbox" aria-label="Auswählen"'+(ADM.sel.has(u.e)?' checked':'')+(u.x?' disabled':'')+'></span>'
     +'<span class="adm-av">'+esc(admIni(u))+'</span>'
-    +'<span class="adm-un"><b>'+esc(u.n||u.e.split('@')[0])+'</b>'+(on?'':'<em class="adm-tag">inaktiv</em>')+'</span>'
+    +'<span class="adm-un"><b>'+esc(u.n||u.e.split('@')[0])+'</b>'+(on?'':'<em class="adm-tag">inaktiv</em>')+(u.x?'<em class="adm-tag">Protern</em>':'')+'</span>'
     +'<span class="adm-ue">'+esc(u.e)+'</span>'
-    +(showOrg?'<span class="adm-uo">'+(og?esc(og.name):'<i>ohne Verband</i>')+'</span>':'')
+    +(showOrg?'<span class="adm-uo">'+(u.x?'<i>Protern-Zugang</i>':og?esc(og.name):'<i>ohne Verband</i>')+'</span>':'')
     +'<span class="adm-role">'+(u.r==='athlete'?'Athlet:in':'Coach')+'</span>'
     +'<span class="adm-dv" title="Computer / Handys">'+ADMI.desk+nd+ADMI.mob+nm+'</span>'
     +'<span class="adm-ago" title="Zuletzt angemeldet">'+esc(admAgo(u.last))+'</span>'
     +'<i class="adm-uchev">'+ADMCH+'</i></div>'
-    +(op?'<div class="adm-ux"><label>Verband<select data-a="org"><option value="">– ohne Verband –</option>'+orgs+'</select></label>'
+    +(op?'<div class="adm-ux">'+(u.x?'<small>Protern-Zugang: Passwort und Konto werden bei Protern verwaltet. Hier lassen sich die angemeldeten Geräte freigeben.</small>':'<label>Verband<select data-a="org"><option value="">– ohne Verband –</option>'+orgs+'</select></label>')
       +'<div class="adm-devs"><span class="adm-xh">Geräte</span>'+(dv.length?dv.map(x=>'<div class="adm-d">'+(x.kind==='mobile'?ADMI.mob:ADMI.desk)+'<span>'+esc(x.label||'Gerät')+'<small>zuletzt '+esc(admAgo(x.seen))+'</small></span><button data-a="dev" data-v="'+esc(x.dev)+'">Freigeben</button></div>').join(''):'<small>Keine Geräte angemeldet.</small>')+'</div>'
-      +'<div class="adm-btns"><button data-a="pw">Neues Passwort</button><button data-a="akt">'+(on?'Deaktivieren':'Aktivieren')+'</button><button class="danger" data-a="del">Löschen</button></div></div>':'')+'</div>'; }
+      +(u.x?'':'<div class="adm-btns"><button data-a="pw">Neues Passwort</button><button data-a="akt">'+(on?'Deaktivieren':'Aktivieren')+'</button><button class="danger" data-a="del">Löschen</button></div>')+'</div>':'')+'</div>'; }
 function admMatch(u){ const q=ADM.q.trim().toLowerCase(); return !q||(u.n||'').toLowerCase().includes(q)||u.e.includes(q); }
 function admRender(){ const D=ADM.d, m=$('#admModal'), q=ADM.q.trim(); if(!ADM.sel) ADM.sel=new Set(); if(!ADM.v) ADM.v='all';
-  if(ADM.v!=='all'&&ADM.v!=='none'&&!admIsOrg(ADM.v)) ADM.v='all';
+  if(ADM.v!=='all'&&ADM.v!=='none'&&!(ADM.v==='ext'&&D.ext.length)&&!admIsOrg(ADM.v)) ADM.v='all';
   const sc=m.querySelector('.adm-body'), top=sc&&ADM._lv===(q?'q':ADM.v)?sc.scrollTop:0;
   const none=D.users.filter(u=>!u.org||!admIsOrg(u.org)), V=q?'q':ADM.v, org=admIsOrg(V)?D.orgs.find(o=>o.id===V):null;
   ADM._lv=V; [...ADM.sel].forEach(e=>{ if(!D.users.some(u=>u.e===e)) ADM.sel.delete(e); });
-  let U=V==='q'?D.users.filter(admMatch):V==='all'?D.users:V==='none'?none:D.users.filter(u=>u.org===V);
+  let U=V==='q'?D.users.concat(D.ext).filter(admMatch):V==='ext'?D.ext:V==='all'?D.users:V==='none'?none:D.users.filter(u=>u.org===V);
   const U0=U, OLD=Date.now()-90*864e5, ST={all:u=>true,act:admAct,off:u=>!admAct(u),never:u=>!u.last,old:u=>!u.last||new Date(u.last)<OLD};
   if(!ST[ADM.st]) ADM.st='all'; U=U.filter(ST[ADM.st]);
   const nmOf=u=>String(u.n||u.e), ogOf=u=>{ const o=D.orgs.find(x=>x.id===u.org); return o?o.name:'~'; }, cmp=(x,y)=>String(x).localeCompare(String(y),'de',{numeric:true,sensitivity:'base'});
@@ -8825,16 +8825,18 @@ function admRender(){ const D=ADM.d, m=$('#admModal'), q=ADM.q.trim(); if(!ADM.s
   const nav='<nav class="adm-nav" aria-label="Verbände">'
     +nv('all','Alle Zugänge',nAct+' aktiv','<em class="adm-n">'+D.users.length+'</em>')
     +(none.length?nv('none','Ohne Verband','zuordnen','<em class="adm-n warn">'+none.length+'</em>','none'):'')
+    +(D.ext.length?nv('ext','Protern-Zugänge','nur Geräte','<em class="adm-n">'+D.ext.length+'</em>'):'')
     +typs.map(t=>'<div class="adm-nh">'+esc(t||'Weitere')+'</div>'+D.orgs.filter(o=>(o.typ||'')===t).map(o=>nv(o.id,esc(o.name),'','<em class="adm-cap'+(admFull(o)?' full':admCnt(o)?' some':'')+'">'+admCapTxt(o)+'</em>')).join('')).join('')+'</nav>';
   const nsel='<select class="adm-nsel" aria-label="Ansicht"><option value="all"'+(V==='all'?' selected':'')+'>Alle Zugänge ('+D.users.length+')</option>'+(none.length?'<option value="none"'+(V==='none'?' selected':'')+'>Ohne Verband ('+none.length+')</option>':'')
+    +(D.ext.length?'<option value="ext"'+(V==='ext'?' selected':'')+'>Protern-Zugänge ('+D.ext.length+')</option>':'')
     +typs.map(t=>'<optgroup label="'+esc(t||'Weitere')+'">'+D.orgs.filter(o=>(o.typ||'')===t).map(o=>'<option value="'+esc(o.id)+'"'+(V===o.id?' selected':'')+'>'+esc(o.name)+' · '+admCapTxt(o)+'</option>').join('')+'</optgroup>').join('')+'</select>';
   /* Kopf der Liste */
   let ph;
   if(org) ph='<div class="adm-ph"><div class="adm-pt"><h4>'+esc(org.name)+'</h4><span>'+esc(org.typ||'')+' · '+(org.max==null?'unbegrenzt viele Zugänge':'höchstens '+org.max+' aktive Zugänge')+'</span></div>'
     +'<div class="adm-pcap"><em class="adm-cap'+(admFull(org)?' full':'')+'">'+admCapTxt(org)+'</em></div>'
     +(U0.length?'<button class="adm-csv" title="Diese Liste als CSV-Datei (Excel) herunterladen">CSV</button>':'')+'<button class="btn-pri adm-add" data-new="'+esc(org.id)+'"'+(admFull(org)?' disabled title="Verband voll – zuerst einen Zugang deaktivieren"':'')+'>+ Zugang</button></div>';
-  else ph='<div class="adm-ph"><div class="adm-pt"><h4>'+(V==='q'?'Suche «'+esc(q)+'»':V==='none'?'Ohne Verband':'Alle Zugänge')+'</h4><span>'
-    +(V==='q'?U0.length+' Treffer':V==='none'?'Ältere Zugänge – auswählen und einem Verband zuordnen':nAct+' aktiv · '+(D.users.length-nAct)+' inaktiv')+'</span></div>'+(U0.length?'<button class="adm-csv" title="Diese Liste als CSV-Datei (Excel) herunterladen">CSV</button>':'')+'</div>';
+  else ph='<div class="adm-ph"><div class="adm-pt"><h4>'+(V==='q'?'Suche «'+esc(q)+'»':V==='none'?'Ohne Verband':V==='ext'?'Protern-Zugänge':'Alle Zugänge')+'</h4><span>'
+    +(V==='q'?U0.length+' Treffer':V==='none'?'Ältere Zugänge – auswählen und einem Verband zuordnen':V==='ext'?'Anmeldung mit Protern-Zugang – hier lassen sich nur Geräte freigeben':nAct+' aktiv · '+(D.users.length-nAct)+' inaktiv')+'</span></div>'+(U0.length?'<button class="adm-csv" title="Diese Liste als CSV-Datei (Excel) herunterladen">CSV</button>':'')+'</div>';
   const fl=U0.length?'<div class="adm-fl" role="group" aria-label="Filter">'+[['all','Alle'],['act','Aktiv'],['off','Inaktiv'],['never','Nie angemeldet'],['old','Über 90 Tage nicht da']].map(([k,l])=>{ const n=U0.filter(ST[k]).length; return '<button data-st="'+k+'" class="'+(ADM.st===k?'on':'')+'"'+(n||k==='all'||ADM.st===k?'':' disabled')+'>'+l+' <i>'+n+'</i></button>'; }).join('')+'</div>':'';
   /* Mehrfach-Auswahl */
   const nSel=ADM.sel.size, selAct=D.users.filter(u=>ADM.sel.has(u.e)&&admAct(u)).length;
@@ -8842,7 +8844,7 @@ function admRender(){ const D=ADM.d, m=$('#admModal'), q=ADM.q.trim(); if(!ADM.s
     +D.orgs.map(o=>{ const f=admFree(o), ok=f>=selAct; return '<option value="'+esc(o.id)+'"'+(ok?'':' disabled')+'>'+esc(o.name)+(o.max==null?'':' · noch '+f+' frei')+'</option>'; }).join('')
     +'</select><button class="btn-pri adm-bgo" disabled>Zuordnen</button><span class="adm-bsep"></span><button class="adm-bb" data-b="off">Deaktivieren</button><button class="adm-bb danger" data-b="del">Löschen</button><button class="adm-bx">Aufheben</button></div>':'';
   /* Tabelle */
-  const showOrg=!org, cols=admCols(showOrg), LIM=150, allSel=U.length&&U.every(u=>ADM.sel.has(u.e));
+  const showOrg=!org, cols=admCols(showOrg), LIM=150, allSel=U.some(u=>!u.x)&&U.every(u=>u.x||ADM.sel.has(u.e));
   const sh=(k,l,r)=>{ const on=ADM.sort&&ADM.sort.k===k; return '<button class="adm-so'+(on?' on':'')+(r?' r':'')+'" data-sort="'+k+'" title="Sortieren">'+l+'<i>'+(on?(ADM.sort.d>0?'▲':'▼'):'')+'</i></button>'; };
   const th='<div class="adm-th" style="--cols:'+cols+'"><span class="adm-ck"><input type="checkbox" class="adm-all" aria-label="Alle auswählen"'+(allSel?' checked':'')+'></span><span></span>'+sh('n','Name')+sh('e','E-Mail')+(showOrg?sh('org','Verband'):'')+sh('r','Rolle')+'<span>Geräte</span>'+sh('last','Zuletzt',1)+'<span></span></div>';
   const list=U.length?th+'<div class="adm-ul" style="--cols:'+cols+'">'+U.slice(0,LIM).map(u=>admUserRow(u,showOrg)).join('')+'</div>'+(U.length>LIM?'<div class="adm-more">… '+(U.length-LIM)+' weitere – über die Suche finden</div>':'')
@@ -8857,13 +8859,13 @@ function admRender(){ const D=ADM.d, m=$('#admModal'), q=ADM.q.trim(); if(!ADM.s
   const go=v=>{ ADM.v=v; ADM.q=''; ADM.open=''; admRender(); };
   m.querySelectorAll('.adm-nv').forEach(b=>b.onclick=()=>go(b.dataset.v)); $('.adm-nsel',m).onchange=e=>go(e.target.value);
   m.querySelectorAll('[data-new]').forEach(b=>b.onclick=()=>admNew(b.dataset.new));
-  const all=$('.adm-all',m); if(all) all.onchange=()=>{ U.forEach(u=>all.checked?ADM.sel.add(u.e):ADM.sel.delete(u.e)); admRender(); };
+  const all=$('.adm-all',m); if(all) all.onchange=()=>{ U.forEach(u=>{ if(!u.x) all.checked?ADM.sel.add(u.e):ADM.sel.delete(u.e); }); admRender(); };
   if(nSel){ const bo=$('.adm-bo',m), bg=$('.adm-bgo',m); bo.onchange=()=>{ bg.disabled=!bo.value; }; bg.onclick=()=>admBulk(bo.value); $('.adm-bx',m).onclick=()=>{ ADM.sel.clear(); admRender(); };
     m.querySelectorAll('.adm-bb').forEach(b=>b.onclick=()=>admBulkSet(b.dataset.b)); }
   m.querySelectorAll('[data-st]').forEach(b=>b.onclick=()=>{ ADM.st=b.dataset.st; ADM.open=''; admRender(); });
   m.querySelectorAll('[data-sort]').forEach(b=>b.onclick=()=>{ const k=b.dataset.sort, c=ADM.sort; ADM.sort=c&&c.k===k?(c.d>0?{k,d:-1}:null):{k,d:k==='last'?-1:1}; admRender(); });
   const cv=$('.adm-csv',m); if(cv) cv.onclick=()=>admCsv(U,org?org.name:V==='none'?'ohne-verband':V==='q'?'suche':'alle');
-  m.querySelectorAll('.adm-u').forEach(el=>{ const u=D.users.find(x=>x.e===el.dataset.e), ck=$('.adm-ck input',el);
+  m.querySelectorAll('.adm-u').forEach(el=>{ const u=D.users.find(x=>x.e===el.dataset.e)||D.ext.find(x=>x.e===el.dataset.e), ck=$('.adm-ck input',el);
     ck.onclick=e=>e.stopPropagation(); $('.adm-ck',el).onclick=e=>e.stopPropagation(); ck.onchange=()=>{ ck.checked?ADM.sel.add(u.e):ADM.sel.delete(u.e); admRender(); };
     const ur=$('.adm-ur',el); ur.onkeydown=e=>{ if(e.target===ur&&(e.key==='Enter'||e.key===' ')){ e.preventDefault(); ur.click(); } };
     el.querySelectorAll('[data-a]').forEach(b=>{ const a=b.dataset.a; if(a==='org') b.onchange=()=>admDo(u,'org',b.value); else b.onclick=()=>admUserAct(u,a,b); }); }); }
@@ -9983,7 +9985,7 @@ if(false&&!LS.get('hint1',0)){ setTimeout(()=>{ toast(matchMedia('(pointer:coars
 
 /* Update-Hinweis: prüft version.json auf GitHub Pages; «Aktualisieren» lädt die Seite ohne Cache neu */
 (()=>{
-  const BUILD='20261123184828'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
+  const BUILD='20261123190935'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
   // nach einem Update die ?v=… aus der Adresse entfernen
   try{ const u=new URL(location.href); if(u.searchParams.has('v')){ u.searchParams.delete('v'); history.replaceState(null,'',u.pathname+(u.search||'')+u.hash); } }catch(e){}
   const el=$('#upd'); let latest=null, snoozed=null, busy=false;
