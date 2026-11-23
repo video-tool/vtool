@@ -8704,7 +8704,7 @@ addEventListener('unhandledrejection',e=>{ FB.errs.push('Promise: '+String(e.rea
 function fbOn(){ return !!(typeof TRN_API!=='undefined'&&TRN_API); }
 const fbIco='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v12H8l-4 4z"/><path d="M12 7.5v4M12 14h.01"/></svg>';
 function fbInfo(){ const D=mode==='cmp'?A:mode==='gps'?GD:S, c=D&&D.clip, n=x=>x?(x.alias||x.name||'').slice(0,90):'';
-  return {build:'20261123190935'.startsWith('%%')?'dev':'20261123190935',env:window.VLAB_ENV||'live',url:location.pathname,lang:(window.vlabLang&&vlabLang.get())||'de',ua:navigator.userAgent.slice(0,240),
+  return {build:'20261123194447'.startsWith('%%')?'dev':'20261123194447',env:window.VLAB_ENV||'live',url:location.pathname,lang:(window.vlabLang&&vlabLang.get())||'de',ua:navigator.userAgent.slice(0,240),
     scr:screen.width+'×'+screen.height+' @'+(devicePixelRatio||1)+' · Fenster '+innerWidth+'×'+innerHeight,mem:navigator.deviceMemory||null,cpu:navigator.hardwareConcurrency||null,net:navigator.onLine?'online':'offline',
     view:mode+(mode==='cmp'&&$('#viewCmp').classList.contains('overlay')?' · overlay':''),clip:n(c),clipB:mode==='cmp'?n(B.clip):'',
     t:D&&D.ready?+(D.frame/D.fps).toFixed(2):null,fps:c&&c.fps||null,size:c?[c.w,c.h].join('×'):'',n:clips.length,errs:FB.errs.slice()}; }
@@ -8763,7 +8763,7 @@ const ADMI={x:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" strok
   mob:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="2.5" width="10" height="19" rx="2.5"/><path d="M11 18.5h2"/></svg>'};
 const ADMERR={denied:'Admin-Passwort falsch oder keine Admin-Rechte.',full:'Dieser Verband hat schon 2 aktive Zugänge. Zuerst einen deaktivieren oder löschen.',
   exists:'Diese E-Mail hat schon einen Zugang.',gtg:'Diese E-Mail ist ein Gate-to-Gate-Konto und kann sich schon anmelden.',bad:'Bitte Angaben prüfen (E-Mail).',
-  org:'Verband unbekannt.',self:'Den eigenen Zugang kann man nicht löschen.',gone:'Zugang nicht mehr vorhanden.',auth:'Bitte neu anmelden.',sql:'Server noch nicht eingerichtet (SQL fehlt).',net:'Keine Verbindung.'};
+  org:'Verband unbekannt.',orgname:'Einen Verband mit diesem Namen gibt es schon.',self:'Den eigenen Zugang kann man nicht löschen.',gone:'Zugang nicht mehr vorhanden.',auth:'Bitte neu anmelden.',sql:'Server noch nicht eingerichtet (SQL fehlt).',net:'Keine Verbindung.'};
 function admPwGen(){ const C='bdfgklmnprstvz', V='aeiou', r=new Uint32Array(8); crypto.getRandomValues(r); let s='';
   for(let i=0;i<6;i++) s+=(i%2?V:C)[r[i]%(i%2?V.length:C.length)]; return s[0].toUpperCase()+s.slice(1,3)+'-'+s.slice(3)+'-'+String(10+r[6]%90); }
 async function admCall(fn,body){ try{ const r=await vlabAuth.rpc(fn,Object.assign({p_t:vlabAuth.tok(),p_pw:ADM.pw},body||{})); if(r.status===404) return {ok:false,err:'sql'};
@@ -8834,9 +8834,9 @@ function admRender(){ const D=ADM.d, m=$('#admModal'), q=ADM.q.trim(); if(!ADM.s
   let ph;
   if(org) ph='<div class="adm-ph"><div class="adm-pt"><h4>'+esc(org.name)+'</h4><span>'+esc(org.typ||'')+' · '+(org.max==null?'unbegrenzt viele Zugänge':'höchstens '+org.max+' aktive Zugänge')+'</span></div>'
     +'<div class="adm-pcap"><em class="adm-cap'+(admFull(org)?' full':'')+'">'+admCapTxt(org)+'</em></div>'
-    +(U0.length?'<button class="adm-csv" title="Diese Liste als CSV-Datei (Excel) herunterladen">CSV</button>':'')+'<button class="btn-pri adm-add" data-new="'+esc(org.id)+'"'+(admFull(org)?' disabled title="Verband voll – zuerst einen Zugang deaktivieren"':'')+'>+ Zugang</button></div>';
+    +'<button class="adm-csv adm-oedit" title="Name, Typ und Anzahl Zugänge dieses Verbands ändern">Bearbeiten</button>'+(U0.length?'<button class="adm-csv adm-dl" title="Diese Liste als CSV-Datei (Excel) herunterladen">CSV</button>':'')+'<button class="btn-pri adm-add" data-new="'+esc(org.id)+'"'+(admFull(org)?' disabled title="Verband voll – zuerst einen Zugang deaktivieren"':'')+'>+ Zugang</button></div>';
   else ph='<div class="adm-ph"><div class="adm-pt"><h4>'+(V==='q'?'Suche «'+esc(q)+'»':V==='none'?'Ohne Verband':V==='ext'?'Protern-Zugänge':'Alle Zugänge')+'</h4><span>'
-    +(V==='q'?U0.length+' Treffer':V==='none'?'Ältere Zugänge – auswählen und einem Verband zuordnen':V==='ext'?'Anmeldung mit Protern-Zugang – hier lassen sich nur Geräte freigeben':nAct+' aktiv · '+(D.users.length-nAct)+' inaktiv')+'</span></div>'+(U0.length?'<button class="adm-csv" title="Diese Liste als CSV-Datei (Excel) herunterladen">CSV</button>':'')+'</div>';
+    +(V==='q'?U0.length+' Treffer':V==='none'?'Ältere Zugänge – auswählen und einem Verband zuordnen':V==='ext'?'Anmeldung mit Protern-Zugang – hier lassen sich nur Geräte freigeben':nAct+' aktiv · '+(D.users.length-nAct)+' inaktiv')+'</span></div>'+(U0.length?'<button class="adm-csv adm-dl" title="Diese Liste als CSV-Datei (Excel) herunterladen">CSV</button>':'')+'</div>';
   const fl=U0.length?'<div class="adm-fl" role="group" aria-label="Filter">'+[['all','Alle'],['act','Aktiv'],['off','Inaktiv'],['never','Nie angemeldet'],['old','Über 90 Tage nicht da']].map(([k,l])=>{ const n=U0.filter(ST[k]).length; return '<button data-st="'+k+'" class="'+(ADM.st===k?'on':'')+'"'+(n||k==='all'||ADM.st===k?'':' disabled')+'>'+l+' <i>'+n+'</i></button>'; }).join('')+'</div>':'';
   /* Mehrfach-Auswahl */
   const nSel=ADM.sel.size, selAct=D.users.filter(u=>ADM.sel.has(u.e)&&admAct(u)).length;
@@ -8850,7 +8850,7 @@ function admRender(){ const D=ADM.d, m=$('#admModal'), q=ADM.q.trim(); if(!ADM.s
   const list=U.length?th+'<div class="adm-ul" style="--cols:'+cols+'">'+U.slice(0,LIM).map(u=>admUserRow(u,showOrg)).join('')+'</div>'+(U.length>LIM?'<div class="adm-more">… '+(U.length-LIM)+' weitere – über die Suche finden</div>':'')
     :org?'<div class="adm-zero"><span class="use-ic">'+ADMI.ppl+'</span><b>Noch kein Zugang für '+esc(org.name)+'</b><small>'+(org.max==null?'Beliebig viele Zugänge möglich.':'Bis zu '+org.max+' aktive Zugänge.')+(none.length?' Oder ältere Zugänge unter «Ohne Verband» auswählen und zuordnen.':'')+'</small><button class="btn-pri" data-new="'+esc(org.id)+'">+ Ersten Zugang anlegen</button></div>'
     :'<div class="adm-zero"><b>'+(U0.length?'Keine Zugänge mit diesem Filter.':V==='q'?'Nichts gefunden.':'Noch keine Zugänge.')+'</b></div>';
-  const body='<div class="adm-bar"><input type="search" class="adm-q" placeholder="Name oder E-Mail suchen" value="'+esc(ADM.q)+'"><button class="btn-pri" data-new="">+ Neuer Zugang</button></div>'
+  const body='<div class="adm-bar"><input type="search" class="adm-q" placeholder="Name oder E-Mail suchen" value="'+esc(ADM.q)+'"><button class="adm-csv adm-oadd" title="Neuen Verband anlegen">+ Verband</button><button class="btn-pri" data-new="">+ Neuer Zugang</button></div>'
     +'<div class="adm-main">'+nav+'<section class="adm-pane">'+nsel+ph+fl+bulk+'<div class="adm-body">'+list+'</div></section></div>';
   admShell(body,D.orgs.length+' Verbände · '+nAct+' aktive Zugänge · angemeldet als '+(D.me||''));
   const nb=m.querySelector('.adm-body'); nb.scrollTop=top; const nvs=m.querySelector('.adm-nav .on'); if(nvs&&ADM._nt!=null) m.querySelector('.adm-nav').scrollTop=ADM._nt;
@@ -8864,7 +8864,8 @@ function admRender(){ const D=ADM.d, m=$('#admModal'), q=ADM.q.trim(); if(!ADM.s
     m.querySelectorAll('.adm-bb').forEach(b=>b.onclick=()=>admBulkSet(b.dataset.b)); }
   m.querySelectorAll('[data-st]').forEach(b=>b.onclick=()=>{ ADM.st=b.dataset.st; ADM.open=''; admRender(); });
   m.querySelectorAll('[data-sort]').forEach(b=>b.onclick=()=>{ const k=b.dataset.sort, c=ADM.sort; ADM.sort=c&&c.k===k?(c.d>0?{k,d:-1}:null):{k,d:k==='last'?-1:1}; admRender(); });
-  const cv=$('.adm-csv',m); if(cv) cv.onclick=()=>admCsv(U,org?org.name:V==='none'?'ohne-verband':V==='q'?'suche':'alle');
+  const oa=$('.adm-oadd',m); if(oa) oa.onclick=()=>admOrgForm(null); const oe=$('.adm-oedit',m); if(oe) oe.onclick=()=>admOrgForm(org);
+  const cv=$('.adm-dl',m); if(cv) cv.onclick=()=>admCsv(U,org?org.name:V==='none'?'ohne-verband':V==='q'?'suche':'alle');
   m.querySelectorAll('.adm-u').forEach(el=>{ const u=D.users.find(x=>x.e===el.dataset.e)||D.ext.find(x=>x.e===el.dataset.e), ck=$('.adm-ck input',el);
     ck.onclick=e=>e.stopPropagation(); $('.adm-ck',el).onclick=e=>e.stopPropagation(); ck.onchange=()=>{ ck.checked?ADM.sel.add(u.e):ADM.sel.delete(u.e); admRender(); };
     const ur=$('.adm-ur',el); ur.onkeydown=e=>{ if(e.target===ur&&(e.key==='Enter'||e.key===' ')){ e.preventDefault(); ur.click(); } };
@@ -8915,6 +8916,21 @@ function admNew(org){ const D=ADM.d, pw=admPwGen();
     const j=await admCall('vlab_adm_add',{p_e:e,p_n:f.n.value.trim(),p_org:f.org.value,p_r:f.r.value,p_h:h}); ADM.busy=false;
     if(!j.ok){ er.textContent=ADMERR[j.err]||'Fehler.'; go.disabled=false; go.textContent='Zugang anlegen'; if(j.err==='denied'){ ADM.pw=null; admPwForm(ADMERR.denied); } return; }
     const u={e,n:f.n.value.trim()}; await admLoad(); admShow('Zugang angelegt',u,p); }; }
+/* Verband anlegen (o = null) oder bearbeiten: Name, Typ (Überschrift in der Navigation) und höchstens aktive Zugänge (leer = unbegrenzt). Server: vlab_adm_org. */
+function admOrgForm(o){ const D=ADM.d, typs=[]; D.orgs.forEach(x=>{ if(x.typ&&!typs.includes(x.typ)) typs.push(x.typ); });
+  const m=admShell('<form class="adm-new"><label>Name des Verbands<input name="n" autocomplete="off" maxlength="80" required></label>'
+    +'<label>Typ<input name="t" list="admTyps" autocomplete="off" maxlength="40" required placeholder="z. B. Regionalverband"><datalist id="admTyps">'+typs.map(t=>'<option value="'+esc(t)+'">').join('')+'</datalist></label>'
+    +'<label>Höchstens aktive Zugänge<input name="mx" type="number" inputmode="numeric" min="1" max="999" step="1" placeholder="leer = unbegrenzt"></label>'
+    +'<span class="err"></span><div class="adm-btns"><button class="btn-pri" type="submit">'+(o?'Speichern':'Verband anlegen')+'</button><button type="button" data-b>Abbrechen</button></div></form>',o?'Verband bearbeiten':'Neuer Verband');
+  const f=$('form',m), er=$('.err',f), go=$('[type=submit]',f); if(o){ f.n.value=o.name; f.t.value=o.typ||''; f.mx.value=o.max==null?'':o.max; } else { f.t.value='Regionalverband'; f.mx.value=2; }
+  $('[data-b]',f).onclick=()=>admRender(); setTimeout(()=>f.n.focus(),60);
+  f.onsubmit=async ev=>{ ev.preventDefault(); if(ADM.busy) return; const n=f.n.value.trim(), t=f.t.value.trim(), mv=f.mx.value.trim(), mx=mv===''?null:Math.round(+mv);
+    if(!n||!t){ er.textContent='Bitte Name und Typ angeben.'; return; } if(mx!=null&&!(mx>=1&&mx<=999)){ er.textContent='Anzahl Zugänge: 1 bis 999, oder leer für unbegrenzt.'; return; }
+    if(D.orgs.some(x=>x.name.toLowerCase()===n.toLowerCase()&&(!o||x.id!==o.id))){ er.textContent=ADMERR.orgname; return; }
+    if(o&&mx!=null&&admCnt(o)>mx&&!confirm(o.name+' hat '+admCnt(o)+' aktive Zugänge, mehr als die neue Grenze '+mx+'. Sie bleiben aktiv; neue Zugänge sind erst möglich, wenn wieder Platz ist. Trotzdem speichern?')) return;
+    ADM.busy=true; go.disabled=true; const j=await admCall('vlab_adm_org',{p_id:o?o.id:null,p_name:n,p_typ:t,p_max:mx}); ADM.busy=false;
+    if(!j.ok){ er.textContent=ADMERR[j.err]||'Fehler.'; go.disabled=false; if(j.err==='denied'){ ADM.pw=null; admPwForm(ADMERR.denied); } return; }
+    if(j.id) ADM.v=j.id; ADM.q=''; toast(o?'Verband gespeichert.':'Verband angelegt.'); await admLoad(); }; }
 window.admMenuItem=(pop,close)=>{ if(!(window.vlabAuth&&vlabAuth.admin&&vlabAuth.admin())) return; const b=document.createElement('button'); b.className='vp-use vp-adm'; b.setAttribute('role','menuitem');
   b.innerHTML=ADMI.ppl+'Benutzer verwalten'; b.onclick=()=>{ close(); admOpen(); }; const o=$('.vp-out',pop); o?o.before(b):pop.appendChild(b); };
 window.admOpen=admOpen;
@@ -9818,11 +9834,11 @@ document.addEventListener('visibilitychange',async()=>{ if(SER.on&&!document.hid
   window.vlabUserUI=()=>{ const s=window.vlabAuth&&vlabAuth.get(), b=$('#btnOut'); if(!b) return; $('#btnOutAv').textContent=s?ini(s):'?'; b.title=s?(s.n||s.e):'Konto'; };
   $('#btnOut').addEventListener('click',e=>{ e.stopPropagation(); if(pop){ close(); return; } const s=window.vlabAuth&&vlabAuth.get()||{}, b=e.currentTarget;
     pop=document.createElement('div'); pop.className='vl-pop'; pop.setAttribute('role','menu');
-    pop.innerHTML='<div class="vp-h"><span class="vl-av"></span><div class="vp-t"><span class="vp-n"></span><span class="vp-e"></span>'+(ROLE[s.r]?'<span class="vp-r"></span>':'')+'</div></div><div class="vp-sep"></div>'+(window.vlabAuth&&vlabAuth.admin&&vlabAuth.admin()?'<button class="vp-use" role="menuitem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>Nutzungsanalyse</button><button class="vp-use vp-stg" role="menuitem"'+(stgOff()?' disabled title="Noch nicht aktiv"':'')+'><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6M10 3v6L4.5 18.5A1.7 1.7 0 0 0 6 21h12a1.7 1.7 0 0 0 1.5-2.5L14 9V3"/><path d="M7 15h10"/></svg>'+(window.VLAB_ENV==='staging'?'Zur Live-Seite':'Zur Staging-Seite')+'</button><div class="vp-sep"></div>':'')+'<button class="vp-lang" role="menuitem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1"/></svg>Einstellungen</button><button class="vp-out" role="menuitem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3"/><path d="M10 17l5-5-5-5"/><path d="M15 12H3"/></svg>Abmelden</button>';
+    pop.innerHTML='<div class="vp-h"><span class="vl-av"></span><div class="vp-t"><span class="vp-n"></span><span class="vp-e"></span>'+(ROLE[s.r]?'<span class="vp-r"></span>':'')+'</div></div><div class="vp-sep"></div>'+(window.vlabAuth&&vlabAuth.admin&&vlabAuth.admin()?'<button class="vp-use vp-ana" role="menuitem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>Nutzungsanalyse</button><button class="vp-use vp-stg" role="menuitem"'+(stgOff()?' disabled title="Noch nicht aktiv"':'')+'><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6M10 3v6L4.5 18.5A1.7 1.7 0 0 0 6 21h12a1.7 1.7 0 0 0 1.5-2.5L14 9V3"/><path d="M7 15h10"/></svg>'+(window.VLAB_ENV==='staging'?'Zur Live-Seite':'Zur Staging-Seite')+'</button><div class="vp-sep"></div>':'')+'<button class="vp-lang" role="menuitem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1"/></svg>Einstellungen</button><button class="vp-out" role="menuitem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3"/><path d="M10 17l5-5-5-5"/><path d="M15 12H3"/></svg>Abmelden</button>';
     $('.vl-av',pop).textContent=ini(s); $('.vp-n',pop).textContent=s.n||s.e||''; $('.vp-e',pop).textContent=s.n?s.e:''; if(ROLE[s.r]) $('.vp-r',pop).textContent=ROLE[s.r];
     $('.vp-lang',pop).addEventListener('click',()=>{ close(); settingsOpen(); }); if(window.trnMenuItem) trnMenuItem(pop,close); if(window.fbMenuItem) fbMenuItem(pop,close); if(window.admMenuItem) admMenuItem(pop,close);
     $('.vp-out',pop).addEventListener('click',()=>{ close(); if(window.vlabAuth) vlabAuth.logout(); });
-    { const u=$('.vp-use:not(.vp-stg)',pop); if(u) u.addEventListener('click',()=>{ close(); useOpen(); }); const g=$('.vp-stg',pop); if(g) g.addEventListener('click',()=>{ close(); stgGo(); }); }
+    { const u=$('.vp-ana',pop); /* eigene Klasse: «Training-Aktivität» steht davor und ist auch .vp-use, sonst bekam jener Knopf den Klick */ if(u) u.addEventListener('click',()=>{ close(); useOpen(); }); const g=$('.vp-stg',pop); if(g) g.addEventListener('click',()=>{ close(); stgGo(); }); }
     document.body.appendChild(pop); b.classList.add('on'); const r=b.getBoundingClientRect(), h=pop.offsetHeight, w=pop.offsetWidth;
     pop.style.left=Math.max(8,Math.min(innerWidth-w-8,r.right-w))+'px'; pop.style.top=(r.top-h-8>8?r.top-h-8:r.bottom+8)+'px'; });
   document.addEventListener('pointerdown',e=>{ if(pop&&!e.target.closest('.vl-pop,#btnOut')) close(); },true);
@@ -9985,7 +10001,7 @@ if(false&&!LS.get('hint1',0)){ setTimeout(()=>{ toast(matchMedia('(pointer:coars
 
 /* Update-Hinweis: prüft version.json auf GitHub Pages; «Aktualisieren» lädt die Seite ohne Cache neu */
 (()=>{
-  const BUILD='20261123190935'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
+  const BUILD='20261123194447'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
   // nach einem Update die ?v=… aus der Adresse entfernen
   try{ const u=new URL(location.href); if(u.searchParams.has('v')){ u.searchParams.delete('v'); history.replaceState(null,'',u.pathname+(u.search||'')+u.hash); } }catch(e){}
   const el=$('#upd'); let latest=null, snoozed=null, busy=false;
