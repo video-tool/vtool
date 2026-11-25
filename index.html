@@ -3668,6 +3668,17 @@ body #viewSingle .pbar #sTitle::after{font-size:12px}
   #sHost{container-type:size;align-items:center;justify-content:center}
   #sHost .stage.has:not(.portrait){flex:none;width:min(100cqw,calc(100cqh * var(--ar,16/9)));height:auto;aspect-ratio:var(--ar,16/9)}
 }
+
+/* Knopf-Hinweise im Player (js/80_feinschliff.js) */
+.btn-tip{position:fixed;z-index:2147482000;pointer-events:none;max-width:280px;background:var(--tip,#14181f);color:var(--tip-txt,#fff);font:600 12px/1.35 var(--font);padding:6px 9px;border-radius:8px;box-shadow:0 8px 24px -8px rgba(0,0,0,.45);opacity:0;transform:translateY(2px);transition:opacity .12s,transform .12s}
+.btn-tip.on{opacity:1;transform:none}
+
+/* Seitenleiste am Computer: grössere Vorschaubilder bei den Beispiel-Läufen, Zeilen etwas höher */
+@media (min-width:1000px){
+  .ft-demo .ft-th{width:64px!important;height:36px!important}
+  .ft-demo .ft-row.file{min-height:46px!important}
+  .ft-demo .ft-nm{font-size:12.5px!important}
+}
 </style>
 </head>
 <body class="m-single">
@@ -8818,7 +8829,7 @@ addEventListener('unhandledrejection',e=>{ FB.errs.push('Promise: '+String(e.rea
 function fbOn(){ return !!(typeof TRN_API!=='undefined'&&TRN_API); }
 const fbIco='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v12H8l-4 4z"/><path d="M12 7.5v4M12 14h.01"/></svg>';
 function fbInfo(){ const D=mode==='cmp'?A:mode==='gps'?GD:S, c=D&&D.clip, n=x=>x?(x.alias||x.name||'').slice(0,90):'';
-  return {build:'20261125105429'.startsWith('%%')?'dev':'20261125105429',env:window.VLAB_ENV||'live',url:location.pathname,lang:(window.vlabLang&&vlabLang.get())||'de',ua:navigator.userAgent.slice(0,240),
+  return {build:'20261125134359'.startsWith('%%')?'dev':'20261125134359',env:window.VLAB_ENV||'live',url:location.pathname,lang:(window.vlabLang&&vlabLang.get())||'de',ua:navigator.userAgent.slice(0,240),
     scr:screen.width+'×'+screen.height+' @'+(devicePixelRatio||1)+' · Fenster '+innerWidth+'×'+innerHeight,mem:navigator.deviceMemory||null,cpu:navigator.hardwareConcurrency||null,net:navigator.onLine?'online':'offline',
     view:mode+(mode==='cmp'&&$('#viewCmp').classList.contains('overlay')?' · overlay':''),clip:n(c),clipB:mode==='cmp'?n(B.clip):'',
     t:D&&D.ready?+(D.frame/D.fps).toFixed(2):null,fps:c&&c.fps||null,size:c?[c.w,c.h].join('×'):'',n:clips.length,errs:FB.errs.slice()}; }
@@ -9692,7 +9703,8 @@ function renderDemoList(){
   const el=$('#ftDemo'); if(!el) return; const q=FT.q||''; const ds=clips.filter(c=>c.demo&&c.meta&&c.meta.ok&&(!q||[c.name,c.meta.athlete,c.meta.place,c.meta.disc,c.meta.date,c.meta.run,DISC_LONG[c.meta.disc]].join(' ').toLowerCase().includes(q)));
   const any=clips.some(c=>c.demo&&c.meta&&c.meta.ok), show=any&&!FT.roots.length; el.hidden=!show; if(show&&!ds.length){ if(el._sig!=='none:'+q){ el._sig='none:'+q; el.innerHTML='<div class="ft-none">Keine Treffer für «'+q.replace(/[<>&]/g,'')+'»</div>'; } return; } const em=$('#ftEmpty'); if(em) em.classList.toggle('compact',show); if(!show) return;
   const on=c=>mode==='single'?S.clip===c:mode==='gps'?GD.clip===c:(A.clip===c||B.clip===c);
-  const gk=c=>(c.meta.place||'')+'|'+(c.meta.disc||'')+'|'+(c.meta.date||''), groups=new Map(); ds.forEach(c=>{ const k=gk(c); if(!groups.has(k)) groups.set(k,[]); groups.get(k).push(c); });
+  const gk=c=>(c.meta.place||'')+'|'+(c.meta.disc||'')+'|'+(c.meta.date||''), g0=new Map(); ds.forEach(c=>{ const k=gk(c); if(!g0.has(k)) g0.set(k,[]); g0.get(k).push(c); });
+  const groups=new Map([...g0].sort((a,b)=>(b[1][0].meta.key||0)-(a[1][0].meta.key||0))); /* neueste zuerst, ohne Datum am Schluss (Reihenfolge sonst wie bisher) */
   const act=mode+':'+ds.filter(on).map(c=>c.id).join(','); if(act!==DL.act){ DL.act=act; DL.closed.clear(); } /* neue Auswahl: Gruppen mit aktiven Videos wieder offen */
   const isOpen=(k,cs)=>{ if(q) return true; if(cs.some(on)) return !DL.closed.has(k); return DL.open===null?!ds.some(on)&&k===groups.keys().next().value:DL.open===k; };
   const sig=q+'|'+mode+'|'+[S,A,B,GD].map(d=>d.clip&&d.clip.id).join(',')+'|'+ds.map(c=>c.id+':'+(c.poster?1:0)).join(',')+'|'+[...groups].filter(([k,cs])=>isOpen(k,cs)).map(([k])=>k).join(';');
@@ -9705,7 +9717,7 @@ function renderDemoList(){
     const rows=new Map(); cs.forEach(c=>{ const m=c.meta, rk=(m.athlete||c.id)+'|'+(m.run||''); if(!rows.has(rk)) rows.set(rk,[]); const L=rows.get(rk); if(L.some(x=>(x.meta.cam||'')===(m.cam||''))) rows.set(rk+'|'+c.id,[c]); else L.push(c); }); /* derselbe Lauf aus mehreren Kameras = eine Zeile */
     const b0=base(m0), sx=nBase[b0]>1?gSex(cs):'', lbl=b0+(sx?' · '+(sx==='M'?'Herren':'Damen'):'');
     h.innerHTML=`<span class="ft-chev${open?' open':''}">${ICN.chev}</span><span class="dh-t"></span>`+(!open&&mode==='cmp'&&cs.some(on)?`<span class="ab-tags">${cs.includes(A.clip)?'<em class="ta">A</em>':''}${cs.includes(B.clip)?'<em class="tb">B</em>':''}</span>`:'')+`<span class="dh-d"></span><span class="dh-n">${rows.size}</span>`;
-    $('.dh-t',h).textContent=lbl; $('.dh-d',h).textContent=m0.date||''; el.appendChild(h);
+    $('.dh-t',h).textContent=lbl; $('.dh-d',h).textContent=(m0.date||'').replace(/\.20(\d\d)$/,'.$1'); /* 24.10.26: kurzes Jahr, damit der Name mehr Platz hat */ el.appendChild(h);
     { const t=$('.dh-t',h); if(t.scrollWidth>t.clientWidth+1) h.title=[lbl,m0.date].filter(Boolean).join(' · '); } /* Hinweis nur, wenn der Name abgeschnitten ist – sonst steht alles schon in der Zeile */
     if(!open) return;
     rows.forEach(L=>{ const c=L.find(on)||L[0], m=c.meta, multi=L.length>1, r=document.createElement('div');
@@ -10198,7 +10210,7 @@ if(false&&!LS.get('hint1',0)){ setTimeout(()=>{ toast(matchMedia('(pointer:coars
 
 /* Update-Hinweis: prüft version.json auf GitHub Pages; «Aktualisieren» lädt die Seite ohne Cache neu */
 (()=>{
-  const BUILD='20261125105429'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
+  const BUILD='20261125134359'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
   // nach einem Update die ?v=… aus der Adresse entfernen
   try{ const u=new URL(location.href); if(u.searchParams.has('v')){ u.searchParams.delete('v'); history.replaceState(null,'',u.pathname+(u.search||'')+u.hash); } }catch(e){}
   const el=$('#upd'); let latest=null, snoozed=null, busy=false;
@@ -10374,6 +10386,23 @@ async function preOvLoad(){ if(PRE_OV) return PRE_OV; try{ const r=await fetch('
 (function(){ const set=()=>{ const t=$('.tabs'); if(t&&t.offsetParent!==null&&getComputedStyle(t).position==='fixed') document.documentElement.style.setProperty('--tabsH',Math.round(innerHeight-t.getBoundingClientRect().top)+'px'); }; addEventListener('resize',set); addEventListener('orientationchange',()=>setTimeout(set,300)); setTimeout(set,0); setTimeout(set,800); try{ new ResizeObserver(set).observe($('.tabs')); }catch(e){} })();
 /* App aufgebaut → sichtbar machen */
 requestAnimationFrame(()=>requestAnimationFrame(()=>setTimeout(()=>document.documentElement.classList.remove('vboot'),30)));
+/* ---------- Knopf-Hinweise im Player (Computer mit Maus) ----------
+   Die Knöpfe haben einen title; der Browser zeigt ihn erst nach rund 1 s und unauffällig. Hier erscheint er nach kurzer
+   Zeit als dunkle Sprechblase über dem Knopf. Der title wird während des Zeigens entfernt (sonst kämen beide) und danach
+   unverändert wieder gesetzt – i18n ignoriert entfernte Attribute und erkennt den eigenen Text wieder, die Übersetzung bleibt also richtig. */
+(function(){
+  if(!matchMedia('(hover:hover) and (pointer:fine)').matches) return;
+  const tip=document.createElement('div'); tip.className='btn-tip'; tip.setAttribute('role','tooltip'); document.body.appendChild(tip);
+  let cur=null, tmr=0;
+  const hide=()=>{ clearTimeout(tmr); tip.classList.remove('on'); if(cur){ if(cur.dataset.tipT!=null){ if(!cur.hasAttribute('title')) cur.setAttribute('title',cur.dataset.tipT); delete cur.dataset.tipT; } /* hat der Code den title inzwischen neu gesetzt, diesen behalten */ cur=null; } };
+  const show=el=>{ const t=el.dataset.tipT; if(!t||cur!==el||!el.isConnected) return; tip.textContent=t; tip.classList.add('on');
+    const r=el.getBoundingClientRect(), w=tip.offsetWidth, h=tip.offsetHeight, x=Math.max(8,Math.min(innerWidth-w-8,r.left+r.width/2-w/2));
+    let y=r.top-h-8; if(y<8) y=r.bottom+8; tip.style.left=x+'px'; tip.style.top=y+'px'; };
+  document.addEventListener('pointerover',e=>{ const el=e.target.closest&&e.target.closest('.card.player button[title], .card.player label.ctl[title], .card.player .ctl-lab[title]');
+    if(el===cur) return; hide(); if(!el||!el.title) return; cur=el; el.dataset.tipT=el.title; el.removeAttribute('title'); tmr=setTimeout(()=>show(el),350); });
+  document.addEventListener('pointerdown',hide,true); document.addEventListener('keydown',hide,true); window.addEventListener('blur',hide);
+  document.addEventListener('scroll',hide,true);
+})();
 </script>
 </body>
 </html>
