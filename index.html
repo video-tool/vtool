@@ -8812,7 +8812,7 @@ addEventListener('unhandledrejection',e=>errTrack('Promise: '+String(e.reason&&e
 function fbOn(){ return !!(typeof TRN_API!=='undefined'&&TRN_API); }
 const fbIco='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v12H8l-4 4z"/><path d="M12 7.5v4M12 14h.01"/></svg>';
 function fbInfo(){ const D=mode==='cmp'?A:mode==='gps'?GD:S, c=D&&D.clip, n=x=>x?(x.alias||x.name||'').slice(0,90):'';
-  return {build:'20261125183407'.startsWith('%%')?'dev':'20261125183407',env:window.VLAB_ENV||'live',url:location.pathname,lang:(window.vlabLang&&vlabLang.get())||'de',ua:navigator.userAgent.slice(0,240),
+  return {build:'20261126085235'.startsWith('%%')?'dev':'20261126085235',env:window.VLAB_ENV||'live',url:location.pathname,lang:(window.vlabLang&&vlabLang.get())||'de',ua:navigator.userAgent.slice(0,240),
     scr:screen.width+'×'+screen.height+' @'+(devicePixelRatio||1)+' · Fenster '+innerWidth+'×'+innerHeight,mem:navigator.deviceMemory||null,cpu:navigator.hardwareConcurrency||null,net:navigator.onLine?'online':'offline',
     view:mode+(mode==='cmp'&&$('#viewCmp').classList.contains('overlay')?' · overlay':''),clip:n(c),clipB:mode==='cmp'?n(B.clip):'',
     t:D&&D.ready?+(D.frame/D.fps).toFixed(2):null,fps:c&&c.fps||null,size:c?[c.w,c.h].join('×'):'',n:clips.length,errs:FB.errs.slice()}; }
@@ -8862,6 +8862,8 @@ async function fbAdmin(el){ if(!el||!fbOn()||!USE.h) return; const s=vlabAuth.ge
         }catch(e){ d.textContent='Nicht erreichbar.'; } };
       box.appendChild(r); }); };
   load(); }
+/* Adresse der Live-App für Zugangs-Mails: auf eigener Domain deren Wurzel, sonst die GitHub-Adresse */
+function appUrl(){ return /(^|\.)github\.io$|^localhost$|^127\./.test(location.hostname)?'https://video-tool.github.io/vtool/':location.origin+'/'; }
 /* Benutzerverwaltung (nur Admins, Profil-Menü › Benutzer verwalten). Der Server prüft Sitzung, Admin-Liste und Admin-Passwort
    (vlab_adm_list / vlab_adm_add / vlab_adm_set). Das Admin-Passwort bleibt nur im Speicher dieser Seite. Pro Verband höchstens
    so viele aktive Zugänge wie vlab_orgs.max (Swiss-Ski unbegrenzt) – der Server blockiert, die Anzeige warnt vorher. */
@@ -9013,8 +9015,8 @@ async function admUserAct(u,a,b){ if(a==='tog'){ ADM.open=ADM.open===u.e?'':u.e;
     const h=await vlabAuth.hash(u.e,pw); if(await admDo(u,'pw',h)) admShow('Neues Passwort',u,pw); } }
 function admShow(title,u,pw){ const m=admShell('<div class="adm-done"><h4></h4><dl><dt>E-Mail</dt><dd class="e"></dd><dt>Passwort</dt><dd class="p"></dd></dl><p>Das Passwort ist nur jetzt sichtbar. Bitte direkt weitergeben.</p><div class="adm-btns"><button class="btn-pri" data-c>Kopieren</button><button data-m>Per E-Mail senden</button><button data-b>Zurück zur Übersicht</button></div></div>');
   $('h4',m).textContent=title+(u.n?' · '+u.n:''); $('.e',m).textContent=u.e; $('.p',m).textContent=pw;
-  $('[data-c]',m).onclick=async()=>{ const t='Video-Lab: https://video-tool.github.io/vtool/\nE-Mail: '+u.e+'\nPasswort: '+pw; try{ await navigator.clipboard.writeText(t); toast('Kopiert.'); }catch(e){ toast('Kopieren nicht möglich – bitte abschreiben.'); } };
-  $('[data-m]',m).onclick=()=>{ const b='Hallo\n\nhier dein Zugang zum Video-Lab von Swiss-Ski:\n\nAdresse: https://video-tool.github.io/vtool/\nE-Mail: '+u.e+'\nPasswort: '+pw+'\n\nBitte das Passwort nicht weitergeben.\n\nGruss';
+  $('[data-c]',m).onclick=async()=>{ const t='Video-Lab: '+appUrl()+'\nE-Mail: '+u.e+'\nPasswort: '+pw; try{ await navigator.clipboard.writeText(t); toast('Kopiert.'); }catch(e){ toast('Kopieren nicht möglich – bitte abschreiben.'); } };
+  $('[data-m]',m).onclick=()=>{ const b='Hallo\n\nhier dein Zugang zum Video-Lab von Swiss-Ski:\n\nAdresse: '+appUrl()+'\nE-Mail: '+u.e+'\nPasswort: '+pw+'\n\nBitte das Passwort nicht weitergeben.\n\nGruss';
     location.href='mailto:'+encodeURIComponent(u.e)+'?subject='+encodeURIComponent('Dein Zugang zum Video-Lab')+'&body='+encodeURIComponent(b); };
   $('[data-b]',m).onclick=()=>admRender(); }
 function admNew(org,pre){ const D=ADM.d, pw=admPwGen(); /* pre = Anmeldung aus dem Formular: Name und E-Mail vorausgefüllt, nach dem Anlegen im Board als «Zugang erstellt» markiert */
@@ -10194,7 +10196,7 @@ if(false&&!LS.get('hint1',0)){ setTimeout(()=>{ toast(matchMedia('(pointer:coars
 
 /* Update-Hinweis: prüft version.json auf GitHub Pages; «Aktualisieren» lädt die Seite ohne Cache neu */
 (()=>{
-  const BUILD='20261125183407'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
+  const BUILD='20261126085235'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
   // nach einem Update die ?v=… aus der Adresse entfernen
   try{ const u=new URL(location.href); if(u.searchParams.has('v')){ u.searchParams.delete('v'); history.replaceState(null,'',u.pathname+(u.search||'')+u.hash); } }catch(e){}
   const el=$('#upd'); let latest=null, snoozed=null, busy=false;
