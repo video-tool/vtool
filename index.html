@@ -4218,7 +4218,7 @@ async function readRange(src,start,len){
   const r=await fetch(src,{headers:{Range:'bytes='+start+'-'+(start+len-1)}}); if(r.status!==206) throw new Error('no range');
   const cr=r.headers.get('content-range')||''; const total=+(cr.split('/')[1]||0); return {d:new Uint8Array(await r.arrayBuffer()),total}; }
 async function mp4Fps(url){
-  let src=url; if(/^blob:/.test(url)) src=await (await fetch(url)).blob();
+  let src=url; if(typeof url==='string'&&/^blob:/.test(url)) src=await (await fetch(url)).blob();
   const u32=(d,o)=>((d[o]<<24)>>>0)+(d[o+1]<<16)+(d[o+2]<<8)+d[o+3], typ=(d,o)=>String.fromCharCode(d[o],d[o+1],d[o+2],d[o+3]);
   let off=0, total=Infinity, moov=null;
   for(let k=0;k<64&&off<total;k++){ const {d,total:t}=await readRange(src,off,16); if(t) total=t; if(d.length<8) break;
@@ -4258,7 +4258,7 @@ function addClip(o){
   const st=LS.get(clipKey(c),null);
   if(st){ c.markers=st.markers||[]; c.notes=st.notes||{}; c.anns=st.anns||[]; c.holds=st.holds||[]; c.loop=Object.assign(c.loop,st.loop||{}); c.loop.on=false; if(st.fps) c.manualFps=st.fps; }
   let res; c.whenFps=new Promise(r=>res=r); c._fpsRes=res;
-  if(o.pre) c.pre=o.pre;
+  if(o.pre) c.pre=o.pre; if(o.file instanceof Blob) c.file=o.file; /* Datei selbst merken: Bildrate und Bildzeiten direkt daraus lesen. fetch(blob-URL) holt am iPad die ganze Datei in den Speicher (2 GB → Video steht) */
   c.gen=new ThumbGen(c);
   clips.push(c); renderLibSoon(); return c;
 }
@@ -4275,7 +4275,7 @@ function addFiles(files){
   const gfs=[...files].filter(f=>/\.(csv|gpx|json|txt)$/i.test(f.name)); if(gfs.length){ importGpsFiles(gfs); if(gfs.length===files.length) return; files=[...files].filter(f=>!gfs.includes(f)); }
   const vids=[...files].filter(f=>/^video\//.test(f.type)||/\.(mp4|mov|m4v|mkv|webm|avi|mts)$/i.test(f.name));
   if(!vids.length){ toast('Keine Videodatei erkannt. MP4 oder MOV wählen.'); return; }
-  const added=vids.map(f=>{ const c=addClip({name:f.name,size:f.size,mod:f.lastModified,url:URL.createObjectURL(f)}); if(f._h) rememberHandle(c,f._h); return c; });
+  const added=vids.map(f=>{ const c=addClip({name:f.name,size:f.size,mod:f.lastModified,url:URL.createObjectURL(f),file:f}); if(f._h) rememberHandle(c,f._h); return c; });
   if(typeof noteOpen==='function') noteOpen(added);
   if(window.trnNew) trnNew(added); /* laufende Training-Aktivität: in die Cloud */
   if(mode==='single'){ S.setClip(added[0]); }
@@ -4371,7 +4371,7 @@ class ThumbGen{
   destroy(){ this.dead=true; try{ this.v.removeAttribute('src'); this.v.load(); this.v.remove(); }catch(e){} this.map.clear(); }
   async detect(){
     const v=this.v,c=this.c; let fps=null;
-    try{ fps=await mp4Fps(c.url); if(!(fps>=5&&fps<=1000)) fps=null; }catch(e){ fps=null; }
+    try{ fps=await mp4Fps(c.file||c.url); if(!(fps>=5&&fps<=1000)) fps=null; }catch(e){ fps=null; }
     if(!fps&&HAS_RVFC){
       fps=await new Promise(res=>{
         const ts=[]; let done=false;
@@ -5214,7 +5214,7 @@ $$('.tab').forEach(t=>t.addEventListener('click',()=>{ if(t.dataset.lay){ if(cur
 
 /* Dateien */
 $('#fileIn').addEventListener('change',e=>{ const fs=e.target.files; if(fs&&fs.length){
-  if(pickTarget&&fs.length===1){ const c=addClip({name:fs[0].name,size:fs[0].size,mod:fs[0].lastModified,url:URL.createObjectURL(fs[0])}); if(typeof noteOpen==='function') noteOpen([c]); pickTarget.setClip(c); if(pickTarget!==S) unlink(); syncSelects(); renderLib(); refreshSingleHead(); }
+  if(pickTarget&&fs.length===1){ const c=addClip({name:fs[0].name,size:fs[0].size,mod:fs[0].lastModified,url:URL.createObjectURL(fs[0]),file:fs[0]}); if(typeof noteOpen==='function') noteOpen([c]); pickTarget.setClip(c); if(pickTarget!==S) unlink(); syncSelects(); renderLib(); refreshSingleHead(); }
   else addFiles(fs); }
   pickTarget=null; e.target.value=''; });
 let dragN=0;
@@ -7335,7 +7335,7 @@ $('#catList').addEventListener('change',e=>{ const inp=e.target.closest('input[d
 $('#catSel').addEventListener('change',e=>{ const c=clips.find(x=>String(x.id)===e.target.value); if(c){ CAT.items.push(catItem(c)); catRender(); if(!(c.dur>0)) catDur(c).then(catRender); } });
 $('#catAddOpen').addEventListener('click',()=>{ if(!CAT.live) pickVideosForCat(); });
 async function pickVideosForCat(){ const inp=document.createElement('input'); inp.type='file'; inp.accept='video/*,.mov,.mp4,.m4v'; inp.multiple=true;
-  inp.onchange=()=>{ const fs=[...inp.files].filter(f=>/^video\//.test(f.type)||/\.(mp4|mov|m4v|webm)$/i.test(f.name)); fs.forEach(f=>{ const c=addClip({name:f.name,size:f.size,mod:f.lastModified,url:URL.createObjectURL(f)}); CAT.items.push({c,a:0,b:null}); catDur(c).then(catRender); }); renderLib(); catRender(); };
+  inp.onchange=()=>{ const fs=[...inp.files].filter(f=>/^video\//.test(f.type)||/\.(mp4|mov|m4v|webm)$/i.test(f.name)); fs.forEach(f=>{ const c=addClip({name:f.name,size:f.size,mod:f.lastModified,url:URL.createObjectURL(f),file:f}); CAT.items.push({c,a:0,b:null}); catDur(c).then(catRender); }); renderLib(); catRender(); };
   inp.click(); }
 $('#catRate').addEventListener('click',e=>{ const b=e.target.closest('[data-r]'); if(!b||CAT.live) return; CAT.rate=+b.dataset.r; $$('#catRate button').forEach(x=>x.classList.toggle('on',x===b)); catSummary(); });
 ['#catTitle','#catInfo','#catFade','#catAnn'].forEach(id=>$(id).addEventListener('change',catSummary));
@@ -8123,7 +8123,7 @@ function trnPicker(box,list,kind){ const pool=$('.trn-pool',box), inp=$('input',
 const TRN_MAX=95*1024*1024;
 async function trnShrink(c,prog){
   await Promise.race([catDur(c),new Promise(r=>setTimeout(r,8000))]); const fps0=c.fps||(await Promise.race([c.whenFps,new Promise(r=>setTimeout(()=>r(null),1500))]))||30, fps=Math.min(60,Math.max(15,fps0));
-  const orig=async()=>{ if(c.size>TRN_MAX) throw new Error('size'); const r=await fetch(c.url); return {blob:await r.blob(),w:c.w,h:c.h,small:false}; };
+  const orig=async()=>{ if(c.size>TRN_MAX) throw new Error('size'); return {blob:c.file||await (await fetch(c.url)).blob(),w:c.w,h:c.h,small:false}; };
   if(typeof VideoEncoder==='undefined'||typeof Mp4Muxer==='undefined'||!(c.dur>0)) return orig();
   /* Zeitgrenze: bleibt das Lesen eines Bildes hängen (auf dem iPhone bei manchen Videos), nicht ewig bei «Verkleinern 0 %» stehen, sondern das Original hochladen */
   const lim=(pr,ms)=>{ let to; return Promise.race([pr,new Promise((_,rej)=>{ to=setTimeout(()=>rej(new Error('Zeitgrenze')),ms); })]).finally(()=>clearTimeout(to)); };
@@ -8204,7 +8204,7 @@ async function trnLibGet(sid,v){ if(TRN.dl[v.id]!=null) return; const s=trnL().f
   try{ const r=await fetch(TRN_API+'/api/s/'+sid+'/v/'+v.id); if(!r.ok) throw new Error(r.status); const tot=+r.headers.get('Content-Length')||v.size||0; let blob;
     if(r.body&&r.body.getReader){ const rd=r.body.getReader(), parts=[]; let n=0; for(;;){ const {done,value}=await rd.read(); if(done) break; parts.push(value); n+=value.length; if(tot){ TRN.dl[v.id]=Math.min(.99,n/tot); trnLibDlUI(v.id,TRN.dl[v.id]); } } blob=new Blob(parts,{type:r.headers.get('Content-Type')||'video/mp4'}); }
     else blob=await r.blob();
-    const c=addClip({name:v.name||'Video.mp4',size:blob.size,mod:v.t||Date.now(),url:URL.createObjectURL(blob)}); c.trnVid=v.id;
+    const c=addClip({name:v.name||'Video.mp4',size:blob.size,mod:v.t||Date.now(),url:URL.createObjectURL(blob),file:blob}); c.trnVid=v.id;
     trnUpd(sid,q=>{ (q.up=q.up||{})[trnQK(q,c)]=v.id; }); delete TRN.dl[v.id];
     if(mode==='single'){ S.setClip(c); if(typeof refreshSingleHead==='function') refreshSingleHead(); } renderLib(); syncSelects(); toast('Geladen: '+metaTitle(c),1800);
   }catch(e){ delete TRN.dl[v.id]; trnLibDlUI(v.id,null); toast('Laden nicht möglich – kein Netz?',3200); } }
@@ -8410,7 +8410,7 @@ setTimeout(()=>{ if(trnOn()) trnBoot(); },900);
 async function cloudSync(){ if(!window.indexedDB) return; let db;
   try{ db=await new Promise((res,rej)=>{ const r=indexedDB.open('vlab-cloud',1); r.onupgradeneeded=()=>{ r.result.createObjectStore('clips',{keyPath:'id'}); }; r.onsuccess=()=>res(r.result); r.onerror=()=>rej(r.error); }); }catch(e){ return; }
   const L=await new Promise(res=>{ try{ const q=db.transaction('clips').objectStore('clips').getAll(); q.onsuccess=()=>res(q.result||[]); q.onerror=()=>res([]); }catch(e){ res([]); } }); db.close();
-  let n=0; for(const f of L){ if(!f.blob||clips.some(x=>x.cloud===f.id)) continue; const c=addClip({name:f.name,size:f.blob.size,mod:f.t||Date.now(),url:URL.createObjectURL(f.blob)}); c.cloud=f.id; n++; }
+  let n=0; for(const f of L){ if(!f.blob||clips.some(x=>x.cloud===f.id)) continue; const c=addClip({name:f.name,size:f.blob.size,mod:f.t||Date.now(),url:URL.createObjectURL(f.blob),file:f.blob}); c.cloud=f.id; n++; }
   if(n){ renderLib(); syncSelects(); } }
 window.cloudDel=async id=>{ try{ const db=await new Promise((res,rej)=>{ const r=indexedDB.open('vlab-cloud',1); r.onupgradeneeded=()=>r.result.createObjectStore('clips',{keyPath:'id'}); r.onsuccess=()=>res(r.result); r.onerror=()=>rej(); }); db.transaction('clips','readwrite').objectStore('clips').delete(id); }catch(e){} };
 setTimeout(cloudSync,700); document.addEventListener('visibilitychange',()=>{ if(!document.hidden) cloudSync(); });
@@ -8465,7 +8465,7 @@ async function pickVideos(target){
   const t0=performance.now(); let hs; try{ hs=await window.showOpenFilePicker({multiple:!target,types:[{description:'Videos',accept:{'video/*':['.mp4','.mov','.m4v','.mkv','.webm','.mts','.avi']}}]}); }
   catch(e){ if(!fsaFail(e,t0)) return; pickTarget=target||null; $('#fileIn').click(); toast('Das Dateifenster des Browsers liess sich nicht öffnen – die einfache Auswahl wird verwendet. Geht nichts auf: bitte nochmals klicken.',5200); return; }
   const files=[]; for(const h of hs){ try{ const f=await h.getFile(); f._h=h; files.push(f); }catch(e){} }
-  if(target&&files[0]){ const c=addClip({name:files[0].name,size:files[0].size,mod:files[0].lastModified,url:URL.createObjectURL(files[0])}); rememberHandle(c,files[0]._h); target.setClip(c); if(target!==S&&target!==GD) unlink(); syncSelects(); renderLib(); refreshSingleHead(); gpsSelects(); return; }
+  if(target&&files[0]){ const c=addClip({name:files[0].name,size:files[0].size,mod:files[0].lastModified,url:URL.createObjectURL(files[0]),file:files[0]}); rememberHandle(c,files[0]._h); target.setClip(c); if(target!==S&&target!==GD) unlink(); syncSelects(); renderLib(); refreshSingleHead(); gpsSelects(); return; }
   if(files.length) addFiles(files);
 }
 const PENDING=[];
@@ -8480,7 +8480,7 @@ async function restoreSession(){
   all.sort((a,b)=>(b[1].at||0)-(a[1].at||0));
   const ok=[], gone=[];
   for(const [k,v] of all){ if(k.startsWith('root:')) continue; if(clips.some(c=>clipKey(c)===k)) continue; let p='prompt'; try{ p=await v.h.queryPermission({mode:'read'}); }catch(e){}
-    if(p==='granted'){ try{ const f=await v.h.getFile(); const c=addClip({name:f.name,size:f.size,mod:f.lastModified,url:URL.createObjectURL(f)}); c.handle=v.h; ok.push(c); }catch(e){ idbDel(k); gone.push(v.name||k); } }
+    if(p==='granted'){ try{ const f=await v.h.getFile(); const c=addClip({name:f.name,size:f.size,mod:f.lastModified,url:URL.createObjectURL(f),file:f}); c.handle=v.h; ok.push(c); }catch(e){ idbDel(k); gone.push(v.name||k); } }
     else PENDING.push([k,v]); }
   if(ok.length){ if(!S.clip||S.clip.demo){ S.setClip(ok[0]); refreshSingleHead(); } renderLib(); syncSelects(); gpsSelects(); toast(ok.length===1?'Video der letzten Sitzung geöffnet':ok.length+' Videos der letzten Sitzung geöffnet'); }
   goneToast(gone);
@@ -8497,7 +8497,7 @@ async function restorePending(){
   if(!PENDING.length&&LAST_GONE.length){ LAST_GONE=[]; restoreUI(); pickVideos(); return; }
   const list=PENDING.splice(0); let n=0, first=null; const gone=[];
   for(const [k,v] of list){ try{ const p=await v.h.requestPermission({mode:'read'}); if(p!=='granted'){ PENDING.push([k,v]); continue; }
-      const f=await v.h.getFile(); const c=addClip({name:f.name,size:f.size,mod:f.lastModified,url:URL.createObjectURL(f)}); c.handle=v.h; n++; first=first||c; }
+      const f=await v.h.getFile(); const c=addClip({name:f.name,size:f.size,mod:f.lastModified,url:URL.createObjectURL(f),file:f}); c.handle=v.h; n++; first=first||c; }
     catch(e){ idbDel(k); gone.push(v.name||k); } }
   goneToast(gone); restoreUI(); if(first&&(!S.clip||S.clip.demo)){ S.setClip(first); refreshSingleHead(); }
   renderLib(); syncSelects(); gpsSelects(); if(n) toast(n===1?'Video wieder geöffnet':n+' Videos wieder geöffnet');
@@ -8816,7 +8816,7 @@ addEventListener('unhandledrejection',e=>errTrack('Promise: '+String(e.reason&&e
 function fbOn(){ return !!(typeof TRN_API!=='undefined'&&TRN_API); }
 const fbIco='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v12H8l-4 4z"/><path d="M12 7.5v4M12 14h.01"/></svg>';
 function fbInfo(){ const D=mode==='cmp'?A:mode==='gps'?GD:S, c=D&&D.clip, n=x=>x?(x.alias||x.name||'').slice(0,90):'';
-  return {build:'20261127084924'.startsWith('%%')?'dev':'20261127084924',env:window.VLAB_ENV||'live',url:location.pathname,lang:(window.vlabLang&&vlabLang.get())||'de',ua:navigator.userAgent.slice(0,240),
+  return {build:'20261127123746'.startsWith('%%')?'dev':'20261127123746',env:window.VLAB_ENV||'live',url:location.pathname,lang:(window.vlabLang&&vlabLang.get())||'de',ua:navigator.userAgent.slice(0,240),
     scr:screen.width+'×'+screen.height+' @'+(devicePixelRatio||1)+' · Fenster '+innerWidth+'×'+innerHeight,mem:navigator.deviceMemory||null,cpu:navigator.hardwareConcurrency||null,net:navigator.onLine?'online':'offline',
     view:mode+(mode==='cmp'&&$('#viewCmp').classList.contains('overlay')?' · overlay':''),clip:n(c),clipB:mode==='cmp'?n(B.clip):'',
     t:D&&D.ready?+(D.frame/D.fps).toFixed(2):null,fps:c&&c.fps||null,size:c?[c.w,c.h].join('×'):'',n:clips.length,errs:FB.errs.slice()}; }
@@ -9599,7 +9599,7 @@ async function ftOpen(node,target){
   let c=clipOfNode(node);
   if(!c){ let f; try{ f=await node.h.getFile(); }catch(e){ toast('Datei nicht lesbar – wurde sie verschoben?'); return; }
     c=clips.find(x=>!x.demo&&x.name===f.name&&x.size===f.size);
-    if(!c){ c=addClip({name:f.name,size:f.size,mod:f.lastModified,url:URL.createObjectURL(f)}); if(!node.ro) rememberHandle(c,node.h); }
+    if(!c){ c=addClip({name:f.name,size:f.size,mod:f.lastModified,url:URL.createObjectURL(f),file:f}); if(!node.ro) rememberHandle(c,node.h); }
     c._node=node; }
   if(mode==='single') { S.setClip(c); refreshSingleHead(); }
   else if(mode==='gps'){ GD.setClip(c); gpsSelects(); }
@@ -10102,7 +10102,7 @@ async function fieldSync(){ if(!window.indexedDB) return; let db;
     const nm=f.fname||(String(f.name||'Lauf').replace(/[^\wäöüÄÖÜéèà\- ]+/g,'').trim().replace(/\s+/g,'_')+'.'+(/webm/.test(f.mime||f.blob.type)?'webm':'mp4'));
     let c=clips.find(x=>x.field===f.id);
     if(c){ if(c.name!==nm){ c.name=nm; c.meta=parseName(nm); ch=true; } continue; } // in der Field-App umbenannt
-    c=addClip({name:nm,size:f.blob.size,mod:f.t0||f.created,url:URL.createObjectURL(f.blob)}); c.field=f.id; if(f.t0) c.fieldT0=f.t0; n++;
+    c=addClip({name:nm,size:f.blob.size,mod:f.t0||f.created,url:URL.createObjectURL(f.blob),file:f.blob}); c.field=f.id; if(f.t0) c.fieldT0=f.t0; n++;
     if(false&&f.marks&&f.marks.length&&!c.markers.length){ /* Marker aus der Feld-App: Funktion entfernt */ const mk=f.marks; c.whenFps.then(()=>{ const fps=c.fps||30; c.markers=[...new Set(mk.map(t=>Math.round(t*fps)))].sort((a,b)=>a-b); c.markers.forEach(fr=>{ if(!(c.notes||{})[fr]) setNote(c,fr,'Beim Filmen'); }); saveClip(c); renderLib(); decks.forEach(d=>{ if(d.clip===c){ d.dirty=true; } }); if(typeof renderMarks==='function') renderMarks(); }); } }
   clips.filter(c=>c.field&&!seen.has(c.field)&&!decks.some(d=>d.clip===c)).forEach(c=>{ removeClip(c,true); ch=true; }); // in der Field-App gelöscht
   if(n||ch){ renderLib(); syncSelects(); }
@@ -10204,7 +10204,7 @@ if(false&&!LS.get('hint1',0)){ setTimeout(()=>{ toast(matchMedia('(pointer:coars
 
 /* Update-Hinweis: prüft version.json auf GitHub Pages; «Aktualisieren» lädt die Seite ohne Cache neu */
 (()=>{
-  const BUILD='20261127084924'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
+  const BUILD='20261127123746'; if(!/^https?:/.test(location.protocol)||BUILD.startsWith('%%')) return;
   // nach einem Update die ?v=… aus der Adresse entfernen
   try{ const u=new URL(location.href); if(u.searchParams.has('v')){ u.searchParams.delete('v'); history.replaceState(null,'',u.pathname+(u.search||'')+u.hash); } }catch(e){}
   const el=$('#upd'); let latest=null, snoozed=null, busy=false;
